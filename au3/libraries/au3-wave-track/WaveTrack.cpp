@@ -1257,8 +1257,9 @@ void WaveTrack::Clear(double t0, double t1, bool moveClips)
 {
     bool addCutLines = false;
     bool split = false;
+    bool clearByTrimming = gPrefs->ReadBool("/GUI/NonDestructiveEditing", false);
 
-    HandleClear(t0, t1, addCutLines, split, moveClips);
+    HandleClear(t0, t1, addCutLines, split, moveClips, clearByTrimming);
 }
 
 /*! @excsafety{Strong} */
