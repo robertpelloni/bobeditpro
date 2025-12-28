@@ -1,5 +1,17 @@
 List of significant changes and bug fixes going back to version 1.1.0
 
+Changes in version 3.7.0 (Upcoming)
+
+This version introduces foundational features for the Adobe Audition Parity Roadmap.
+
+ Major Features
+   * Non-Destructive Editing (Experimental)
+     - Added a preference in Tracks Behaviors to enable non-destructive deletion.
+     - When enabled, deleting audio trims clips instead of removing sample data.
+   * Real-Time Effects on Clips
+     - Added underlying architecture to support real-time effects on individual clips.
+     - (Note: UI for this feature is in development).
+
 Changes in version 3.6.4
 
 This is a patch release. It fixes the following bugs: 

@@ -6,17 +6,19 @@ This roadmap outlines the strategic phases required to bring Audacity to feature
 *Focus: Bridging the gap between "Editor" and "DAW".*
 
 ### 1.1 Non-Destructive Waveform Editing
+**Status: In Progress / Experimental**
 **Current State**: Audacity is primarily destructive in Waveform view. Multitrack view has clips, but edits within them are often destructive or limited.
 **Goal**: All edits (cuts, fades, effects) should be non-destructive by default.
-*   **Virtual Clips**: Implement a robust "Clip" architecture where the underlying audio file is never touched.
+*   **Virtual Clips**: Implement a robust "Clip" architecture where the underlying audio file is never touched. (Initial implementation via `NonDestructiveEditing` pref).
 *   **Clip Layers**: Allow stacking clips/takes on a single track (Comping).
 *   **Undo History Persistence**: Save undo history with the project file (like Audition's "History" panel).
 
 ### 1.2 Enhanced Real-Time Effects Rack
+**Status: Foundation Laid**
 **Current State**: Audacity 3.2+ has real-time effects, but the UI and routing are basic compared to Audition's Rack.
 **Goal**: A fully featured, automatable Effects Rack.
 *   **Pre/Post Fader Slots**: Allow placing effects before or after the volume fader.
-*   **Clip-Level Effects**: Apply real-time effects to individual clips, not just tracks.
+*   **Clip-Level Effects**: Apply real-time effects to individual clips, not just tracks. (Infrastructure added in `WaveClipRealtimeEffects`).
 *   **Sidechaining**: Support sidechain inputs for compressors/gates.
 *   **Effect Chain Presets**: Save/load entire chains of effects.
 
