@@ -2,9 +2,9 @@
 
 ## Submodules
 
-| Path | URL | Status |
-|------|-----|--------|
-| `muse_framework` | `https://github.com/musescore/framework_tmp.git` | Active |
+| Path | URL | Status | Version (Commit) | Date Checked |
+|------|-----|--------|------------------|--------------|
+| `muse_framework` | `https://github.com/musescore/framework_tmp.git` | Active | `db0f4fd338c51996a72ea2fa05cc687e3686f1ec` | 2025-12-28 |
 
 ## Directory Layout
 
