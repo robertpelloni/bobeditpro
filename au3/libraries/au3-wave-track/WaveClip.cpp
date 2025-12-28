@@ -43,6 +43,10 @@ void WaveClipListener::WriteXMLAttributes(XMLWriter&) const
 {
 }
 
+void WaveClipListener::WriteXMLTags(XMLWriter&) const
+{
+}
+
 bool WaveClipListener::HandleXMLAttribute(
     const std::string_view&, const XMLAttributeValueView&)
 {
@@ -1263,6 +1267,10 @@ void WaveClip::WriteXML(size_t ii, XMLWriter& xmlFile) const
 
     mSequences[ii]->WriteXML(xmlFile);
     mEnvelope->WriteXML(xmlFile);
+
+    Attachments::ForEach([&](const WaveClipListener& listener){
+        listener.WriteXMLTags(xmlFile);
+    });
 
     for (const auto& clip: mCutLines) {
         clip->WriteXML(ii, xmlFile);
