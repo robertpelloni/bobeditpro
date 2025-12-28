@@ -49,6 +49,14 @@ bool WaveClipRealtimeEffects::HandleXMLAttribute(
     return false;
 }
 
+ XMLTagHandler* WaveClipRealtimeEffects::HandleXMLChild(const std::string_view& tag)
+ {
+     if (tag == RealtimeEffectList::XMLTag()) {
+         return static_cast<XMLTagHandler*>(this);
+     }
+     return nullptr;
+ }
+
 void WaveClipRealtimeEffects::MakeStereo(WaveClipListener&& other, bool aligned)
 {
     // When merging two mono clips into stereo, we need to decide what to do with effects.

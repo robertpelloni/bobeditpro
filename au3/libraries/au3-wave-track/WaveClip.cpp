@@ -53,6 +53,11 @@ bool WaveClipListener::HandleXMLAttribute(
     return false;
 }
 
+ XMLTagHandler* WaveClipListener::HandleXMLChild(const std::string_view&)
+ {
+     return nullptr;
+ }
+
 void WaveClipListener::MakeStereo(WaveClipListener&&, bool)
 {
 }
@@ -1226,7 +1231,10 @@ XMLTagHandler* WaveClip::HandleXMLChild(const std::string_view& tag)
         mCutLines.push_back(WaveClip::NewShared(1, pFirst->GetFactory(), format, mRate));
         return mCutLines.back().get();
     } else {
-        return nullptr;
+         auto pHandler = Attachments::FindIf([&](WaveClipListener& listener){
+             return listener.HandleXMLChild(tag);
+         });
+         return pHandler ? dynamic_cast<XMLTagHandler*>(pHandler) : nullptr;
     }
 }
 

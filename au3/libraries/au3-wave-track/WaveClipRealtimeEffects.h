@@ -30,6 +30,7 @@ public:
     void WriteXMLTags(XMLWriter& writer) const override;
     bool HandleXMLAttribute(
         const std::string_view& attr, const XMLAttributeValueView& valueView) override;
+    XMLTagHandler* HandleXMLChild(const std::string_view& tag) override;
     void MakeStereo(WaveClipListener&& other, bool aligned) override;
     void SwapChannels() override;
     void Erase(size_t index) override;

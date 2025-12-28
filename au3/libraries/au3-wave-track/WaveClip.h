@@ -62,6 +62,9 @@ struct WaveClipListener : WaveClipListenerBase {
     virtual bool HandleXMLAttribute(
         const std::string_view& attr, const XMLAttributeValueView& valueView);
 
+    // Default implementation returns nullptr
+    virtual XMLTagHandler* HandleXMLChild(const std::string_view& tag);
+
     //! Append the other's attachments to this, assuming concrete subclasses are
     //! the same
     /*!
