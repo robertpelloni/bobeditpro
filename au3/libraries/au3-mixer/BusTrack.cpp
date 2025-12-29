@@ -19,6 +19,14 @@ BusTrack::BusTrack(CreateToken&&)
 
 BusTrack::~BusTrack() = default;
 
+ auto BusTrack::ClassTypeInfo() -> const TypeInfo&
+ {
+    static Track::TypeInfo info{
+        { "bus", "bus", XO("Bus Track") },
+        true, &PlayableTrack::ClassTypeInfo() };
+    return info;
+ }
+
 Track::Holder BusTrack::Clone(bool backup) const
 {
     // Basic clone for now

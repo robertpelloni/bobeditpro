@@ -1,25 +1,25 @@
 # Handoff Log
 
 ## Session Summary
-*   **Version**: Updated to 3.7.2.
-*   **Submodules**: `bobcoin` and `muse_framework` updated.
+*   **Version**: 3.7.2.
 *   **Features Implemented**:
-    *   **Phase 1.1**: Non-Destructive Editing (Backend).
-    *   **Phase 1.2**: Clip Realtime Effects (Backend + Adapter).
-    *   **Phase 1.3**: Track Routing Data Model (`mRouteId`, `mPersistentId`).
-*   **Current Task**: Implementing Phase 1.3 Logic (Routing in `AudioIO.cpp`).
+    *   **Phase 1.3**: Track Routing & Bussing Logic (Backend).
+        *   `AudioIOSequences` updated to carry Bus Tracks.
+        *   `AudioIO` updated to allocate Bus Buffers and process routing/mixing.
+        *   `Au3Player` updated to populate Bus Tracks.
+        *   `BusTrack` integrated into Track Type system.
+*   **Current State**: Backend support for busses and routing is complete. UI is missing.
 
 ## Next Steps
-1.  **Analyze AudioIO Routing**: Determine how to inject intermediate buffers for Bus Tracks in `FillPlayBuffers`.
-2.  **Implement Mixing Logic**:
-    *   Identify Bus Tracks in the project.
-    *   Allocate buffers for them.
-    *   Route `WaveTrack` output to Bus buffers based on `GetRouteId()`.
-    *   Process Bus buffers (Apply effects/volume).
-    *   Mix Bus buffers to Master.
-3.  **UI**: Eventually add UI for selecting Route ID.
+1.  **Phase 1.3 UI**:
+    *   Add "Add Bus Track" command/menu.
+    *   Add "Route To" dropdown in Track Control Panel (TCP).
+    *   Visualize Bus Tracks in the Mixer Board.
+2.  **Phase 1.2 UI**:
+    *   Pre/Post Fader slots UI.
+    *   Clip Effects UI (currently no way to add effects to clips via UI).
 
 ## Active Context
-*   `PlayableTrack` now has `GetRouteId()` (defaults to 0/Master) and `GetPersistentId()`.
-*   `BusTrack` exists in `au3-mixer`.
-*   `WaveClipRealtimeEffects` handles clip effects.
+*   `PlayableTrack::MasterRouteId` is 0.
+*   `AudioIO` mixes to `mBusBuffers` if routed, then processes busses.
+*   `BusTrack` has `RealtimeEffectList`.

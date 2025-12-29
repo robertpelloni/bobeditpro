@@ -19,6 +19,8 @@ class MIXER_API BusTrack final : public PlayableTrack
 public:
     static const char* BusTrack_tag;
 
+    static const TypeInfo& ClassTypeInfo();
+
     BusTrack(CreateToken&&);
     virtual ~BusTrack();
 
@@ -42,5 +44,7 @@ public:
 private:
     RealtimeEffectList mEffects;
 };
+
+ENUMERATE_TRACK_TYPE(BusTrack);
 
 #endif

@@ -24,7 +24,7 @@ It needs:
 *   Volume/Pan controls.
 *   Input Buffers (summing point).
 
-**Status:** Scaffold implemented in `au3/libraries/au3-mixer/BusTrack.h`.
+**Status:** Scaffold implemented in `au3/libraries/au3-mixer/BusTrack.h`. Type Info registered.
 
 ### 2. Routing Logic
 Currently, `AudioIO` iterates `mPlaybackTracks` and mixes them to `mMasterBuffers`.
@@ -47,11 +47,14 @@ We need a `RoutingGraph` or `MixerGraph`.
     *   Process `BusTrack`s (apply bus effects).
     *   Sum `BusTrack` outputs (and tracks routed to Master) to `MasterBuffer`.
 
+    **Status:** Implemented. `AudioIO` now handles `mBusTracks`, allocates `mBusBuffers`, routes output, and processes busses.
+
 ## Risks & Challenges
 *   **Latency Compensation**: Busses introduce routing complexity. If a track goes to Master AND a Bus (Send), latency must be aligned.
-*   **Feedback Loops**: Need detection to prevent Bus A -> Bus B -> Bus A.
+*   **Feedback Loops**: Need detection to prevent Bus A -> Bus B -> Bus A. (Not yet implemented).
 *   **UI**: The Track Panel UI needs to show busses. They should probably sit at the bottom or in a separate folder.
 
 ## Next Steps
-*   Implement `AudioIO` routing logic (Phase 1.3 Step 3).
-*   Add Bus Track UI.
+*   **UI**: Add "Add Bus Track" menu item.
+*   **UI**: Add Routing Selector (Dropdown in Track Control Panel) to set `RouteId`.
+*   **Sends**: Implement Pre/Post Fader Sends.
