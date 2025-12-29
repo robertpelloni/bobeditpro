@@ -1,6 +1,10 @@
 List of significant changes and bug fixes going back to version 1.1.0
 
-Changes in version 3.7.0 (Upcoming)
+Changes in version 3.7.1 (Dev)
+
+   * Maintenance updates.
+
+Changes in version 3.7.0
 
 This version introduces foundational features for the Adobe Audition Parity Roadmap.
 
