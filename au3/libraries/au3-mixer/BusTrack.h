@@ -1,0 +1,46 @@
+/**********************************************************************
+
+  Audacity: A Digital Audio Editor
+
+  BusTrack.h
+
+  (c) 2024 Audacity Team
+
+**********************************************************************/
+
+#ifndef __AUDACITY_BUSTRACK__
+#define __AUDACITY_BUSTRACK__
+
+#include "au3-playable-track/PlayableTrack.h"
+#include "au3-realtime-effects/RealtimeEffectList.h"
+
+class MIXER_API BusTrack final : public PlayableTrack
+{
+public:
+    static const char* BusTrack_tag;
+
+    BusTrack(CreateToken&&);
+    virtual ~BusTrack();
+
+    // Track overrides
+    Track::Holder Clone(bool backup) const override;
+
+    // PlayableTrack overrides
+    bool GetMute() const override;
+    bool GetSolo() const override;
+
+    // Bus specific
+    RealtimeEffectList& GetEffects();
+    const RealtimeEffectList& GetEffects() const;
+
+    // XML
+    bool HandleXMLTag(const std::string_view& tag, const AttributesList& attrs) override;
+    void HandleXMLEndTag(const std::string_view& tag) override;
+    XMLTagHandler* HandleXMLChild(const std::string_view& tag) override;
+    void WriteXML(XMLWriter& xmlFile) const override;
+
+private:
+    RealtimeEffectList mEffects;
+};
+
+#endif
