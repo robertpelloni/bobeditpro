@@ -2227,11 +2227,42 @@ bool AudioIO::ProcessPlaybackSlices(
                     std::fill_n(pointers[i], len, .0f);
                 }
 
-                const auto discardable = pScope->Process(channelGroup, &pointers[0],
+                auto discardable = pScope->Process(channelGroup, &pointers[0],
                                                          mScratchPointers.data(),
                                                          // The single dummy output buffer:
                                                          mScratchPointers[mNumPlaybackChannels],
-                                                         mNumPlaybackChannels, len);
+                                                         mNumPlaybackChannels, len, RealtimeEffectList::Stage::PreFader);
+
+                for (int i = 0; i < seq->NChannels(); ++i) {
+                    auto& buffer = mProcessingBuffers[bufferIndex + i];
+                    buffer.erase(buffer.begin() + offset, buffer.begin() + offset + discardable);
+                }
+
+                // Update len after pre-fader discard
+                auto currentLen = len - discardable;
+
+                // Apply Gain (Pre-Pan)
+                float gain = 1.0f;
+                if (const auto wt = dynamic_cast<const WaveTrack*>(seq.get())) {
+                    gain = wt->GetVolume();
+                }
+
+                if (gain != 1.0f && currentLen > 0) {
+                    for (int i = 0; i < seq->NChannels(); ++i) {
+                        auto& buffer = mProcessingBuffers[bufferIndex + i];
+                        float* data = buffer.data() + offset;
+                        for(size_t s=0; s<currentLen; ++s) {
+                            data[s] *= gain;
+                        }
+                    }
+                }
+
+                // Post-Fader
+                discardable = pScope->Process(channelGroup, &pointers[0],
+                                              mScratchPointers.data(),
+                                              mScratchPointers[mNumPlaybackChannels],
+                                              mNumPlaybackChannels, currentLen, RealtimeEffectList::Stage::PostFader);
+
                 // Check for asynchronous user changes in mute, solo status
                 const auto silenced = SequenceShouldBeSilent(*seq);
                 for (int i = 0; i < seq->NChannels(); ++i) {
@@ -2239,7 +2270,7 @@ bool AudioIO::ProcessPlaybackSlices(
                     buffer.erase(buffer.begin() + offset, buffer.begin() + offset + discardable);
                     if (silenced) {
                         //TODO: fade out smoothly
-                        std::fill_n(buffer.data() + offset, len - discardable, 0);
+                        std::fill_n(buffer.data() + offset, currentLen - discardable, 0);
                     }
                 }
             }
@@ -2309,9 +2340,15 @@ bool AudioIO::ProcessPlaybackSlices(
                     auto& destBuffers = it->second;
                     const auto numChannels = seq->NChannels();
 
+                    float gain = 1.0f;
+                    if (const auto wt = dynamic_cast<const WaveTrack*>(seq.get())) {
+                        gain = wt->GetVolume();
+                    }
+
                     if (numChannels > 1) {
                         for (unsigned n = 0, cnt = std::min(numChannels, (size_t)destBuffers.size()); n < cnt; ++n) {
-                            const float volume = seq->GetChannelVolume(n);
+                            float volume = seq->GetChannelVolume(n);
+                            if (gain != 0.0f) volume /= gain; else volume = 0.0f;
                             for (unsigned i = 0; i < samplesAvailable; ++i) {
                                 destBuffers[n][i] += mProcessingBuffers[bufferIndex + n][i] * volume;
                             }
@@ -2319,7 +2356,8 @@ bool AudioIO::ProcessPlaybackSlices(
                     } else if (numChannels == 1) {
                         // Mix mono source to all bus channels
                         for (unsigned n = 0; n < destBuffers.size(); ++n) {
-                            const float volume = seq->GetChannelVolume(n);
+                            float volume = seq->GetChannelVolume(n);
+                            if (gain != 0.0f) volume /= gain; else volume = 0.0f;
                             for (unsigned i = 0; i < samplesAvailable; ++i) {
                                 destBuffers[n][i] += mProcessingBuffers[bufferIndex][i] * volume;
                             }
@@ -2333,9 +2371,16 @@ bool AudioIO::ProcessPlaybackSlices(
 
             auto& buffers = track.mBuffers;
             const auto numChannels = seq->NChannels();
+            float gain = 1.0f;
+            if (const auto wt = dynamic_cast<const WaveTrack*>(seq.get())) {
+                gain = wt->GetVolume();
+            }
+
             if (numChannels > 1) {
                 for (unsigned n = 0, cnt = std::min(numChannels, mNumPlaybackChannels); n < cnt; ++n) {
-                    const float volume = seq->GetChannelVolume(n);
+                    float volume = seq->GetChannelVolume(n);
+                    if (gain != 0.0f) volume /= gain; else volume = 0.0f;
+
                     for (unsigned i = 0; i < samplesAvailable; ++i) {
                         mProcessingBuffers[bufferIndex + n][i] *= volume;
                         mMasterBuffers[n][i] += mProcessingBuffers[bufferIndex + n][i];
@@ -2353,18 +2398,21 @@ bool AudioIO::ProcessPlaybackSlices(
                 for (unsigned n = 0; n < mNumPlaybackChannels; ++n) {
                     maxVolume = std::max(maxVolume, seq->GetChannelVolume(n));
                 }
+                float maxPan = maxVolume; // Approx
+                if (gain != 0.0f) maxPan /= gain; else maxPan = 0.0f;
 
                 // Mix mono source is duplicated into every output channel
                 // accounting for panning
                 for (unsigned n = 0; n < mNumPlaybackChannels; ++n) {
-                    const float volume = seq->GetChannelVolume(n);
+                    float volume = seq->GetChannelVolume(n);
+                    if (gain != 0.0f) volume /= gain; else volume = 0.0f;
                     for (unsigned i = 0; i < samplesAvailable; ++i) {
                         mMasterBuffers[n][i] += mProcessingBuffers[bufferIndex][i] * volume;
                     }
                 }
 
                 for (unsigned i = 0; i < samplesAvailable; ++i) {
-                    mProcessingBuffers[bufferIndex][i] *= maxVolume;
+                    mProcessingBuffers[bufferIndex][i] *= maxPan;
                 }
 
                 for (unsigned n = 0; n < mNumPlaybackChannels; ++n) {
