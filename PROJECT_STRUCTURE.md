@@ -1,12 +1,12 @@
 # Project Dashboard & Structure
 
 ## Version
-Current Version: 3.7.2
+Current Version: 3.7.3
 
 ## Submodules
 | Name | Path | Version (Commit) | Description |
 | :--- | :--- | :--- | :--- |
-| **bobcoin** | `bobcoin/` | `44f3944e89a5eba5f95113b56709bf7500265e04` | Bobcoin cryptocurrency submodule. |
+| **bobcoin** | `bobcoin/` | `d37fdfdb2ff6f19bce281b4e6793bcea82b86978` | Bobcoin cryptocurrency submodule. |
 | **muse_framework** | `muse_framework/` | `db0f4fd338c51996a72ea2fa05cc687e3686f1ec` | MuseScore UI Framework (Qt/QML based). |
 
 ## Directory Structure
