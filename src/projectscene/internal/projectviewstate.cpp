@@ -4,6 +4,10 @@
 
 #include <memory>
 
+#include <QApplication>
+#include <QEvent>
+#include <QKeyEvent>
+
 #include "framework/global/types/retval.h"
 
 #include "au3wrap/iau3project.h"
@@ -187,8 +191,12 @@ void setTrackRulerType(std::shared_ptr<au::project::IAudacityProject> project, c
 }
 }
 
-ProjectViewState::ProjectViewState(const muse::modularity::ContextPtr& ctx, std::shared_ptr<au::au3::IAu3Project> project)
+ProjectViewState::ProjectViewState(const muse::modularity::ContextPtr& ctx)
     : muse::Injectable(ctx)
+{
+}
+
+void ProjectViewState::init(const std::shared_ptr<au3::IAu3Project>& project)
 {
     configuration()->setIsEffectsPanelVisible(false);
     qApp->installEventFilter(this);
@@ -484,46 +492,36 @@ au::trackedit::TrackIdList ProjectViewState::tracksInRange(double y1, double y2)
         return {};
     }
 
-    if (y1 < 0 && y2 < 0) {
-        return {};
-    }
-
     if (y1 > y2) {
         std::swap(y1, y2);
     }
 
-    if (y1 < 1) {
-        y1 = 1;
-    }
-
+    // Tracks are sorted by index, i.e., top to bottom.
     trackedit::TrackIdList tracks = prj->trackIdList();
-    trackedit::TrackIdList result;
 
-    int trackTop = -m_tracksVerticalOffset.val;
-    int trackBottom = trackTop;
-
-    for (trackedit::TrackId trackId : tracks) {
-        trackTop = trackBottom;
-        trackBottom = trackTop + trackHeight(trackId).val;
-
-        if (muse::RealIsEqualOrMore(y1, trackTop) && !muse::RealIsEqualOrMore(y1, trackBottom)) {
-            result.push_back(trackId);
-        }
-
-        if (muse::RealIsEqualOrMore(y2, trackTop) && !muse::RealIsEqualOrMore(y2, trackBottom)) {
-            if (!result.empty() && result.back() != trackId) {
-                result.push_back(trackId);
-            }
+    int i = 0;
+    const auto numTracks = static_cast<int>(tracks.size());
+    while (i < numTracks) {
+        const trackedit::TrackId& trackId = tracks[i];
+        const auto trackTop = trackVerticalPosition(trackId);
+        const auto trackBottom = trackTop + trackHeight(trackId).val;
+        if (y1 < trackBottom) {
             break;
         }
-
-        if (!result.empty() && result.back() != trackId) {
-            result.push_back(trackId);
-            continue;
-        }
+        ++i;
     }
 
-    return result;
+    auto j = i;
+    while (j < numTracks) {
+        const trackedit::TrackId& trackId = tracks[j];
+        const auto trackTop = trackVerticalPosition(trackId);
+        if (y2 <= trackTop) {
+            break;
+        }
+        ++j;
+    }
+
+    return trackedit::TrackIdList(tracks.begin() + i, tracks.begin() + j);
 }
 
 void ProjectViewState::setChannelHeightRatio(const trackedit::TrackId& trackId, double ratio)

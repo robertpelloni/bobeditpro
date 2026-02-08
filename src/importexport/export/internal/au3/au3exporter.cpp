@@ -15,6 +15,7 @@
 
 #include "au3wrap/au3types.h"
 #include "au3wrap/internal/wxtypes_convert.h"
+#include "importexport/export/exportutils.h"
 
 #include "translation.h"
 
@@ -94,22 +95,9 @@ void Au3Exporter::init()
     RegisterExportPlugins();
 }
 
-muse::Ret Au3Exporter::exportData(std::string filename)
+muse::Ret Au3Exporter::exportData(const muse::io::path_t& path)
 {
-    muse::io::path_t directoryPath = exportConfiguration()->directoryPath();
-    muse::io::path_t filePath = directoryPath.appendingComponent(filename);
-
-    if (suffix(filePath).empty()) {
-        auto extensions = formatExtensions(exportConfiguration()->currentFormat());
-        std::string defaultExtension = "";
-        if (!extensions.empty()) {
-            defaultExtension = extensions.front();
-        }
-
-        filePath = filePath.appendingSuffix(defaultExtension);
-    }
-
-    wxFileName wxfilename = wxFromString(filePath.toString());
+    wxFileName wxfilename = wxFromString(path.toString());
 
     Au3Project* project = reinterpret_cast<Au3Project*>(globalContext()->currentProject()->au3ProjectPtr());
     IF_ASSERT_FAILED(project) {
@@ -131,6 +119,7 @@ muse::Ret Au3Exporter::exportData(std::string filename)
     editor->Load(*gPrefs);
     m_parameters = ExportUtils::ParametersFromEditor(*editor);
 
+    m_selectedOnly = false;
     // TODO: implement other ExportProcessType's selections
     if (exportConfiguration()->processType() == ExportProcessType::SELECTED_AUDIO) {
         m_t0
@@ -139,6 +128,7 @@ muse::Ret Au3Exporter::exportData(std::string filename)
         m_t1
             = selectionController()->timeSelectionIsNotEmpty() ? selectionController()->dataSelectedEndTime()
               : selectionController()->rightMostSelectedClipEndTime().value_or(0.0);
+        m_selectedOnly = true;
     } else if (exportConfiguration()->processType() == ExportProcessType::AUDIO_IN_LOOP_REGION) {
         auto region = playbackController()->loopRegion();
         m_t0 = region.start;
@@ -150,8 +140,6 @@ muse::Ret Au3Exporter::exportData(std::string filename)
         m_t1 = trackeditProject->totalTime().to_double();
     }
 
-    m_selectedOnly = false;
-
     m_tags = &Tags::Get(*project);
 
     auto exportedTracks = ExportUtils::FindExportWaveTracks(TrackList::Get(*project), m_selectedOnly);
@@ -160,15 +148,47 @@ muse::Ret Au3Exporter::exportData(std::string filename)
         return muse::make_ret(muse::Ret::Code::InternalError, muse::trc("export", "All selected audio is muted"));
     }
 
-    // TODO: update when custom mapping is implemented
-    if (ExportChannelsPref::ExportChannels(exportConfiguration()->exportChannels()) == ExportChannelsPref::ExportChannels::MONO) {
-        m_numChannels = 1;
-    } else {
-        m_numChannels = 2;
+    int inputChannelsCount = 0;
+    for (const auto& exportedTrack : exportedTracks) {
+        inputChannelsCount += exportedTrack->NChannels();
     }
 
-    // TODO: m_mixerSpec should be created ONLY when custom mapping is applied
-    // m_mixerSpec = std::make_unique<MixerOptions::Downmix>(exportedTracks.size(), m_numChannels).get();
+    auto downMix = std::make_unique<MixerOptions::Downmix>(inputChannelsCount,
+                                                           exportConfiguration()->exportChannels());
+    if (ExportChannelsPref::ExportChannels(exportConfiguration()->exportChannelsType()) == ExportChannelsPref::ExportChannels::MONO) {
+        m_numChannels = 1;
+    } else if (ExportChannelsPref::ExportChannels(exportConfiguration()->exportChannelsType())
+               == ExportChannelsPref::ExportChannels::STEREO) {
+        m_numChannels = 2;
+    } else {
+        //Figure out the final channel mapping: mixer dialog shows
+        //all tracks regardless of their mute/solo state, but
+        //muted channels should not be present in exported file -
+        //apply channel mask to exclude them
+        auto channelMask = prepareChannelMask();
+        downMix = std::make_unique<MixerOptions::Downmix>(*downMix, channelMask);
+        m_mixerSpec = downMix.get();
+
+        const std::vector<std::vector<bool> > matrix = utils::valToMatrix(exportConfiguration()->exportCustomChannelMapping());
+        m_numChannels = exportConfiguration()->exportChannels();
+
+        for (int in = 0; in < inputChannelsCount; ++in) {
+            for (int out = 0; out < m_numChannels; ++out) {
+                m_mixerSpec->mMap[in][out] = false;
+            }
+        }
+
+        const int rows = std::min(inputChannelsCount, static_cast<int>(matrix.size()));
+        for (int in = 0; in < rows; ++in) {
+            const int cols = std::min(static_cast<int>(m_numChannels), static_cast<int>(matrix[in].size()));
+            for (int out = 0; out < cols; ++out) {
+                if (matrix[in][out]) {
+                    m_mixerSpec->mMap[in][out] = true;
+                }
+            }
+        }
+    }
+
     m_sampleRate = exportConfiguration()->exportSampleRate();
 
     try {
@@ -403,4 +423,36 @@ OptionsEditorUPtr Au3Exporter::optionsEditor() const
     }
 
     return nullptr;
+}
+
+std::vector<bool> Au3Exporter::prepareChannelMask() const
+{
+    Au3Project* project = reinterpret_cast<Au3Project*>(globalContext()->currentProject()->au3ProjectPtr());
+    IF_ASSERT_FAILED(project) {
+        return {};
+    }
+
+    auto tracks = TrackList::Get(*project).Any<WaveTrack>();
+    std::vector<bool> channelMask(
+        tracks.sum([](const auto track) { return track->NChannels(); }),
+        false);
+    unsigned trackIndex = 0;
+    for (const auto track : tracks) {
+        if (track->GetSolo()) {
+            channelMask.assign(channelMask.size(), false);
+            for (unsigned i = 0; i < track->NChannels(); ++i) {
+                channelMask[trackIndex++] = true;
+            }
+            break;
+        }
+        if (!track->GetMute() && (!m_selectedOnly || track->GetSelected())) {
+            for (unsigned i = 0; i < track->NChannels(); ++i) {
+                channelMask[trackIndex++] = true;
+            }
+        } else {
+            trackIndex += track->NChannels();
+        }
+    }
+
+    return channelMask;
 }
