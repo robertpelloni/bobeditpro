@@ -7,6 +7,7 @@
 #include "au3-wave-track/WaveClip.h"
 #include "au3-wave-track/WaveTrack.h"
 #include "au3-label-track/LabelTrack.h"
+#include "au3-mixer/BusTrack.h"
 
 #include "wxtypes_convert.h"
 
@@ -19,6 +20,9 @@ au::trackedit::TrackType trackType(const Au3Track* track)
 {
     if (dynamic_cast<const LabelTrack*>(track)) {
         return au::trackedit::TrackType::Label;
+    }
+    if (dynamic_cast<const BusTrack*>(track)) {
+        return au::trackedit::TrackType::Bus;
     }
 
     switch (track->NChannels()) {

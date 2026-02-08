@@ -13,6 +13,7 @@
 #include "au3-wave-track/WaveTrack.h"
 #include "au3-wave-track/WaveClip.h"
 #include "au3-label-track/LabelTrack.h"
+#include "au3-mixer/BusTrack.h"
 #include "au3-project-rate/ProjectRate.h"
 #include "au3-project-rate/QualitySettings.h"
 #include "au3-effects/MixAndRender.h"
@@ -677,6 +678,24 @@ bool Au3TracksInteraction::newStereoTrack()
 
     projectHistory()->pushHistoryState("Created new stereo track", "New Stereo Track");
     return true;
+}
+
+bool Au3TracksInteraction::newBusTrack()
+{
+    auto& tracks = Au3TrackList::Get(projectRef());
+    auto t = std::make_shared<BusTrack>();
+    t->SetName(tracks.MakeUniqueTrackName(wxT("Bus Track")));
+    auto result = tracks.Add(t, ::TrackList::DoAssignId::Yes);
+
+    if (result) {
+        const auto prj = globalContext()->currentTrackeditProject();
+        prj->notifyAboutTrackAdded(DomConverter::track(result));
+
+        selectionController()->setSelectedTracks({ result->GetId() });
+        selectionController()->setFocusedTrack(result->GetId());
+        return true;
+    }
+    return false;
 }
 
 muse::RetVal<au::trackedit::TrackId> Au3TracksInteraction::newLabelTrack(const muse::String& title)
