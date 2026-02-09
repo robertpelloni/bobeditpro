@@ -19,6 +19,8 @@ BusTrack::BusTrack()
 
 BusTrack::BusTrack(const BusTrack& orig, ProtectedCreationArg&&)
     : PlayableTrack(orig, {})
+    , mVolume{ orig.mVolume }
+    , mPan{ orig.mPan }
 {
 }
 
@@ -96,5 +98,26 @@ void BusTrack::WriteXML(XMLWriter& xmlFile) const
     xmlFile.StartTag(wxT("bustrack"));
     this->WriteCommonXMLAttributes(xmlFile);
     this->PlayableTrack::WriteXMLAttributes(xmlFile);
+
+    xmlFile.WriteAttr(wxT("gain"), mVolume);
+    xmlFile.WriteAttr(wxT("pan"), mPan);
+
     xmlFile.EndTag(wxT("bustrack"));
+}
+
+bool BusTrack::HandleXMLAttribute(const std::string_view& attr, const XMLAttributeValueView& valueView)
+{
+    if (PlayableTrack::HandleXMLAttribute(attr, valueView))
+        return true;
+
+    if (attr == "gain") {
+        mVolume = valueView.ToDouble();
+        return true;
+    }
+    if (attr == "pan") {
+        mPan = valueView.ToDouble();
+        return true;
+    }
+
+    return false;
 }

@@ -9,16 +9,16 @@ This document tracks the implementation of features required to achieve parity w
 - [x] `PlayableTrack` interface.
 - [x] `WaveTrack` implementation.
 
-### 1.2 Bus Tracks & Routing (Partially Done)
+### 1.2 Bus Tracks & Routing (Phase 1 Complete)
 - [x] **BusTrack Implementation:** `BusTrack` class in `au3-mixer`.
 - [x] **UI Integration:** "Add Bus Track" in menus and track panel.
-- [ ] **Routing Logic:** `PlayableTrack::SetRouteId` to route audio to busses (Logic exists in `AudioIO` but needs UI exposure).
+- [x] **Routing Logic:** `PlayableTrack::SetRouteId` exposed via `MixerBoardModel` and `MixerChannelStrip.qml`.
 - [ ] **Aux Sends:** Send slots on channel strips (Missing).
 
-### 1.3 Mixer View (Next Priority)
-- [ ] **Mixer Board UI:** Dedicated QML view with vertical channel strips.
-- [ ] **Faders & Meters:** Vertical volume faders and meters for each track.
-- [ ] **Routing Matrix:** UI for selecting Input/Output/Bus for each track.
+### 1.3 Mixer View (Initial Implementation Done)
+- [x] **Mixer Board UI:** Dedicated QML view (`MixerBoard.qml`) with vertical channel strips (`MixerChannelStrip.qml`).
+- [x] **Faders & Meters:** Vertical volume faders and meters for each track (wired to backend).
+- [x] **Routing Matrix:** UI for selecting Output/Bus for each track (implemented via dropdown).
 
 ### 1.4 Real-time Effects (In Progress)
 - [x] Effect Stack architecture (`au3-realtime-effects`).

@@ -51,6 +51,10 @@ public:
     void SetMute(bool m);
     void SetSolo(bool s);
 
+    static constexpr int MasterRouteId = 0;
+    int GetRouteId() const { return mRouteId; }
+    void SetRouteId(int id) { mRouteId = id; }
+
     // Serialize, not with tags of its own, but as attributes within a tag.
     void WriteXMLAttributes(XMLWriter& xmlFile) const;
 
@@ -62,6 +66,9 @@ protected:
     void DoSetMute(bool value);
     bool DoGetSolo() const;
     void DoSetSolo(bool value);
+
+private:
+    int mRouteId{ MasterRouteId };
 };
 
 ENUMERATE_TRACK_TYPE(PlayableTrack);

@@ -5,14 +5,24 @@ import QtQuick.Controls
 import Muse.Ui
 import Muse.UiComponents
 
-import Audacity.ProjectScene.trackspanel.audio // For VolumeSlider, PanKnob if available
-
 Rectangle {
     id: root
 
     property string trackName: "Track"
     property real volume: 1.0
     property real pan: 0.0
+    property bool mute: false
+    property bool solo: false
+    property int routeId: 0
+
+    property var availableRoutes: []
+    property var availableRouteIds: []
+
+    signal volumeChangedRequest(real value)
+    signal panChangedRequest(real value)
+    signal muteChangedRequest(bool value)
+    signal soloChangedRequest(bool value)
+    signal routeChangedRequest(int index)
 
     color: ui.theme.backgroundSecondaryColor
     border.color: ui.theme.separatorColor
@@ -34,23 +44,23 @@ Rectangle {
 
         SeparatorLine { Layout.fillWidth: true }
 
-        // Pan Knob
-        Item {
-            Layout.alignment: Qt.AlignHCenter
-            Layout.preferredWidth: 40
-            Layout.preferredHeight: 40
+        // Pan Slider (Horizontal) - Temporary until Knob is ready
+        ColumnLayout {
+            Layout.fillWidth: true
+            spacing: 2
 
-            // Placeholder for actual PanKnob
-            Rectangle {
-                anchors.fill: parent
-                radius: width / 2
-                color: ui.theme.buttonColor
-                border.color: ui.theme.borderColor
-            }
             StyledTextLabel {
-                anchors.centerIn: parent
-                text: "Pan"
+                Layout.alignment: Qt.AlignHCenter
+                text: "Pan: " + Math.round(root.pan * 100) + "%"
                 font.pixelSize: 10
+            }
+
+            StyledSlider {
+                Layout.fillWidth: true
+                from: -1.0
+                to: 1.0
+                value: root.pan
+                onMoved: root.panChangedRequest(value)
             }
         }
 
@@ -59,28 +69,44 @@ Rectangle {
             Layout.fillHeight: true
             Layout.fillWidth: true
 
-            // Placeholder for Vertical Volume Slider
-            Rectangle {
+            Slider {
                 anchors.centerIn: parent
-                width: 30
                 height: parent.height
-                color: ui.theme.trackBackground
+                orientation: Qt.Vertical
+                from: 0.0
+                to: 2.0 // Allow up to +6dB approx (2.0 amplitude)
+                value: root.volume
 
-                Rectangle {
-                    y: parent.height * (1.0 - root.volume)
-                    width: parent.width
-                    height: 20
-                    color: ui.theme.accentColor
+                onMoved: root.volumeChangedRequest(value)
+
+                background: Rectangle {
+                    x: parent.leftPadding + parent.availableWidth / 2 - width / 2
+                    y: parent.topPadding
+                    implicitWidth: 4
+                    implicitHeight: 200
+                    width: implicitWidth
+                    height: parent.availableHeight
+                    radius: 2
+                    color: ui.theme.trackBackground
+
+                    Rectangle {
+                        width: parent.width
+                        height: parent.height * (parent.parent.visualPosition)
+                        color: ui.theme.accentColor
+                        radius: 2
+                    }
+                }
+
+                handle: Rectangle {
+                    x: parent.leftPadding + parent.availableWidth / 2 - width / 2
+                    y: parent.topPadding + parent.visualPosition * (parent.availableHeight - height)
+                    implicitWidth: 20
+                    implicitHeight: 10
+                    radius: 2
+                    color: parent.pressed ? ui.theme.buttonColor : ui.theme.buttonColor
+                    border.color: ui.theme.borderColor
                 }
             }
-        }
-
-        // Meters
-        Rectangle {
-            Layout.fillWidth: true
-            Layout.preferredHeight: 100
-            color: "black"
-            // Placeholder for meters
         }
 
         // Mute/Solo Buttons
@@ -92,12 +118,36 @@ Rectangle {
                 Layout.fillWidth: true
                 text: "M"
                 checkable: true
+                checked: root.mute
+                onClicked: root.muteChangedRequest(checked)
+
+                checkedColor: "red" // Distinctive color for Mute
             }
             FlatButton {
                 Layout.fillWidth: true
                 text: "S"
                 checkable: true
+                checked: root.solo
+                onClicked: root.soloChangedRequest(checked)
+
+                checkedColor: "yellow" // Distinctive color for Solo
             }
+        }
+
+        // Output/Bus Selection
+        StyledDropdown {
+            Layout.fillWidth: true
+            model: root.availableRoutes
+            currentIndex: {
+                 // Manual indexOf implementation if QML array doesn't support it directly on this variant
+                 if (root.availableRouteIds) {
+                     for (var i = 0; i < root.availableRouteIds.length; i++) {
+                         if (root.availableRouteIds[i] === root.routeId) return i;
+                     }
+                 }
+                 return 0;
+            }
+            onActivated: (index) => root.routeChangedRequest(index)
         }
     }
 }

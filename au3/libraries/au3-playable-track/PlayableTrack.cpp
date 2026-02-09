@@ -108,6 +108,7 @@ PlayableTrack::PlayableTrack()
 PlayableTrack::PlayableTrack(
     const PlayableTrack& orig, ProtectedCreationArg&& a)
     : AudioTrack{orig, std::move(a)}
+    , mRouteId{ orig.mRouteId }
 {
 }
 
@@ -152,6 +153,8 @@ void PlayableTrack::WriteXMLAttributes(XMLWriter& xmlFile) const
 {
     xmlFile.WriteAttr(wxT("mute"), DoGetMute());
     xmlFile.WriteAttr(wxT("solo"), DoGetSolo());
+    if (GetRouteId() != MasterRouteId)
+        xmlFile.WriteAttr(wxT("route_to"), GetRouteId());
     AudioTrack::WriteXMLAttributes(xmlFile);
 }
 
@@ -165,6 +168,9 @@ bool PlayableTrack::HandleXMLAttribute(const std::string_view& attr, const XMLAt
         return true;
     } else if (attr == "solo" && value.TryGet(nValue)) {
         DoSetSolo(nValue != 0);
+        return true;
+    } else if (attr == "route_to" && value.TryGet(nValue)) {
+        SetRouteId(nValue);
         return true;
     }
 

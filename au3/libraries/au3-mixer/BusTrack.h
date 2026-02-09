@@ -40,6 +40,17 @@ public:
     // Serialization
     void WriteXML(XMLWriter& xmlFile) const override;
     // BusTrack inherits Track::HandleCommonXMLAttribute and PlayableTrack::HandleXMLAttribute
+    bool HandleXMLAttribute(const std::string_view& attr, const XMLAttributeValueView& value);
+
+    float GetVolume() const { return mVolume; }
+    void SetVolume(float v) { mVolume = v; }
+
+    float GetPan() const { return mPan; }
+    void SetPan(float p) { mPan = p; }
+
+private:
+    float mVolume{ 1.0f };
+    float mPan{ 0.0f };
 };
 
 ENUMERATE_TRACK_TYPE(BusTrack);
