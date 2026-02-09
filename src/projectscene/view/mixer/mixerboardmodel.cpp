@@ -202,6 +202,14 @@ void MixerBoardModel::setRoute(int row, int routeIndex)
     auto& strip = m_strips[row];
     if (strip.routeId == newRouteId) return;
 
+    // Check for cycles before updating
+    if (!canRoute(strip.trackId, newRouteId)) {
+        // Invalid route (cycle detected)
+        // Emit dataChanged to force the UI to revert to the current value (strip.routeId)
+        emit dataChanged(index(row), index(row), {RouteRole});
+        return;
+    }
+
     strip.routeId = newRouteId;
     emit dataChanged(index(row), index(row), {RouteRole});
 
@@ -213,6 +221,158 @@ void MixerBoardModel::setRoute(int row, int routeIndex)
     if (auto playable = dynamic_cast<PlayableTrack*>(au3Track)) {
         playable->SetRouteId(newRouteId);
     }
+}
+
+QVariantList MixerBoardModel::getSends(int row) const
+{
+    QVariantList list;
+    if (row < 0 || row >= m_strips.count()) return list;
+
+    auto prj = globalContext()->currentProject();
+    if (!prj) return list;
+    auto& au3Prj = *reinterpret_cast<Au3Project*>(prj->au3ProjectPtr());
+
+    auto strip = m_strips[row];
+    Au3Track* au3Track = DomAccessor::findTrack(au3Prj, Au3TrackId(strip.trackId));
+    auto playable = dynamic_cast<PlayableTrack*>(au3Track);
+    if (!playable) return list;
+
+    const auto& sends = playable->GetAuxSends();
+    for (const auto& send : sends) {
+        QVariantMap map;
+        map["destId"] = send.mDestinationId;
+        map["amount"] = send.mAmount;
+        map["pan"] = send.mPan;
+        map["pre"] = send.mPreFader;
+
+        // Find name
+        QString name = "Unknown";
+        int idx = m_availableRouteIds.indexOf(send.mDestinationId);
+        if (idx >= 0) {
+            name = m_availableRoutes[idx];
+        }
+        map["destName"] = name;
+        list.append(map);
+    }
+    return list;
+}
+
+void MixerBoardModel::addSend(int row, int routeIndex)
+{
+    if (row < 0 || row >= m_strips.count()) return;
+    if (routeIndex < 0 || routeIndex >= m_availableRouteIds.count()) return;
+    int destId = m_availableRouteIds[routeIndex];
+
+    // Cycle check!
+    auto strip = m_strips[row];
+    if (!canRoute(strip.trackId, destId)) return;
+
+    auto prj = globalContext()->currentProject();
+    if (!prj) return;
+    auto& au3Prj = *reinterpret_cast<Au3Project*>(prj->au3ProjectPtr());
+
+    Au3Track* au3Track = DomAccessor::findTrack(au3Prj, Au3TrackId(strip.trackId));
+    if (auto playable = dynamic_cast<PlayableTrack*>(au3Track)) {
+        // Check if exists
+        if (playable->GetAuxSend(destId)) return;
+
+        AuxSend send;
+        send.mDestinationId = destId;
+        send.mAmount = 1.0f; // Unity gain default
+
+        playable->AddAuxSend(send);
+        emit dataChanged(index(row), index(row));
+    }
+}
+
+void MixerBoardModel::removeSend(int row, int destId)
+{
+    if (row < 0 || row >= m_strips.count()) return;
+    auto prj = globalContext()->currentProject();
+    if (!prj) return;
+    auto& au3Prj = *reinterpret_cast<Au3Project*>(prj->au3ProjectPtr());
+
+    Au3Track* au3Track = DomAccessor::findTrack(au3Prj, Au3TrackId(m_strips[row].trackId));
+    if (auto playable = dynamic_cast<PlayableTrack*>(au3Track)) {
+        playable->RemoveAuxSend(destId);
+        emit dataChanged(index(row), index(row));
+    }
+}
+
+void MixerBoardModel::setSendAmount(int row, int destId, double amount)
+{
+    if (row < 0 || row >= m_strips.count()) return;
+    auto prj = globalContext()->currentProject();
+    if (!prj) return;
+    auto& au3Prj = *reinterpret_cast<Au3Project*>(prj->au3ProjectPtr());
+
+    Au3Track* au3Track = DomAccessor::findTrack(au3Prj, Au3TrackId(m_strips[row].trackId));
+    if (auto playable = dynamic_cast<PlayableTrack*>(au3Track)) {
+        if (auto* send = playable->GetAuxSend(destId)) {
+            playable->SetAuxSend(destId, amount, send->mPan, send->mPreFader);
+        }
+    }
+}
+
+void MixerBoardModel::setSendPan(int row, int destId, double pan)
+{
+    if (row < 0 || row >= m_strips.count()) return;
+    auto prj = globalContext()->currentProject();
+    if (!prj) return;
+    auto& au3Prj = *reinterpret_cast<Au3Project*>(prj->au3ProjectPtr());
+
+    Au3Track* au3Track = DomAccessor::findTrack(au3Prj, Au3TrackId(m_strips[row].trackId));
+    if (auto playable = dynamic_cast<PlayableTrack*>(au3Track)) {
+        if (auto* send = playable->GetAuxSend(destId)) {
+            playable->SetAuxSend(destId, send->mAmount, pan, send->mPreFader);
+        }
+    }
+}
+
+void MixerBoardModel::setSendPre(int row, int destId, bool pre)
+{
+    if (row < 0 || row >= m_strips.count()) return;
+    auto prj = globalContext()->currentProject();
+    if (!prj) return;
+    auto& au3Prj = *reinterpret_cast<Au3Project*>(prj->au3ProjectPtr());
+
+    Au3Track* au3Track = DomAccessor::findTrack(au3Prj, Au3TrackId(m_strips[row].trackId));
+    if (auto playable = dynamic_cast<PlayableTrack*>(au3Track)) {
+        if (auto* send = playable->GetAuxSend(destId)) {
+            playable->SetAuxSend(destId, send->mAmount, send->mPan, pre);
+            emit dataChanged(index(row), index(row));
+        }
+    }
+}
+
+bool MixerBoardModel::canRoute(int sourceId, int targetId) const
+{
+    if (sourceId == targetId) return false;
+    if (targetId == 0) return true; // Master is always safe
+
+    auto prj = globalContext()->currentProject();
+    if (!prj) return false;
+    auto& au3Prj = *reinterpret_cast<Au3Project*>(prj->au3ProjectPtr());
+
+    // Simple cycle check: trace downstream
+    int currentId = targetId;
+    int steps = 0;
+    const int maxSteps = 100; // Safety brake
+
+    while (currentId != 0 && steps++ < maxSteps) {
+        if (currentId == sourceId) return false; // Loop detected
+
+        Au3Track* track = DomAccessor::findTrack(au3Prj, Au3TrackId(currentId));
+        if (!track) break; // Dead end
+
+        if (auto pt = dynamic_cast<PlayableTrack*>(track)) {
+            currentId = pt->GetRouteId();
+        } else {
+            break; // Not routable
+        }
+    }
+
+    return true;
 }
 
 int MixerBoardModel::rowCount(const QModelIndex& parent) const
@@ -246,6 +406,8 @@ QVariant MixerBoardModel::data(const QModelIndex& index, int role) const
         return strip.trackId;
     case RouteRole:
         return strip.routeId;
+    case SendsRole:
+        return getSends(index.row());
     default:
         return QVariant();
     }
@@ -261,5 +423,6 @@ QHash<int, QByteArray> MixerBoardModel::roleNames() const
     roles[SoloRole] = "solo";
     roles[TrackIdRole] = "trackId";
     roles[RouteRole] = "routeId";
+    roles[SendsRole] = "sends";
     return roles;
 }

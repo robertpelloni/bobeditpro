@@ -18,6 +18,7 @@
 
 *//*******************************************************************/
 #include "PlayableTrack.h"
+#include "au3-xml/XMLWriter.h"
 
 namespace {
 struct MuteAndSolo : ClientData::Cloneable<> {
@@ -109,6 +110,7 @@ PlayableTrack::PlayableTrack(
     const PlayableTrack& orig, ProtectedCreationArg&& a)
     : AudioTrack{orig, std::move(a)}
     , mRouteId{ orig.mRouteId }
+    , mAuxSends{ orig.mAuxSends }
 {
 }
 
@@ -146,6 +148,85 @@ bool PlayableTrack::DoGetSolo() const
 void PlayableTrack::DoSetSolo(bool value)
 {
     MuteAndSolo::Get(*this).SetSolo(value);
+}
+
+void PlayableTrack::RemoveAuxSend(int destId)
+{
+    auto it = std::remove_if(mAuxSends.begin(), mAuxSends.end(),
+        [destId](const AuxSend& s){ return s.mDestinationId == destId; });
+    if (it != mAuxSends.end()) {
+        mAuxSends.erase(it, mAuxSends.end());
+        Notify(true);
+    }
+}
+
+void PlayableTrack::SetAuxSend(int destId, float amount, float pan, bool pre)
+{
+    for (auto& s : mAuxSends) {
+        if (s.mDestinationId == destId) {
+            if (s.mAmount != amount || s.mPan != pan || s.mPreFader != pre) {
+                s.mAmount = amount;
+                s.mPan = pan;
+                s.mPreFader = pre;
+                Notify(true);
+            }
+            return;
+        }
+    }
+    mAuxSends.push_back({destId, amount, pan, pre});
+    Notify(true);
+}
+
+AuxSend* PlayableTrack::GetAuxSend(int destId)
+{
+    for (auto& s : mAuxSends) {
+        if (s.mDestinationId == destId) return &s;
+    }
+    return nullptr;
+}
+
+void PlayableTrack::WriteXMLAuxSends(XMLWriter& xmlFile) const
+{
+    for (const auto& send : mAuxSends) {
+        xmlFile.StartTag(wxT("aux_send"));
+        xmlFile.WriteAttr(wxT("dest"), send.mDestinationId);
+        xmlFile.WriteAttr(wxT("amount"), send.mAmount);
+        xmlFile.WriteAttr(wxT("pan"), send.mPan);
+        xmlFile.WriteAttr(wxT("pre"), send.mPreFader);
+        xmlFile.EndTag(wxT("aux_send"));
+    }
+}
+
+bool PlayableTrack::HandleAuxSendTag(const std::string_view& tag, const AttributesList& attrs)
+{
+    if (tag != "aux_send") return false;
+
+    AuxSend send;
+    bool hasDest = false;
+
+    for (const auto& pair : attrs) {
+        auto attr = pair.first;
+        auto val = pair.second;
+        long nVal;
+        double dVal;
+
+        if (attr == "dest" && val.TryGet(nVal)) {
+            send.mDestinationId = nVal;
+            hasDest = true;
+        } else if (attr == "amount" && val.TryGet(dVal)) {
+            send.mAmount = static_cast<float>(dVal);
+        } else if (attr == "pan" && val.TryGet(dVal)) {
+            send.mPan = static_cast<float>(dVal);
+        } else if (attr == "pre" && val.TryGet(nVal)) {
+            send.mPreFader = (nVal != 0);
+        }
+    }
+
+    if (hasDest) {
+        AddAuxSend(send);
+        return true;
+    }
+    return false;
 }
 
 // Serialize, not with tags of its own, but as attributes within a tag.

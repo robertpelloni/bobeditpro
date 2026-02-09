@@ -102,6 +102,8 @@ void BusTrack::WriteXML(XMLWriter& xmlFile) const
     xmlFile.WriteAttr(wxT("gain"), mVolume);
     xmlFile.WriteAttr(wxT("pan"), mPan);
 
+    this->PlayableTrack::WriteXMLAuxSends(xmlFile);
+
     xmlFile.EndTag(wxT("bustrack"));
 }
 
@@ -120,4 +122,22 @@ bool BusTrack::HandleXMLAttribute(const std::string_view& attr, const XMLAttribu
     }
 
     return false;
+}
+
+bool BusTrack::HandleXMLTag(const std::string_view& tag, const AttributesList& attrs)
+{
+    if (tag == "bustrack") {
+        return Track::HandleXMLTag(tag, attrs);
+    }
+    if (tag == "aux_send") {
+        return PlayableTrack::HandleAuxSendTag(tag, attrs);
+    }
+    return false;
+}
+
+XMLTagHandler* BusTrack::HandleXMLChild(const std::string_view& tag)
+{
+    if (tag == "aux_send")
+        return this;
+    return nullptr;
 }

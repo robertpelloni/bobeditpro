@@ -15,6 +15,22 @@
 
 #include "au3-preferences/Prefs.h"
 #include "au3-track/Track.h"
+#include <vector>
+
+struct AuxSend {
+    int mDestinationId{ 0 };
+    float mAmount{ 0.0f };
+    float mPan{ 0.0f };
+    bool mPreFader{ false };
+
+    bool operator==(const AuxSend& other) const {
+        return mDestinationId == other.mDestinationId &&
+               mAmount == other.mAmount &&
+               mPan == other.mPan &&
+               mPreFader == other.mPreFader;
+    }
+    bool operator!=(const AuxSend& other) const { return !(*this == other); }
+};
 
 //! Track subclass holding data representing sound (as notes, or samples, or ...)
 class PLAYABLE_TRACK_API AudioTrack /* not final */ : public Track
@@ -61,6 +77,16 @@ public:
     // Return true iff the attribute is recognized.
     bool HandleXMLAttribute(const std::string_view& attr, const XMLAttributeValueView& value);
 
+    // Aux Sends
+    const std::vector<AuxSend>& GetAuxSends() const { return mAuxSends; }
+    void AddAuxSend(const AuxSend& send) { mAuxSends.push_back(send); }
+    void RemoveAuxSend(int destId);
+    void SetAuxSend(int destId, float amount, float pan, bool pre);
+    AuxSend* GetAuxSend(int destId);
+
+    void WriteXMLAuxSends(XMLWriter& xmlFile) const;
+    bool HandleAuxSendTag(const std::string_view& tag, const AttributesList& attrs);
+
 protected:
     bool DoGetMute() const;
     void DoSetMute(bool value);
@@ -69,6 +95,7 @@ protected:
 
 private:
     int mRouteId{ MasterRouteId };
+    std::vector<AuxSend> mAuxSends;
 };
 
 ENUMERATE_TRACK_TYPE(PlayableTrack);

@@ -17,12 +17,17 @@ Rectangle {
 
     property var availableRoutes: []
     property var availableRouteIds: []
+    property var sends: []
 
     signal volumeChangedRequest(real value)
     signal panChangedRequest(real value)
     signal muteChangedRequest(bool value)
     signal soloChangedRequest(bool value)
     signal routeChangedRequest(int index)
+
+    signal addSendRequest(int index)
+    signal removeSendRequest(int destId)
+    signal sendAmountChangedRequest(int destId, real value)
 
     color: ui.theme.backgroundSecondaryColor
     border.color: ui.theme.separatorColor
@@ -40,6 +45,60 @@ Rectangle {
             text: root.trackName
             horizontalAlignment: Text.AlignHCenter
             elide: Text.ElideRight
+        }
+
+        SeparatorLine { Layout.fillWidth: true }
+
+        // Sends Section
+        ColumnLayout {
+            Layout.fillWidth: true
+            spacing: 2
+
+            StyledTextLabel {
+                text: "Sends"
+                font.bold: true
+                font.pixelSize: 10
+            }
+
+            Repeater {
+                model: root.sends
+                delegate: RowLayout {
+                    Layout.fillWidth: true
+                    spacing: 4
+
+                    StyledTextLabel {
+                        Layout.preferredWidth: 30
+                        text: modelData.destName
+                        elide: Text.ElideRight
+                        font.pixelSize: 9
+                    }
+
+                    Slider {
+                        Layout.fillWidth: true
+                        from: 0.0
+                        to: 1.0
+                        value: modelData.amount
+                        onMoved: root.sendAmountChangedRequest(modelData.destId, value)
+                    }
+
+                    Button {
+                        text: "x"
+                        Layout.preferredWidth: 20
+                        Layout.preferredHeight: 20
+                        onClicked: root.removeSendRequest(modelData.destId)
+                    }
+                }
+            }
+
+            // Add Send
+            StyledDropdown {
+                Layout.fillWidth: true
+                model: root.availableRoutes
+                // We want this to act as a command button, not a state selector
+                // So we don't bind currentIndex strictly?
+                // Or we accept it resets to 0.
+                onActivated: (index) => root.addSendRequest(index)
+            }
         }
 
         SeparatorLine { Layout.fillWidth: true }

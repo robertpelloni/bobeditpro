@@ -42,6 +42,10 @@ public:
     // BusTrack inherits Track::HandleCommonXMLAttribute and PlayableTrack::HandleXMLAttribute
     bool HandleXMLAttribute(const std::string_view& attr, const XMLAttributeValueView& value);
 
+    // Child tag handling for Aux Sends
+    bool HandleXMLTag(const std::string_view& tag, const AttributesList& attrs) override;
+    XMLTagHandler* HandleXMLChild(const std::string_view& tag) override;
+
     float GetVolume() const { return mVolume; }
     void SetVolume(float v) { mVolume = v; }
 

@@ -6,7 +6,7 @@
 
 ## Status: Phase 1 (Mixer & Routing) Complete
 
-The Mixer View and Bus Track infrastructure are now implemented. The backend supports full routing, volume, pan, mute, and solo controls, and the frontend (QML) exposes these via a dedicated Mixer Board.
+The Mixer View, Bus Track infrastructure, Routing, and Aux Sends are now implemented.
 
 ### Completed Features
 - **Bus Tracks:**
@@ -14,21 +14,26 @@ The Mixer View and Bus Track infrastructure are now implemented. The backend sup
   - Added to "Add Track" menu and properly serialized to XML.
 - **Mixer View:**
   - `MixerBoard.qml` hosts a scrollable list of channel strips.
-  - `MixerChannelStrip.qml` provides UI for Volume (slider), Pan (slider), Mute/Solo (buttons), and Output Routing (dropdown).
+  - `MixerChannelStrip.qml` provides UI for Volume, Pan, Mute/Solo, Output Routing, and **Aux Sends**.
+- **Routing & Mixing:**
+  - `PlayableTrack` stores `mRouteId` and `mAuxSends`.
+  - **Cycle Detection:** `MixerBoardModel` prevents circular routing loops.
+  - **Aux Sends:** Tracks can send to multiple destinations (Pre/Post fader support).
 - **Backend Logic:**
   - `MixerBoardModel` (C++) bridges the TrackList to QML.
-  - Handles dynamic track updates and property binding.
-  - `PlayableTrack` updated to support `mRouteId` for routing logic.
+  - XML Serialization handles `<aux_send>` tags for both `WaveTrack` and `BusTrack`.
 
 ### Immediate Next Steps
-1. **Build Verification:** The current environment has a configuration issue with Qt6 (`Qt6Config.cmake` not found). The code is written based on static analysis and needs to be compiled and verified.
-2. **Cycle Detection:** The current routing logic allows circular routing (e.g., Bus A -> Bus B -> Bus A). Implement a check in `MixerBoardModel::setRoute` or `PlayableTrack::SetRouteId` to prevent this.
-3. **Aux Sends:** The UI and backend for Aux Sends (sending a portion of signal to another bus) are not yet implemented.
-4. **Visual Polish:** The Mixer UI is functional but uses standard Qt controls. Styling should be improved to match the dark theme of the application.
+1. **Audio Engine Integration:** The data models are ready, but the actual summing logic in `AudioIO::ProcessPlaybackSlices` (or similar) needs to be updated to:
+   - Read `mRouteId` and `mAuxSends` from `PlayableTrack`.
+   - Mix samples into the appropriate `BusBuffer`.
+2. **Visual Polish:** The Mixer UI uses basic styling. Improve the look of the Faders and Send controls.
+3. **Build Verification:** Verify compilation in a clean environment (current environment has Qt config issues).
 
 ### Key Files
-- `src/projectscene/view/mixer/mixerboardmodel.cpp`: Main backend logic for the mixer.
-- `src/projectscene/qml/Audacity/ProjectScene/mixer/MixerBoard.qml`: Main Mixer UI.
-- `au3/libraries/au3-mixer/BusTrack.cpp`: Bus Track implementation.
+- `src/projectscene/view/mixer/mixerboardmodel.cpp`: Mixer backend & cycle detection.
+- `au3/libraries/au3-playable-track/PlayableTrack.cpp`: Base track logic (Routing, Sends).
+- `au3/libraries/au3-mixer/BusTrack.cpp`: Bus implementation.
+- `src/projectscene/qml/Audacity/ProjectScene/mixer/MixerBoard.qml`: UI Entry point.
 
 Good luck!

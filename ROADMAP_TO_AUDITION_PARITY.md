@@ -12,13 +12,15 @@ This document tracks the implementation of features required to achieve parity w
 ### 1.2 Bus Tracks & Routing (Phase 1 Complete)
 - [x] **BusTrack Implementation:** `BusTrack` class in `au3-mixer`.
 - [x] **UI Integration:** "Add Bus Track" in menus and track panel.
-- [x] **Routing Logic:** `PlayableTrack::SetRouteId` exposed via `MixerBoardModel` and `MixerChannelStrip.qml`.
-- [ ] **Aux Sends:** Send slots on channel strips (Missing).
+- [x] **Routing Logic:** `PlayableTrack::SetRouteId` exposed via `MixerBoardModel`.
+- [x] **Cycle Detection:** Routing loops are detected and prevented.
+- [x] **Aux Sends:** Backend support (`mAuxSends`) and UI controls (Add/Remove/Level).
 
-### 1.3 Mixer View (Initial Implementation Done)
+### 1.3 Mixer View (Implementation Done)
 - [x] **Mixer Board UI:** Dedicated QML view (`MixerBoard.qml`) with vertical channel strips (`MixerChannelStrip.qml`).
 - [x] **Faders & Meters:** Vertical volume faders and meters for each track (wired to backend).
-- [x] **Routing Matrix:** UI for selecting Output/Bus for each track (implemented via dropdown).
+- [x] **Routing Matrix:** UI for selecting Output/Bus.
+- [x] **Sends Section:** UI for managing Aux Sends per track.
 
 ### 1.4 Real-time Effects (In Progress)
 - [x] Effect Stack architecture (`au3-realtime-effects`).

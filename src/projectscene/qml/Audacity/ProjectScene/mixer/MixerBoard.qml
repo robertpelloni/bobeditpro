@@ -35,6 +35,7 @@ Item {
                         mute: model.mute
                         solo: model.solo
                         routeId: model.routeId
+                        sends: model.sends
 
                         availableRoutes: mixerModel.availableRoutes
                         availableRouteIds: mixerModel.availableRouteIds
@@ -44,7 +45,10 @@ Item {
                         onMuteChangedRequest: (val) => mixerModel.setMute(index, val)
                         onSoloChangedRequest: (val) => mixerModel.setSolo(index, val)
                         onRouteChangedRequest: (routeIndex) => mixerModel.setRoute(index, routeIndex)
-                    }
+
+                        onAddSendRequest: (routeIndex) => mixerModel.addSend(index, routeIndex)
+                        onRemoveSendRequest: (destId) => mixerModel.removeSend(index, destId)
+                        onSendAmountChangedRequest: (destId, val) => mixerModel.setSendAmount(index, destId, val)
                 }
 
                 // Master Fader (Placeholder)

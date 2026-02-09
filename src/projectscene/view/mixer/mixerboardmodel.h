@@ -29,7 +29,8 @@ public:
         MuteRole,
         SoloRole,
         TrackIdRole,
-        RouteRole
+        RouteRole,
+        SendsRole
     };
 
     explicit MixerBoardModel(QObject* parent = nullptr);
@@ -43,12 +44,23 @@ public:
     Q_INVOKABLE void setSolo(int row, bool solo);
     Q_INVOKABLE void setRoute(int row, int routeIndex);
 
+    // Aux Sends
+    Q_INVOKABLE QVariantList getSends(int row) const;
+    Q_INVOKABLE void addSend(int row, int routeIndex);
+    Q_INVOKABLE void removeSend(int row, int destId);
+    Q_INVOKABLE void setSendAmount(int row, int destId, double amount);
+    Q_INVOKABLE void setSendPan(int row, int destId, double pan);
+    Q_INVOKABLE void setSendPre(int row, int destId, bool pre);
+
     QStringList availableRoutes() const { return m_availableRoutes; }
     QList<int> availableRouteIds() const { return m_availableRouteIds; }
 
     int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
     QHash<int, QByteArray> roleNames() const override;
+
+    //! Check for routing cycle
+    bool canRoute(int sourceId, int targetId) const;
 
 private:
     void updateTrackList();
