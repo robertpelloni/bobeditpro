@@ -9,27 +9,32 @@ This document tracks the implementation of features required to achieve parity w
 - [x] `PlayableTrack` interface.
 - [x] `WaveTrack` implementation.
 
-### 1.2 Bus Tracks & Routing (In Progress)
-- [ ] **BusTrack Implementation:** Create `BusTrack` class in `au3-mixer`.
-- [ ] **Routing Logic:** Implement `PlayableTrack::SetRouteId` to route audio to busses.
-- [ ] **UI Integration:** Add "Add Bus Track" to menus and track panel.
-- [ ] **Mixer View:** Dedicated mixer panel with faders and routing matrix.
+### 1.2 Bus Tracks & Routing (Partially Done)
+- [x] **BusTrack Implementation:** `BusTrack` class in `au3-mixer`.
+- [x] **UI Integration:** "Add Bus Track" in menus and track panel.
+- [ ] **Routing Logic:** `PlayableTrack::SetRouteId` to route audio to busses (Logic exists in `AudioIO` but needs UI exposure).
+- [ ] **Aux Sends:** Send slots on channel strips (Missing).
 
-### 1.3 Real-time Effects (In Progress)
+### 1.3 Mixer View (Next Priority)
+- [ ] **Mixer Board UI:** Dedicated QML view with vertical channel strips.
+- [ ] **Faders & Meters:** Vertical volume faders and meters for each track.
+- [ ] **Routing Matrix:** UI for selecting Input/Output/Bus for each track.
+
+### 1.4 Real-time Effects (In Progress)
 - [x] Effect Stack architecture (`au3-realtime-effects`).
-- [ ] Pre-fader vs Post-fader slots.
-- [ ] Clip-level effects.
+- [x] Clip-level effects.
+- [ ] **Master Effects:** UI for Master Fader effects rack.
 
-## Phase 2: Spectral Editing
+## Phase 2: Spectral Editing (Gap Analysis)
 
-### 2.1 Visualization
-- [x] Basic Spectrogram view.
-- [ ] Multi-resolution STFT.
+### 2.1 Visualization (Done)
+- [x] Basic Spectrogram view (`SpectrogramRuler`).
+- [x] Multi-resolution STFT (`au3-fft`).
 
-### 2.2 Tools
-- [ ] Spectral Selection Tool.
-- [ ] Spot Healing Brush (Frequency-domain interpolation).
-- [ ] Noise Print & Reduction.
+### 2.2 Tools (Missing)
+- [ ] **Spectral Selection Tool:** Ability to select frequency ranges (Backend in `au3-time-frequency-selection`, UI missing).
+- [ ] **Spot Healing Brush:** Frequency-domain interpolation for click removal (Missing).
+- [ ] **Noise Print & Reduction:** Adaptive noise reduction (Missing backend port).
 
 ## Phase 3: Workflow Enhancements
 
