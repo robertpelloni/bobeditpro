@@ -1,39 +1,31 @@
 # Handoff Note
 
 **To:** Incoming Engineer
-**From:** Audition Parity Team (Phase 1)
+**From:** Audition Parity Team
 **Date:** 2024-05-24
 
-## Status: Phase 1 (Mixer & Routing) Complete
+## Status: Major Migration to BobUI
 
-The Mixer View, Bus Track infrastructure, Routing, and Aux Sends are now implemented.
+The project has undergone a significant infrastructure change. We have replaced the dependency on the system Qt6 library with **BobUI**, a custom fork of QtBase included as a submodule.
 
-### Completed Features
-- **Bus Tracks:**
-  - `BusTrack` class fully implemented in `au3-mixer`.
-  - Added to "Add Track" menu and properly serialized to XML.
-- **Mixer View:**
-  - `MixerBoard.qml` hosts a scrollable list of channel strips.
-  - `MixerChannelStrip.qml` provides UI for Volume, Pan, Mute/Solo, Output Routing, and **Aux Sends**.
-- **Routing & Mixing:**
-  - `PlayableTrack` stores `mRouteId` and `mAuxSends`.
-  - **Cycle Detection:** `MixerBoardModel` prevents circular routing loops.
-  - **Aux Sends:** Tracks can send to multiple destinations (Pre/Post fader support).
-- **Backend Logic:**
-  - `MixerBoardModel` (C++) bridges the TrackList to QML.
-  - XML Serialization handles `<aux_send>` tags for both `WaveTrack` and `BusTrack`.
+### Build System Changes
+- `CMakeLists.txt` now includes `SetupBobUi` instead of `SetupQt6`.
+- `bobui` is built in-tree. This increases build times but ensures complete control over the UI stack.
+- **Do not** revert this change unless authorized.
 
-### Immediate Next Steps
-1. **Audio Engine Integration:** The data models are ready, but the actual summing logic in `AudioIO::ProcessPlaybackSlices` (or similar) needs to be updated to:
-   - Read `mRouteId` and `mAuxSends` from `PlayableTrack`.
-   - Mix samples into the appropriate `BusBuffer`.
-2. **Visual Polish:** The Mixer UI uses basic styling. Improve the look of the Faders and Send controls.
-3. **Build Verification:** Verify compilation in a clean environment (current environment has Qt config issues).
+### Feature Status
+- **Mixer View:** Implemented with Cycle Detection and Aux Sends.
+- **Routing:** Functional backend and UI.
+- **Cycle Detection:** Implemented in `MixerBoardModel`.
+
+### Immediate Actions
+1.  **Build Verification:** The migration is theoretical/scaffolded. You must verify that `bobui` compiles correctly in the target environment.
+2.  **Namespace Checks:** Ensure that `bobui` correctly exports `Qt::Core` etc. If it uses a different namespace (e.g., `Bob::Core`), extensive refactoring will be needed.
+3.  **Performance:** Monitor build times.
 
 ### Key Files
-- `src/projectscene/view/mixer/mixerboardmodel.cpp`: Mixer backend & cycle detection.
-- `au3/libraries/au3-playable-track/PlayableTrack.cpp`: Base track logic (Routing, Sends).
-- `au3/libraries/au3-mixer/BusTrack.cpp`: Bus implementation.
-- `src/projectscene/qml/Audacity/ProjectScene/mixer/MixerBoard.qml`: UI Entry point.
+- `buildscripts/cmake/SetupBobUi.cmake`: The new setup script.
+- `BOBUI_MIGRATION.md`: Migration details.
+- `src/projectscene/view/mixer/mixerboardmodel.cpp`: Mixer logic.
 
 Good luck!
