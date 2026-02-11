@@ -15,12 +15,18 @@ This document tracks the implementation of features required to achieve parity w
 - [x] **Routing Logic:** `PlayableTrack::SetRouteId` exposed via `MixerBoardModel`.
 - [x] **Cycle Detection:** Routing loops are detected and prevented.
 - [x] **Aux Sends:** Backend support (`mAuxSends`) and UI controls (Add/Remove/Level).
+- [x] **Audio Engine Integration:** `AudioIO` mixes routed tracks and sends into `mBusAccumulators`, then sums Busses to Master.
 
 ### 1.3 Mixer View (Implementation Done)
 - [x] **Mixer Board UI:** Dedicated QML view (`MixerBoard.qml`) with vertical channel strips (`MixerChannelStrip.qml`).
 - [x] **Faders & Meters:** Vertical volume faders and meters for each track (wired to backend).
 - [x] **Routing Matrix:** UI for selecting Output/Bus.
 - [x] **Sends Section:** UI for managing Aux Sends per track.
+
+### 1.X BobUI Migration (In Progress)
+- [x] **Submodule:** Added `bobui` (QtBase fork).
+- [x] **Build System:** Configured `SetupBobUi.cmake` to build Qt in-tree.
+- [ ] **Verification:** Confirm compilation on all platforms.
 
 ### 1.4 Real-time Effects (In Progress)
 - [x] Effect Stack architecture (`au3-realtime-effects`).

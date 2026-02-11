@@ -1,5 +1,12 @@
 List of significant changes and bug fixes going back to version 1.1.0
 
+Changes in version 3.7.5
+
+* Feature: Migrated UI toolkit to BobUI (in-tree Qt fork).
+* Feature: Implemented audio engine integration for Bus Routing and Aux Sends.
+* Feature: Added Cycle Detection to routing logic.
+* Documentation: Massive overhaul of project documentation and agent instructions.
+
 Changes in version 3.7.4
 
 * Feature: Added Mixer View with Volume, Pan, Mute, Solo, and Routing controls.
