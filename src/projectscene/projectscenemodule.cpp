@@ -79,6 +79,8 @@
 
 #include "view/trackruler/trackrulermodel.h"
 
+#include "view/mixer/mixerboardmodel.h"
+
 using namespace au::projectscene;
 using namespace muse::modularity;
 using namespace muse::ui;
@@ -210,6 +212,9 @@ void ProjectSceneModule::registerUiTypes()
 
     //track ruler
     qmlRegisterType<TrackRulerModel>("Audacity.ProjectScene", 1, 0, "TrackRulerModel");
+
+    // mixer
+    qmlRegisterType<MixerBoardModel>("Audacity.ProjectScene", 1, 0, "MixerBoardModel");
 }
 
 void ProjectSceneModule::onInit(const muse::IApplication::RunMode& mode)

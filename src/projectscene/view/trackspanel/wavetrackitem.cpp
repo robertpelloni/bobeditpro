@@ -119,6 +119,7 @@ int WaveTrackItem::channelCount() const
     case trackedit::TrackType::Mono:
         return 1;
     case trackedit::TrackType::Stereo:
+    case trackedit::TrackType::Bus:
         return 2;
     default:
         return 0;

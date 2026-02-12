@@ -28,6 +28,7 @@ import Muse.Dock
 
 import Audacity.AppShell
 import Audacity.ProjectScene
+import Audacity.ProjectScene.mixer
 import Audacity.Playback
 import Audacity.TrackEdit
 
@@ -353,6 +354,30 @@ DockPage {
                             tracksPanelContent.showEffectsSection = tracksPanel.showEffectsSection
                         }
                     }
+                }
+            }
+        },
+        DockPanel {
+            objectName: pageModel.mixerPanelName()
+            title: qsTrc("appshell", "Mixer")
+
+            closable: true
+            floatable: true
+
+            width: 600
+            minimumWidth: 200
+            maximumWidth: 1000
+
+            groupName: root.horizontalPanelsGroup
+            location: Location.Bottom
+
+            visible: false // Hidden by default
+
+            dropDestinations: root.horizontalPanelDropDestinations
+
+            MixerBoard {
+                mixerModel: MixerBoardModel {
+                    Component.onCompleted: load()
                 }
             }
         },
