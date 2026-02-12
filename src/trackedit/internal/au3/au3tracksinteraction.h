@@ -5,13 +5,15 @@
 
 #include "au3wrap/au3types.h"
 
-#include "modularity/ioc.h"
-#include "iinteractive.h"
+#include "framework/global/modularity/ioc.h"
+#include "framework/interactive/iinteractive.h"
+
 #include "context/iglobalcontext.h"
 #include "trackedit/itrackeditconfiguration.h"
 #include "trackedit/iclipsinteraction.h"
 #include "trackedit/iselectioncontroller.h"
 #include "trackedit/iprojecthistory.h"
+#include "trackedit/internal/itracknavigationcontroller.h"
 #include "playback/iplaybackconfiguration.h"
 
 #include "../../itracksinteraction.h"
@@ -30,6 +32,7 @@ class Au3TracksInteraction : public ITracksInteraction, public muse::Injectable
     muse::Inject<au::trackedit::ISelectionController> selectionController{ this };
     muse::Inject<au::trackedit::IProjectHistory> projectHistory{ this };
     muse::Inject<au::trackedit::IClipsInteraction> clipsInteraction{ this };
+    muse::Inject<au::trackedit::ITrackNavigationController> trackNavigationController{ this };
 
 public:
     Au3TracksInteraction(const muse::modularity::ContextPtr& ctx);

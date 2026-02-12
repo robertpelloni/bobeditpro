@@ -22,6 +22,7 @@
 
 #include "startupscenario.h"
 
+#include "appshell/appshelltypes.h"
 #include "global/async/async.h"
 #include "global/translation.h"
 #include "global/log.h"
@@ -35,7 +36,7 @@ static const muse::Uri ALPHA_WELCOME_POPUP("audacity://alphaWelcomePopup");
 static const muse::Uri HOME_URI("audacity://home");
 static const muse::Uri PROJECT_URI("audacity://project");
 
-static StartupModeType modeTypeTromString(const std::string& str)
+static StartupModeType modeTypeFromString(const std::string& str)
 {
     if ("start-empty" == str) {
         return StartupModeType::StartEmpty;
@@ -68,7 +69,7 @@ bool StartupScenario::isStartWithNewFileAsSecondaryInstance() const
     }
 
     if (!m_startupTypeStr.empty()) {
-        return modeTypeTromString(m_startupTypeStr) == StartupModeType::StartWithNewScore;
+        return modeTypeFromString(m_startupTypeStr) == StartupModeType::StartWithNewScore;
     }
 
     return false;
@@ -84,14 +85,12 @@ void StartupScenario::setStartupScoreFile(const std::optional<ProjectFile>& file
     m_startupScoreFile = file ? file.value() : ProjectFile();
 }
 
-void StartupScenario::runOnSplashScreen()
+muse::async::Promise<muse::Ret> StartupScenario::runOnSplashScreen()
 {
-    //! NOTE Registering plugins shows a window (dialog) before the main window is shown.
-    //! After closing it, the application may in a state where there are no open windows,
-    //! which leads to automatic exit from the application.
-    //! (Thanks to the splashscreen, but this is not an obvious detail)
-    // qApp->setQuitLockEnabled(false);
-    // qApp->setQuitLockEnabled(true);
+    return muse::async::make_promise<muse::Ret>([this](auto resolve, auto) {
+        const muse::Ret ret = muse::make_ret(muse::Ret::Code::Ok);
+        return resolve(ret);
+    });
 }
 
 void StartupScenario::runAfterSplashScreen()
@@ -122,9 +121,11 @@ void StartupScenario::runAfterSplashScreen()
         }
         once = true;
 
-        muse::io::paths_t newPluginPaths = registerAudioPluginsScenario()->scanForNewPluginPaths();
+        muse::audioplugins::PluginScanResult scanResult = registerAudioPluginsScenario()->scanPlugins();
 
-        if (!newPluginPaths.empty()) {
+        registerAudioPluginsScenario()->unregisterRemovedPlugins(scanResult.missingPluginIds);
+
+        if (!scanResult.newPluginPaths.empty()) {
             auto ret = interactive()->questionSync(muse::trc("appshell", "Scanning audio plugins"),
                                                    muse::trc(
                                                        "appshell",
@@ -135,10 +136,7 @@ void StartupScenario::runAfterSplashScreen()
                                                      muse::IInteractive::ButtonData(
                                                          muse::IInteractive::Button::Apply, muse::trc("appshell", "Scan plugins"), true) });
             if (ret.standardButton() == muse::IInteractive::Button::Apply) {
-                muse::Ret ret = registerAudioPluginsScenario()->updatePluginsRegistry(newPluginPaths);
-                if (!ret) {
-                    LOGE() << ret.toString();
-                }
+                registerAudioPluginsScenario()->registerNewPlugins(scanResult.newPluginPaths);
             }
         }
 
@@ -166,7 +164,7 @@ StartupModeType StartupScenario::resolveStartupModeType() const
     }
 
     if (!m_startupTypeStr.empty()) {
-        return modeTypeTromString(m_startupTypeStr);
+        return modeTypeFromString(m_startupTypeStr);
     }
 
     return configuration()->startupModeType();
@@ -202,7 +200,7 @@ void StartupScenario::onStartupPageOpened(StartupModeType modeType)
     } break;
     case StartupModeType::FirstLaunch: {
         dispatcher()->dispatch("file-new");
-        interactive()->openSync(FIRST_LAUNCH_SETUP_URI);
+        interactive()->open(FIRST_LAUNCH_SETUP_URI);
 #ifndef MUSE_APP_UNSTABLE
         interactive()->openSync(ALPHA_WELCOME_POPUP);
 #endif

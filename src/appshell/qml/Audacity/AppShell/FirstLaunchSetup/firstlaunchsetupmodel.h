@@ -25,11 +25,11 @@
 #include <QObject>
 #include <QtQml/qqmlregistration.h>
 
-#include "global/async/asyncable.h"
+#include "framework/global/async/asyncable.h"
+#include "framework/global/modularity/ioc.h"
+#include "framework/interactive/iinteractive.h"
 
-#include "modularity/ioc.h"
-#include "iappshellconfiguration.h"
-#include "iinteractive.h"
+#include "appshell/iappshellconfiguration.h"
 
 namespace au::appshell {
 class FirstLaunchSetupModel : public QObject, public muse::async::Asyncable, public muse::Injectable
@@ -46,8 +46,7 @@ class FirstLaunchSetupModel : public QObject, public muse::async::Asyncable, pub
     Q_PROPERTY(bool canFinish READ canFinish NOTIFY currentPageChanged)
     Q_PROPERTY(QString dialogTitle READ dialogTitle CONSTANT)
     Q_PROPERTY(QString backButtonText READ backButtonText CONSTANT)
-    Q_PROPERTY(QString nextButtonText READ nextButtonText CONSTANT)
-    Q_PROPERTY(QString doneButtonText READ doneButtonText CONSTANT)
+    Q_PROPERTY(QString nextButtonText READ nextButtonText NOTIFY nextButtonTextChanged)
 
     muse::GlobalInject<IAppShellConfiguration> configuration;
 
@@ -66,10 +65,9 @@ public:
     bool canGoForward() const;
     bool canFinish() const;
 
-    static QString dialogTitle();
-    static QString backButtonText();
-    static QString nextButtonText();
-    static QString doneButtonText();
+    QString dialogTitle() const;
+    QString backButtonText() const;
+    QString nextButtonText() const;
     Q_INVOKABLE QString formatPageProgress(int current, int total) const;
 
     Q_INVOKABLE void finish();
@@ -79,6 +77,7 @@ public slots:
 
 signals:
     void currentPageChanged();
+    void nextButtonTextChanged();
 
 private:
     struct Page {

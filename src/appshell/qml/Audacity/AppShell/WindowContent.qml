@@ -23,6 +23,7 @@ import QtQuick
 import QtQuick.Controls
 
 import Muse.Dock
+import Muse.Interactive
 import Muse.Ui
 import Muse.UiComponents
 
@@ -43,6 +44,7 @@ DockWindow {
 
     onPageLoaded: {
         root.interactiveProvider.onPageOpened()
+        window.opacity = 1.0
     }
 
     property NavigationSection topToolKeyNavSec: NavigationSection {

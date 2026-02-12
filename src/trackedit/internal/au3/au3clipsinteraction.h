@@ -3,12 +3,13 @@
 */
 #pragma once
 
-#include "modularity/ioc.h"
+#include "framework/global/modularity/ioc.h"
+#include "framework/interactive/iinteractive.h"
+
 #include "context/iglobalcontext.h"
 #include "trackedit/iselectioncontroller.h"
 #include "trackedit/itrackeditconfiguration.h"
 #include "trackedit/iprojecthistory.h"
-#include "iinteractive.h"
 #include "trackedit/itracksinteraction.h"
 
 #include "au3wrap/au3types.h"
@@ -66,10 +67,11 @@ public:
     ITrackDataPtr clipSplitCut(const ClipKey& clipKey) override;
     bool clipSplitDelete(const ClipKey& clipKey) override;
 
-    bool trimClipLeft(const ClipKey& clipKey, secs_t deltaSec, secs_t minClipDuration, bool completed) override;
-    bool trimClipRight(const ClipKey& clipKey, secs_t deltaSec, secs_t minClipDuration, bool completed) override;
-    bool stretchClipLeft(const ClipKey& clipKey, secs_t deltaSec, secs_t minClipDuration, bool completed) override;
-    bool stretchClipRight(const ClipKey& clipKey, secs_t deltaSec, secs_t minClipDuration, bool completed) override;
+    bool trimClipsLeft(const ClipKeyList& clipKeyList, secs_t deltaSec, secs_t minClipDuration, bool completed) override;
+    bool trimClipsRight(const ClipKeyList& clipKeyList, secs_t deltaSec, secs_t minClipDuration, bool completed) override;
+
+    bool stretchClipsLeft(const ClipKeyList& clipKeyList, secs_t deltaSec, secs_t minClipDuration, bool completed) override;
+    bool stretchClipsRight(const ClipKeyList& clipKeyList, secs_t deltaSec, secs_t minClipDuration, bool completed) override;
 
     muse::Ret makeRoomForClip(const trackedit::ClipKey& clipKey) override;
 
@@ -115,8 +117,6 @@ private:
     secs_t clampRightStretchDelta(const ClipKeyList& clipKeys, secs_t deltaSec, secs_t minClipDuration) const;
     bool trimClipsLeft(const ClipKeyList& clipKeys, secs_t deltaSec, bool completed);
     bool trimClipsRight(const ClipKeyList& clipKeys, secs_t deltaSec, bool completed);
-    bool stretchClipsLeft(const ClipKeyList& clipKeys, secs_t deltaSec, bool completed);
-    bool stretchClipsRight(const ClipKeyList& clipKeys, secs_t deltaSec, bool completed);
 
     bool doChangeClipSpeed(const ClipKey& clipKey, double speed);
 

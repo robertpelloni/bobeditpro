@@ -4,13 +4,14 @@
 
 #pragma once
 
-#include "modularity/ioc.h"
-#include "async/asyncable.h"
-#include "actions/iactionsdispatcher.h"
-#include "actions/actionable.h"
-#include "context/iglobalcontext.h"
-#include "iinteractive.h"
+#include "framework/global/modularity/ioc.h"
+#include "framework/global/async/asyncable.h"
 
+#include "framework/actions/iactionsdispatcher.h"
+#include "framework/actions/actionable.h"
+#include "framework/interactive/iinteractive.h"
+
+#include "context/iglobalcontext.h"
 #include "../iprojectsceneactionscontroller.h"
 #include "../iprojectsceneconfiguration.h"
 
@@ -42,8 +43,8 @@ private:
     void toggleVerticalRulers();
     void toggleRMSInWaveform();
     void toggleClippingInWaveform();
-    void updateDisplayWhilePlaying();
-    void pinnedPlayHead();
+    void toggleUpdateDisplayWhilePlaying();
+    void togglePinnedPlayHead();
     void togglePlaybackOnRulerClickEnabled();
     void toggleTrackHalfWave(const muse::actions::ActionQuery& q);
 

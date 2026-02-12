@@ -85,7 +85,7 @@ Dial {
 
     NavigationControl {
         id: navCtrl
-        name: root.objectName != "" ? root.objectName : "KnobControl"
+        name: root.objectName !== "" ? root.objectName : "KnobControl"
         enabled: root.enabled && root.visible
 
         accessible.role: MUAccessible.Range
@@ -97,14 +97,17 @@ Dial {
         accessible.stepSize: root.stepSize
 
         onNavigationEvent: function(event) {
+            const handle = (stepSize) => {
+                prv.requestNewValue(root.value + stepSize)
+                event.accepted = true
+            }
+
             switch(event.type) {
-            case NavigationEvent.Left:
-                prv.requestNewValue(root.value - root.stepSize)
-                event.accepted = true
+            case NavigationEvent.Up:
+                handle(root.stepSize)
                 break
-            case NavigationEvent.Right:
-                prv.requestNewValue(root.value + root.stepSize)
-                event.accepted = true
+            case NavigationEvent.Down:
+                handle(-root.stepSize)
                 break
             }
         }

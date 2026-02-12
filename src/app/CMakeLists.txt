@@ -95,6 +95,7 @@ add_to_link_if_exists(muse::diagnostics)
 add_to_link_if_exists(muse::dockwindow)
 add_to_link_if_exists(muse::extensions)
 add_to_link_if_exists(muse::graphicaleffects_qml)
+add_to_link_if_exists(muse::interactive)
 add_to_link_if_exists(muse::languages)
 add_to_link_if_exists(muse::learn)
 add_to_link_if_exists(muse::legacytreeview_qml)
@@ -111,6 +112,7 @@ add_to_link_if_exists(muse::workspace)
 add_to_link_if_exists(appshell)
 add_to_link_if_exists(au3audio)
 add_to_link_if_exists(au3wrap)
+add_to_link_if_exists(au3cloud)
 add_to_link_if_exists(audio)
 add_to_link_if_exists(context)
 add_to_link_if_exists(effects_audio_unit)
@@ -162,8 +164,12 @@ qt_add_executable(${EXECUTABLE_NAME}
     ${APP_RCC_SOURCES}
     ${AUDACITY_APPEND_SRC}
     main.cpp
-    app.cpp
-    app.h
+    appfactory.cpp
+    appfactory.h
+    guiapp.cpp
+    guiapp.h
+    pluginregistrationapp.cpp
+    pluginregistrationapp.h
     commandlineparser.cpp
     commandlineparser.h
 )
