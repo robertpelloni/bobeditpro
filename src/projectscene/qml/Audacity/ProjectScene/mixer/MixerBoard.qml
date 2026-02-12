@@ -49,6 +49,7 @@ Item {
                         onAddSendRequest: (routeIndex) => mixerModel.addSend(index, routeIndex)
                         onRemoveSendRequest: (destId) => mixerModel.removeSend(index, destId)
                         onSendAmountChangedRequest: (destId, val) => mixerModel.setSendAmount(index, destId, val)
+                    }
                 }
 
                 // Master Fader (Placeholder)

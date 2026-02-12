@@ -32,23 +32,28 @@ This document tracks the implementation of features required to achieve parity w
 - [x] Effect Stack architecture (`au3-realtime-effects`).
 - [x] Clip-level effects.
 - [ ] **Master Effects:** UI for Master Fader effects rack.
+- [ ] **Side-chaining:** Routing track output to effect inputs.
 
-## Phase 2: Spectral Editing (Gap Analysis)
+## Phase 2: Spectral Editing (The "Restoration" Suite)
 
 ### 2.1 Visualization (Done)
 - [x] Basic Spectrogram view (`SpectrogramRuler`).
 - [x] Multi-resolution STFT (`au3-fft`).
 
-### 2.2 Tools (Missing)
-- [ ] **Spectral Selection Tool:** Ability to select frequency ranges (Backend in `au3-time-frequency-selection`, UI missing).
-- [ ] **Spot Healing Brush:** Frequency-domain interpolation for click removal (Missing).
-- [ ] **Noise Print & Reduction:** Adaptive noise reduction (Missing backend port).
+### 2.2 Tools (Next Priority)
+- [ ] **Spectral Selection Tool:** Ability to select frequency ranges (Backend exists in `au3-time-frequency-selection`, UI needs implementation in `src/projectscene`).
+- [ ] **Spot Healing Brush:** UI tool to trigger `SpectralHealEffect` on a selection.
+- [ ] **Noise Print & Reduction:** Port the adaptive noise reduction backend and build the "Capture Noise Print" workflow.
 
-## Phase 3: Workflow Enhancements
+## Phase 3: Workflow & Automation
 
 ### 3.1 Automation
-- [ ] Envelope editing on tracks.
-- [ ] Write/Latch/Touch automation modes.
+- [ ] **Envelope Lanes:** Expandable lanes for Volume, Pan, and Effect parameters.
+- [ ] **Automation Modes:** Read, Write, Latch, Touch logic in `PlayableTrack`.
+
+### 3.2 Session Management
+- [ ] Non-destructive session files (`.au4`).
+- [ ] Asset management (Project Manager).
 
 ### 3.2 Session Management
 - [ ] Non-destructive session files (`.au4`?).
