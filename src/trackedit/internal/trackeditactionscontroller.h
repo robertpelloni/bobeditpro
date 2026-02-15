@@ -116,6 +116,7 @@ private:
 
     void newMonoTrack();
     void newStereoTrack();
+    void newBusTrack();
     void newLabelTrack();
 
     void deleteTracks(const muse::actions::ActionData&);
