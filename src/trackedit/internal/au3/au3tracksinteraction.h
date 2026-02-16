@@ -5,15 +5,13 @@
 
 #include "au3wrap/au3types.h"
 
-#include "framework/global/modularity/ioc.h"
-#include "framework/interactive/iinteractive.h"
-
+#include "modularity/ioc.h"
+#include "iinteractive.h"
 #include "context/iglobalcontext.h"
 #include "trackedit/itrackeditconfiguration.h"
 #include "trackedit/iclipsinteraction.h"
 #include "trackedit/iselectioncontroller.h"
 #include "trackedit/iprojecthistory.h"
-#include "trackedit/internal/itracknavigationcontroller.h"
 #include "playback/iplaybackconfiguration.h"
 
 #include "../../itracksinteraction.h"
@@ -22,25 +20,24 @@ namespace au::trackedit {
 class Au3TrackData;
 using Au3TrackDataPtr = std::shared_ptr<Au3TrackData>;
 
-class Au3TracksInteraction : public ITracksInteraction, public muse::Injectable
+class Au3TracksInteraction : public ITracksInteraction
 {
-    muse::GlobalInject<au::trackedit::ITrackeditConfiguration> configuration;
-    muse::GlobalInject<au::playback::IPlaybackConfiguration> playbackConfiguration;
-
-    muse::Inject<muse::IInteractive> interactive{ this };
-    muse::Inject<au::context::IGlobalContext> globalContext{ this };
-    muse::Inject<au::trackedit::ISelectionController> selectionController{ this };
-    muse::Inject<au::trackedit::IProjectHistory> projectHistory{ this };
-    muse::Inject<au::trackedit::IClipsInteraction> clipsInteraction{ this };
-    muse::Inject<au::trackedit::ITrackNavigationController> trackNavigationController{ this };
+    muse::Inject<muse::IInteractive> interactive;
+    muse::Inject<au::context::IGlobalContext> globalContext;
+    muse::Inject<au::trackedit::ISelectionController> selectionController;
+    muse::Inject<au::trackedit::ITrackeditConfiguration> configuration;
+    muse::Inject<au::trackedit::IProjectHistory> projectHistory;
+    muse::Inject<au::trackedit::IClipsInteraction> clipsInteraction;
+    muse::Inject<au::playback::IPlaybackConfiguration> playbackConfiguration;
 
 public:
-    Au3TracksInteraction(const muse::modularity::ContextPtr& ctx);
+    Au3TracksInteraction();
 
     bool trimTracksData(const std::vector<trackedit::TrackId>& tracksIds, secs_t begin, secs_t end) override;
     bool silenceTracksData(const std::vector<trackedit::TrackId>& tracksIds, secs_t begin, secs_t end) override;
     bool changeTrackTitle(const trackedit::TrackId trackId, const muse::String& title) override;
     bool changeTracksColor(const TrackIdList& tracksIds, const std::string& color) override;
+    bool changeAudioTrackViewType(const trackedit::TrackId& trackId, trackedit::TrackViewType viewType) override;
 
     muse::Ret paste(const std::vector<ITrackDataPtr>& data, secs_t begin, bool moveClips, bool moveAllTracks, bool isMultiSelectionCopy,
                     bool& projectWasModified) override;
@@ -60,7 +57,6 @@ public:
 
     bool newMonoTrack() override;
     bool newStereoTrack() override;
-    bool newBusTrack() override;
     muse::RetVal<TrackId> newLabelTrack(const muse::String& title = muse::String()) override;
 
     bool deleteTracks(const TrackIdList& trackIds) override;

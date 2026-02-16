@@ -6,7 +6,7 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
 import Muse.Ui 1.0
-import Muse.UiComponents
+import Muse.UiComponents 1.0
 
 import Audacity.UiComponents 1.0
 
@@ -22,9 +22,6 @@ RowLayout {
     property int lowerTimeSignature: 0
 
     property int currentFormat: 0
-
-    property NavigationPanel navigationPanel: null
-    property string accessibleName: ""
 
     signal startValueChangeRequested(var newValue)
     signal endValueChangeRequested(var newValue)
@@ -45,12 +42,6 @@ RowLayout {
 
         showMenu: false
 
-        navigation.panel: root.navigationPanel
-        navigation.row: 1
-        navigation.column: 1
-
-        accessibleName: root.accessibleName
-
         onValueChangeRequested: function(newValue) {
             root.startValueChangeRequested(newValue)
         }
@@ -68,10 +59,6 @@ RowLayout {
         currentFormat: root.currentFormat
 
         backgroundLeftRadius: 0
-
-        navigation.panel: root.navigationPanel
-        navigation.row: startTimecode.navigation.row
-        navigation.column: startTimecode.navigationColumnEnd + 1
 
         onValueChangeRequested: function(newValue) {
             root.endValueChangeRequested(newValue)

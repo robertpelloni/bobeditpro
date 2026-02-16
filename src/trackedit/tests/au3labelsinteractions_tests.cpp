@@ -7,7 +7,6 @@
 
 #include "au3interactiontestbase.h"
 #include "mocks/selectioncontrollermock.h"
-#include "mocks/tracknavigationcontrollermock.h"
 
 #include "au3-label-track/LabelTrack.h"
 #include "au3wrap/internal/domaccessor.h"
@@ -32,16 +31,14 @@ class Au3LabelsInteractionsTests : public Au3InteractionTestBase
 public:
     void SetUp() override
     {
-        m_labelsInteraction = std::make_shared<Au3LabelsInteraction>(muse::modularity::globalCtx());
+        m_labelsInteraction = std::make_shared<Au3LabelsInteraction>();
 
         m_globalContext = std::make_shared<NiceMock<context::GlobalContextMock> >();
         m_selectionController = std::make_shared<NiceMock<SelectionControllerMock> >();
-        m_trackNavigationController = std::make_shared<NiceMock<TrackNavigationControllerMock> >();
         m_playbackState = std::make_shared<NiceMock<context::PlaybackStateMock> >();
 
         m_labelsInteraction->globalContext.set(m_globalContext);
         m_labelsInteraction->selectionController.set(m_selectionController);
-        m_labelsInteraction->trackNavigationController.set(m_trackNavigationController);
 
         m_trackEditProject = std::make_shared<NiceMock<TrackeditProjectMock> >();
         ON_CALL(*m_globalContext, currentTrackeditProject())
@@ -56,15 +53,11 @@ public:
         ON_CALL(*m_currentProject, trackeditProject())
         .WillByDefault(Return(m_trackEditProject));
 
-        ON_CALL(*m_trackNavigationController, focusedTrack())
-        .WillByDefault(Return(INVALID_TRACK));
-
         initTestProject();
     }
 
     std::shared_ptr<Au3LabelsInteraction> m_labelsInteraction;
     std::shared_ptr<SelectionControllerMock> m_selectionController;
-    std::shared_ptr<TrackNavigationControllerMock> m_trackNavigationController;
 };
 
 TEST_F(Au3LabelsInteractionsTests, AddLabelToSelectionCreatesLabelTrackWhenNoneExists)
@@ -80,7 +73,7 @@ TEST_F(Au3LabelsInteractionsTests, AddLabelToSelectionCreatesLabelTrackWhenNoneE
     .WillByDefault(Return(selectionStart));
     ON_CALL(*m_selectionController, dataSelectedEndTime())
     .WillByDefault(Return(selectionEnd));
-    ON_CALL(*m_trackNavigationController, focusedTrack())
+    ON_CALL(*m_selectionController, focusedTrack())
     .WillByDefault(Return(INVALID_TRACK));
 
     //! [EXPECT] The project is notified about a new track and a new label being added
@@ -124,7 +117,7 @@ TEST_F(Au3LabelsInteractionsTests, AddLabelToSelectionUsesExistingLabelTrack)
     .WillByDefault(Return(selectionStart));
     ON_CALL(*m_selectionController, dataSelectedEndTime())
     .WillByDefault(Return(selectionEnd));
-    ON_CALL(*m_trackNavigationController, focusedTrack())
+    ON_CALL(*m_selectionController, focusedTrack())
     .WillByDefault(Return(INVALID_TRACK));
 
     //! [EXPECT] The project is notified about a new label being added but NOT about a new track
@@ -163,7 +156,7 @@ TEST_F(Au3LabelsInteractionsTests, AddLabelToSelectionUsesFocusedLabelTrack)
 
     //! [GIVEN] The second label track is focused
     const TrackId focusedTrackId = secondLabelTrack->GetId();
-    ON_CALL(*m_trackNavigationController, focusedTrack())
+    ON_CALL(*m_selectionController, focusedTrack())
     .WillByDefault(Return(focusedTrackId));
 
     //! [GIVEN] There is a selection from 0.5 to 1.5 seconds
@@ -208,7 +201,7 @@ TEST_F(Au3LabelsInteractionsTests, AddLabelToSelectionWithZeroLengthSelection)
     .WillByDefault(Return(cursorPosition));
     ON_CALL(*m_selectionController, dataSelectedEndTime())
     .WillByDefault(Return(cursorPosition));
-    ON_CALL(*m_trackNavigationController, focusedTrack())
+    ON_CALL(*m_selectionController, focusedTrack())
     .WillByDefault(Return(INVALID_TRACK));
 
     //! [EXPECT] The project is notified about a new track and a new label being added
@@ -243,7 +236,7 @@ TEST_F(Au3LabelsInteractionsTests, AddMultipleLabelsToSameLabelTrack)
     const Au3TrackList& projectTracks = Au3TrackList::Get(projectRef());
     ASSERT_EQ(projectTracks.Size(), 0) << "Precondition failed: The project should be empty";
 
-    ON_CALL(*m_trackNavigationController, focusedTrack())
+    ON_CALL(*m_selectionController, focusedTrack())
     .WillByDefault(Return(INVALID_TRACK));
 
     //! [EXPECT] Notifications for track and labels
@@ -310,7 +303,7 @@ TEST_F(Au3LabelsInteractionsTests, AddLabelToSelectionWithAudioTrackPresent)
     .WillByDefault(Return(selectionStart));
     ON_CALL(*m_selectionController, dataSelectedEndTime())
     .WillByDefault(Return(selectionEnd));
-    ON_CALL(*m_trackNavigationController, focusedTrack())
+    ON_CALL(*m_selectionController, focusedTrack())
     .WillByDefault(Return(INVALID_TRACK));
 
     //! [EXPECT] The project is notified about a new label track and a new label being added
@@ -359,7 +352,7 @@ TEST_F(Au3LabelsInteractionsTests, AddLabelToSelectionWhenPlaybackIsActive)
     .WillByDefault(Return(selectionStart));
     ON_CALL(*m_selectionController, dataSelectedEndTime())
     .WillByDefault(Return(selectionEnd));
-    ON_CALL(*m_trackNavigationController, focusedTrack())
+    ON_CALL(*m_selectionController, focusedTrack())
     .WillByDefault(Return(INVALID_TRACK));
 
     //! [GIVEN] Playback is active at position 2.5 seconds
@@ -410,7 +403,7 @@ TEST_F(Au3LabelsInteractionsTests, AddLabelToSelectionWhenRecordingIsActive)
     .WillByDefault(Return(selectionStart));
     ON_CALL(*m_selectionController, dataSelectedEndTime())
     .WillByDefault(Return(selectionEnd));
-    ON_CALL(*m_trackNavigationController, focusedTrack())
+    ON_CALL(*m_selectionController, focusedTrack())
     .WillByDefault(Return(INVALID_TRACK));
 
     //! [GIVEN] Playback is not active
@@ -1094,10 +1087,10 @@ TEST_F(Au3LabelsInteractionsTests, MoveLabelsRight)
     const double timeOffset = 2.0;
 
     //! [WHEN] Move the labels right
-    muse::RetVal<LabelKeyList> result = m_labelsInteraction->moveLabels(selectedLabels, timeOffset, 0);
+    bool result = m_labelsInteraction->moveLabels(timeOffset);
 
     //! [THEN] The operation is successful
-    ASSERT_TRUE(result.ret) << "Moving labels should succeed";
+    ASSERT_TRUE(result) << "Moving labels should succeed";
 
     //! [THEN] All labels are moved by the offset
     const Au3Label* label1 = labelTrack->GetLabel(0);
@@ -1159,10 +1152,10 @@ TEST_F(Au3LabelsInteractionsTests, MoveLabelsLeftWhenLabelIsAtZero)
     const double timeOffset = -1.0;
 
     //! [WHEN] Move the labels left by 1.0 second
-    muse::RetVal<LabelKeyList> result = m_labelsInteraction->moveLabels(selectedLabels, timeOffset, 0);
+    bool result = m_labelsInteraction->moveLabels(timeOffset);
 
     //! [THEN] The operation is successful
-    ASSERT_TRUE(result.ret) << "Moving labels should succeed";
+    ASSERT_TRUE(result) << "Moving labels should succeed";
 
     //! [THEN] Labels are moved but the leftmost is clamped to zero
     const Au3Label* label1 = labelTrack->GetLabel(0);
@@ -1206,10 +1199,10 @@ TEST_F(Au3LabelsInteractionsTests, MoveLabelsWithZeroOffset)
     EXPECT_CALL(*m_trackEditProject, notifyAboutLabelChanged(_)).Times(0);
 
     //! [WHEN] Move the label by zero offset
-    muse::RetVal<LabelKeyList> result = m_labelsInteraction->moveLabels(selectedLabels, 0.0, 0);
+    bool result = m_labelsInteraction->moveLabels(0.0);
 
     //! [THEN] The operation succeeds but does nothing
-    ASSERT_TRUE(result.ret) << "Moving by zero should succeed";
+    ASSERT_TRUE(result) << "Moving by zero should succeed";
 
     //! [THEN] The label position is unchanged
     const Au3Label* label = labelTrack->GetLabel(0);
@@ -1235,15 +1228,16 @@ TEST_F(Au3LabelsInteractionsTests, MoveLabelsWithNoSelection)
 
     //! [GIVEN] No labels are selected
     LabelKeyList emptySelection;
+    ON_CALL(*m_selectionController, selectedLabels()).WillByDefault(Return(emptySelection));
 
     //! [EXPECT] No notifications should be sent
     EXPECT_CALL(*m_trackEditProject, notifyAboutLabelChanged(_)).Times(0);
 
     //! [WHEN] Try to move labels with no selection
-    muse::RetVal<LabelKeyList> result = m_labelsInteraction->moveLabels(emptySelection, 2.0, 0);
+    bool result = m_labelsInteraction->moveLabels(2.0);
 
-    //! [THEN] The operation don't fail
-    ASSERT_TRUE(result.ret) << "Moving with no selection shouldn't fail";
+    //! [THEN] The operation fails
+    ASSERT_FALSE(result) << "Moving with no selection should fail";
 
     //! [THEN] The label position is unchanged
     const Au3Label* label = labelTrack->GetLabel(0);
@@ -1275,7 +1269,7 @@ TEST_F(Au3LabelsInteractionsTests, MoveLabelsToAnotherTrack)
 
     //! [WHEN] Move the label from first track to second track
     LabelKeyList labelsToMove = { { labelTrack1->GetId(), labelId } };
-    muse::RetVal<LabelKeyList> result = m_labelsInteraction->moveLabelsToTrack(labelsToMove, labelTrack2->GetId());
+    muse::RetVal<LabelKeyList> result = m_labelsInteraction->moveLabels(labelsToMove, labelTrack2->GetId());
 
     //! [THEN] The operation is successful
     ASSERT_TRUE(result.ret) << "Moving label to another track should succeed";

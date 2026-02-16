@@ -17,7 +17,7 @@ Item {
         anchors.fill: parent
 
         window: Window {
-            color: ui.theme.extra["effect_controls_disabling_overlay_color"]
+            color: "#55555555"
         }
     }
 
@@ -25,7 +25,7 @@ Item {
         visible: root.visible && root.effectFamily === EffectFamily.Builtin
         anchors.fill: parent
 
-        color: ui.theme.extra["effect_controls_disabling_overlay_color"]
+        color: "#55555555"
 
         MouseArea {
             id: interceptingMouseArea

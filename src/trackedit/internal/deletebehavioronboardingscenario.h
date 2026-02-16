@@ -3,27 +3,21 @@
  */
 #pragma once
 
-#include "framework/global/modularity/ioc.h"
-
-#include "framework/interactive/iinteractive.h"
-#include "framework/actions/iactionsdispatcher.h"
-
+#include "modularity/ioc.h"
+#include "global/iinteractive.h"
+#include "actions/iactionsdispatcher.h"
 #include "trackedit/itrackeditconfiguration.h"
 
 #include "trackedit/trackedittypes.h"
 
 namespace au::trackedit {
-class DeleteBehaviorOnboardingScenario : public muse::Injectable
+class DeleteBehaviorOnboardingScenario
 {
-    muse::GlobalInject<ITrackeditConfiguration> configuration;
-
-    muse::Inject<muse::IInteractive> interactive { this };
-    muse::Inject<muse::actions::IActionsDispatcher> dispatcher { this };
+    muse::Inject<muse::IInteractive> interactive;
+    muse::Inject<muse::actions::IActionsDispatcher> dispatcher;
+    muse::Inject<ITrackeditConfiguration> configuration;
 
 public:
-    DeleteBehaviorOnboardingScenario(const muse::modularity::ContextPtr& ctx)
-        : muse::Injectable(ctx) {}
-
     bool showOnboardingDialog() const;
     void showFollowupDialog() const;
 

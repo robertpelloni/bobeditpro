@@ -35,10 +35,6 @@ set(MODULE_SRC
 
 )
 
-set(MODULE_LINK
-    muse::uicomponents_qml
-)
-
 setup_module()
 
 if (AU_BUILD_UICOMONENTS_TESTS)

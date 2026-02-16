@@ -1,5 +1,3 @@
-#include <QApplication>
-
 #include "global/types/translatablestring.h"
 
 #include "au3wrap/internal/domaccessor.h"

@@ -5,12 +5,11 @@
 
 #include <QQuickWindow>
 
-#include "au3-audio-unit/AudioUnitInstance.h"
 #include "audiounitcontrol.h"
 
 namespace au::effects {
 AudioUnitView::AudioUnitView(QQuickItem* parent)
-    : QQuickItem(parent), muse::Injectable(muse::iocCtxForQmlObject(this))
+    : QQuickItem(parent)
 {
 }
 

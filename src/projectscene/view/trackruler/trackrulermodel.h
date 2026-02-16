@@ -17,19 +17,16 @@
 #include "projectscene/view/trackruler/itrackruler.h"
 
 namespace au::projectscene {
-class TrackRulerModel : public QObject, public muse::async::Asyncable, public muse::Injectable
+class TrackRulerModel : public QObject, public muse::async::Asyncable
 {
     Q_OBJECT
 
-    muse::GlobalInject<au::playback::IPlaybackConfiguration> configuration;
-
-    muse::Inject<muse::actions::IActionsDispatcher> dispatcher{ this };
-    muse::Inject<au::context::IGlobalContext> globalContext{ this };
+    muse::Inject<muse::actions::IActionsDispatcher> dispatcher;
+    muse::Inject<au::playback::IPlaybackConfiguration> configuration;
+    muse::Inject<au::context::IGlobalContext> globalContext;
 
     Q_PROPERTY(std::vector<QVariantMap> fullSteps READ fullSteps NOTIFY fullStepsChanged)
     Q_PROPERTY(std::vector<QVariantMap> smallSteps READ smallSteps NOTIFY smallStepsChanged)
-
-    Q_PROPERTY(bool initialized READ initialized WRITE setInitialized NOTIFY initializedChanged FINAL)
 
     Q_PROPERTY(bool isStereo READ isStereo WRITE setIsStereo NOTIFY isStereoChanged FINAL)
     Q_PROPERTY(bool isCollapsed READ isCollapsed WRITE setIsCollapsed NOTIFY isCollapsedChanged FINAL)
@@ -92,9 +89,6 @@ public:
 
     bool isHalfWave() const;
 
-    bool initialized() const;
-    void setInitialized(bool newInitialized);
-
 signals:
     void fullStepsChanged();
     void smallStepsChanged();
@@ -114,8 +108,6 @@ signals:
     void trackIdChanged();
 
     void isHalfWaveChanged();
-    void initializedChanged();
-
 private:
     IProjectViewStatePtr viewState() const;
 
@@ -129,6 +121,5 @@ private:
     bool m_isCollapsed = false;
     int m_height = 0;
     double m_channelHeightRatio = 0.5;
-    bool m_initialized = false;
 };
 }

@@ -14,11 +14,12 @@
 #include <cassert>
 #include <cctype>
 
+#include <rapidjson/document.h>
+#include <rapidjson/writer.h>
+
 #include "au3-string-utils/CodeConversions.h"
 #include "au3-preferences/Prefs.h"
 
-#include "au3-import-export/rapidjson/document.h"
-#include "au3-import-export/rapidjson/writer.h"
 #include "au3-network-manager/IResponse.h"
 #include "au3-network-manager/NetworkManager.h"
 #include "au3-network-manager/Request.h"
@@ -88,7 +89,7 @@ void WriteCommonFields(
     WriteAccessFields(document, grantType, scope);
 }
 
-template<typename Elem, typename First, typename ... Others>
+template<typename Elem, typename First, typename ...Others>
 void append(std::basic_string<Elem>& dest, First&& first, Others&& ... others)
 {
     dest.append(first);
@@ -97,7 +98,7 @@ void append(std::basic_string<Elem>& dest, First&& first, Others&& ... others)
     }
 }
 
-template<typename First, typename ... Others>
+template<typename First, typename ...Others>
 auto concat(First&& first, Others&& ... others)
 {
     std::basic_string<typename First::value_type> dest(first);
@@ -280,34 +281,6 @@ void OAuthService::AuthoriseRefreshToken(
     AuthoriseRefreshToken(
         config, audacity::ToUTF8(refreshToken.Read()), trace,
         std::move(completedHandler), silent);
-}
-
-void OAuthService::AuthorizeCode(std::string_view authorizationCode,
-                                 std::string_view redirectUri, AudiocomTrace trace,
-                                 std::function<void(std::string_view)> completedHandler)
-{
-    using namespace rapidjson;
-
-    Document document;
-    document.SetObject();
-
-    document.AddMember(
-        "code", StringRef(authorizationCode.data(), authorizationCode.size()),
-        document.GetAllocator());
-
-    document.AddMember(
-        "redirect_uri", StringRef(redirectUri.data(), redirectUri.size()),
-        document.GetAllocator());
-
-    WriteCommonFields(document, "authorization_code", "all");
-
-    rapidjson::StringBuffer buffer;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-    document.Accept(writer);
-
-    DoAuthorise(
-        GetServiceConfig(), { buffer.GetString(), buffer.GetSize() }, trace,
-        std::move(completedHandler), false);
 }
 
 void OAuthService::AuthoriseCode(

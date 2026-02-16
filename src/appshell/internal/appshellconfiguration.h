@@ -27,6 +27,7 @@
 #include "modularity/ioc.h"
 #include "iglobalconfiguration.h"
 #include "io/ifilesystem.h"
+// #include "multiinstances/imultiinstancesprovider.h"
 #include "ui/iuiconfiguration.h"
 #include "projectscene/iprojectsceneconfiguration.h"
 // #include "project/iprojectconfiguration.h"
@@ -38,9 +39,15 @@
 namespace au::appshell {
 class AppShellConfiguration : public IAppShellConfiguration, public muse::async::Asyncable
 {
-    muse::GlobalInject<muse::IGlobalConfiguration> globalConfiguration;
-    muse::GlobalInject<muse::io::IFileSystem> fileSystem;
-    muse::GlobalInject<projectscene::IProjectSceneConfiguration> projectSceneConfiguration;
+    muse::Inject<muse::IGlobalConfiguration> globalConfiguration;
+    muse::Inject<muse::io::IFileSystem> fileSystem;
+    muse::Inject<projectscene::IProjectSceneConfiguration> projectSceneConfiguration;
+    // INJECT(mi::IMultiInstancesProvider, multiInstancesProvider)
+    // INJECT(ui::IUiConfiguration, uiConfiguration)
+    // INJECT(project::IProjectConfiguration, projectConfiguration)
+    // INJECT(notation::INotationConfiguration, notationConfiguration)
+    // INJECT(playback::IPlaybackConfiguration, playbackConfiguration)
+    // INJECT(languages::ILanguagesConfiguration, languagesConfiguration)
 
 public:
     void init();

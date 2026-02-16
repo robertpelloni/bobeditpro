@@ -60,14 +60,14 @@ const UiActionList RecordUiActions::m_mainActions = {
     UiAction(RECORD_TOGGLE_INPUT_MONITORING.toString(),
              au::context::UiCtxAny,
              au::context::CTX_ANY,
-             TranslatableString("action", "Turn on input monitoring"),
-             TranslatableString("action", "Turn on input monitoring"),
+             TranslatableString("action", "Enable input monitoring"),
+             TranslatableString("action", "Enable input monitoring"),
              Checkable::Yes
              ),
 };
 
-RecordUiActions::RecordUiActions(const muse::modularity::ContextPtr& ctx, std::shared_ptr<RecordController> controller)
-    : muse::Injectable(ctx), m_controller(controller)
+RecordUiActions::RecordUiActions(std::shared_ptr<RecordController> controller)
+    : m_controller(controller)
 {
 }
 

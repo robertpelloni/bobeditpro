@@ -1,15 +1,12 @@
 /*
  * Audacity: A Digital Audio Editor
  */
-
 #include "trackeditoperationcontroller.h"
-
 #include "trackediterrors.h"
 
 namespace au::trackedit {
-TrackeditOperationController::TrackeditOperationController(const muse::modularity::ContextPtr& ctx,
-                                                           std::unique_ptr<IUndoManager> undoManager)
-    : muse::Injectable(ctx), m_undoManager{std::move(undoManager)} {}
+TrackeditOperationController::TrackeditOperationController(std::unique_ptr<IUndoManager> undoManager)
+    : m_undoManager{std::move(undoManager)} {}
 
 secs_t TrackeditOperationController::clipStartTime(const ClipKey& clipKey) const
 {
@@ -121,6 +118,16 @@ bool TrackeditOperationController::changeTracksColor(const TrackIdList& tracksId
     return false;
 }
 
+bool TrackeditOperationController::changeAudioTrackViewType(const trackedit::TrackId& trackId, trackedit::TrackViewType viewType)
+{
+    if (tracksInteraction()->changeAudioTrackViewType(trackId, viewType)) {
+        projectHistory()->modifyState();
+        projectHistory()->markUnsaved();
+        return true;
+    }
+    return false;
+}
+
 bool TrackeditOperationController::changeClipOptimizeForVoice(const ClipKey& clipKey, bool optimize)
 {
     return clipsInteraction()->changeClipOptimizeForVoice(clipKey, optimize);
@@ -143,18 +150,8 @@ void TrackeditOperationController::clearClipboard()
 muse::Ret TrackeditOperationController::pasteFromClipboard(secs_t begin, bool moveClips, bool moveAllTracks)
 {
     auto modifiedState = false;
-    muse::Ret ret;
-    const auto paths = clipboard()->systemClipboardFilePaths();
-
-    if (!paths.empty()) {
-        ret = importer()->importFromSystemClipboard(paths, begin);
-        dispatcher()->dispatch("center-view-on-playhead", muse::actions::ActionData::make_arg1<bool>(
-                                   true /* center only if playhead is not visible */));
-    } else {
-        ret = tracksInteraction()->paste(clipboard()->trackDataCopy(), begin, moveClips, moveAllTracks,
-                                         clipboard()->isMultiSelectionCopy(), modifiedState);
-    }
-
+    const auto ret = tracksInteraction()->paste(clipboard()->trackDataCopy(), begin, moveClips, moveAllTracks,
+                                                clipboard()->isMultiSelectionCopy(), modifiedState);
     if (ret) {
         projectHistory()->pushHistoryState("Pasted from the clipboard", "Paste");
     } else if (modifiedState) {
@@ -166,7 +163,6 @@ muse::Ret TrackeditOperationController::pasteFromClipboard(secs_t begin, bool mo
 
 bool TrackeditOperationController::cutClipIntoClipboard(const ClipKey& clipKey)
 {
-    clipboard()->clearSystemClipboard();
     ITrackDataPtr data = clipsInteraction()->cutClip(clipKey);
     if (!data) {
         return false;
@@ -178,7 +174,6 @@ bool TrackeditOperationController::cutClipIntoClipboard(const ClipKey& clipKey)
 
 bool TrackeditOperationController::cutItemDataIntoClipboard(const TrackIdList& tracksIds, secs_t begin, secs_t end, bool moveClips)
 {
-    clipboard()->clearSystemClipboard();
     std::vector<ITrackDataPtr> tracksData;
     for (const auto& trackId : tracksIds) {
         const auto data = tracksInteraction()->cutTrackData(trackId, begin, end, moveClips);
@@ -196,7 +191,6 @@ bool TrackeditOperationController::cutItemDataIntoClipboard(const TrackIdList& t
 
 bool TrackeditOperationController::copyClipIntoClipboard(const ClipKey& clipKey)
 {
-    clipboard()->clearSystemClipboard();
     ITrackDataPtr data = clipsInteraction()->copyClip(clipKey);
     if (!data) {
         return false;
@@ -208,7 +202,6 @@ bool TrackeditOperationController::copyClipIntoClipboard(const ClipKey& clipKey)
 bool TrackeditOperationController::copyNonContinuousTrackDataIntoClipboard(const TrackId trackId, const TrackItemKeyList& itemKeys,
                                                                            secs_t offset)
 {
-    clipboard()->clearSystemClipboard();
     ITrackDataPtr data = tracksInteraction()->copyNonContinuousTrackData(trackId, itemKeys, offset);
     if (!data) {
         return false;
@@ -222,7 +215,6 @@ bool TrackeditOperationController::copyNonContinuousTrackDataIntoClipboard(const
 
 bool TrackeditOperationController::copyContinuousTrackDataIntoClipboard(const TrackId trackId, secs_t begin, secs_t end)
 {
-    clipboard()->clearSystemClipboard();
     ITrackDataPtr data = tracksInteraction()->copyContinuousTrackData(trackId, begin, end);
     if (!data) {
         return false;
@@ -243,13 +235,7 @@ bool TrackeditOperationController::removeClip(const ClipKey& clipKey)
 bool TrackeditOperationController::removeClips(const ClipKeyList& clipKeyList, bool moveClips)
 {
     if (clipsInteraction()->removeClips(clipKeyList, moveClips)) {
-        bool hasLabels = isLabelsSelected();
-        if (hasLabels) {
-            labelsInteraction()->removeLabels(selectedLabels(), moveClips);
-        }
-
-        const std::string msg = hasLabels ? "Remove multiple items" : "Remove multiple clips";
-        projectHistory()->pushHistoryState("Remove", msg);
+        projectHistory()->pushHistoryState("Delete", "Delete multiple clips");
         return true;
     }
     return false;
@@ -264,101 +250,21 @@ bool TrackeditOperationController::removeTracksData(const TrackIdList& tracksIds
     return false;
 }
 
-muse::RetVal<ClipKeyList> TrackeditOperationController::moveClips(const ClipKeyList& clipKeyList, secs_t timePositionOffset,
-                                                                  int trackPositionOffset,
-                                                                  bool completed,
-                                                                  bool& clipsMovedToOtherTrack)
+bool TrackeditOperationController::moveClips(secs_t timePositionOffset, int trackPositionOffset, bool completed,
+                                             bool& clipsMovedToOtherTrack)
 {
-    // Labels to move along with clips
-    LabelKeyList selectedLabels = selectionController()->selectedLabels();
-    if (!selectedLabels.empty()) {
-        secs_t clampedOffset = timePositionOffset;
-
-        for (const auto& clipKey : clipKeyList) {
-            secs_t startTime = clipsInteraction()->clipStartTime(clipKey);
-            if (startTime + clampedOffset < 0.0) {
-                clampedOffset = -startTime;
-            }
-        }
-
-        auto prj = globalContext()->currentTrackeditProject();
-        for (const auto& labelKey : selectedLabels) {
-            trackedit::Label label = prj->label(labelKey);
-            if (label.isValid() && label.startTime + clampedOffset < 0.0) {
-                clampedOffset = -label.startTime;
-            }
-        }
-
-        labelsInteraction()->moveLabels(selectedLabels, clampedOffset, trackPositionOffset);
-        timePositionOffset = clampedOffset;
-    }
-
-    muse::RetVal<ClipKeyList> result = clipsInteraction()->moveClips(clipKeyList, timePositionOffset, trackPositionOffset, completed,
-                                                                     clipsMovedToOtherTrack);
-
-    if (!result.ret) {
+    auto success = true;
+    if (!clipsInteraction()->moveClips(timePositionOffset, trackPositionOffset, completed, clipsMovedToOtherTrack)) {
+        success = false;
         if (completed) {
             clipsMovedToOtherTrack = false;
             projectHistory()->rollbackState();
             globalContext()->currentTrackeditProject()->reload();
         }
     } else if (completed) {
-        const std::string msg = !selectedLabels.empty() ? "Items moved" : "Clip moved";
-        projectHistory()->pushHistoryState(msg, "Move clip");
+        projectHistory()->pushHistoryState("Clip moved", "Move clip");
     }
-    return result;
-}
-
-bool TrackeditOperationController::moveRangeSelection(secs_t timePositionOffset, bool completed)
-{
-    ClipKeyList clipsInRange = selectionController()->clipsIntersectingRangeSelection();
-    LabelKeyList labelsInRange = selectionController()->labelsIntersectingRangeSelection();
-
-    if (clipsInRange.empty() && labelsInRange.empty()) {
-        return false;
-    }
-
-    secs_t clampedOffset = timePositionOffset;
-
-    for (const auto& clipKey : clipsInRange) {
-        secs_t startTime = clipsInteraction()->clipStartTime(clipKey);
-        if (startTime + clampedOffset < 0.0) {
-            clampedOffset = -startTime;
-        }
-    }
-
-    auto prj = globalContext()->currentTrackeditProject();
-    for (const auto& labelKey : labelsInRange) {
-        trackedit::Label label = prj->label(labelKey);
-        if (label.isValid() && label.startTime + clampedOffset < 0.0) {
-            clampedOffset = -label.startTime;
-        }
-    }
-
-    secs_t dataSelStart = selectionController()->dataSelectedStartTime();
-    if (dataSelStart + clampedOffset < 0.0) {
-        clampedOffset = -dataSelStart;
-    }
-
-    for (const auto& clipKey : clipsInRange) {
-        secs_t currentStart = clipsInteraction()->clipStartTime(clipKey);
-        clipsInteraction()->changeClipStartTime(clipKey, currentStart + clampedOffset, completed);
-    }
-
-    if (!labelsInRange.empty()) {
-        labelsInteraction()->moveLabels(labelsInRange, clampedOffset, 0);
-    }
-
-    selectionController()->setDataSelectedStartTime(
-        selectionController()->dataSelectedStartTime() + clampedOffset, false);
-    selectionController()->setDataSelectedEndTime(
-        selectionController()->dataSelectedEndTime() + clampedOffset, false);
-
-    if (completed) {
-        projectHistory()->pushHistoryState("Items moved", "Move items");
-    }
-
-    return true;
+    return success;
 }
 
 void TrackeditOperationController::cancelItemDragEdit()
@@ -491,91 +397,59 @@ bool TrackeditOperationController::splitDeleteSelectedOnTracks(const TrackIdList
     return false;
 }
 
-bool TrackeditOperationController::trimClipsLeft(const ClipKeyList& clipKeyList, secs_t deltaSec, secs_t minClipDuration, bool completed,
+bool TrackeditOperationController::trimClipLeft(const ClipKey& clipKey, secs_t deltaSec, secs_t minClipDuration, bool completed,
+                                                UndoPushType type)
+{
+    const auto success = clipsInteraction()->trimClipLeft(clipKey, deltaSec, minClipDuration, completed);
+    if (success && completed) {
+        projectHistory()->pushHistoryState("Clip left trimmed", "Trim clip left", type);
+    }
+    return success;
+}
+
+bool TrackeditOperationController::trimClipRight(const ClipKey& clipKey, secs_t deltaSec, secs_t minClipDuration, bool completed,
                                                  UndoPushType type)
 {
-    const auto success = clipsInteraction()->trimClipsLeft(clipKeyList, deltaSec, minClipDuration, completed);
-    if (!success) {
-        return success;
-    }
-
-    bool hasLabels = isLabelsSelected();
-    if (hasLabels) {
-        labelsInteraction()->stretchLabelsLeft(selectedLabels(), deltaSec, completed);
-    }
-
-    if (completed) {
-        std::string msg = hasLabels ? "Trim items left" : "Trim clip left";
-        projectHistory()->pushHistoryState("Trim", msg, type);
+    const auto success = clipsInteraction()->trimClipRight(clipKey, deltaSec, minClipDuration, completed);
+    if (success && completed) {
+        projectHistory()->pushHistoryState("Clip right trimmed", "Trim clip right", type);
     }
     return success;
 }
 
-bool TrackeditOperationController::trimClipsRight(const ClipKeyList& clipKeyList, secs_t deltaSec, secs_t minClipDuration, bool completed,
-                                                  UndoPushType type)
+bool TrackeditOperationController::stretchClipLeft(const ClipKey& clipKey, secs_t deltaSec, secs_t minClipDuration, bool completed,
+                                                   UndoPushType type)
 {
-    const auto success = clipsInteraction()->trimClipsRight(clipKeyList, deltaSec, minClipDuration, completed);
-    if (!success) {
-        return success;
-    }
-
-    bool hasLabels = isLabelsSelected();
-    if (hasLabels) {
-        labelsInteraction()->stretchLabelsRight(selectedLabels(), deltaSec, completed);
-    }
-    if (completed) {
-        std::string msg = hasLabels ? "Trim items right" : "Trim clip right";
-        projectHistory()->pushHistoryState("Trim", msg, type);
+    const auto success = clipsInteraction()->stretchClipLeft(clipKey, deltaSec, minClipDuration, completed);
+    if (success && completed) {
+        projectHistory()->pushHistoryState("Clip left stretched", "Stretch clip left", type);
     }
     return success;
 }
 
-bool TrackeditOperationController::stretchClipsLeft(const ClipKeyList& clipKeyList, secs_t deltaSec, secs_t minClipDuration, bool completed,
+bool TrackeditOperationController::stretchClipRight(const ClipKey& clipKey, secs_t deltaSec, secs_t minClipDuration, bool completed,
                                                     UndoPushType type)
 {
-    const auto success = clipsInteraction()->stretchClipsLeft(clipKeyList, deltaSec, minClipDuration, completed);
-    if (!success) {
-        return success;
+    const auto success = clipsInteraction()->stretchClipRight(clipKey, deltaSec, minClipDuration, completed);
+    if (success && completed) {
+        projectHistory()->pushHistoryState("Clip right stretched", "Stretch clip right", type);
     }
-
-    bool hasLabels = isLabelsSelected();
-    if (hasLabels) {
-        labelsInteraction()->stretchLabelsLeft(selectedLabels(), deltaSec, completed);
-    }
-
-    if (completed) {
-        std::string msg = hasLabels ? "Stretch items left" : "Stretch clip left";
-        projectHistory()->pushHistoryState("Stretch", msg, type);
-    }
-
-    return success;
-}
-
-bool TrackeditOperationController::stretchClipsRight(const ClipKeyList& clipKeyList, secs_t deltaSec, secs_t minClipDuration,
-                                                     bool completed,
-                                                     UndoPushType type)
-{
-    const auto success = clipsInteraction()->stretchClipsRight(clipKeyList, deltaSec, minClipDuration, completed);
-    if (!success) {
-        return success;
-    }
-
-    bool hasLabels = isLabelsSelected();
-    if (hasLabels) {
-        labelsInteraction()->stretchLabelsRight(selectedLabels(), deltaSec, completed);
-    }
-
-    if (completed) {
-        std::string msg = hasLabels ? "Stretch items right" : "Stretch clips right";
-        projectHistory()->pushHistoryState("Stretch", msg, type);
-    }
-
     return success;
 }
 
 secs_t TrackeditOperationController::clipDuration(const ClipKey& clipKey) const
 {
     return clipsInteraction()->clipDuration(clipKey);
+}
+
+std::optional<secs_t> TrackeditOperationController::getLeftmostClipStartTime(const ClipKeyList& clipKeys) const
+{
+    return clipsInteraction()->getLeftmostClipStartTime(clipKeys);
+}
+
+std::optional<secs_t> TrackeditOperationController::getRightmostClipEndTime(const ClipKeyList& clipKeys) const
+{
+    return clipsInteraction()->getRightmostClipEndTime(clipKeys);
 }
 
 double TrackeditOperationController::nearestZeroCrossing(double t0) const
@@ -591,7 +465,7 @@ muse::Ret TrackeditOperationController::makeRoomForClip(const ClipKey& clipKey)
 bool TrackeditOperationController::newMonoTrack()
 {
     if (tracksInteraction()->newMonoTrack()) {
-        projectHistory()->pushHistoryState("Created new mono track", "New mono track");
+        projectHistory()->pushHistoryState("Created new audio track", "New track");
         return true;
     }
     return false;
@@ -600,16 +474,7 @@ bool TrackeditOperationController::newMonoTrack()
 bool TrackeditOperationController::newStereoTrack()
 {
     if (tracksInteraction()->newStereoTrack()) {
-        projectHistory()->pushHistoryState("Created new stereo track", "New stereo track");
-        return true;
-    }
-    return false;
-}
-
-bool TrackeditOperationController::newBusTrack()
-{
-    if (tracksInteraction()->newBusTrack()) {
-        projectHistory()->pushHistoryState("Created new bus track", "New Bus Track");
+        projectHistory()->pushHistoryState("Created new audio track", "New track");
         return true;
     }
     return false;
@@ -617,11 +482,7 @@ bool TrackeditOperationController::newBusTrack()
 
 muse::RetVal<TrackId> TrackeditOperationController::newLabelTrack(const muse::String& title)
 {
-    auto track = tracksInteraction()->newLabelTrack(title);
-    if (track.ret.success()) {
-        projectHistory()->pushHistoryState("Created label track", "New label track");
-    }
-    return track;
+    return tracksInteraction()->newLabelTrack(title);
 }
 
 bool TrackeditOperationController::deleteTracks(const TrackIdList& trackIds)
@@ -854,7 +715,7 @@ bool TrackeditOperationController::cutLabel(const LabelKey& labelKey)
     }
 
     clipboard()->addTrackData(std::move(data));
-    projectHistory()->pushHistoryState("Cut", "Cut label");
+    projectHistory()->pushHistoryState("Label cut", "Cut label");
     return true;
 }
 
@@ -871,7 +732,7 @@ bool TrackeditOperationController::copyLabel(const LabelKey& labelKey)
 bool TrackeditOperationController::removeLabel(const LabelKey& labelKey)
 {
     if (labelsInteraction()->removeLabel(labelKey)) {
-        projectHistory()->pushHistoryState("Remove", "Remove label");
+        projectHistory()->pushHistoryState("Label removed", "Remove label");
         return true;
     }
     return false;
@@ -880,86 +741,24 @@ bool TrackeditOperationController::removeLabel(const LabelKey& labelKey)
 bool TrackeditOperationController::removeLabels(const LabelKeyList& labelKeys, bool moveLabels)
 {
     if (labelsInteraction()->removeLabels(labelKeys, moveLabels)) {
-        bool hasClips = isClipsSelected();
-        if (hasClips) {
-            clipsInteraction()->removeClips(selectedClips(), moveLabels);
-        }
-
-        if (hasClips) {
-            projectHistory()->pushHistoryState("Remove", "Remove multiple items");
-        } else {
-            projectHistory()->pushHistoryState("Remove", "Remove multiple labels");
-        }
-
+        projectHistory()->pushHistoryState("Labels removed", "Remove labels");
         return true;
     }
     return false;
 }
 
-bool TrackeditOperationController::moveLabels(const LabelKeyList& labelKeys, secs_t timePositionOffset, bool completed)
+bool TrackeditOperationController::moveLabels(secs_t timePositionOffset, bool completed)
 {
-    ClipKeyList selectedClips = selectionController()->selectedClips();
-    if (!selectedClips.empty()) {
-        secs_t clampedOffset = timePositionOffset;
-
-        for (const auto& clipKey : selectedClips) {
-            secs_t startTime = clipsInteraction()->clipStartTime(clipKey);
-            if (startTime + clampedOffset < 0.0) {
-                clampedOffset = -startTime;
-            }
-        }
-
-        auto prj = globalContext()->currentTrackeditProject();
-        for (const auto& labelKey : labelKeys) {
-            trackedit::Label label = prj->label(labelKey);
-            if (label.isValid() && label.startTime + clampedOffset < 0.0) {
-                clampedOffset = -label.startTime;
-            }
-        }
-
-        for (const auto& clipKey : selectedClips) {
-            secs_t currentStart = clipsInteraction()->clipStartTime(clipKey);
-            clipsInteraction()->changeClipStartTime(clipKey, currentStart + clampedOffset, completed);
-        }
-
-        timePositionOffset = clampedOffset;
+    bool success = labelsInteraction()->moveLabels(timePositionOffset);
+    if (success && completed) {
+        projectHistory()->pushHistoryState("Labels moved", "Move labels");
     }
-
-    muse::RetVal<LabelKeyList> retVal = labelsInteraction()->moveLabels(labelKeys, timePositionOffset, 0);
-    if (retVal.ret && completed) {
-        const std::string msg = !selectedClips.empty() ? "Move items" : "Move labels";
-        projectHistory()->pushHistoryState("Move", msg);
-    }
-    return retVal.ret;
+    return success;
 }
 
-muse::RetVal<LabelKeyList> TrackeditOperationController::moveLabels(const LabelKeyList& labelKeys, secs_t timePositionOffset,
-                                                                    int trackPositionOffset,
-                                                                    bool completed)
+muse::RetVal<LabelKeyList> TrackeditOperationController::moveLabels(const LabelKeyList& labelKeys, const TrackId& toTrackId, bool completed)
 {
-    muse::RetVal<LabelKeyList> retVal = labelsInteraction()->moveLabels(labelKeys, timePositionOffset, trackPositionOffset);
-    if (!retVal.ret) {
-        return retVal;
-    }
-
-    bool clipsSelected = isClipsSelected();
-    if (isClipsSelected()) {
-        bool clipsMovedToOtherTracks = false;
-        clipsInteraction()->moveClips(selectedClips(), timePositionOffset, trackPositionOffset, completed, clipsMovedToOtherTracks);
-    }
-
-    if (completed) {
-        const std::string msg = clipsSelected ? "Move items" : "Movel labels";
-        projectHistory()->pushHistoryState("Move", msg);
-    }
-
-    return retVal;
-}
-
-muse::RetVal<LabelKeyList> TrackeditOperationController::moveLabelsToTrack(const LabelKeyList& labelKeys, const TrackId& toTrackId,
-                                                                           bool completed)
-{
-    muse::RetVal<LabelKeyList> retVal = labelsInteraction()->moveLabelsToTrack(labelKeys, toTrackId);
+    muse::RetVal<LabelKeyList> retVal = labelsInteraction()->moveLabels(labelKeys, toTrackId);
     if (retVal.ret && completed) {
         projectHistory()->pushHistoryState("Labels moved", "Move labels");
     }
@@ -975,28 +774,6 @@ bool TrackeditOperationController::stretchLabelLeft(const LabelKey& labelKey, se
     return success;
 }
 
-bool TrackeditOperationController::stretchLabelsLeft(const LabelKeyList& labelKeyList, secs_t deltaSec,
-                                                     bool completed)
-{
-    bool success = labelsInteraction()->stretchLabelsLeft(labelKeyList, deltaSec, completed);
-    if (!success) {
-        return success;
-    }
-
-    bool clipsSelected = isClipsSelected();
-    if (clipsSelected) {
-        constexpr double MIN_CLIP_WIDTH = 3.0;
-        clipsInteraction()->stretchClipsLeft(selectedClips(), deltaSec, MIN_CLIP_WIDTH, completed);
-    }
-
-    if (completed) {
-        const std::string msg = clipsSelected ? "Stretch items left" : "Stretch labels left";
-        projectHistory()->pushHistoryState("Stretch", msg);
-    }
-
-    return success;
-}
-
 bool TrackeditOperationController::stretchLabelRight(const LabelKey& labelKey, secs_t newEndTime, bool completed)
 {
     bool success = labelsInteraction()->stretchLabelRight(labelKey, newEndTime, completed);
@@ -1006,25 +783,9 @@ bool TrackeditOperationController::stretchLabelRight(const LabelKey& labelKey, s
     return success;
 }
 
-bool TrackeditOperationController::stretchLabelsRight(const LabelKeyList& labelKeyList, secs_t deltaSec,
-                                                      bool completed)
+std::optional<secs_t> TrackeditOperationController::getLeftmostLabelStartTime(const LabelKeyList& labelKeys) const
 {
-    bool success = labelsInteraction()->stretchLabelsRight(labelKeyList, deltaSec, completed);
-    if (!success) {
-        return success;
-    }
-
-    bool clipsSelected = isClipsSelected();
-    if (clipsSelected) {
-        constexpr double MIN_CLIP_WIDTH = 3.0;
-        clipsInteraction()->stretchClipsRight(selectedClips(), -deltaSec, MIN_CLIP_WIDTH, completed);
-    }
-
-    if (completed) {
-        const std::string msg = clipsSelected ? "Stretch items right" : "Stretch labels right";
-        projectHistory()->pushHistoryState("Stretch", msg);
-    }
-    return success;
+    return labelsInteraction()->getLeftmostLabelStartTime(labelKeys);
 }
 
 muse::Progress TrackeditOperationController::progress() const
@@ -1054,25 +815,5 @@ void TrackeditOperationController::pushProjectHistoryDeleteState(secs_t start, s
     std::stringstream ss;
     ss << "Delete " << duration << " seconds at " << start;
     projectHistory()->pushHistoryState(ss.str(), "Delete");
-}
-
-bool TrackeditOperationController::isClipsSelected() const
-{
-    return selectionController()->hasSelectedClips();
-}
-
-ClipKeyList TrackeditOperationController::selectedClips() const
-{
-    return selectionController()->selectedClips();
-}
-
-bool TrackeditOperationController::isLabelsSelected() const
-{
-    return selectionController()->hasSelectedLabels();
-}
-
-LabelKeyList TrackeditOperationController::selectedLabels() const
-{
-    return selectionController()->selectedLabels();
 }
 }

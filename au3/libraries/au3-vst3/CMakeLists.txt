@@ -13,8 +13,6 @@ set( SOURCES
    VST3EffectsModule.h
    VST3Instance.cpp
    VST3Instance.h
-   VST3ParameterExtraction.cpp
-   VST3ParameterExtraction.h
    VST3Utils.cpp
    VST3Utils.h
    VST3Wrapper.cpp

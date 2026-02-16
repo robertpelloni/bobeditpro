@@ -24,6 +24,11 @@
 using namespace au::context;
 using namespace au::project;
 
+GlobalContext::GlobalContext()
+{
+    m_playbackState = std::make_shared<PlaybackState>();
+}
+
 void GlobalContext::setCurrentProject(const IAudacityProjectPtr& project)
 {
     if (m_currentProject == project) {

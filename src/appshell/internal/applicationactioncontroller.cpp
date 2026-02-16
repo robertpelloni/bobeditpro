@@ -74,7 +74,6 @@ void ApplicationActionController::init()
     dispatcher()->reg(this, "action://redo", this, &ApplicationActionController::doGlobalRedo);
     dispatcher()->reg(this, "action://delete", this, &ApplicationActionController::doGlobalDelete);
     dispatcher()->reg(this, "action://cancel", this, &ApplicationActionController::doGlobalCancel);
-    dispatcher()->reg(this, "action://trigger", this, &ApplicationActionController::doGlobalTrigger);
 }
 
 const std::vector<muse::actions::ActionCode>& ApplicationActionController::prohibitedActionsWhileRecording() const
@@ -207,10 +206,10 @@ bool ApplicationActionController::quit()
 void ApplicationActionController::restart()
 {
     if (projectFilesController()->closeOpenedProject()) {
-        // if (multiwindowsProvider()->instances().size() == 1) {
+        // if (multiInstancesProvider()->instances().size() == 1) {
         application()->restart();
         // } else {
-        // multiwindowsProvider()->quitAllAndRestartLast();
+        // multiInstancesProvider()->quitAllAndRestartLast();
 
         // QCoreApplication::exit();
         // }
@@ -247,8 +246,8 @@ void ApplicationActionController::openAskForHelpPage()
 void ApplicationActionController::openPreferencesDialog()
 {
     //! TODO AU4
-    // if (multiwindowsProvider()->isPreferencesAlreadyOpened()) {
-    //     multiwindowsProvider()->activateWindowWithOpenedPreferences();
+    // if (multiInstancesProvider()->isPreferencesAlreadyOpened()) {
+    //     multiInstancesProvider()->activateWindowWithOpenedPreferences();
     //     return;
     // }
 
@@ -334,16 +333,9 @@ bool ApplicationActionController::isProjectOpened() const
     return hasProject && isOpened;
 }
 
-bool ApplicationActionController::isProjectOpenedAndFocused() const
-{
-    bool isOpened = isProjectOpened();
-    bool isFocused = uiContextResolver()->matchWithCurrent(context::UiCtxProjectFocused);
-    return isOpened && isFocused;
-}
-
 void ApplicationActionController::doGlobalCopy()
 {
-    if (isProjectOpenedAndFocused()) {
+    if (isProjectOpened()) {
         dispatcher()->dispatch("action://trackedit/copy");
     } else {
         // resolve other actions
@@ -352,7 +344,7 @@ void ApplicationActionController::doGlobalCopy()
 
 void ApplicationActionController::doGlobalCut()
 {
-    if (isProjectOpenedAndFocused()) {
+    if (isProjectOpened()) {
         dispatcher()->dispatch("action://trackedit/cut");
     } else {
         // resolve other actions
@@ -361,7 +353,7 @@ void ApplicationActionController::doGlobalCut()
 
 void ApplicationActionController::doGlobalPaste()
 {
-    if (isProjectOpenedAndFocused()) {
+    if (isProjectOpened()) {
         dispatcher()->dispatch("action://trackedit/paste-default");
     } else {
         // resolve other actions
@@ -388,7 +380,7 @@ void ApplicationActionController::doGlobalRedo()
 
 void ApplicationActionController::doGlobalDelete()
 {
-    if (isProjectOpenedAndFocused()) {
+    if (isProjectOpened()) {
         dispatcher()->dispatch("action://trackedit/delete");
     } else {
         // resolve other actions
@@ -397,18 +389,9 @@ void ApplicationActionController::doGlobalDelete()
 
 void ApplicationActionController::doGlobalCancel()
 {
-    if (isProjectOpenedAndFocused()) {
+    if (isProjectOpened()) {
         dispatcher()->dispatch("action://trackedit/cancel");
     } else {
         dispatcher()->dispatch("nav-escape");
-    }
-}
-
-void ApplicationActionController::doGlobalTrigger()
-{
-    if (isProjectOpened()) {
-        dispatcher()->dispatch("action://playback/play");
-    } else {
-        dispatcher()->dispatch("nav-trigger-control");
     }
 }

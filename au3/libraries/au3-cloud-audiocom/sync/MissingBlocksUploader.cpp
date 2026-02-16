@@ -57,8 +57,7 @@ void MissingBlocksUploader::Start(
     mUploadTasks         = std::move(uploadTasks);
     mProgressCallback    = std::move(progressCallback);
     if (!mProgressCallback) {
-        mProgressCallback = [](auto...) {};
-    }
+        mProgressCallback = [](auto...) {} }
 
     mProgressData.TotalBlocks = mUploadTasks.size();
 
@@ -169,7 +168,7 @@ MissingBlocksUploader::ProducedItem MissingBlocksUploader::PopBlockFromQueue()
     });
 
     if (!mIsRunning.load(std::memory_order_relaxed)) {
-        return {};
+        return {}
     }
 
     auto item            = std::move(mRingBuffer[mRingBufferReadIndex]);

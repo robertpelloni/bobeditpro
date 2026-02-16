@@ -19,8 +19,6 @@ StyledDialogView {
 
     resizable: false
 
-    closeOnEscape: !labelsTableView.currentEditedCell
-
     onNavigationActivateRequested: {
         topPanel.focusOnFirst()
     }

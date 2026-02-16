@@ -13,14 +13,13 @@
 
 struct TrackListEvent;
 namespace au::trackedit {
-class Au3TrackeditProject : public ITrackeditProject, public muse::Injectable
+class Au3TrackeditProject : public ITrackeditProject
 {
-    muse::GlobalInject<muse::IGlobalConfiguration> globalConfiguration;
-
-    muse::Inject<trackedit::IProjectHistory> projectHistory { this };
+    muse::Inject<muse::IGlobalConfiguration> globalConfiguration;
+    muse::Inject<trackedit::IProjectHistory> projectHistory;
 
 public:
-    explicit Au3TrackeditProject(const muse::modularity::ContextPtr& ctx, const std::shared_ptr<au::au3::IAu3Project>& au3project);
+    explicit Au3TrackeditProject(const std::shared_ptr<au::au3::IAu3Project>& au3project);
     ~Au3TrackeditProject() override;
 
     TrackIdList trackIdList() const override;
@@ -89,11 +88,10 @@ private:
     mutable muse::async::Channel<trackedit::Track, int> m_trackMoved;
 };
 
-class Au3TrackeditProjectCreator : public ITrackeditProjectCreator, public muse::Injectable
+class Au3TrackeditProjectCreator : public ITrackeditProjectCreator
 {
 public:
-    Au3TrackeditProjectCreator(const muse::modularity::ContextPtr& ctx)
-        : muse::Injectable(ctx) {}
+    Au3TrackeditProjectCreator() = default;
 
     ITrackeditProjectPtr create(const std::shared_ptr<au::au3::IAu3Project>& au3project) const override;
 };

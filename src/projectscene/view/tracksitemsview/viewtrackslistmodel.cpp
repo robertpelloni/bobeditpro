@@ -42,7 +42,7 @@ static_assert(numDecimals(0.005) == 3);
 }
 
 ViewTracksListModel::ViewTracksListModel(QObject* parent)
-    : QAbstractListModel(parent), muse::Injectable(muse::iocCtxForQmlObject(this))
+    : QAbstractListModel(parent)
 {
 }
 
@@ -61,8 +61,12 @@ void ViewTracksListModel::load()
         emit escapePressed();
     }, muse::async::Asyncable::Mode::SetReplace);
 
-    trackPlaybackControl()->muteOrSoloChanged().onReceive(this, [this] (long trackId) {
-        emit dataChanged(indexOf(trackId), indexOf(trackId), { IsTrackAudibleRole });
+    trackPlaybackControl()->muteOrSoloChanged().onReceive(this, [this] (long) {
+        emit dataChanged(index(0), index(static_cast<int>(m_trackList.size()) - 1), { IsTrackAudibleRole });
+    }, muse::async::Asyncable::Mode::SetReplace);
+
+    projectHistory()->historyChanged().onNotify(this, [this]() {
+        emit dataChanged(index(0), index(m_trackList.size() - 1), { IsTrackAudibleRole });
     }, muse::async::Asyncable::Mode::SetReplace);
 
     beginResetModel();
@@ -75,7 +79,6 @@ void ViewTracksListModel::load()
             return;
         }
 
-        // TODO: only dataChanged affected tracks, not the whole thing
         QModelIndex beginIndex = index(0);
         QModelIndex lastIndex = index(static_cast<int>(m_trackList.size()) - 1);
 
@@ -83,12 +86,12 @@ void ViewTracksListModel::load()
         emit dataChanged(beginIndex, lastIndex, { IsDataSelectedRole });
     }, muse::async::Asyncable::Mode::SetReplace);
 
-    trackNavigationController()->focusedTrackChanged().onReceive(this, [this](const trackedit::TrackId& /*trackId*/, bool /*highlight*/) {
+    selectionController()->focusedTrackChanged().onReceive(this, [this](const trackedit::TrackId& trackId) {
+        Q_UNUSED(trackId);
         if (m_trackList.empty()) {
             return;
         }
 
-        // TODO: only dataChanged affected tracks, not the whole thing
         QModelIndex beginIndex = index(0);
         QModelIndex lastIndex = index(static_cast<int>(m_trackList.size()) - 1);
 
@@ -98,33 +101,8 @@ void ViewTracksListModel::load()
     selectionController()->clipsSelected().onReceive(this, [this](const trackedit::ClipKeyList& clipKeys) {
         Q_UNUSED(clipKeys);
 
-        // TODO: only dataChanged affected tracks, not the whole thing
         const int lastIndex = static_cast<int>(m_trackList.size()) - 1;
         emit dataChanged(index(0), index(lastIndex), { IsMultiSelectionActiveRole });
-    }, muse::async::Asyncable::Mode::SetReplace);
-
-    selectionController()->selectedTracksChanged().onReceive(this, [this](const trackedit::TrackIdList& trackIds) {
-        Q_UNUSED(trackIds);
-
-        if (m_trackList.empty()) {
-            return;
-        }
-
-        // TODO: only dataChanged affected tracks, not the whole thing
-        const int lastIndex = static_cast<int>(m_trackList.size()) - 1;
-        emit dataChanged(index(0), index(lastIndex), { IsTrackSelectedRole });
-    }, muse::async::Asyncable::Mode::SetReplace);
-
-    selectionController()->tracksSelected().onReceive(this, [this](const trackedit::TrackIdList& trackIds) {
-        Q_UNUSED(trackIds);
-
-        if (m_trackList.empty()) {
-            return;
-        }
-
-        // TODO: only dataChanged affected tracks, not the whole thing
-        const int lastIndex = static_cast<int>(m_trackList.size()) - 1;
-        emit dataChanged(index(0), index(lastIndex), { IsTrackSelectedRole });
     }, muse::async::Asyncable::Mode::SetReplace);
 
     selectionController()->dataSelectedStartTimeChanged().onReceive(this, [this](trackedit::secs_t begin) {
@@ -133,7 +111,6 @@ void ViewTracksListModel::load()
             return;
         }
 
-        // TODO: only dataChanged affected tracks, not the whole thing
         const int lastIndex = static_cast<int>(m_trackList.size()) - 1;
         emit dataChanged(index(0), index(lastIndex), { IsDataSelectedRole });
     }, muse::async::Asyncable::Mode::SetReplace);
@@ -144,17 +121,8 @@ void ViewTracksListModel::load()
             return;
         }
 
-        // TODO: only dataChanged affected tracks, not the whole thing
         const int lastIndex = static_cast<int>(m_trackList.size()) - 1;
         emit dataChanged(index(0), index(lastIndex), { IsDataSelectedRole });
-    }, muse::async::Asyncable::Mode::SetReplace);
-
-    selectionController()->frequencySelectionChanged().onReceive(this, [this](trackedit::TrackId trackId) {
-        QModelIndex idx = indexOf(trackId);
-        if (!idx.isValid()) {
-            return;
-        }
-        emit dataChanged(idx, idx, { FrequencySelectionRole });
     }, muse::async::Asyncable::Mode::SetReplace);
 
     prj->tracksChanged().onReceive(this, [this](const std::vector<au::trackedit::Track> tracks) {
@@ -212,12 +180,14 @@ void ViewTracksListModel::load()
     }, muse::async::Asyncable::Mode::SetReplace);
 
     prj->trackChanged().onReceive(this, [this](const trackedit::Track& track) {
-        QModelIndex idx = indexOf(track.id);
-        if (!idx.isValid()) {
-            return;
+        for (size_t i = 0; i < m_trackList.size(); ++i) {
+            if (m_trackList.at(i).id == track.id) {
+                m_trackList[i] = track;
+
+                emit dataChanged(index(i), index(i));
+                break;
+            }
         }
-        m_trackList[idx.row()] = track;
-        emit dataChanged(idx, idx);
         emit verticalRulerWidthChanged();
     }, muse::async::Asyncable::Mode::SetReplace);
 
@@ -252,17 +222,6 @@ int ViewTracksListModel::rowCount(const QModelIndex&) const
     return static_cast<int>(m_trackList.size());
 }
 
-namespace {
-au::trackedit::TrackViewType getTrackViewType(const au::project::IAudacityProjectPtr& prj, const au::trackedit::TrackId& trackId)
-{
-    if (!prj) {
-        return au::trackedit::TrackViewType::Undefined;
-    }
-    const auto viewState = prj->viewState();
-    return viewState->trackViewType(trackId).val;
-}
-}
-
 QVariant ViewTracksListModel::data(const QModelIndex& index, int role) const
 {
     if (!index.isValid()) {
@@ -273,9 +232,6 @@ QVariant ViewTracksListModel::data(const QModelIndex& index, int role) const
     switch (role) {
     case TrackIdRole:
         return QVariant::fromValue(track.id);
-    case TrackSampleRateRole: {
-        return static_cast<int>(track.rate);
-    }
     case IsDataSelectedRole: {
         return muse::contains(selectionController()->selectedTracks(), track.id) && selectionController()->timeSelectionIsNotEmpty();
     }
@@ -283,7 +239,7 @@ QVariant ViewTracksListModel::data(const QModelIndex& index, int role) const
         return muse::contains(selectionController()->selectedTracks(), track.id);
     }
     case IsTrackFocusedRole: {
-        return trackNavigationController()->focusedTrack() == track.id;
+        return selectionController()->focusedTrack() == track.id;
     }
     case IsMultiSelectionActiveRole: {
         return selectionController()->selectedClips().size() > 1;
@@ -310,24 +266,13 @@ QVariant ViewTracksListModel::data(const QModelIndex& index, int role) const
     case IsStereoRole:
         return track.type == au::trackedit::TrackType::Stereo;
 
-    case IsWaveformViewVisibleRole: {
-        const auto vt = getTrackViewType(globalContext()->currentProject(), track.id);
-        return vt == trackedit::TrackViewType::Waveform || vt == trackedit::TrackViewType::WaveformAndSpectrogram;
-    }
+    case IsWaveformViewVisibleRole:
+        return track.viewType == au::trackedit::TrackViewType::Waveform
+               || track.viewType == au::trackedit::TrackViewType::WaveformAndSpectrogram;
 
-    case IsSpectrogramViewVisibleRole: {
-        const auto vt = getTrackViewType(globalContext()->currentProject(), track.id);
-        return vt == trackedit::TrackViewType::Spectrogram || vt == trackedit::TrackViewType::WaveformAndSpectrogram;
-    }
-
-    case FrequencySelectionRole: {
-        const auto [startFrequency, endFrequency] = selectionController()->frequencySelection(track.id);
-        const QVariantMap frequencySelectionMap {
-            { "startFrequency", startFrequency },
-            { "endFrequency", endFrequency }
-        };
-        return frequencySelectionMap;
-    }
+    case IsSpectrogramViewVisibleRole:
+        return track.viewType == au::trackedit::TrackViewType::Spectrogram
+               || track.viewType == au::trackedit::TrackViewType::WaveformAndSpectrogram;
 
     case DbRangeRole:
         return playback::PlaybackMeterDbRange::toDouble(playbackConfiguration()->playbackMeterDbRange());
@@ -349,7 +294,6 @@ QHash<int, QByteArray> ViewTracksListModel::roleNames() const
     {
         { TypeRole, "trackType" },
         { TrackIdRole, "trackId" },
-        { TrackSampleRateRole, "trackSampleRate" },
         { IsDataSelectedRole, "isDataSelected" },
         { IsTrackSelectedRole, "isTrackSelected" },
         { IsTrackFocusedRole, "isTrackFocused" },
@@ -359,7 +303,6 @@ QHash<int, QByteArray> ViewTracksListModel::roleNames() const
         { DbRangeRole, "dbRange" },
         { IsWaveformViewVisibleRole, "isWaveformViewVisible" },
         { IsSpectrogramViewVisibleRole, "isSpectrogramViewVisible" },
-        { FrequencySelectionRole, "frequencySelection" },
         { ColorRole, "color" }
     };
     return roles;
@@ -380,16 +323,6 @@ int ViewTracksListModel::verticalRulerWidth() const
     }
 
     return viewState->verticalRulerWidth().val;
-}
-
-QModelIndex ViewTracksListModel::indexOf(trackedit::TrackId trackId)
-{
-    for (size_t i = 0; i < m_trackList.size(); i++) {
-        if (m_trackList[i].id == trackId) {
-            return index(static_cast<int>(i));
-        }
-    }
-    return QModelIndex();
 }
 
 int ViewTracksListModel::totalTracksHeight() const

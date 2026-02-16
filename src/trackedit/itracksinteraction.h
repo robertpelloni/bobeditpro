@@ -27,6 +27,7 @@ public:
     virtual bool changeTrackTitle(const trackedit::TrackId trackId, const muse::String& title) = 0;
 
     virtual bool changeTracksColor(const TrackIdList& trackId, const std::string& color) = 0;
+    virtual bool changeAudioTrackViewType(const trackedit::TrackId& trackId, trackedit::TrackViewType viewType) = 0;
 
     virtual muse::Ret paste(const std::vector<ITrackDataPtr>& data, secs_t begin, bool moveClips, bool moveAllTracks,
                             bool isMultiSelectionCopy, bool& modifiedState) = 0;
@@ -46,7 +47,6 @@ public:
 
     virtual bool newMonoTrack() = 0;
     virtual bool newStereoTrack() = 0;
-    virtual bool newBusTrack() = 0;
     virtual muse::RetVal<TrackId> newLabelTrack(const muse::String& title = muse::String()) = 0;
 
     virtual bool deleteTracks(const TrackIdList& trackIds) = 0;

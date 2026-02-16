@@ -20,8 +20,5 @@ public:
 
     MOCK_METHOD(void, setMultiSelectionCopy, (bool newValue), (override));
     MOCK_METHOD(bool, isMultiSelectionCopy, (), (const, override));
-
-    MOCK_METHOD(std::vector<muse::io::path_t>, systemClipboardFilePaths, (), (const, override));
-    MOCK_METHOD(void, clearSystemClipboard, (), (override));
 };
 }

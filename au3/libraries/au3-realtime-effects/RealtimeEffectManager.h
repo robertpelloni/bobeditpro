@@ -152,20 +152,20 @@ private:
 
     //! Visit states for group or for the master when group is null
     template<typename StateVisitor>
-    void VisitGroup(ChannelGroup* group, const StateVisitor& func, RealtimeEffectList::Stage stage = RealtimeEffectList::Stage::All)
+    void VisitGroup(ChannelGroup* group, const StateVisitor& func)
     {
         if (group == nullptr) {
-            RealtimeEffectList::Get(mProject).Visit(func, stage);
+            RealtimeEffectList::Get(mProject).Visit(func);
         } else {
             // Call the function for each effect on the group list
-            RealtimeEffectList::Get(*group).Visit(func, stage);
+            RealtimeEffectList::Get(*group).Visit(func);
         }
     }
 
     template<typename StateVisitor>
-    void VisitGroup(const ChannelGroup* group, const StateVisitor& func, RealtimeEffectList::Stage stage = RealtimeEffectList::Stage::All)
+    void VisitGroup(const ChannelGroup* group, const StateVisitor& func)
     {
-        VisitGroup(const_cast<ChannelGroup*>(group), func, stage);
+        VisitGroup(const_cast<ChannelGroup*>(group), func);
     }
 
     //! Visit the per-project states first, then all groups from AddGroup
@@ -271,14 +271,13 @@ public:
                    float* const* scratch,
                    float* dummy,
                    unsigned nBuffers, //!< how many buffers; equal number of scratches
-                   size_t numSamples, //!< length of each buffer
-                   RealtimeEffectList::Stage stage = RealtimeEffectList::Stage::All
+                   size_t numSamples //!< length of each buffer
                    )
     {
         if (const auto pProject = mwProject.lock()) {
             return RealtimeEffectManager::Get(*pProject)
                    .Process(mSuspended, group, buffers, scratch, dummy,
-                            nBuffers, numSamples, stage);
+                            nBuffers, numSamples);
         }
         return 0; // consider them trivially processed
     }

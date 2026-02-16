@@ -23,8 +23,7 @@
 using namespace au::trackedit;
 using namespace au::au3;
 
-Au3LabelsInteraction::Au3LabelsInteraction(const muse::modularity::ContextPtr& ctx)
-    : muse::Injectable(ctx)
+Au3LabelsInteraction::Au3LabelsInteraction()
 {
     m_progress.setMaxNumIncrements(200);
 }
@@ -67,7 +66,7 @@ bool Au3LabelsInteraction::addLabelToSelection()
 
     Au3LabelTrack* labelTrack = nullptr;
 
-    const auto focusedTrackId = trackNavigationController()->focusedTrack();
+    const auto focusedTrackId = selectionController()->focusedTrack();
     if (focusedTrackId > 0) {
         Au3Track* focusedAu3Track = DomAccessor::findTrack(project, Au3TrackId(focusedTrackId));
         if (focusedAu3Track) {
@@ -305,23 +304,15 @@ ITrackDataPtr Au3LabelsInteraction::copyLabel(const LabelKey& labelKey)
     return std::make_shared<Au3TrackData>(std::move(track));
 }
 
-muse::RetVal<LabelKeyList> Au3LabelsInteraction::moveLabels(const LabelKeyList& labelKeys, secs_t timePositionOffset,
-                                                            int trackPositionOffset)
+bool Au3LabelsInteraction::moveLabels(secs_t timePositionOffset)
 {
-    muse::RetVal<LabelKeyList> result;
-    result.ret = make_ret(Err::NoError);
-
-    trackPositionOffset = std::clamp(trackPositionOffset, -1, 1);
-
-    if (muse::RealIsEqual(timePositionOffset, 0.0) && trackPositionOffset == 0) {
-        result.val = labelKeys;
-        return result;
+    if (muse::RealIsEqual(timePositionOffset, 0.0)) {
+        return true;
     }
 
     //! NOTE: cannot start moving until previous move is handled
     if (m_busy) {
-        result.val = labelKeys;
-        return result;
+        return false;
     }
     m_busy = true;
 
@@ -330,71 +321,34 @@ muse::RetVal<LabelKeyList> Au3LabelsInteraction::moveLabels(const LabelKeyList& 
     };
 
     const trackedit::ITrackeditProjectPtr prj = globalContext()->currentTrackeditProject();
-    auto& tracks = Au3TrackList::Get(projectRef());
 
-    auto resolveTrack = [&tracks, &trackPositionOffset](const TrackId& currentTrackId) ->TrackId {
-        size_t index = 0;
-        for (const auto& track : tracks) {
-            if (track->GetId() == currentTrackId) {
-                size_t newIndex = std::clamp(static_cast<int>(index) + trackPositionOffset, 0, static_cast<int>(tracks.Size()) - 1);
-                auto it = std::next(tracks.cbegin(), newIndex);
-                while (*it) {
-                    if (dynamic_cast<const Au3LabelTrack*>(*it)) {
-                        break;
-                    }
-                    newIndex = trackPositionOffset > 0 ? newIndex + 1 : newIndex - 1;
-                    it = std::next(tracks.cbegin(), newIndex);
-                }
-
-                return *it ? (*it)->GetId() : currentTrackId;
-            }
-            ++index;
-        }
-        return INVALID_TRACK;
-    };
+    auto selectedLabels = selectionController()->selectedLabels();
+    if (selectedLabels.empty()) {
+        return false;
+    }
 
     //! NOTE: check if offset is applicable to every label and recalculate if needed
-    std::optional<secs_t> leftmostStartTime = leftmostLabelStartTime(labelKeys);
+    std::optional<secs_t> leftmostLabelStartTime = getLeftmostLabelStartTime(selectionController()->selectedLabels());
 
-    if (leftmostStartTime.has_value()) {
-        if (muse::RealIsEqualOrLess(leftmostStartTime.value() + timePositionOffset, 0.0)) {
-            timePositionOffset = -leftmostStartTime.value();
+    if (leftmostLabelStartTime.has_value()) {
+        if (muse::RealIsEqualOrLess(leftmostLabelStartTime.value() + timePositionOffset, 0.0)) {
+            timePositionOffset = -leftmostLabelStartTime.value();
         }
     }
 
-    std::set<Au3LabelTrack*> changedTracks;
-    for (const auto& labelKey : labelKeys) {
-        Au3LabelTrack* labelTrack = DomAccessor::findLabelTrack(projectRef(), Au3TrackId(labelKey.trackId));
+    for (const auto& selectedLabel : selectedLabels) {
+        Au3LabelTrack* labelTrack = DomAccessor::findLabelTrack(projectRef(), Au3TrackId(selectedLabel.trackId));
         IF_ASSERT_FAILED(labelTrack) {
             continue;
         }
 
-        int labelIndex = labelTrack->GetLabelIndex(labelKey.itemId);
+        int labelIndex = labelTrack->GetLabelIndex(selectedLabel.itemId);
         IF_ASSERT_FAILED(labelIndex >= 0) {
             continue;
         }
 
         const auto& au3labels = labelTrack->GetLabels();
         Au3Label au3Label = au3labels[labelIndex];
-
-        int64_t toTrackId = resolveTrack(labelKey.trackId);
-        IF_ASSERT_FAILED(toTrackId != INVALID_TRACK) {
-            continue;
-        }
-
-        bool moveToAnotherTrack = toTrackId != labelKey.trackId;
-        if (moveToAnotherTrack) {
-            Au3LabelTrack* toLabelTrack = DomAccessor::findLabelTrack(projectRef(), Au3TrackId(toTrackId));
-
-            int64_t newLabelId = toLabelTrack->AddLabel(au3Label.getSelectedRegion(), au3Label.title);
-            labelTrack->DeleteLabelById(au3Label.GetId());
-
-            changedTracks.insert(labelTrack);
-
-            labelTrack = toLabelTrack;
-            au3Label = *labelTrack->GetLabelById(newLabelId);
-            labelIndex = labelTrack->GetLabelIndex(newLabelId);
-        }
 
         // Calculate new times
         double newT0 = std::max(0.0, au3Label.getT0() + timePositionOffset);
@@ -404,26 +358,15 @@ muse::RetVal<LabelKeyList> Au3LabelsInteraction::moveLabels(const LabelKeyList& 
         au3Label.selectedRegion.setTimes(newT0, newT1);
         labelTrack->SetLabel(labelIndex, au3Label);
 
-        changedTracks.insert(labelTrack);
-
-        if (!moveToAnotherTrack && prj) {
+        if (prj) {
             prj->notifyAboutLabelChanged(DomConverter::label(labelTrack, DomAccessor::findLabel(labelTrack, au3Label.GetId())));
         }
-
-        LabelKey newLabelKey = labelKey;
-        newLabelKey.trackId = labelTrack->GetId();
-        newLabelKey.itemId = au3Label.GetId();
-        result.val.push_back(newLabelKey);
     }
 
-    for (const auto& changedTrack : changedTracks) {
-        prj->notifyAboutTrackChanged(DomConverter::track(changedTrack));
-    }
-
-    return result;
+    return true;
 }
 
-muse::RetVal<LabelKeyList> Au3LabelsInteraction::moveLabelsToTrack(const LabelKeyList& labelKeys, const TrackId& toTrackId)
+muse::RetVal<LabelKeyList> Au3LabelsInteraction::moveLabels(const LabelKeyList& labelKeys, const TrackId& toTrackId)
 {
     muse::RetVal<LabelKeyList> result;
     result.ret = make_ret(Err::NoError);
@@ -531,29 +474,6 @@ bool Au3LabelsInteraction::stretchLabelLeft(const LabelKey& labelKey, secs_t new
     return true;
 }
 
-bool Au3LabelsInteraction::stretchLabelsLeft(const LabelKeyList& labelKeys, secs_t deltaSec, bool completed)
-{
-    for (const auto& labelKey : labelKeys) {
-        Au3LabelTrack* labelTrack = DomAccessor::findLabelTrack(projectRef(), Au3TrackId(labelKey.trackId));
-        IF_ASSERT_FAILED(labelTrack) {
-            continue;
-        }
-
-        Au3Label* label = DomAccessor::findLabel(labelTrack, labelKey.itemId);
-        IF_ASSERT_FAILED(label) {
-            continue;
-        }
-
-        secs_t newStartTime = label->selectedRegion.t0() + deltaSec;
-        if (muse::RealIsEqualOrMore(deltaSec, 0) && muse::RealIsEqualOrMore(newStartTime, label->selectedRegion.t1())) {
-            newStartTime = label->selectedRegion.t1();
-        }
-
-        stretchLabelLeft(labelKey, newStartTime, completed);
-    }
-    return true;
-}
-
 bool Au3LabelsInteraction::stretchLabelRight(const LabelKey& labelKey, secs_t newEndTime, bool completed)
 {
     UNUSED(completed);
@@ -606,37 +526,14 @@ bool Au3LabelsInteraction::stretchLabelRight(const LabelKey& labelKey, secs_t ne
     return true;
 }
 
-bool Au3LabelsInteraction::stretchLabelsRight(const LabelKeyList& labelKeys, secs_t deltaSec, bool completed)
-{
-    for (const auto& labelKey : labelKeys) {
-        Au3LabelTrack* labelTrack = DomAccessor::findLabelTrack(projectRef(), Au3TrackId(labelKey.trackId));
-        IF_ASSERT_FAILED(labelTrack) {
-            continue;
-        }
-
-        Au3Label* label = DomAccessor::findLabel(labelTrack, labelKey.itemId);
-        IF_ASSERT_FAILED(label) {
-            continue;
-        }
-
-        secs_t newEndTime = label->selectedRegion.t1() + deltaSec;
-        if (muse::RealIsEqualOrLess(deltaSec, 0) && muse::RealIsEqualOrLess(newEndTime, label->selectedRegion.t0())) {
-            newEndTime = label->selectedRegion.t0();
-        }
-
-        stretchLabelRight(labelKey, newEndTime, completed);
-    }
-    return true;
-}
-
 muse::Progress Au3LabelsInteraction::progress() const
 {
     return m_progress;
 }
 
-std::optional<secs_t> Au3LabelsInteraction::leftmostLabelStartTime(const LabelKeyList& labelKeys) const
+std::optional<secs_t> Au3LabelsInteraction::getLeftmostLabelStartTime(const LabelKeyList& labelKeys) const
 {
-    std::optional<secs_t> leftmostStartTime;
+    std::optional<secs_t> leftmostLabelStartTime;
     for (const auto& selectedLabel : labelKeys) {
         Au3LabelTrack* labelTrack = DomAccessor::findLabelTrack(projectRef(), Au3TrackId(selectedLabel.trackId));
         IF_ASSERT_FAILED(labelTrack) {
@@ -648,10 +545,10 @@ std::optional<secs_t> Au3LabelsInteraction::leftmostLabelStartTime(const LabelKe
             continue;
         }
 
-        if (!leftmostStartTime.has_value() || !muse::RealIsEqualOrMore(label->getT0(), leftmostStartTime.value())) {
-            leftmostStartTime = label->getT0();
+        if (!leftmostLabelStartTime.has_value() || !muse::RealIsEqualOrMore(label->getT0(), leftmostLabelStartTime.value())) {
+            leftmostLabelStartTime = label->getT0();
         }
     }
 
-    return leftmostStartTime;
+    return leftmostLabelStartTime;
 }

@@ -1,10 +1,6 @@
 /*
 * Audacity: A Digital Audio Editor
 */
-#include <cassert>
-#include <iomanip>
-#include <sstream>
-
 #include "framework/global/realfn.h"
 
 #include "linearbaseruler.h"

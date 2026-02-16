@@ -23,32 +23,28 @@
 #define AU_CONTEXT_UICONTEXTRESOLVER_H
 
 #include "../iuicontextresolver.h"
-
-#include "framework/global/async/asyncable.h"
-#include "framework/global/modularity/ioc.h"
-#include "framework/interactive/iinteractive.h"
-
+#include "async/asyncable.h"
+#include "modularity/ioc.h"
+#include "iinteractive.h"
 #include "../iglobalcontext.h"
 #include "ui/inavigationcontroller.h"
-#include "trackedit/internal/itracknavigationcontroller.h"
 
 #ifdef AU_BUILD_PLAYBACK_MODULE
 #include "playback/iplaybackcontroller.h"
 #endif
 
 namespace au::context {
-class UiContextResolver : public muse::ui::IUiContextResolver, public muse::async::Asyncable, public muse::Injectable
+class UiContextResolver : public muse::ui::IUiContextResolver, public muse::async::Asyncable
 {
-    muse::Inject<muse::IInteractive> interactive { this };
-    muse::Inject<IGlobalContext> globalContext { this };
-    muse::Inject<muse::ui::INavigationController> navigationController { this };
-    muse::Inject<trackedit::ITrackNavigationController> trackNavigationController { this };
+    INJECT(muse::IInteractive, interactive)
+    INJECT(IGlobalContext, globalContext)
+    INJECT(muse::ui::INavigationController, navigationController)
 
 #ifdef AU_BUILD_PLAYBACK_MODULE
-    muse::Inject<playback::IPlaybackController> playbackController { this };
+    INJECT(playback::IPlaybackController, playbackController)
 #endif
 public:
-    UiContextResolver(const muse::modularity::ContextPtr& ctx);
+    UiContextResolver() = default;
 
     void init();
 

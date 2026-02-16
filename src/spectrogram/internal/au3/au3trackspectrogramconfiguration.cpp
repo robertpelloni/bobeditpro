@@ -13,16 +13,15 @@
 
 namespace au::spectrogram {
 std::shared_ptr<Au3TrackSpectrogramConfiguration> Au3TrackSpectrogramConfiguration::create(int trackId,
-                                                                                           const context::IGlobalContext& context)
+                                                                                           const au::context::IGlobalContext& context)
 {
     const project::IAudacityProjectPtr project = context.currentProject();
     if (!project) {
         return nullptr;
     }
-    auto au3Project = reinterpret_cast<au3::Au3Project*>(project->au3ProjectPtr());
-    au3::Au3WaveTrack* waveTrack = au3::DomAccessor::findWaveTrack(*au3Project, au3::Au3TrackId { trackId });
-    if (!waveTrack) {
-        // TODO find out why this happens sometimes
+    auto au3Project = reinterpret_cast<au::au3::Au3Project*>(project->au3ProjectPtr());
+    au::au3::Au3WaveTrack* waveTrack = au::au3::DomAccessor::findWaveTrack(*au3Project, au::au3::Au3TrackId { trackId });
+    IF_ASSERT_FAILED(waveTrack) {
         return nullptr;
     }
     return std::make_shared<Au3TrackSpectrogramConfiguration>(Au3SpectrogramSettings::Get(*waveTrack));

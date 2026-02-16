@@ -38,6 +38,5 @@ private:
 };
 
 extern AUDACITY_DLL_API ChoiceSetting TracksBehaviorsAudioTrackPastePolicy;
-extern AUDACITY_DLL_API BoolSetting NonDestructiveEditing;
 
 #endif

@@ -17,7 +17,7 @@
 #include "types/val.h"
 
 namespace au::projectscene {
-class TrackViewStateModel : public QObject, public muse::Injectable, public muse::async::Asyncable
+class TrackViewStateModel : public QObject, public muse::async::Asyncable
 {
     Q_OBJECT
 
@@ -33,11 +33,10 @@ class TrackViewStateModel : public QObject, public muse::Injectable, public muse
 
     Q_PROPERTY(playback::PlaybackMeterModel * meterModel READ meterModel NOTIFY meterModelChanged FINAL)
 
-    muse::GlobalInject<playback::IPlaybackConfiguration> playbackConfiguration;
-
-    muse::Inject<context::IGlobalContext> globalContext{ this };
-    muse::Inject<playback::IPlaybackController> playbackController{ this };
-    muse::Inject<record::IRecordController> recordController{ this };
+    muse::Inject<context::IGlobalContext> globalContext;
+    muse::Inject<playback::IPlaybackController> playbackController;
+    muse::Inject<playback::IPlaybackConfiguration> playbackConfiguration;
+    muse::Inject<record::IRecordController> recordController;
 
 public:
     TrackViewStateModel(QObject* parent = nullptr);

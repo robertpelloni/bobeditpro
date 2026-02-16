@@ -50,10 +50,6 @@ public:
     void Populate(
         const Au3SpectrogramSettings& settings, const WaveChannelInterval& clip, int copyBegin, int copyEnd, size_t numPixels,
         double pixelsPerSecond);
-    // Calculate the dirty columns at the begin and end of the cache (Constant-Q variant)
-    void PopulateConstantQ(
-        const Au3SpectrogramSettings& settings, const WaveChannelInterval& clip, int copyBegin, int copyEnd, size_t numPixels,
-        double pixelsPerSecond);
 
     size_t len { 0 };      // counts pixels, not samples
     std::optional<SpectrogramAlgorithm> algorithm;
@@ -62,8 +58,8 @@ public:
     double rightTrim{ .0 };
     double start;      // relative to clip start
     std::optional<SpectrogramWindowType> windowType;
-    int windowSize { 0 };
-    int zeroPaddingFactor { 0 };
+    size_t windowSize { 0 };
+    unsigned zeroPaddingFactor { 0 };
     int frequencyGain;
     std::vector<float> freq;
     std::vector<long long> where;
@@ -136,7 +132,6 @@ struct WaveClipSpectrumCache final : WaveClipListener
     bool GetSpectrogram(const WaveChannelInterval& clip, const float*& spectrogram, Au3SpectrogramSettings& spectrogramSettings,
                         const long long*& where, size_t numPixels, double t0 /*absolute time*/, double pixelsPerSecond);
 
-    bool IsStereo() const { return mSpecCaches.size() == 2; }
     void MakeStereo(WaveClipListener&& other, bool aligned) override;
     void SwapChannels() override;
     void Erase(size_t index) override;

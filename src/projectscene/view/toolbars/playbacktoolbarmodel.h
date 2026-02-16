@@ -14,10 +14,6 @@
 
 #include "uicomponents/qml/Muse/UiComponents/abstracttoolbarmodel.h"
 
-namespace au::project {
-class IAudacityProject;
-}
-
 namespace au::projectscene {
 class PlaybackToolBarModel : public muse::uicomponents::AbstractToolBarModel
 {
@@ -25,14 +21,13 @@ class PlaybackToolBarModel : public muse::uicomponents::AbstractToolBarModel
 
     Q_PROPERTY(bool isEnabled READ isEnabled NOTIFY isEnabledChanged)
 
-    muse::GlobalInject<muse::ui::IUiConfiguration> uiConfiguration;
-    muse::GlobalInject<playback::IPlaybackConfiguration> configuration;
-    muse::GlobalInject<record::IRecordConfiguration> recordConfiguration;
-
-    muse::Inject<muse::ui::IUiActionsRegister> uiActionsRegister{ this };
-    muse::Inject<context::IGlobalContext> context{ this };
-    muse::Inject<playback::IPlaybackController> playbackController{ this };
-    muse::Inject<record::IRecordController> recordController{ this };
+    muse::Inject<muse::ui::IUiConfiguration> uiConfiguration;
+    muse::Inject<muse::ui::IUiActionsRegister> uiActionsRegister;
+    muse::Inject<context::IGlobalContext> context;
+    muse::Inject<playback::IPlaybackConfiguration> configuration;
+    muse::Inject<playback::IPlaybackController> playbackController;
+    muse::Inject<record::IRecordController> recordController;
+    muse::Inject<record::IRecordConfiguration> recordConfiguration;
 
 public:
     explicit PlaybackToolBarModel(QObject* parent = nullptr);
@@ -60,7 +55,6 @@ signals:
 
 private:
     void reload();
-    void setupProjectConnections(project::IAudacityProject& project);
 
     void onActionsStateChanges(const muse::actions::ActionCodeList& codes) override;
 
@@ -70,7 +64,6 @@ private:
     void updateRecordState();
     void updateLoopState();
     void updateSplitState();
-    void updateGlobalSpectrogramViewState();
 
     void setupConnections();
 

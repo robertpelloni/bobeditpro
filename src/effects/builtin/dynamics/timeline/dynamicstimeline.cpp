@@ -2,6 +2,7 @@
  * Audacity: A Digital Audio Editor
  */
 #include "dynamicstimeline.h"
+#include "dynamicscolors.h"
 #include "painters/areasequencepainter.h"
 #include "painters/linesequencepainter.h"
 
@@ -183,11 +184,11 @@ void DynamicsTimeline::updateDrawerViewportX()
 
 void DynamicsTimeline::resetSequences()
 {
-    QColor areaColor = uiConfiguration()->currentTheme().extra["dynamics_timeline_data_fill_color"].value<QColor>();
+    QColor areaColor = DynamicsColors::timelineDataFillColor();
     areaColor.setAlphaF(0.5);
-    QColor lineColor = uiConfiguration()->currentTheme().values.value(muse::ui::WHITE_COLOR).value<QColor>();
+    QColor lineColor = DynamicsColors::timelineOutputDbLineColor();
     lineColor.setAlphaF(0.5);
-    QColor compressionDbLineColor = uiConfiguration()->currentTheme().extra["dynamics_timeline_compression_db_color"].value<QColor>();
+    QColor compressionDbLineColor = DynamicsColors::timelineCompressionDbColor();
     compressionDbLineColor.setAlphaF(0.5);
     auto inputDb = createSequenceData(areaColor, DrawerType::Area, showInputDb());
     auto outputDb = createSequenceData(areaColor, DrawerType::Area, showOutputDb());

@@ -5,6 +5,8 @@
 
 #include "../common/generatoreffectmodel.h"
 
+#include "effects/effects_base/ieffectsprovider.h"
+
 namespace au::effects {
 class ToneEffect;
 class ToneViewModel : public GeneratorEffectModel
@@ -18,6 +20,8 @@ class ToneViewModel : public GeneratorEffectModel
     Q_PROPERTY(int waveform READ waveform WRITE prop_setWaveform NOTIFY waveformChanged)
     Q_PROPERTY(int interpolation READ interpolation WRITE prop_setInterpolation NOTIFY interpolationChanged)
     Q_PROPERTY(QList<QString> waveforms READ waveforms CONSTANT)
+
+    muse::Inject<IEffectsProvider> effectsProvider;
 
 public:
     ToneViewModel(QObject* parent, int instanceId);
@@ -48,6 +52,8 @@ signals:
 
 private:
     void doEmitSignals() override;
+
+    ToneEffect* effect() const;
 };
 
 class ToneViewModelFactory : public EffectViewModelFactory<ToneViewModel>

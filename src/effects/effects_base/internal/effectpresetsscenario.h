@@ -5,27 +5,24 @@
 
 #include "../ieffectpresetsscenario.h"
 
-#include "framework/global/io/path.h"
+#include "global/io/path.h"
 
-#include "framework/global/modularity/ioc.h"
-#include "framework/global/iglobalconfiguration.h"
-#include "framework/interactive/iinteractive.h"
-
+#include "modularity/ioc.h"
+#include "global/iinteractive.h"
+#include "global/iglobalconfiguration.h"
 #include "../ieffectpresetsprovider.h"
 #include "../ieffectinstancesregister.h"
 
 namespace au::effects {
-class EffectPresetsScenario : public IEffectPresetsScenario, public muse::Injectable
+class EffectPresetsScenario : public IEffectPresetsScenario
 {
-    muse::GlobalInject<muse::IGlobalConfiguration> globalConfiguration;
-
-    muse::Inject<muse::IInteractive> interactive{ this };
-    muse::Inject<IEffectPresetsProvider> presetsProvider{ this };
-    muse::Inject<IEffectInstancesRegister> instancesRegister{ this };
+    muse::Inject<muse::IInteractive> interactive;
+    muse::Inject<muse::IGlobalConfiguration> globalConfiguration;
+    muse::Inject<IEffectPresetsProvider> presetsProvider;
+    muse::Inject<IEffectInstancesRegister> instancesRegister;
 
 public:
-    EffectPresetsScenario(const muse::modularity::ContextPtr& ctx)
-        : muse::Injectable(ctx) {}
+    EffectPresetsScenario() = default;
 
     void applyPreset(const EffectInstanceId& effectInstanceId, const PresetId& presetId) override;
     void saveCurrentAsPreset(const EffectInstanceId& effectInstanceId) override;

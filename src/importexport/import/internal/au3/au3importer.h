@@ -13,15 +13,14 @@
 #include "../../iimporter.h"
 
 namespace au::importexport {
-class Au3Importer : public IImporter, public muse::Injectable
+class Au3Importer : public IImporter
 {
-    muse::Inject<au::context::IGlobalContext> globalContext{ this };
-    muse::Inject<trackedit::ITracksInteraction> tracksInteraction{ this };
-    muse::Inject<trackedit::ISelectionController> selectionController{ this };
+    muse::Inject<au::context::IGlobalContext> globalContext;
+    muse::Inject<trackedit::ITracksInteraction> tracksInteraction;
+    muse::Inject<trackedit::ISelectionController> selectionController;
 
 public:
-    Au3Importer(const muse::modularity::ContextPtr& ctx)
-        : muse::Injectable(ctx) {}
+    Au3Importer() = default;
 
     void init() override;
 
@@ -29,8 +28,6 @@ public:
 
     bool import(const muse::io::path_t& filePath) override;
     bool importIntoTrack(const muse::io::path_t& filePath, trackedit::TrackId dstTrackId, muse::secs_t startTime) override;
-    bool importFromSystemClipboard(const std::vector<muse::io::path_t>& filePaths, muse::secs_t startTime) override;
-    std::vector<std::string> supportedExtensions() const override;
 
 private:
     void addImportedTracks(const muse::io::path_t& fileName, TrackHolders&& newTracks);

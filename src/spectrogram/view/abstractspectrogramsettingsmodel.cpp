@@ -11,7 +11,7 @@
 
 namespace au::spectrogram {
 AbstractSpectrogramSettingsModel::AbstractSpectrogramSettingsModel(QObject* parent)
-    : QObject(parent), muse::Injectable(muse::iocCtxForQmlObject(this))
+    : QObject(parent)
 {}
 
 void AbstractSpectrogramSettingsModel::setMinFreq(int value)

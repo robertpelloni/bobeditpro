@@ -7,19 +7,17 @@
 
 #include <QAbstractListModel>
 
-#include "framework/global/async/asyncable.h"
-#include "framework/global/modularity/ioc.h"
+#include "actions/actionable.h"
+#include "async/asyncable.h"
 
-#include "framework/actions/actionable.h"
-#include "framework/actions/iactionsdispatcher.h"
-#include "framework/interactive/iinteractive.h"
-
+#include "modularity/ioc.h"
+#include "global/iinteractive.h"
 #include "context/iglobalcontext.h"
+#include "actions/iactionsdispatcher.h"
 #include "trackedit/iselectioncontroller.h"
 #include "trackedit/itrackeditinteraction.h"
 #include "trackedit/trackedittypes.h"
 #include "trackedit/iprojecthistory.h"
-#include "trackedit/internal/itracknavigationcontroller.h"
 
 #include "../timeline/timelinecontext.h"
 
@@ -27,8 +25,7 @@
 #include "viewtrackitem.h"
 
 namespace au::projectscene {
-class TrackItemsListModel : public QAbstractListModel, public muse::async::Asyncable, public muse::actions::Actionable,
-    public muse::Injectable
+class TrackItemsListModel : public QAbstractListModel, public muse::async::Asyncable, public muse::actions::Actionable
 {
     Q_OBJECT
 
@@ -37,13 +34,12 @@ class TrackItemsListModel : public QAbstractListModel, public muse::async::Async
     Q_PROPERTY(int cacheBufferPx READ cacheBufferPx CONSTANT)
 
 protected:
-    muse::Inject<muse::actions::IActionsDispatcher> dispatcher{ this };
-    muse::Inject<context::IGlobalContext> globalContext{ this };
-    muse::Inject<muse::IInteractive> interactive{ this };
-    muse::Inject<trackedit::ITrackeditInteraction> trackeditInteraction{ this };
-    muse::Inject<trackedit::ISelectionController> selectionController{ this };
-    muse::Inject<trackedit::IProjectHistory> projectHistory{ this };
-    muse::Inject<trackedit::ITrackNavigationController> trackNavigationController{ this };
+    muse::Inject<muse::actions::IActionsDispatcher> dispatcher;
+    muse::Inject<context::IGlobalContext> globalContext;
+    muse::Inject<muse::IInteractive> interactive;
+    muse::Inject<trackedit::ITrackeditInteraction> trackeditInteraction;
+    muse::Inject<trackedit::ISelectionController> selectionController;
+    muse::Inject<trackedit::IProjectHistory> projectHistory;
 
 public:
     explicit TrackItemsListModel(QObject* parent = nullptr);
@@ -68,9 +64,6 @@ public:
 
     Q_INVOKABLE QVariant findGuideline(const TrackItemKey& key, DirectionType::Direction direction) const;
 
-    Q_INVOKABLE void setFocusedItem(const TrackItemKey& key);
-    Q_INVOKABLE void resetFocusedItem();
-
     int rowCount(const QModelIndex& parent) const override;
     QHash<int, QByteArray> roleNames() const override;
     QVariant data(const QModelIndex& index, int role) const override;
@@ -79,8 +72,6 @@ signals:
     void trackIdChanged();
     void timelineContextChanged();
     void itemTitleEditRequested(const TrackItemKey& key);
-
-    void itemContextMenuOpenRequested(const TrackItemKey& key);
 
 protected slots:
     virtual void onTimelineZoomChanged();

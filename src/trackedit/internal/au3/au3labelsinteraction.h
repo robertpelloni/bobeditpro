@@ -6,21 +6,19 @@
 #include "modularity/ioc.h"
 #include "context/iglobalcontext.h"
 #include "../../iselectioncontroller.h"
-#include "../itracknavigationcontroller.h"
 
 #include "au3wrap/au3types.h"
 
 #include "../../ilabelsinteraction.h"
 
 namespace au::trackedit {
-class Au3LabelsInteraction : public ILabelsInteraction, public muse::Injectable
+class Au3LabelsInteraction : public ILabelsInteraction
 {
-    muse::Inject<context::IGlobalContext> globalContext{ this };
-    muse::Inject<ISelectionController> selectionController{ this };
-    muse::Inject<ITrackNavigationController> trackNavigationController{ this };
+    muse::Inject<context::IGlobalContext> globalContext;
+    muse::Inject<ISelectionController> selectionController;
 
 public:
-    Au3LabelsInteraction(const muse::modularity::ContextPtr& ctx);
+    Au3LabelsInteraction();
 
     muse::RetVal<LabelKey> addLabel(const TrackId& toTrackId) override;
     bool addLabelToSelection() override;
@@ -36,21 +34,18 @@ public:
 
     ITrackDataPtr copyLabel(const LabelKey& labelKey) override;
 
-    muse::RetVal<LabelKeyList> moveLabels(const LabelKeyList& labelKeys, secs_t timePositionOffset, int trackPositionOffset) override;
-    muse::RetVal<LabelKeyList> moveLabelsToTrack(const LabelKeyList& labelKeys, const trackedit::TrackId& toTrackId) override;
+    bool moveLabels(secs_t timePositionOffset) override;
+    muse::RetVal<LabelKeyList> moveLabels(const LabelKeyList& labelKeys, const trackedit::TrackId& toTrackId) override;
 
     bool stretchLabelLeft(const LabelKey& labelKey, secs_t newStartTime, bool completed) override;
-    bool stretchLabelsLeft(const LabelKeyList& labelKeys, secs_t deltaSec, bool completed) override;
-
     bool stretchLabelRight(const LabelKey& labelKey, secs_t newEndTime, bool completed) override;
-    bool stretchLabelsRight(const LabelKeyList& labelKeys, secs_t deltaSec, bool completed) override;
+
+    std::optional<secs_t> getLeftmostLabelStartTime(const LabelKeyList& labelKeys) const override;
 
     muse::Progress progress() const override;
 
 private:
     friend class Au3LabelsInteractionsTests;
-
-    std::optional<secs_t> leftmostLabelStartTime(const LabelKeyList& labelKeys) const;
 
     au3::Au3Project& projectRef() const;
 

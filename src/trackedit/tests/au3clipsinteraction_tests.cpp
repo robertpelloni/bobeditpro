@@ -11,7 +11,7 @@
 #include "mocks/trackeditconfigurationmock.h"
 #include "mocks/projecthistorymock.h"
 
-#include "interactive/tests/mocks/interactivemock.h"
+#include "global/tests/mocks/interactivemock.h"
 
 using ::testing::Truly;
 using ::testing::_;
@@ -22,7 +22,7 @@ class Au3ClipsInteractionTests : public Au3InteractionTestBase
 public:
     void SetUp() override
     {
-        m_clipsInteraction = std::make_shared<Au3ClipsInteraction>(muse::modularity::globalCtx());
+        m_clipsInteraction = std::make_shared<Au3ClipsInteraction>();
 
         m_globalContext = std::make_shared<NiceMock<context::GlobalContextMock> >();
         m_selectionController = std::make_shared<NiceMock<SelectionControllerMock> >();
@@ -446,15 +446,16 @@ TEST_F(Au3ClipsInteractionTests, MoveClipsRight)
     const double lastClipStart = lastClip->GetSequenceStartTime();
     const double lastClipEnd = lastClip->GetSequenceEndTime();
 
-    ClipKeyList selectedClipsKeys = {
-        ClipKey { trackId, firstClip->GetId() },
-        ClipKey { trackId, middleClip->GetId() },
-        ClipKey { trackId, lastClip->GetId() }
-    };
+    EXPECT_CALL(*m_selectionController,
+                selectedClipsInTrackOrder()).Times(1).WillOnce(Return(ClipKeyList {
+            ClipKey { trackId, firstClip->GetId() },
+            ClipKey { trackId, middleClip->GetId() },
+            ClipKey { trackId, lastClip->GetId() }
+        }));
 
     //! [WHEN] Move the clips right
     auto clipsMovedToOtherTracks = false;
-    m_clipsInteraction->moveClips(selectedClipsKeys, secondsToMove, 0, true, clipsMovedToOtherTracks);
+    m_clipsInteraction->moveClips(secondsToMove, 0, true, clipsMovedToOtherTracks);
 
     //! [THEN] All clips are moved
     const WaveTrack::IntervalConstHolder modifiedFirstClip = track->GetSortedClipByIndex(0);
@@ -486,15 +487,22 @@ TEST_F(Au3ClipsInteractionTests, MoveClipLeftWhenClipIsAtZero)
     const double lastClipStart = lastClip->GetSequenceStartTime();
     const double lastClipEnd = lastClip->GetSequenceEndTime();
 
-    ClipKeyList selectedClipsKeys = {
-        ClipKey { trackId, firstClip->GetId() },
-        ClipKey { trackId, middleClip->GetId() },
-        ClipKey { trackId, lastClip->GetId() }
-    };
+    ON_CALL(*m_selectionController,
+            selectedClipsInTrackOrder()).WillByDefault(Return(ClipKeyList {
+            ClipKey { trackId, firstClip->GetId() },
+            ClipKey { trackId, middleClip->GetId() },
+            ClipKey { trackId, lastClip->GetId() }
+        }));
+
+    ON_CALL(*m_selectionController, selectedClips()).WillByDefault(Return(ClipKeyList {
+            ClipKey { trackId, firstClip->GetId() },
+            ClipKey { trackId, middleClip->GetId() },
+            ClipKey { trackId, lastClip->GetId() }
+        }));
 
     //! [WHEN] Move the clips left
     auto clipsMovedToOtherTracks = false;
-    m_clipsInteraction->moveClips(selectedClipsKeys, -1.0, 0, true, clipsMovedToOtherTracks);
+    m_clipsInteraction->moveClips(-1.0, 0, true, clipsMovedToOtherTracks);
 
     //! [THEN] No clip is moved
     const WaveTrack::IntervalConstHolder modifiedFirstClip = track->GetSortedClipByIndex(0);
@@ -574,7 +582,7 @@ TEST_F(Au3ClipsInteractionTests, TrimSingleClipLeft)
     //! [WHEN] Trim the clip from the left
     const secs_t deltaSec = 2 * SAMPLE_INTERVAL;
     const secs_t minClipDuration = 2 * SAMPLE_INTERVAL;
-    m_clipsInteraction->trimClipsLeft({ { trackId, firstClip->GetId() } }, deltaSec, minClipDuration, true);
+    m_clipsInteraction->trimClipLeft({ trackId, firstClip->GetId() }, deltaSec, minClipDuration, true);
 
     //! [THEN] The clip is trimmed
     const WaveTrack::IntervalConstHolder trimmedClip = track->GetSortedClipByIndex(0);
@@ -600,7 +608,7 @@ TEST_F(Au3ClipsInteractionTests, TrimSingleClipRight)
     //! [WHEN] Trim the clip from the right
     const secs_t deltaSec = 2 * SAMPLE_INTERVAL;
     const secs_t minClipDuration = 2 * SAMPLE_INTERVAL;
-    m_clipsInteraction->trimClipsRight({ { trackId, firstClip->GetId() } }, deltaSec, minClipDuration, true);
+    m_clipsInteraction->trimClipRight({ trackId, firstClip->GetId() }, deltaSec, minClipDuration, true);
 
     //! [THEN] The clip is trimmed
     const WaveTrack::IntervalConstHolder trimmedClip = track->GetSortedClipByIndex(0);
@@ -633,10 +641,7 @@ TEST_F(Au3ClipsInteractionTests, TrimTwoClipsLeftShouldConsiderMinClipDuration)
     //! [WHEN] Trim the clips from the left
     const secs_t deltaSec = TRACK_TWO_CLIPS_CLIP1_DURATION;
     const secs_t minClipDuration = 2 * SAMPLE_INTERVAL;
-    m_clipsInteraction->trimClipsLeft(ClipKeyList {
-            ClipKey { trackId, firstClip->GetId() },
-            ClipKey { trackId, secondClip->GetId() }
-        }, deltaSec, minClipDuration, true);
+    m_clipsInteraction->trimClipLeft({ trackId, firstClip->GetId() }, deltaSec, minClipDuration, true);
 
     //! [THEN] The clips are trimmed
     const WaveTrack::IntervalConstHolder trimmedFirstClip = track->GetSortedClipByIndex(0);
@@ -673,10 +678,7 @@ TEST_F(Au3ClipsInteractionTests, TrimTwoClipsRightShouldConsiderMinClipDuration)
     //! [WHEN] Trim the clips from the right
     const secs_t deltaSec = TRACK_TWO_CLIPS_CLIP1_DURATION;
     const secs_t minClipDuration = 2 * SAMPLE_INTERVAL;
-    m_clipsInteraction->trimClipsRight(ClipKeyList {
-            ClipKey { trackId, firstClip->GetId() },
-            ClipKey { trackId, secondClip->GetId() }
-        }, deltaSec, minClipDuration, true);
+    m_clipsInteraction->trimClipRight({ trackId, firstClip->GetId() }, deltaSec, minClipDuration, true);
 
     //! [THEN] The clips are trimmed
     const WaveTrack::IntervalConstHolder trimmedFirstClip = track->GetSortedClipByIndex(0);
@@ -707,7 +709,7 @@ TEST_F(Au3ClipsInteractionTests, StretchSingleClipLeft)
     //! NOTE: In order to avoid rounding problems while comparing clip properties we stretch the clip by half
     const secs_t deltaSec = TRACK_SILENCE_AT_END_CLIP_DURATION / 2;
     const secs_t minClipDuration = 2 * SAMPLE_INTERVAL;
-    m_clipsInteraction->stretchClipsLeft({ { trackId, firstClip->GetId() } }, deltaSec, minClipDuration, true);
+    m_clipsInteraction->stretchClipLeft({ trackId, firstClip->GetId() }, deltaSec, minClipDuration, true);
 
     //! [THEN] The clip is stretched
     const WaveTrack::IntervalConstHolder stretchedClip = track->GetSortedClipByIndex(0);
@@ -733,7 +735,7 @@ TEST_F(Au3ClipsInteractionTests, StretchSingleClipRight)
     //! NOTE: In order to avoid rounding problems while comparing clip properties we stretch the clip by half
     const secs_t deltaSec = TRACK_SILENCE_AT_END_CLIP_DURATION / 2;
     const secs_t minClipDuration = 2 * SAMPLE_INTERVAL;
-    m_clipsInteraction->stretchClipsRight({ { trackId, firstClip->GetId() } }, deltaSec, minClipDuration, true);
+    m_clipsInteraction->stretchClipRight({ trackId, firstClip->GetId() }, deltaSec, minClipDuration, true);
 
     //! [THEN] The clip is stretched
     const WaveTrack::IntervalConstHolder stretchedClip = track->GetSortedClipByIndex(0);
@@ -767,8 +769,7 @@ TEST_F(Au3ClipsInteractionTests, StretchTwoClipsLeftShouldConsiderMinClipDuratio
     const secs_t deltaSec = TRACK_TWO_CLIPS_CLIP1_DURATION;
     const secs_t minClipDuration = TRACK_TWO_CLIPS_CLIP1_DURATION / 2;
 
-    m_clipsInteraction->stretchClipsLeft({ { trackId, firstClip->GetId() },
-                                             { trackId, secondClip->GetId() } }, deltaSec, minClipDuration, true);
+    m_clipsInteraction->stretchClipLeft({ trackId, firstClip->GetId() }, deltaSec, minClipDuration, true);
 
     //! [THEN] The clips are stretched considering the minimum clip duration
     const WaveTrack::IntervalConstHolder stretchedFirstClip = track->GetSortedClipByIndex(0);
@@ -805,8 +806,7 @@ TEST_F(Au3ClipsInteractionTests, StretchTwoClipsRightShouldConsiderMinClipDurati
     const secs_t deltaSec = TRACK_TWO_CLIPS_CLIP1_DURATION;
     const secs_t minClipDuration = TRACK_TWO_CLIPS_CLIP1_DURATION / 2;
 
-    m_clipsInteraction->stretchClipsRight({ { trackId, firstClip->GetId() },
-                                              { trackId, secondClip->GetId() } }, deltaSec, minClipDuration, true);
+    m_clipsInteraction->stretchClipRight({ trackId, firstClip->GetId() }, deltaSec, minClipDuration, true);
 
     //! [THEN] The clips are stretched considering the minimum clip duration
     const WaveTrack::IntervalConstHolder stretchedFirstClip = track->GetSortedClipByIndex(0);

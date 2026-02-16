@@ -17,14 +17,9 @@ static const ActionCode CLIPPING_IN_WAVEFORM_CODE("toggle-clipping-in-waveform")
 static const ActionCode MINUTES_SECONDS_RULER("minutes-seconds-ruler");
 static const ActionCode BEATS_MEASURES_RULER("beats-measures-ruler");
 static const ActionCode CLIP_PITCH_AND_SPEED_CODE("clip-pitch-speed");
-static const ActionCode TOGGLE_UPDATE_DISPLAY_WHILE_PLAYING_CODE("toggle-update-display-while-playing");
-static const ActionCode TOGGLE_PINNED_PLAY_HEAD_CODE("toggle-pinned-play-head");
 static const ActionCode TOGGLE_PLAYBACK_ON_RULER_CLICK_ENABLED_CODE("toggle-playback-on-ruler-click-enabled");
 static const ActionQuery TOGGLE_TRACK_HALF_WAVE("action://projectscene/track-view-half-wave");
 static const ActionCode LABEL_OPEN_EDITOR_CODE("toggle-label-editor");
-static const ActionCode TOGGLE_GLOBAL_SPECTROGRAM_VIEW_ACTION_CODE("action://trackedit/global-view-spectrogram");
-
-static const muse::Uri EDIT_PITCH_AND_SPEED_URI("audacity://projectscene/editpitchandspeed");
 
 void ProjectSceneActionsController::init()
 {
@@ -33,23 +28,13 @@ void ProjectSceneActionsController::init()
     dispatcher()->reg(this, VERTICAL_RULERS_CODE, this, &ProjectSceneActionsController::toggleVerticalRulers);
     dispatcher()->reg(this, RMS_IN_WAVEFORM_CODE, this, &ProjectSceneActionsController::toggleRMSInWaveform);
     dispatcher()->reg(this, CLIPPING_IN_WAVEFORM_CODE, this, &ProjectSceneActionsController::toggleClippingInWaveform);
-    dispatcher()->reg(this, TOGGLE_UPDATE_DISPLAY_WHILE_PLAYING_CODE, this,
-                      &ProjectSceneActionsController::toggleUpdateDisplayWhilePlaying);
-    dispatcher()->reg(this, TOGGLE_PINNED_PLAY_HEAD_CODE, this, &ProjectSceneActionsController::togglePinnedPlayHead);
+    dispatcher()->reg(this, "update-display-while-playing", this, &ProjectSceneActionsController::updateDisplayWhilePlaying);
+    dispatcher()->reg(this, "pinned-play-head", this, &ProjectSceneActionsController::pinnedPlayHead);
     dispatcher()->reg(this, CLIP_PITCH_AND_SPEED_CODE, this, &ProjectSceneActionsController::openClipPitchAndSpeedEdit);
     dispatcher()->reg(this, TOGGLE_PLAYBACK_ON_RULER_CLICK_ENABLED_CODE, this,
                       &ProjectSceneActionsController::togglePlaybackOnRulerClickEnabled);
     dispatcher()->reg(this, TOGGLE_TRACK_HALF_WAVE, this, &ProjectSceneActionsController::toggleTrackHalfWave);
     dispatcher()->reg(this, LABEL_OPEN_EDITOR_CODE, this, &ProjectSceneActionsController::openLabelEditor);
-
-    globalContext()->currentProjectChanged().onNotify(this, [this]() {
-        const auto prj = globalContext()->currentProject();
-        if (prj) {
-            prj->viewState()->globalSpectrogramViewToggleChanged().onNotify(this, [this]() {
-                m_actionEnabledChanged.send(TOGGLE_GLOBAL_SPECTROGRAM_VIEW_ACTION_CODE);
-            });
-        }
-    });
 }
 
 void ProjectSceneActionsController::notifyActionCheckedChanged(const ActionCode& actionCode)
@@ -100,26 +85,18 @@ void ProjectSceneActionsController::toggleClippingInWaveform()
     notifyActionCheckedChanged(CLIPPING_IN_WAVEFORM_CODE);
 }
 
-void ProjectSceneActionsController::toggleUpdateDisplayWhilePlaying()
+void ProjectSceneActionsController::updateDisplayWhilePlaying()
 {
-    bool enabled = configuration()->updateDisplayWhilePlayingEnabled();
-    configuration()->setUpdateDisplayWhilePlayingEnabled(!enabled);
-    notifyActionCheckedChanged(TOGGLE_UPDATE_DISPLAY_WHILE_PLAYING_CODE);
+    NOT_IMPLEMENTED;
 }
 
-void ProjectSceneActionsController::togglePinnedPlayHead()
+void ProjectSceneActionsController::pinnedPlayHead()
 {
-    bool enabled = configuration()->pinnedPlayHeadEnabled();
-    configuration()->setPinnedPlayHeadEnabled(!enabled);
-    notifyActionCheckedChanged(TOGGLE_PINNED_PLAY_HEAD_CODE);
+    NOT_IMPLEMENTED;
 }
 
 void ProjectSceneActionsController::openClipPitchAndSpeedEdit(const ActionData& args)
 {
-    if (interactive()->isOpened(EDIT_PITCH_AND_SPEED_URI).val) {
-        return;
-    }
-
     IF_ASSERT_FAILED(args.count() == 1) {
         return;
     }
@@ -129,7 +106,7 @@ void ProjectSceneActionsController::openClipPitchAndSpeedEdit(const ActionData& 
         return;
     }
 
-    muse::UriQuery query(EDIT_PITCH_AND_SPEED_URI);
+    muse::UriQuery query("audacity://projectscene/editpitchandspeed");
     query.addParam("trackId", muse::Val(std::to_string(clipKey.trackId)));
     query.addParam("clipId", muse::Val(std::to_string(clipKey.itemId)));
     query.addParam("focusItemName", muse::Val("pitch"));
@@ -174,9 +151,7 @@ bool ProjectSceneActionsController::actionChecked(const ActionCode& actionCode) 
         { CLIPPING_IN_WAVEFORM_CODE, configuration()->isClippingInWaveformVisible() },
         { MINUTES_SECONDS_RULER, configuration()->timelineRulerMode() == TimelineRulerMode::MINUTES_AND_SECONDS },
         { BEATS_MEASURES_RULER, configuration()->timelineRulerMode() == TimelineRulerMode::BEATS_AND_MEASURES },
-        { TOGGLE_PLAYBACK_ON_RULER_CLICK_ENABLED_CODE, configuration()->playbackOnRulerClickEnabled() },
-        { TOGGLE_UPDATE_DISPLAY_WHILE_PLAYING_CODE, configuration()->updateDisplayWhilePlayingEnabled() },
-        { TOGGLE_PINNED_PLAY_HEAD_CODE, configuration()->pinnedPlayHeadEnabled() }
+        { TOGGLE_PLAYBACK_ON_RULER_CLICK_ENABLED_CODE, configuration()->playbackOnRulerClickEnabled() }
     };
 
     return isChecked[actionCode];
@@ -187,19 +162,7 @@ Channel<ActionCode> ProjectSceneActionsController::actionCheckedChanged() const
     return m_actionCheckedChanged;
 }
 
-bool ProjectSceneActionsController::canReceiveAction(const ActionCode& actionCode) const
+bool ProjectSceneActionsController::canReceiveAction(const ActionCode&) const
 {
-    const auto prj = globalContext()->currentProject();
-    if (!prj) {
-        return false;
-    } else if (actionCode == TOGGLE_GLOBAL_SPECTROGRAM_VIEW_ACTION_CODE) {
-        return prj->viewState()->globalSpectrogramViewToggleIsActive();
-    } else {
-        return true;
-    }
-}
-
-Channel<ActionCode> ProjectSceneActionsController::actionEnabledChanged() const
-{
-    return m_actionEnabledChanged;
+    return globalContext()->currentProject() != nullptr;
 }

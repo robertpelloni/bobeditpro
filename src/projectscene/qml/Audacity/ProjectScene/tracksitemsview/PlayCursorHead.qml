@@ -12,7 +12,7 @@ StyledIconLabel {
     iconCode: IconCode.PLAYHEAD_FILLED
 
     font.pixelSize: 17
-    color: ui.theme.extra["black_color"]
+    color: "black"
 
     StyledIconLabel {
         id: playheadFill
@@ -24,7 +24,7 @@ StyledIconLabel {
         iconCode: IconCode.PLAYHEAD_FILLED
 
         font.pixelSize: 15
-        color: ui.theme.extra["white_color"]
+        color: "white"
     }
 
     // we do some pixel trickery to hide the aliased bottom part and "connect" to the PlayCursorLine
@@ -35,7 +35,7 @@ StyledIconLabel {
         height: 2
         x: parent.width / 2
         y: 15
-        color: ui.theme.extra["white_color"]
+        color: "white"
         antialiasing: true
     }
     Rectangle {
@@ -45,7 +45,7 @@ StyledIconLabel {
         height: 1
         x: (parent.width / 2) - 1
         y: 16
-        color: ui.theme.extra["black_color"]
+        color: "black"
         antialiasing: true
     }
     Rectangle {
@@ -55,7 +55,7 @@ StyledIconLabel {
         height: 1
         x: (parent.width / 2) + 1
         y: 16
-        color: ui.theme.extra["black_color"]
+        color: "black"
         antialiasing: true
     }
 }

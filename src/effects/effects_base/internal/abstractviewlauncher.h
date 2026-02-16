@@ -4,21 +4,16 @@
 
 #include "effects/effects_base/ieffectinstancesregister.h"
 
-#include "framework/global/modularity/ioc.h"
-#include "framework/interactive/iinteractive.h"
+#include "modularity/ioc.h"
+#include "global/iinteractive.h"
 
 namespace au::effects {
-class AbstractViewLauncher : public IEffectViewLauncher, public muse::Injectable
+class AbstractViewLauncher : public IEffectViewLauncher
 {
 protected:
-    muse::Inject<muse::IInteractive> interactive{ this };
-    muse::Inject<IEffectInstancesRegister> instancesRegister{ this };
+    muse::Inject<muse::IInteractive> interactive;
+    muse::Inject<IEffectInstancesRegister> instancesRegister;
 
-public:
-    AbstractViewLauncher(const muse::modularity::ContextPtr& ctx)
-        : muse::Injectable(ctx) {}
-
-protected:
     muse::Ret doShowEffect(int instanceId, EffectFamily) const;
     void doShowRealtimeEffect(const RealtimeEffectStatePtr& state) const;
 

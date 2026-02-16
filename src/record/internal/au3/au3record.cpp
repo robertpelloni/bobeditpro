@@ -194,7 +194,7 @@ TransportSequences MakeTransportTracks(Au3TrackList& trackList, bool selectedOnl
 
 void Au3Record::init()
 {
-    m_audioInput = std::make_shared<Au3AudioInput>(iocContext());
+    m_audioInput = std::make_shared<Au3AudioInput>();
 
     audioEngine()->updateRequested().onNotify(this, [this]() {
         auto& pendingTracks = PendingTracks::Get(projectRef());

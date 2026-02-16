@@ -7,11 +7,7 @@
 using namespace au::playback;
 
 PlaybackStateModel::PlaybackStateModel(QObject* parent)
-    : QObject(parent), muse::Injectable(muse::iocCtxForQmlObject(this))
-{
-}
-
-void PlaybackStateModel::init()
+    : QObject(parent)
 {
     playbackController()->isPlayingChanged().onNotify(this, [this]() {
         emit isPlayingChanged();

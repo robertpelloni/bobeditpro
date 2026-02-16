@@ -270,6 +270,3 @@ build.*
 # Private developer's files
 .vscode/settings.json
 CMakeUserPresets.json
-
-# QML language server
-**/.qmlls.ini

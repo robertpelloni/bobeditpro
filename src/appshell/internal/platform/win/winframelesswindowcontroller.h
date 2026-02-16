@@ -34,13 +34,13 @@
 #include "windows.h"
 
 namespace au::appshell {
-class WinFramelessWindowController : public QObject, public FramelessWindowController, public muse::Injectable
+class WinFramelessWindowController : public QObject, public FramelessWindowController
 {
-    muse::GlobalInject<muse::ui::IUiConfiguration> uiConfiguration;
-    muse::Inject<muse::ui::IMainWindow> mainWindow { this };
+    INJECT(muse::ui::IUiConfiguration, uiConfiguration)
+    INJECT(muse::ui::IMainWindow, mainWindow)
 
 public:
-    explicit WinFramelessWindowController(QObject* parent = nullptr);
+    explicit WinFramelessWindowController();
 
     void init() override;
 

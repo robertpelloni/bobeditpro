@@ -1,5 +1,23 @@
 /*
- * Audacity: A Digital Audio Editor
+ * SPDX-License-Identifier: GPL-3.0-only
+ * MuseScore-CLA-applies
+ *
+ * MuseScore
+ * Music Composition & Notation
+ *
+ * Copyright (C) 2021 MuseScore BVBA and others
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 3 as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include <QApplication>
@@ -8,11 +26,75 @@
 
 #include <csignal>
 
-#include "appfactory.h"
+#include "app.h"
 #include "commandlineparser.h"
 #include "log.h"
 
+// Framework
 #include "muse_framework_config.h"
+#include "diagnostics/diagnosticsmodule.h"
+#include "framework/draw/drawmodule.h"
+#include "framework/actions/actionsmodule.h"
+#include "framework/audioplugins/audiopluginsmodule.h"
+#include "framework/ui/uimodule.h"
+#include "framework/shortcuts/shortcutsmodule.h"
+#include "framework/accessibility/accessibilitymodule.h"
+#include "framework/uicomponents/uicomponentsmodule.h"
+#include "framework/dockwindow/dockmodule.h"
+#include "framework/cloud/cloudmodule.h"
+#include "framework/network/networkmodule.h"
+#include "framework/learn/learnmodule.h"
+#include "framework/languages/languagesmodule.h"
+#include "framework/workspace/workspacemodule.h"
+
+// need stubs
+#include "framework/stubs/multiinstances/multiinstancesstubmodule.h"
+
+// -----
+#include "appshell/appshellmodule.h"
+#include "context/contextmodule.h"
+#include "project/projectmodule.h"
+#include "projectscene/projectscenemodule.h"
+#include "audio/audiomodule.h"
+#include "au3audio/au3audiomodule.h"
+#include "playback/playbackmodule.h"
+#include "trackedit/trackeditmodule.h"
+#include "spectrogram/spectrogrammodule.h"
+#include "record/recordmodule.h"
+#include "uicomponents/uicomponentsmodule.h"
+#include "effects/effects_base/effectsmodule.h"
+#include "effects/builtin/builtineffectsmodule.h"
+#ifdef AU_MODULE_EFFECTS_LV2
+#include "effects/lv2/lv2effectsmodule.h"
+#else
+#include "stubs/lv2/lv2effectsstubmodule.h"
+#endif
+#ifdef AU_MODULE_EFFECTS_VST
+#include "effects/vst/vsteffectsmodule.h"
+#else
+#include "stubs/vst/vsteffectsstubmodule.h"
+#endif
+#ifdef AU_MODULE_EFFECTS_AUDIO_UNIT
+#include "effects/audio_unit/audiouniteffectsmodule.h"
+#else
+#include "stubs/audio_unit/audiouniteffectsstubmodule.h"
+#endif
+#include "effects/nyquist/nyquisteffectsmodule.h"
+#include "importexport/import/importermodule.h"
+#include "importexport/export/exportermodule.h"
+#include "importexport/labels/labelsmodule.h"
+
+#ifdef MUSE_MODULE_AUTOBOT
+#include "autobot/autobotmodule.h"
+#endif
+
+#ifdef MUSE_MODULE_EXTENSIONS
+#include "framework/extensions/extensionsmodule.h"
+#else
+#include "framework/stubs/extensions/extensionsstubmodule.h"
+#endif
+
+#include "au3wrap/au3wrapmodule.h"
 
 #if (defined (_MSCVER) || defined (_MSC_VER))
 #include <vector>
@@ -135,9 +217,65 @@ int main(int argc, char** argv)
     commandLineParser.init();
     commandLineParser.parse(argc, argv);
 
+    const bool isPluginRegistration = commandLineParser.runMode() == muse::IApplication::RunMode::AudioPluginRegistration;
+
     // Force the 8-bit text encoding to UTF-8. This is the default encoding on all supported platforms except for MSVC under Windows, which
     // would otherwise default to the local ANSI code page and cause corruption of any non-ANSI Unicode characters in command-line arguments.
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
+
+    au::app::App app;
+
+//! NOTE `diagnostics` must be first, because it installs the crash handler.
+//! For other modules, the order is (an should be) unimportant.
+    app.addModule(new muse::diagnostics::DiagnosticsModule());
+
+// framework
+    app.addModule(new muse::audioplugins::AudioPluginsModule());
+    if (!isPluginRegistration) {
+        app.addModule(new muse::draw::DrawModule());
+        app.addModule(new muse::actions::ActionsModule());
+        app.addModule(new muse::workspace::WorkspaceModule());
+        app.addModule(new muse::accessibility::AccessibilityModule());
+        app.addModule(new muse::mi::MultiInstancesModule());
+        app.addModule(new muse::learn::LearnModule());
+        app.addModule(new muse::languages::LanguagesModule());
+        app.addModule(new muse::ui::UiModule());
+        app.addModule(new muse::uicomponents::UiComponentsModule());
+        app.addModule(new muse::dock::DockModule());
+        app.addModule(new muse::shortcuts::ShortcutsModule());
+        app.addModule(new muse::cloud::CloudModule());
+        app.addModule(new muse::network::NetworkModule());
+    }
+
+    // modules
+    app.addModule(new au::appshell::AppShellModule());
+    app.addModule(new muse::extensions::ExtensionsModule());
+#ifdef MUSE_MODULE_AUTOBOT
+    app.addModule(new muse::autobot::AutobotModule());
+#endif
+    app.addModule(new au::uicomponents::UiComponentsModule());
+    app.addModule(new au::effects::AudioUnitEffectsModule());
+    app.addModule(new au::effects::Lv2EffectsModule());
+    app.addModule(new au::effects::VstEffectsModule());
+
+    if (!isPluginRegistration) {
+        app.addModule(new au::context::ContextModule());
+        app.addModule(new au::audio::AudioModule());
+        app.addModule(new au::au3audio::Au3AudioModule());
+        app.addModule(new au::projectscene::ProjectSceneModule());
+        app.addModule(new au::playback::PlaybackModule());
+        app.addModule(new au::record::RecordModule());
+        app.addModule(new au::trackedit::TrackeditModule());
+        app.addModule(new au::spectrogram::SpectrogramModule());
+        app.addModule(new au::project::ProjectModule());
+        app.addModule(new au::importexport::ExporterModule());
+        app.addModule(new au::importexport::ImporterModule());
+        app.addModule(new au::importexport::LabelsModule());
+        app.addModule(new au::au3::Au3WrapModule());
+        app.addModule(new au::effects::EffectsModule());
+        app.addModule(new au::effects::BuiltinEffectsModule());
+        app.addModule(new au::effects::NyquistEffectsModule());
+    }
 
 #if (defined (_MSCVER) || defined (_MSC_VER))
     // On MSVC under Windows, we need to manually retrieve the command-line arguments and convert them from UTF-16 to UTF-8.
@@ -170,9 +308,6 @@ int main(int argc, char** argv)
 
 #endif
 
-    // ====================================================
-    // Create QApplication based on run mode
-    // ====================================================
     QCoreApplication* qApplication = nullptr;
 
     if (commandLineParser.runMode() == muse::IApplication::RunMode::AudioPluginRegistration) {
@@ -183,19 +318,7 @@ int main(int argc, char** argv)
 
     commandLineParser.processBuiltinArgs(*qApplication);
 
-    // ====================================================
-    // Create and run the application
-    // ====================================================
-    au::app::AppFactory factory;
-    std::shared_ptr<muse::IApplication> app = factory.newApp(commandLineParser);
-
-    app->setup();
-
-    app->setupNewContext();
-
-    int code = qApplication->exec();
-
-    app->finish();
+    int code = app.run(*qApplication, commandLineParser);
 
     delete qApplication;
 

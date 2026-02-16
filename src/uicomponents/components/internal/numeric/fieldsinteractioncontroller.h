@@ -28,23 +28,20 @@ public:
 
     int rowCount() const;
 
-    bool isFieldEditable(const QChar& fieldSymbol);
-
 signals:
     void currentEditedFieldIndexChanged();
     void visualItemChanged();
 
     void valueChanged(double value);
-    void editingFinished();
 
 private:
+    static bool isFieldEditable(const QChar& fieldSymbol);
     bool eventFilter(QObject* watched, QEvent* event) override;
     bool needOverrideShortcut(QEvent* event) const;
 
     bool isMouseWithinBoundaries(const QPoint& mousePos) const;
 
     void moveCurrentEditedField(int moveKey);
-    void applyCurrentEditedField(int numberKey);
     void adjustCurrentEditedField(int adjustKey);
     void scrollCurrentEditedField(int pixelsYScrolled, int stepsYScrolled);
 

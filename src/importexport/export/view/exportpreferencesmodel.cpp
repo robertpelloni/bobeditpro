@@ -60,7 +60,7 @@ const std::vector<int> DEFAULT_SAMPLE_RATE_LIST {
 };
 
 ExportPreferencesModel::ExportPreferencesModel(QObject* parent)
-    : QObject(parent), muse::Injectable(muse::iocCtxForQmlObject(this))
+    : QObject(parent)
 {
     //! NOTE: init m_sampleRateMapping
     exportSampleRateList();
@@ -118,8 +118,8 @@ void ExportPreferencesModel::init()
         }
     }
 
-    exportConfiguration()->exportChannelsTypeChanged().onNotify(this, [this] {
-        emit exportChannelsTypeChanged();
+    exportConfiguration()->exportChannelsChanged().onNotify(this, [this] {
+        emit exportChannelsChanged();
     });
 
     exportConfiguration()->exportSampleRateChanged().onNotify(this, [this](){
@@ -172,12 +172,7 @@ void ExportPreferencesModel::setCurrentProcess(const QString& newProcess)
         return;
     }
 
-    const bool timeEmpty = !selectionController()->timeSelectionIsNotEmpty();
-    const bool noClips = !selectionController()->hasSelectedClips();
-    const bool moreThanOneClip = selectionController()->selectedClips().size() > 1;
-    if (type == ExportProcessType::SELECTED_AUDIO
-        && timeEmpty
-        && (noClips || moreThanOneClip)) {
+    if (type == ExportProcessType::SELECTED_AUDIO && !selectionController()->timeSelectionIsNotEmpty()) {
         interactive()->error(muse::trc("export", "No selected audio"),
                              muse::trc("export",
                                        "Export selected audio requires a selection of audio data in the project. Please return to the project, make a selection and then try again."));
@@ -284,14 +279,14 @@ QStringList ExportPreferencesModel::formatsList() const
     return result;
 }
 
-void ExportPreferencesModel::setExportChannelsType(ExportChannelsPref::ExportChannels type)
+ExportChannelsPref::ExportChannels ExportPreferencesModel::exportChannels() const
 {
-    exportConfiguration()->setExportChannelsType(static_cast<int>(type));
+    return ExportChannelsPref::ExportChannels(exportConfiguration()->exportChannels());
 }
 
-ExportChannelsPref::ExportChannels ExportPreferencesModel::exportChannelsType() const
+void ExportPreferencesModel::setExportChannels(ExportChannelsPref::ExportChannels exportChannels)
 {
-    return static_cast<ExportChannelsPref::ExportChannels>(exportConfiguration()->exportChannelsType());
+    exportConfiguration()->setExportChannels(static_cast<int>(exportChannels));
 }
 
 int ExportPreferencesModel::maxExportChannels() const
@@ -360,11 +355,6 @@ void ExportPreferencesModel::openMetadataDialog()
     dispatcher()->dispatch("open-metadata-dialog");
 }
 
-void ExportPreferencesModel::openCustomMappingDialog()
-{
-    dispatcher()->dispatch("open-custom-mapping");
-}
-
 void ExportPreferencesModel::setFilePickerPath(const QString& path)
 {
     muse::io::FileInfo info(path);
@@ -431,8 +421,8 @@ void ExportPreferencesModel::updateExportChannels()
 {
     int maxChannels = exporter()->maxChannels();
 
-    if (static_cast<int>(exportChannelsType()) > maxChannels) {
-        setExportChannelsType(ExportChannelsPref::ExportChannels(maxChannels));
+    if (static_cast<int>(exportChannels()) > maxChannels) {
+        setExportChannels(ExportChannelsPref::ExportChannels(maxChannels));
     }
 }
 
@@ -466,39 +456,10 @@ QStringList ExportPreferencesModel::fileFilter()
 
 void ExportPreferencesModel::exportData()
 {
-    muse::io::path_t directoryPath = exportConfiguration()->directoryPath();
-    muse::io::path_t filePath = directoryPath.appendingComponent(filename());
-
-    if (suffix(filePath).empty()) {
-        auto extensions = exporter()->formatExtensions(exportConfiguration()->currentFormat());
-        std::string defaultExtension;
-        if (!extensions.empty()) {
-            defaultExtension = extensions.front();
-        }
-
-        filePath = filePath.appendingSuffix(defaultExtension);
-    }
-
-    if (fileSystem()->exists(filePath)) {
-        const int overwriteBtn = int(muse::IInteractive::Button::CustomButton) + 1;
-        const auto question = muse::trc("export", "Do you want to overwrite?");
-        const auto btnText = muse::trc("export", "Overwrite");
-        muse::IInteractive::Result result = interactive()->questionSync("", question,
-                                                                        { muse::IInteractive::ButtonData(overwriteBtn, btnText),
-                                                                          interactive()->buttonData(muse::IInteractive::Button::Cancel)
-                                                                        });
-        if (result.button() != overwriteBtn) {
-            return;
-        }
-    }
-
-    muse::Ret result = exporter()->exportData(filePath);
+    muse::Ret result = exporter()->exportData(filename().toStdString());
     if (!result.success() && !result.text().empty()) {
         interactive()->error(muse::trc("export", "Export error"), result.text());
-        return;
     }
-
-    emit exportCompleted();
 }
 
 bool ExportPreferencesModel::customFFmpegOptionsVisible()

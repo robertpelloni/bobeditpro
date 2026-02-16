@@ -14,7 +14,7 @@ constexpr int CACHE_BUFFER_PX = 200;
 constexpr double MOVE_THRESHOLD = 3.0;
 
 TrackItemsListModel::TrackItemsListModel(QObject* parent)
-    : QAbstractListModel(parent), muse::Injectable(muse::iocCtxForQmlObject(this))
+    : QAbstractListModel(parent)
 {
 }
 
@@ -159,6 +159,11 @@ void TrackItemsListModel::onSelectedItem(const trackedit::TrackItemKey& k)
 
 void TrackItemsListModel::onSelectedItems(const trackedit::TrackItemKeyList& keyList)
 {
+    if (keyList.size() == 1) {
+        onSelectedItem(keyList.front());
+        return;
+    }
+
     // Multiple-item selection can only be done programmatically, hence there is no need to check for the Shift key ;
     // we can begin by clearing everything.
     clearSelectedItems();
@@ -210,16 +215,6 @@ QVariant TrackItemsListModel::findGuideline(const TrackItemKey& key, DirectionTy
     }
 
     return QVariant(-1.0);
-}
-
-void TrackItemsListModel::setFocusedItem(const TrackItemKey& key)
-{
-    trackNavigationController()->setFocusedItem(key.key);
-}
-
-void TrackItemsListModel::resetFocusedItem()
-{
-    trackNavigationController()->setFocusedItem({});
 }
 
 QVariant TrackItemsListModel::neighbor(const TrackItemKey& key, int offset) const
@@ -522,25 +517,6 @@ void TrackItemsListModel::init()
         updateItemsMetrics();
     });
 
-    trackNavigationController()->focusedItemChanged().onReceive(this, [this](const TrackItemKey& itemKey, bool /*highlight*/) {
-        if (itemKey.trackId() != m_trackId) {
-            return;
-        }
-
-        ViewTrackItem* item = itemByKey(itemKey.key);
-        if (item) {
-            item->setFocused(true);
-        }
-    });
-
-    trackNavigationController()->openContextMenuRequested().onReceive(this, [this](const TrackItemKey& key){
-        if (key.trackId() != m_trackId) {
-            return;
-        }
-
-        emit itemContextMenuOpenRequested(key);
-    });
-
     onInit();
 
     reload();
@@ -596,8 +572,6 @@ void TrackItemsListModel::startEditItem(const TrackItemKey& key)
     if (vs) {
         vs->updateItemsBoundaries(true, key.key);
     }
-
-    setFocusedItem(key);
 }
 
 void TrackItemsListModel::endEditItem(const TrackItemKey& key)

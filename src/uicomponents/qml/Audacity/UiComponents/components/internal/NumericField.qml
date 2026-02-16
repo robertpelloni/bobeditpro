@@ -6,7 +6,7 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
 import Muse.Ui 1.0
-import Muse.UiComponents
+import Muse.UiComponents 1.0
 
 import Audacity.UiComponents 1.0
 
@@ -23,9 +23,6 @@ ListItemBlank {
     mouseArea.enabled: isEditable
 
     opacity: enabled ? 1.0 : ui.theme.itemOpacityDisabled
-
-    navigation.name: symbolField.text
-    navigation.enabled: isEditable
 
     StyledTextLabel {
         id: symbolField

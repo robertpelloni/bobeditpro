@@ -20,7 +20,6 @@ RowLayout {
     property alias isOpened: menuLoader.isMenuOpened
 
     property NavigationControl navigation: allowOptionToggle ? optionCheckBox.navigation : navCtrl
-    property bool drawFocusBorderInsideRect: false
 
     signal isOptionEnableChangeRequested(var enable)
     signal handleMenuItem(var itemId)
@@ -67,10 +66,6 @@ RowLayout {
             accessible.role: MUAccessible.ListItem
             accessible.name: labelItem.text
 
-            panel: optionCheckBox.navigation.panel
-            row: optionCheckBox.navigation.row
-            column: optionCheckBox.navigation.column + 1
-
             onActiveChanged: {
                 if (!dropdown.activeFocus) {
                     dropdown.forceActiveFocus()
@@ -86,10 +81,7 @@ RowLayout {
             id: backgroundItem
             anchors.fill: parent
 
-            NavigationFocusBorder {
-                navigationCtrl: navCtrl
-                drawOutsideParent: !root.drawFocusBorderInsideRect
-            }
+            NavigationFocusBorder { navigationCtrl: navCtrl }
 
             color: ui.theme.textFieldColor
             border.color: ui.theme.strokeColor

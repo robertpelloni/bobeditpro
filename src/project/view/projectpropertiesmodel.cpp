@@ -21,7 +21,6 @@
  */
 #include "projectpropertiesmodel.h"
 
-#include "modularity/ioc.h"
 #include "translation.h"
 #include "log.h"
 
@@ -30,7 +29,7 @@ using namespace muse::modularity;
 using namespace au::project;
 
 ProjectPropertiesModel::ProjectPropertiesModel(QObject* parent)
-    : QAbstractListModel(parent), muse::Injectable(muse::iocCtxForQmlObject(this))
+    : QAbstractListModel(parent)
 {
 }
 

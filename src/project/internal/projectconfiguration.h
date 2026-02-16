@@ -5,15 +5,13 @@
 
 #include "modularity/ioc.h"
 #include "global/iglobalconfiguration.h"
-#include "io/ifilesystem.h"
 
 #include "../iprojectconfiguration.h"
 
 namespace au::project {
 class ProjectConfiguration final : public IProjectConfiguration
 {
-    muse::GlobalInject<muse::IGlobalConfiguration> globalConfiguration;
-    muse::GlobalInject<muse::io::IFileSystem> fileSystem;
+    muse::Inject<muse::IGlobalConfiguration> globalConfiguration;
 
 public:
     ProjectConfiguration() = default;

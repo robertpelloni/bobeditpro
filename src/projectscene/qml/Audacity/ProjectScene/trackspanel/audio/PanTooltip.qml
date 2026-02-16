@@ -5,7 +5,7 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 
 import Muse.Ui 1.0
-import Muse.UiComponents
+import Muse.UiComponents 1.0
 
 StyledPopupView {
     id: root
@@ -57,7 +57,7 @@ StyledPopupView {
         repeat: false
 
         onTriggered: {
-            root.open()
+            open()
         }
     }
 
@@ -68,13 +68,13 @@ StyledPopupView {
         repeat: false
 
         onTriggered: {
-            root.close()
+            close()
         }
     }
 
     function show(noDelay = false) {
         if (noDelay) {
-            root.open()
+            open()
         } else {
             openTimer.restart()
         }
@@ -83,7 +83,7 @@ StyledPopupView {
 
     function hide(noDelay = false) {
         if (noDelay) {
-            root.close()
+            close()
         } else {
             closeTimer.restart()
         }

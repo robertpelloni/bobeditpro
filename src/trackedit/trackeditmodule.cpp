@@ -23,10 +23,7 @@
 
 #include <QtQml>
 
-#include "framework/global/modularity/ioc.h"
-
-#include "framework/ui/iuiactionsregister.h"
-#include "framework/interactive/iinteractiveuriregister.h"
+#include "modularity/ioc.h"
 
 #include "internal/trackedituiactions.h"
 #include "internal/trackeditactionscontroller.h"
@@ -51,6 +48,9 @@
 #include "internal/au3/au3clipsinteraction.h"
 #include "internal/au3/au3labelsinteraction.h"
 
+#include "ui/iuiactionsregister.h"
+#include "ui/iinteractiveuriregister.h"
+
 using namespace au::trackedit;
 using namespace muse;
 using namespace muse::modularity;
@@ -58,6 +58,12 @@ using namespace muse::ui;
 using namespace muse::actions;
 
 TrackeditModule::TrackeditModule()
+    : m_trackeditController(std::make_shared<TrackeditActionsController>()),
+    m_trackeditUiActions(std::make_shared<TrackeditUiActions>(m_trackeditController)),
+    m_selectionController(std::make_shared<Au3SelectionController>()),
+    m_configuration(std::make_shared<TrackeditConfiguration>()),
+    m_trackNavigationController(std::make_shared<TrackNavigationController>()),
+    m_trackSpectrogramSettingsUpdater(std::make_shared<TrackSpectrogramSettingsUpdater>())
 {
 }
 
@@ -73,26 +79,19 @@ std::string TrackeditModule::moduleName() const
 
 void TrackeditModule::registerExports()
 {
-    m_trackeditController = std::make_shared<TrackeditActionsController>(iocContext());
-    m_trackeditUiActions = std::make_shared<TrackeditUiActions>(iocContext(), m_trackeditController);
-    m_selectionController = std::make_shared<Au3SelectionController>(iocContext());
-    m_configuration = std::make_shared<TrackeditConfiguration>();
-    m_trackNavigationController = std::make_shared<TrackNavigationController>(iocContext());
-    m_trackSpectrogramSettingsUpdater = std::make_shared<TrackSpectrogramSettingsUpdater>(iocContext());
-
-    ioc()->registerExport<ITrackeditProjectCreator>(moduleName(), new Au3TrackeditProjectCreator(iocContext()));
+    ioc()->registerExport<ITrackeditProjectCreator>(moduleName(), new Au3TrackeditProjectCreator());
     ioc()->registerExport<ITrackeditInteraction>(moduleName(),
-                                                 new TrackeditInteraction(iocContext(), std::make_unique<TrackeditOperationController>(
-                                                                              iocContext(), std::make_unique<UndoManager>(iocContext()))));
+                                                 new TrackeditInteraction(std::make_unique<TrackeditOperationController>(
+                                                                              std::make_unique<UndoManager>())));
     ioc()->registerExport<ISelectionController>(moduleName(), m_selectionController);
-    ioc()->registerExport<IProjectHistory>(moduleName(), new Au3ProjectHistory(iocContext()));
-    ioc()->registerExport<ITrackeditClipboard>(moduleName(), new Au3TrackeditClipboard(iocContext()));
+    ioc()->registerExport<IProjectHistory>(moduleName(), new Au3ProjectHistory());
+    ioc()->registerExport<ITrackeditClipboard>(moduleName(), new Au3TrackeditClipboard());
     ioc()->registerExport<ITrackeditConfiguration>(moduleName(), m_configuration);
     ioc()->registerExport<ITrackNavigationController>(moduleName(), m_trackNavigationController);
 
-    ioc()->registerExport<ITracksInteraction>(moduleName(), new Au3TracksInteraction(iocContext()));
-    ioc()->registerExport<IClipsInteraction>(moduleName(), new Au3ClipsInteraction(iocContext()));
-    ioc()->registerExport<ILabelsInteraction>(moduleName(), new Au3LabelsInteraction(iocContext()));
+    ioc()->registerExport<ITracksInteraction>(moduleName(), new Au3TracksInteraction());
+    ioc()->registerExport<IClipsInteraction>(moduleName(), new Au3ClipsInteraction());
+    ioc()->registerExport<ILabelsInteraction>(moduleName(), new Au3LabelsInteraction());
 }
 
 void TrackeditModule::registerUiTypes()
@@ -105,7 +104,7 @@ void TrackeditModule::registerUiTypes()
 
 void TrackeditModule::resolveImports()
 {
-    auto ir = ioc()->resolve<muse::interactive::IInteractiveUriRegister>(moduleName());
+    auto ir = ioc()->resolve<muse::ui::IInteractiveUriRegister>(moduleName());
     if (ir) {
         ir->registerQmlUri(muse::Uri("audacity://trackedit/custom_rate"), "Audacity/TrackEdit/CustomRateDialog.qml");
         ir->registerQmlUri(muse::Uri("audacity://trackedit/custom_time"), "Audacity/TrackEdit/CustomTimeDialog.qml");

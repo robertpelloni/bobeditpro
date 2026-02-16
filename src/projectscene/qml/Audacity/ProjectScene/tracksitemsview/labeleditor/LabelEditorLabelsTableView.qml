@@ -105,10 +105,6 @@ StyledTableView {
             property int row
             property int column
 
-            property NavigationPanel navigationPanel
-            property int navigationRow
-            property int navigationColumnStart
-
             property string accessibleName: val
 
             signal changed(double value)
@@ -126,26 +122,16 @@ StyledTableView {
             upperTimeSignature: Boolean(itemData) ? itemData.upperTimeSignature : -1
             lowerTimeSignature: Boolean(itemData) ? itemData.lowerTimeSignature : -1
 
-            navigation.panel: navigationPanel
-            navigation.enabled: root.currentEditedCell === item
-            navigation.row: navigationRow
-            navigation.column: navigationColumnStart
-
-            navigation.onActiveChanged: function(active) {
-                if (active) {
-                    navigation.triggered()
-                }
-            }
+            // navigation.panel: navigationPanel
+            // navigation.row: navigationRow
+            // navigation.column: navigationColumnStart
 
             onValueChangeRequested: function(newValue) {
                 item.changed(newValue)
             }
-
-            onValueEditingFinished: {
-                Qt.callLater(editingFinished)
-            }
         }
     }
+
 
     Component {
         id: frequencyComp
@@ -158,10 +144,6 @@ StyledTableView {
             property int row
             property int column
 
-            property NavigationPanel navigationPanel
-            property int navigationRow
-            property int navigationColumnStart
-
             property string accessibleName: val
 
             signal changed(double value)
@@ -179,23 +161,12 @@ StyledTableView {
             upperTimeSignature: Boolean(itemData) ? itemData.upperTimeSignature : -1
             lowerTimeSignature: Boolean(itemData) ? itemData.lowerTimeSignature : -1
 
-            navigation.panel: navigationPanel
-            navigation.enabled: root.currentEditedCell === item
-            navigation.row: navigationRow
-            navigation.column: navigationColumnStart
-
-            navigation.onActiveChanged: function(active) {
-                if (active) {
-                    navigation.triggered()
-                }
-            }
+            // navigation.panel: navigationPanel
+            // navigation.row: navigationRow
+            // navigation.column: navigationColumnStart
 
             onValueChangeRequested: function(newValue) {
                 item.changed(newValue)
-            }
-
-            onValueEditingFinished: {
-                Qt.callLater(editingFinished)
             }
         }
     }

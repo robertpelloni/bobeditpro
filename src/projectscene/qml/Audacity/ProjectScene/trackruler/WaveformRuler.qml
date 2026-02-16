@@ -16,14 +16,15 @@ Item {
     TrackRulerModel {
         id: rulerModel
 
-        height: initialized ? root.height : 0
+        height: root.height
 
-        trackId: initialized ? model.trackId : -1
-        isStereo: initialized ? model.isStereo : false
+        trackId: model.trackId
+        isStereo: model.isStereo
 
-        isCollapsed: initialized ? root.isCollapsed : false
-        channelHeightRatio: initialized ? root.channelHeightRatio : 1.0
+        isCollapsed: root.isCollapsed
+        channelHeightRatio: root.channelHeightRatio
     }
+
     MouseArea {
         anchors.fill: parent
         acceptedButtons: Qt.RightButton | Qt.LeftButton
@@ -86,7 +87,7 @@ Item {
 
                 width: 8
                 height: 1
-                color: ui.theme.fontSecondaryColor
+                color: ui.theme.isDark ? "#F4F7F9" : "#F4F5F9"
 
                 antialiasing: true
             }
@@ -100,7 +101,7 @@ Item {
                 width: parent.width - tick.width
                 height: 1
 
-                color: ui.theme.extra["waveform_ruler_tick_extension_color"]
+                color: "#475157"
 
                 visible: modelData.fullWidthTick
 
@@ -126,7 +127,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
 
                     text: rulerModel.sampleToText(modelData.value)
-                    color: ui.theme.extra["waveform_ruler_label_color"]
+                    color: "#F9F9FA"
                     font.pixelSize: 11
 
                     font.bold: modelData.bold
@@ -146,7 +147,7 @@ Item {
 
                     width: 3
                     height: 1
-                    color: ui.theme.fontSecondaryColor
+                    color: "#F4F5F9"
 
                     visible: modelData.value < 0
 
@@ -171,7 +172,7 @@ Item {
             Rectangle {
                 width: 4
                 height: 1
-                color: ui.theme.extra["waveform_ruler_small_step_color"]
+                color: ui.theme.isDark ? "#868B8E" : "#8B8C96"
                 anchors.verticalCenter: parent.verticalCenter
                 antialiasing: true
             }

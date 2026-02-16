@@ -22,7 +22,6 @@
 #pragma once
 
 #include <QObject>
-#include <QTimer>
 
 #include "global/async/asyncable.h"
 
@@ -33,7 +32,7 @@
 #include "../timeline/timelinecontext.h"
 
 namespace au::projectscene {
-class PlayCursorController : public QObject, public muse::async::Asyncable, public muse::Injectable
+class PlayCursorController : public QObject, public muse::async::Asyncable
 {
     Q_OBJECT
 
@@ -41,8 +40,8 @@ class PlayCursorController : public QObject, public muse::async::Asyncable, publ
 
     Q_PROPERTY(double positionX READ positionX NOTIFY positionXChanged FINAL)
 
-    muse::Inject<context::IGlobalContext> globalContext{ this };
-    muse::Inject<muse::actions::IActionsDispatcher> dispatcher{ this };
+    muse::Inject<context::IGlobalContext> globalContext;
+    muse::Inject<muse::actions::IActionsDispatcher> dispatcher;
 
 public:
     PlayCursorController(QObject* parent = nullptr);
@@ -67,16 +66,8 @@ private:
     projectscene::IProjectViewStatePtr projectViewState() const;
 
     void updatePositionX(muse::secs_t secs);
-    void ensureCursorAtCenter(muse::secs_t secs) const;
-
-    void onUserHorizontalScroll();
-    void onScrollSuppressionTimeout();
-    void clearScrollSuppression();
 
     TimelineContext* m_context = nullptr;
     double m_positionX = 0.0;
-
-    QTimer m_scrollSuppressionTimer;
-    bool m_viewUpdatesSuppressed = false;
 };
 }

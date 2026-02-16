@@ -1,7 +1,5 @@
 #pragma once
 
-#include <QPainter>
-
 #include "au3-wave-track/WaveClip.h"
 #include "au3-wave-track-paint/waveform/WavePaintParameters.h"
 #include "au3-wave-track-paint/waveform/WaveDataCache.h"

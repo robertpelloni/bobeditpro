@@ -3,12 +3,10 @@
 */
 #pragma once
 
-#include "framework/global/modularity/ioc.h"
-
+#include "modularity/ioc.h"
 #include "ui/iuiconfiguration.h"
 #include "workspace/iworkspacemanager.h"
 #include "iprojectsceneconfiguration.h"
-#include "context/iglobalcontext.h"
 
 #include "trackitemslistmodel.h"
 #include "trackclipitem.h"
@@ -24,11 +22,10 @@ class TrackClipsListModel : public TrackItemsListModel
         bool asymmetricStereoHeightsPossible READ asymmetricStereoHeightsPossible NOTIFY asymmetricStereoHeightsPossibleChanged)
     Q_PROPERTY(bool isContrastFocusBorderEnabled READ isContrastFocusBorderEnabled NOTIFY isContrastFocusBorderEnabledChanged FINAL)
 
-    muse::GlobalInject<projectscene::IProjectSceneConfiguration> projectSceneConfiguration;
-    muse::GlobalInject<muse::ui::IUiConfiguration> uiConfiguration;
-
-    muse::Inject<context::IGlobalContext> globalContext { this };
-    muse::Inject<muse::workspace::IWorkspaceManager> workspacesManager{ this };
+    muse::Inject<projectscene::IProjectSceneConfiguration> projectSceneConfiguration;
+    muse::Inject<muse::workspace::IWorkspaceManager> workspacesManager;
+    muse::Inject<trackedit::IProjectHistory> projectHistory;
+    muse::Inject<muse::ui::IUiConfiguration> uiConfiguration;
 
 public:
     explicit TrackClipsListModel(QObject* parent = nullptr);

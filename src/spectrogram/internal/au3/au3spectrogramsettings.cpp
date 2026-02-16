@@ -6,19 +6,16 @@
 #include "iglobalspectrogramconfiguration.h"
 #include "au3spectrogramutils.h"
 #include "spectrogramtypes.h"
-#include "../numberscale.h"
 
 #include "au3-basic-ui/BasicUI.h"
 #include "au3-fft/FFT.h"
+#include "au3-screen-geometry/NumberScale.h"
 #include "au3-wave-track/WaveTrack.h"
 
 #include "framework/global/log.h"
 
-#include "tft/WaveletCalculator.h"
-
 #include <algorithm>
 #include <cmath>
-#include <memory>
 
 namespace au::spectrogram {
 namespace {
@@ -66,14 +63,14 @@ Au3SpectrogramSettings& Au3SpectrogramSettings::Get(WaveTrack& track)
 
 Au3SpectrogramSettings::Au3SpectrogramSettings(const Au3SpectrogramSettings& other)
     : syncWithGlobalSettings(other.syncWithGlobalSettings)
-    , minFreq(other.minFreq)
-    , maxFreq(other.maxFreq)
     , range(other.range)
     , gain(other.gain)
     , frequencyGain(other.frequencyGain)
     , colorScheme(other.colorScheme)
     , scaleType(other.scaleType)
     , algorithm(other.algorithm)
+    , minFreq(other.minFreq)
+    , maxFreq(other.maxFreq)
 
     // Do not copy these!
     , hFFT{}
@@ -184,7 +181,6 @@ void Au3SpectrogramSettings::DestroyWindows()
     window.reset();
     dWindow.reset();
     tWindow.reset();
-    pTFCalculator.reset(nullptr);
 }
 
 namespace {
@@ -252,13 +248,7 @@ void RecreateWindow(
 
 void Au3SpectrogramSettings::CacheWindows()
 {
-    if (isConstantQ()) {
-        if (pTFCalculator == nullptr) {
-            // JUST USING CONSTANT PARAMETERS FOR NOW. @todo : Should be inferred from settings
-            pTFCalculator = std::make_unique<TFT::WaveletCalculator>(10 /*octaves*/, 0.4 /*fmax*/, 18 /*Q*/, 50 /*overlap*/);
-        }
-    } else if (hFFT == nullptr || window == nullptr
-               || (algorithm == SpectrogramAlgorithm::Reassignment && (tWindow == nullptr || dWindow == nullptr))) {
+    if (hFFT == NULL || window == NULL || (algorithm == SpectrogramAlgorithm::Reassignment && (tWindow == NULL || dWindow == NULL))) {
         double scale;
         auto factor = ZeroPaddingFactor();
         const auto fftLen = WindowSize() * factor;
@@ -311,6 +301,108 @@ size_t Au3SpectrogramSettings::NBins() const
     return GetFFTLength() / 2;
 }
 
+NumberScale Au3SpectrogramSettings::GetScale(float minFreqIn, float maxFreqIn) const
+{
+    NumberScaleType type = nstLinear;
+
+    // Don't assume the correspondence of the enums will remain direct in the future.
+    // Do this switch.
+    switch (scaleType) {
+    default:
+        wxASSERT(false);
+    case SpectrogramScale::Linear:
+        type = nstLinear;
+        break;
+    case SpectrogramScale::Logarithmic:
+        type = nstLogarithmic;
+        break;
+    case SpectrogramScale::Mel:
+        type = nstMel;
+        break;
+    case SpectrogramScale::Bark:
+        type = nstBark;
+        break;
+    case SpectrogramScale::ERB:
+        type = nstErb;
+        break;
+    case SpectrogramScale::Period:
+        type = nstPeriod;
+        break;
+    }
+
+    return NumberScale(type, minFreqIn, maxFreqIn);
+}
+
+static const ChannelGroup::Attachments::RegisteredFactory
+    key2{ [](auto&) { return std::make_unique<SpectrogramBounds>(); } };
+
+SpectrogramBounds& SpectrogramBounds::Get(WaveTrack& track)
+{
+    return track.Attachments::Get<SpectrogramBounds>(key2);
+}
+
+const SpectrogramBounds& SpectrogramBounds::Get(
+    const WaveTrack& track)
+{
+    return Get(const_cast<WaveTrack&>(track));
+}
+
+SpectrogramBounds::~SpectrogramBounds() = default;
+
+auto SpectrogramBounds::Clone() const -> PointerType
+{
+    return std::make_unique<SpectrogramBounds>(*this);
+}
+
+void SpectrogramBounds::GetBounds(
+    const WaveTrack& wt, float& min, float& max) const
+{
+    const double rate = wt.GetRate();
+
+    const auto& settings = Au3SpectrogramSettings::Get(wt);
+    const auto type = settings.scaleType;
+
+    const float top = (rate / 2.);
+
+    float bottom;
+    if (type == SpectrogramScale::Linear) {
+        bottom = 0.0f;
+    } else if (type == SpectrogramScale::Period) {
+        // special case
+        const auto half = settings.GetFFTLength() / 2;
+        // EAC returns no data for below this frequency:
+        const float bin2 = rate / half;
+        bottom = bin2;
+    } else {
+        // logarithmic, etc.
+        bottom = 1.0f;
+    }
+
+    {
+        float spectrumMax = mSpectrumMax;
+        if (spectrumMax < 0) {
+            spectrumMax = settings.maxFreq;
+        }
+        if (spectrumMax < 0) {
+            max = top;
+        } else {
+            max = std::clamp(spectrumMax, bottom, top);
+        }
+    }
+
+    {
+        float spectrumMin = mSpectrumMin;
+        if (spectrumMin < 0) {
+            spectrumMin = settings.minFreq;
+        }
+        if (spectrumMin < 0) {
+            min = std::max(bottom, top / 1000.0f);
+        } else {
+            min = std::clamp(spectrumMin, bottom, top);
+        }
+    }
+}
+
 void Au3SpectrogramSettings::SetZeroPaddingFactor(int factor)
 {
     assert(isPowerOfTwo(factor));
@@ -324,7 +416,7 @@ void Au3SpectrogramSettings::SetWindowType(SpectrogramWindowType type)
     DestroyWindows();
 }
 
-int Au3SpectrogramSettings::ZeroPaddingFactor() const
+size_t Au3SpectrogramSettings::ZeroPaddingFactor() const
 {
     return algorithm == SpectrogramAlgorithm::Pitch ? 1 : m_zeroPaddingFactor;
 }

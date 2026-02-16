@@ -25,32 +25,28 @@
 
 #include "iopensaveprojectscenario.h"
 
-#include "framework/global/modularity/ioc.h"
-#include "framework/global/io/ifilesystem.h"
-#include "framework/interactive/iinteractive.h"
+#include "modularity/ioc.h"
+#include "iprojectconfiguration.h"
+#include "iprojectfilescontroller.h"
+#include "global/io/ifilesystem.h"
+#include "global/iinteractive.h"
 
-#include "framework/cloud/musescorecom/imusescorecomservice.h"
-#include "framework/cloud/audiocom/iaudiocomservice.h"
-#include "framework/cloud/qml/Muse/Cloud/enums.h"
-
-#include "project/iprojectconfiguration.h"
-#include "project/iprojectfilescontroller.h"
+#include "cloud/musescorecom/imusescorecomservice.h"
+#include "cloud/audiocom/iaudiocomservice.h"
+#include "cloud/cloudqmltypes.h"
 
 namespace au::project {
-class OpenSaveProjectScenario : public IOpenSaveProjectScenario, public muse::Injectable
+class OpenSaveProjectScenario : public IOpenSaveProjectScenario
 {
-    muse::GlobalInject<IProjectConfiguration> configuration;
-    muse::GlobalInject<muse::io::IFileSystem> fileSystem;
-
-    muse::GlobalInject<IProjectFilesController> projectFilesController;
-
-    muse::Inject<muse::IInteractive> interactive { this };
-    muse::Inject<muse::cloud::IMuseScoreComService> museScoreComService { this };
-    muse::Inject<muse::cloud::IAudioComService> audioComService { this };
+    muse::Inject<IProjectConfiguration> configuration;
+    muse::Inject<IProjectFilesController> projectFilesController;
+    muse::Inject<muse::IInteractive> interactive;
+    muse::Inject<muse::io::IFileSystem> fileSystem;
+    muse::Inject<muse::cloud::IMuseScoreComService> museScoreComService;
+    muse::Inject<muse::cloud::IAudioComService> audioComService;
 
 public:
-    OpenSaveProjectScenario(const muse::modularity::ContextPtr& ctx)
-        : muse::Injectable(ctx) {}
+    OpenSaveProjectScenario() = default;
 
     muse::RetVal<SaveLocation> askSaveLocation(IAudacityProjectPtr project, SaveMode mode,
                                                SaveLocationType preselectedType = SaveLocationType::Undefined) const override;

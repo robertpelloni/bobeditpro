@@ -11,10 +11,9 @@
 #include "mocks/trackeditconfigurationmock.h"
 #include "mocks/projecthistorymock.h"
 #include "mocks/clipboardmock.h"
-#include "mocks/tracknavigationcontrollermock.h"
 #include "../trackediterrors.h"
 
-#include "interactive/tests/mocks/interactivemock.h"
+#include "global/tests/mocks/interactivemock.h"
 
 #include "au3wrap/internal/trackcolor.h"
 
@@ -27,11 +26,10 @@ class Au3TracksInteractionTests : public Au3InteractionTestBase
 public:
     void SetUp() override
     {
-        m_tracksInteraction = std::make_shared<Au3TracksInteraction>(muse::modularity::globalCtx());
+        m_tracksInteraction = std::make_shared<Au3TracksInteraction>();
 
         m_globalContext = std::make_shared<NiceMock<context::GlobalContextMock> >();
         m_selectionController = std::make_shared<NiceMock<SelectionControllerMock> >();
-        m_trackNavigationController = std::make_shared<NiceMock<TrackNavigationControllerMock> >();
         m_interactive = std::make_shared<NiceMock<muse::InteractiveMock> >();
         m_playbackState = std::make_shared<NiceMock<context::PlaybackStateMock> >();
         m_configuration = std::make_shared<NiceMock<TrackeditConfigurationMock> >();
@@ -40,7 +38,6 @@ public:
 
         m_tracksInteraction->globalContext.set(m_globalContext);
         m_tracksInteraction->selectionController.set(m_selectionController);
-        m_tracksInteraction->trackNavigationController.set(m_trackNavigationController);
         m_tracksInteraction->interactive.set(m_interactive);
         m_tracksInteraction->configuration.set(m_configuration);
         m_tracksInteraction->projectHistory.set(m_projectHistory);
@@ -58,9 +55,6 @@ public:
         ON_CALL(*m_currentProject, trackeditProject())
         .WillByDefault(Return(m_trackEditProject));
 
-        ON_CALL(*m_trackNavigationController, focusedTrack())
-        .WillByDefault(Return(INVALID_TRACK));
-
         initTestProject();
     }
 
@@ -71,8 +65,6 @@ public:
 
     std::shared_ptr<Au3TracksInteraction> m_tracksInteraction;
     std::shared_ptr<SelectionControllerMock> m_selectionController;
-    std::shared_ptr<TrackNavigationControllerMock> m_trackNavigationController;
-
     std::shared_ptr<TrackeditConfigurationMock> m_configuration;
     std::shared_ptr<ProjectHistoryMock> m_projectHistory;
     std::shared_ptr<ClipboardMock> m_clipboard;

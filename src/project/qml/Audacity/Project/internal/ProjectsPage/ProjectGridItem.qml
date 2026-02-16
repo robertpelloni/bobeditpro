@@ -23,7 +23,7 @@ import QtQuick 2.15
 import QtQuick.Layouts 1.15
 
 import Muse.Ui 1.0
-import Muse.UiComponents
+import Muse.UiComponents 1.0
 import Muse.GraphicalEffects 1.0
 import Audacity.Project 1.0
 
@@ -266,7 +266,7 @@ FocusScope {
 
         Rectangle {
             anchors.fill: parent
-            color: ui.theme.extra["white_color"]
+            color: "white"
 
             StyledIconLabel {
                 anchors.centerIn: parent
@@ -274,7 +274,7 @@ FocusScope {
                 iconCode: IconCode.PLUS
 
                 font.pixelSize: 50
-                color: ui.theme.extra["black_color"]
+                color: "black"
             }
         }
     }

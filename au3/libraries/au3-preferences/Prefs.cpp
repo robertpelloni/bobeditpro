@@ -62,10 +62,6 @@
 StickySetting<BoolSetting> DefaultUpdatesCheckingFlag{
     L"/Update/DefaultUpdatesChecking", true };
 
-StickySetting<BoolSetting> SendAnonymousUsageInfo{ L"SendAnonymousUsageInfo", false };
-
-StickySetting<StringSetting> InstanceId{ L"InstanceId" };
-
 std::unique_ptr<audacity::BasicSettings> ugPrefs {};
 
 audacity::BasicSettings* gPrefs = nullptr;

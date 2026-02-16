@@ -11,14 +11,11 @@
 namespace au::context {
 class GlobalContext : public au::context::IGlobalContext, public muse::Injectable
 {
-    muse::Inject<au::record::IRecordController> recordController { this };
+    muse::Inject<au::record::IRecordController> recordController;
 
 public:
-    GlobalContext(muse::modularity::ContextPtr ctx)
-        : muse::Injectable(std::move(ctx))
-        , m_playbackState(std::make_shared<PlaybackState>())
-    {
-    }
+
+    GlobalContext();
 
     void setCurrentProject(const au::project::IAudacityProjectPtr& project) override;
     au::project::IAudacityProjectPtr currentProject() const override;

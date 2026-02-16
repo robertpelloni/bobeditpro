@@ -15,11 +15,10 @@ namespace au::spectrogram {
 class GlobalSpectrogramSettingsModel : public AbstractSpectrogramSettingsModel, public muse::async::Asyncable, public QQmlParserStatus
 {
     Q_OBJECT
-    Q_INTERFACES(QQmlParserStatus)
     Q_PROPERTY(
         bool spectralSelectionEnabled READ spectralSelectionEnabled WRITE setSpectralSelectionEnabled NOTIFY spectralSelectionEnabledChanged)
 
-    muse::GlobalInject<IGlobalSpectrogramConfiguration> configuration;
+    muse::Inject<IGlobalSpectrogramConfiguration> configuration;
 
 public:
     GlobalSpectrogramSettingsModel(QObject* parent = nullptr);

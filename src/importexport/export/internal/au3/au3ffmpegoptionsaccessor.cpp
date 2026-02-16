@@ -2,9 +2,7 @@
 * Audacity: A Digital Audio Editor
 */
 
-#include "mod-ffmpeg/FFmpeg.h"
 #include "mod-ffmpeg/ExportFFmpegOptions.h"
-#include "mod-ffmpeg/lib-ffmpeg-support/FFmpegFunctions.h"
 
 #include "au3ffmpegoptionsaccessor.h"
 
@@ -50,25 +48,6 @@ void Au3FFmpegOptionsAccessor::fetchAllCodecs()
 std::vector<std::string> Au3FFmpegOptionsAccessor::predictionOrderMethodList() const
 {
     return m_options->GetPredictionOrderMethods();
-}
-
-std::string Au3FFmpegOptionsAccessor::ffmpegVersion() const
-{
-    return GetFFmpegVersion().Translation().ToStdString();
-}
-
-std::string Au3FFmpegOptionsAccessor::ffmpegLibraryPath() const
-{
-    auto ffmpeg = FFmpegFunctions::Load();
-    if (!ffmpeg) {
-        return {};
-    }
-    return ffmpeg->GetLoadedAVFormatPath().ToStdString();
-}
-
-bool Au3FFmpegOptionsAccessor::setFFmpegLibraryPath(const muse::io::path_t& path)
-{
-    return SetFFmpegPath(path.toStdString());
 }
 
 std::vector<std::string> Au3FFmpegOptionsAccessor::profileList() const

@@ -3,7 +3,6 @@
 */
 #pragma once
 
-#include "global/modularity/ioc.h"
 #include "audio/iaudioengine.h"
 #include "record/irecordconfiguration.h"
 
@@ -13,7 +12,7 @@ class Au3AudioEngine final : public au::audio::IAudioEngine
 public:
     Au3AudioEngine() = default;
 
-    muse::GlobalInject<au::record::IRecordConfiguration> recordConfiguration;
+    muse::Inject<au::record::IRecordConfiguration> recordConfiguration;
 
     void init();
     void deinit();

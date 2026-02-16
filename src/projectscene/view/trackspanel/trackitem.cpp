@@ -25,7 +25,7 @@ static muse::ui::IconCode::Code iconFromTrackType(au::trackedit::TrackType type)
 }
 
 TrackItem::TrackItem(QObject* parent)
-    : QObject(parent), muse::Injectable(muse::iocCtxForQmlObject(this))
+    : QObject(parent)
 {
     qRegisterMetaType<au::trackedit::TrackType>("au::trackedit::TrackType");
 }
@@ -50,7 +50,7 @@ void TrackItem::init(const trackedit::Track& track)
 
     m_icon = iconFromTrackType(track.type);
 
-    m_isFocused = trackNavigationController()->focusedTrack() == m_trackId;
+    m_isFocused = selectionController()->focusedTrack() == m_trackId;
     emit isFocusedChanged();
 }
 

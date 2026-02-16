@@ -18,24 +18,21 @@
 #include "record/irecordcontroller.h"
 #include "record/irecordmetercontroller.h"
 #include "trackedit/iselectioncontroller.h"
-#include "trackedit/internal/itracknavigationcontroller.h"
 
 namespace au::record {
-class Au3AudioInput : public IAudioInput, public muse::async::Asyncable, public muse::Injectable
+class Au3AudioInput : public IAudioInput, public muse::async::Asyncable
 {
-    muse::GlobalInject<record::IRecordConfiguration> configuration;
-
-    muse::Inject<au::audio::IAudioEngine> audioEngine{ this };
-    muse::Inject<au::context::IGlobalContext> globalContext{ this };
-    muse::Inject<audio::IAudioDevicesProvider> audioDevicesProvider{ this };
-    muse::Inject<playback::IPlaybackController> playbackController{ this };
-    muse::Inject<record::IRecordController> controller{ this };
-    muse::Inject<record::IRecordMeterController> meterController{ this };
-    muse::Inject<trackedit::ISelectionController> selectionController{ this };
-    muse::Inject<trackedit::ITrackNavigationController> trackNavigationController{ this };
+    muse::Inject<au::audio::IAudioEngine> audioEngine;
+    muse::Inject<au::context::IGlobalContext> globalContext;
+    muse::Inject<audio::IAudioDevicesProvider> audioDevicesProvider;
+    muse::Inject<playback::IPlaybackController> playbackController;
+    muse::Inject<record::IRecordConfiguration> configuration;
+    muse::Inject<record::IRecordController> controller;
+    muse::Inject<record::IRecordMeterController> meterController;
+    muse::Inject<trackedit::ISelectionController> selectionController;
 
 public:
-    Au3AudioInput(const muse::modularity::ContextPtr& ctx);
+    Au3AudioInput();
 
     muse::async::Promise<float> recordVolume() const override;
     void setRecordVolume(float volume) override;

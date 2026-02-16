@@ -79,16 +79,6 @@ void LabelStruct::SetId(int64_t id)
     mId = id;
 }
 
-bool LabelStruct::GetSelected() const
-{
-    return mSelected;
-}
-
-void LabelStruct::SetSelected(bool selected)
-{
-    mSelected = selected;
-}
-
 LabelTrack::Interval::~Interval() = default;
 
 double LabelTrack::Interval::Start() const
@@ -150,6 +140,7 @@ LabelTrack::Holder LabelTrack::CreatePtr(TrackList& trackList)
 {
     auto track = std::make_shared<LabelTrack>();
     track->SetName(trackList.MakeUniqueTrackName(GetDefaultName()));
+    trackList.Add(track);
     return track;
 }
 
@@ -167,7 +158,6 @@ LabelTrack::LabelTrack(const LabelTrack& orig, ProtectedCreationArg&& a)
     for (auto& original: orig.mLabels) {
         LabelStruct l { original.selectedRegion, original.title };
         l.SetId(LabelStruct::NewID());
-        l.SetSelected(original.GetSelected());
         mLabels.push_back(l);
     }
 }
@@ -788,7 +778,6 @@ bool LabelTrack::HandleXMLTag(const std::string_view& tag, const AttributesList&
     if (tag == "label") {
         SelectedRegion selectedRegion;
         wxString title;
-        bool selected = false;
 
         // loop through attrs, which is a null-terminated list of
         // attribute-value pairs
@@ -801,8 +790,6 @@ bool LabelTrack::HandleXMLTag(const std::string_view& tag, const AttributesList&
             // Bug 1905 no longer applies, as valueView has no limits anyway
             else if (attr == "title") {
                 title = value.ToWString();
-            } else if (attr == "isSelected") {
-                value.TryGet(selected);
             }
         } // while
 
@@ -814,7 +801,6 @@ bool LabelTrack::HandleXMLTag(const std::string_view& tag, const AttributesList&
         //   selectedRegion.collapseToT0();
 
         LabelStruct l { selectedRegion, title };
-        l.SetSelected(selected);
         mLabels.push_back(l);
 
         return true;
@@ -865,7 +851,6 @@ void LabelTrack::WriteXML(XMLWriter& xmlFile) const
         .WriteXMLAttributes(xmlFile, "t", "t1");
         // PRL: to do: write other selection fields
         xmlFile.WriteAttr(wxT("title"), labelStruct.title);
-        xmlFile.WriteAttr(wxT("isSelected"), labelStruct.GetSelected());
         xmlFile.EndTag(wxT("label"));
     }
 

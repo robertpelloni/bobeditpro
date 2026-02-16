@@ -5,9 +5,8 @@
 
 #include <qqmlintegration.h>
 
-#include "framework/global/modularity/ioc.h"
-#include "framework/interactive/iinteractive.h"
-
+#include "modularity/ioc.h"
+#include "iinteractive.h"
 #include "context/iglobalcontext.h"
 #include "trackedit/itrackeditinteraction.h"
 #include "trackedit/ilabelsinteraction.h"
@@ -39,15 +38,14 @@ class LabelsTableViewModel : public muse::uicomponents::AbstractTableViewModel, 
     Q_OBJECT
     QML_ELEMENT;
 
-    muse::GlobalInject<importexport::ILabelsConfiguration> labelsImportExportConfiguration;
-    muse::GlobalInject<IProjectSceneConfiguration> configuration;
-
     muse::Inject<muse::IInteractive> interactive = { this };
     muse::Inject<context::IGlobalContext> globalContext = { this };
     muse::Inject<trackedit::ITrackeditInteraction> trackeditInteraction = { this };
     muse::Inject<trackedit::ILabelsInteraction> labelsInteraction = { this };
     muse::Inject<importexport::ILabelsExporter> labelExporter = { this };
     muse::Inject<importexport::ILabelsImporter> labelsImporter = { this };
+    muse::Inject<importexport::ILabelsConfiguration> labelsImportExportConfiguration = { this };
+    muse::Inject<IProjectSceneConfiguration> configuration = { this };
 
 public:
     explicit LabelsTableViewModel(QObject* parent = nullptr);
@@ -87,7 +85,7 @@ private:
     bool changeLabelLowFrequency(int row, const muse::Val& value);
     bool changeLabelHighFrequency(int row, const muse::Val& value);
 
-    muse::RetVal<QString> createNewLabelTrack(int currentRow);
+    QString createNewLabelTrack(int currentRow);
 
     muse::io::path_t selectFileForExport();
     muse::io::path_t selectFileForImport();

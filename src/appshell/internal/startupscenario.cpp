@@ -22,7 +22,6 @@
 
 #include "startupscenario.h"
 
-#include "appshell/appshelltypes.h"
 #include "global/async/async.h"
 #include "global/translation.h"
 #include "global/log.h"
@@ -31,12 +30,12 @@ using namespace au::appshell;
 using namespace muse::actions;
 using namespace au::project;
 
-static const muse::UriQuery FIRST_LAUNCH_SETUP_URI("audacity://firstLaunchSetup?floating=true");
+static const muse::UriQuery FIRST_LAUNCH_SETUP_URI("musescore://firstLaunchSetup?floating=true");
 static const muse::Uri ALPHA_WELCOME_POPUP("audacity://alphaWelcomePopup");
-static const muse::Uri HOME_URI("audacity://home");
+static const muse::Uri HOME_URI("musescore://home");
 static const muse::Uri PROJECT_URI("audacity://project");
 
-static StartupModeType modeTypeFromString(const std::string& str)
+static StartupModeType modeTypeTromString(const std::string& str)
 {
     if ("start-empty" == str) {
         return StartupModeType::StartEmpty;
@@ -69,7 +68,7 @@ bool StartupScenario::isStartWithNewFileAsSecondaryInstance() const
     }
 
     if (!m_startupTypeStr.empty()) {
-        return modeTypeFromString(m_startupTypeStr) == StartupModeType::StartWithNewScore;
+        return modeTypeTromString(m_startupTypeStr) == StartupModeType::StartWithNewScore;
     }
 
     return false;
@@ -85,12 +84,14 @@ void StartupScenario::setStartupScoreFile(const std::optional<ProjectFile>& file
     m_startupScoreFile = file ? file.value() : ProjectFile();
 }
 
-muse::async::Promise<muse::Ret> StartupScenario::runOnSplashScreen()
+void StartupScenario::runOnSplashScreen()
 {
-    return muse::async::make_promise<muse::Ret>([this](auto resolve, auto) {
-        const muse::Ret ret = muse::make_ret(muse::Ret::Code::Ok);
-        return resolve(ret);
-    });
+    //! NOTE Registering plugins shows a window (dialog) before the main window is shown.
+    //! After closing it, the application may in a state where there are no open windows,
+    //! which leads to automatic exit from the application.
+    //! (Thanks to the splashscreen, but this is not an obvious detail)
+    // qApp->setQuitLockEnabled(false);
+    // qApp->setQuitLockEnabled(true);
 }
 
 void StartupScenario::runAfterSplashScreen()
@@ -103,7 +104,7 @@ void StartupScenario::runAfterSplashScreen()
 
     StartupModeType modeType = resolveStartupModeType();
     //! TODO AU4
-    // bool isMainInstance = multiwindowsProvider()->isMainInstance();
+    // bool isMainInstance = multiInstancesProvider()->isMainInstance();
     if (/*isMainInstance && */ sessionsManager()->hasProjectsForRestore()) {
         modeType = StartupModeType::Recovery;
     }
@@ -121,11 +122,9 @@ void StartupScenario::runAfterSplashScreen()
         }
         once = true;
 
-        muse::audioplugins::PluginScanResult scanResult = registerAudioPluginsScenario()->scanPlugins();
+        muse::io::paths_t newPluginPaths = registerAudioPluginsScenario()->scanForNewPluginPaths();
 
-        registerAudioPluginsScenario()->unregisterRemovedPlugins(scanResult.missingPluginIds);
-
-        if (!scanResult.newPluginPaths.empty()) {
+        if (!newPluginPaths.empty()) {
             auto ret = interactive()->questionSync(muse::trc("appshell", "Scanning audio plugins"),
                                                    muse::trc(
                                                        "appshell",
@@ -136,7 +135,10 @@ void StartupScenario::runAfterSplashScreen()
                                                      muse::IInteractive::ButtonData(
                                                          muse::IInteractive::Button::Apply, muse::trc("appshell", "Scan plugins"), true) });
             if (ret.standardButton() == muse::IInteractive::Button::Apply) {
-                registerAudioPluginsScenario()->registerNewPlugins(scanResult.newPluginPaths);
+                muse::Ret ret = registerAudioPluginsScenario()->registerNewPlugins(newPluginPaths);
+                if (!ret) {
+                    LOGE() << ret.toString();
+                }
             }
         }
 
@@ -164,7 +166,7 @@ StartupModeType StartupScenario::resolveStartupModeType() const
     }
 
     if (!m_startupTypeStr.empty()) {
-        return modeTypeFromString(m_startupTypeStr);
+        return modeTypeTromString(m_startupTypeStr);
     }
 
     return configuration()->startupModeType();
@@ -200,7 +202,7 @@ void StartupScenario::onStartupPageOpened(StartupModeType modeType)
     } break;
     case StartupModeType::FirstLaunch: {
         dispatcher()->dispatch("file-new");
-        interactive()->open(FIRST_LAUNCH_SETUP_URI);
+        interactive()->openSync(FIRST_LAUNCH_SETUP_URI);
 #ifndef MUSE_APP_UNSTABLE
         interactive()->openSync(ALPHA_WELCOME_POPUP);
 #endif

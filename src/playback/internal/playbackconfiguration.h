@@ -11,10 +11,12 @@
 namespace au::playback {
 class PlaybackConfiguration : public IPlaybackConfiguration
 {
-    muse::GlobalInject<muse::ui::IUiConfiguration> uiConfiguration;
+    muse::Inject<muse::ui::IUiConfiguration> uiConfiguration;
 
 public:
     void init();
+
+    muse::draw::Color playColor() const override;
 
     au::uicomponents::TimecodeFormatType playbackTimeItemFormat() const override;
     void setPlaybackTimeItemFormat(au::uicomponents::TimecodeFormatType format) override;

@@ -176,11 +176,6 @@ void Lv2ViewModel::doStartPreview()
     });
 }
 
-void Lv2ViewModel::doStopPreview()
-{
-    effectsProvider()->stopPreview();
-}
-
 std::optional<XID> Lv2ViewModel::x11Window() const
 {
     if (!m_isX11Window) {

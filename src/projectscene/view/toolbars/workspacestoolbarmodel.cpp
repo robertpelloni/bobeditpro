@@ -6,7 +6,7 @@
 #include "muse_framework_config.h"
 
 #ifdef MUSE_MODULE_WORKSPACE
-#include "workspace/qml/Muse/Workspace/workspacesmenumodel.h"
+#include "workspace/view/workspacesmenumodel.h"
 #endif
 
 #include "uicomponents/qml/Muse/UiComponents/toolbaritem.h"

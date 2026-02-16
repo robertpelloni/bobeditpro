@@ -3,14 +3,15 @@
 */
 #include "fieldsinteractioncontroller.h"
 
-#include <QCursor>
 #include <QKeyEvent>
+
+#include "log.h"
 
 using namespace au::uicomponents;
 
 bool FieldsInteractionController::isFieldEditable(const QChar& fieldSymbol)
 {
-    return fieldSymbol.isDigit() || fieldSymbol == '-';
+    return fieldSymbol.isDigit();
 }
 
 FieldsInteractionController::FieldsInteractionController(QObject* parent)
@@ -94,18 +95,20 @@ bool FieldsInteractionController::eventFilter(QObject* watched, QEvent* event)
             finishEditing();
             return true;
         } else if (key >= Qt::Key_0 && key <= Qt::Key_9) {
-            applyCurrentEditedField(key);
+            QString newValueStr = m_valueString;
+            newValueStr.replace('-', QChar('0'));
+            newValueStr.replace(m_currentEditedFieldIndex, 1, QChar('0' + (key - Qt::Key_0)));
+
+            emit valueChanged(m_formatter->stringToValue(newValueStr).value());
+
             moveCurrentEditedField(Qt::Key_Right);
+
             return true;
         } else if (key == Qt::Key_Left || key == Qt::Key_Right) {
             moveCurrentEditedField(key);
             return true;
         } else if (key == Qt::Key_Up || key == Qt::Key_Down) {
             adjustCurrentEditedField(key);
-            return true;
-        } else if (key == Qt::Key_Backspace) {
-            applyCurrentEditedField(Qt::Key_0);
-            moveCurrentEditedField(Qt::Key_Left);
             return true;
         }
     } else if (event->type() == QEvent::MouseButtonPress) {
@@ -138,9 +141,7 @@ bool FieldsInteractionController::needOverrideShortcut(QEvent* event) const
 
         Qt::Key_Escape,
         Qt::Key_Enter,
-        Qt::Key_Return,
-
-        Qt::Key_Backspace
+        Qt::Key_Return
     };
 
     return muse::contains(navigationKeys, key);
@@ -180,15 +181,6 @@ void FieldsInteractionController::moveCurrentEditedField(int moveKey)
     }
 
     setCurrentEditedFieldIndex(newIndex);
-}
-
-void FieldsInteractionController::applyCurrentEditedField(int numberKey)
-{
-    QString newValueStr = m_valueString;
-    newValueStr.replace('-', QChar('0'));
-    newValueStr.replace(m_currentEditedFieldIndex, 1, QChar('0' + (numberKey - Qt::Key_0)));
-
-    emit valueChanged(m_formatter->stringToValue(newValueStr).value());
 }
 
 void FieldsInteractionController::adjustCurrentEditedField(int adjustKey)
@@ -236,6 +228,4 @@ void FieldsInteractionController::scrollCurrentEditedField(int pixelsYScrolled, 
 void FieldsInteractionController::finishEditing()
 {
     setCurrentEditedFieldIndex(-1);
-
-    emit editingFinished();
 }

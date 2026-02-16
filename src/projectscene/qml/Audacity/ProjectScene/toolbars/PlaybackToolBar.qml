@@ -4,7 +4,7 @@
 import QtQuick 2.15
 
 import Muse.Ui 1.0
-import Muse.UiComponents
+import Muse.UiComponents 1.0
 
 import Audacity.Playback 1.0
 import Audacity.Record 1.0
@@ -323,7 +323,7 @@ Item {
         enabled: view.model.isEnabled
 
         navigation.panel: root.navigationPanel
-        navigation.order: 10000
+        navigation.order: 100
         navigation.accessible.name: qsTrc("projectscene", "Customize toolbar")
 
         onClicked: {

@@ -4,7 +4,6 @@ import Muse.Ui
 import Muse.UiComponents
 
 import Audacity.ProjectScene
-import Audacity.Spectrogram
 
 TrackItemsContainer {
     id: root
@@ -18,15 +17,8 @@ TrackItemsContainer {
     property bool rightTrimPressedButtons: false
     property real dbRange: -60.0
     property color trackColor
-    required property int headerHeight
     required property bool isWaveformViewVisible
     required property bool isSpectrogramViewVisible
-    required property double selectionStartFrequency
-    required property double selectionEndFrequency
-    required property bool spectralSelectionEnabled
-    required property var pressedSpectrogram
-    required property double sampleRate
-    required property var selectionController
 
     signal movePreviewClip(int x, int width, string title)
     signal clearPreviewClip
@@ -34,7 +26,6 @@ TrackItemsContainer {
     QtObject {
         id: prv
         readonly property bool isMultiView: root.isSpectrogramViewVisible && root.isWaveformViewVisible
-        readonly property real viewHeight: (root.height - root.headerHeight) / (prv.isMultiView ? 2 : 1)
     }
 
     TrackClipsListModel {
@@ -50,25 +41,6 @@ TrackItemsContainer {
     function changeClipTitle(index, newTitle) {
         clipsModel.changeClipTitle(index, newTitle)
         clipsModel.resetSelectedClips()
-    }
-
-    function getSpectrogramHit(mouseY) {
-        if (!contentItem) {
-            return null
-        }
-        // Get spectrogram hit does the mapping to canvas internally
-        const e = {
-            x: 0,
-            y: 0
-        }
-        var hit = null
-        contentItem.clipsContainer.mapToAllClips(e, function (clipItem, mouseEvent, controller) {
-            hit = clipItem.getSpectrogramHit(mouseY)
-            if (hit) {
-                controller.shouldStop = true
-            }
-        })
-        return hit
     }
 
     onCtrlPressedChanged: {
@@ -104,9 +76,6 @@ TrackItemsContainer {
                 property int currentChannel: 0
 
                 function mapToAllClips(e, f) {
-                    const controller = {
-                        shouldStop: false
-                    }
                     for (let i = 0; i < repeator.count; i++) {
                         let clipLoader = repeator.itemAt(i)
                         if (clipLoader && clipLoader.item) {
@@ -116,10 +85,7 @@ TrackItemsContainer {
                                 modifiers: e.modifiers,
                                 x: clipPos.x,
                                 y: clipPos.y
-                            }, controller)
-                            if (controller.shouldStop) {
-                                break
-                            }
+                            })
                         }
                     }
                 }
@@ -284,14 +250,12 @@ TrackItemsContainer {
                                 pitch: itemData.pitch
 
                                 currentClipStyle: clipsModel.clipStyle
-                                headerHeight: root.headerHeight
 
                                 speedPercentage: itemData.speedPercentage
                                 clipSelected: itemData.selected
                                 clipIntersectsSelection: itemData.intersectsSelection
                                 isMultiSelectionActive: root.isMultiSelectionActive
                                 isDataSelected: root.isDataSelected
-                                clipFocused: itemData.focused
                                 moveActive: root.moveActive
                                 isAudible: root.isTrackAudible
                                 dbRange: root.dbRange
@@ -301,19 +265,12 @@ TrackItemsContainer {
                                 isSpectrogramViewVisible: root.isSpectrogramViewVisible
                                 multiSampleEdit: clipsContainer.multiSampleEdit
                                 altPressed: root.altPressed
-                                selectionInProgress: root.selectionInProgress
-                                selectionEditInProgress: root.selectionEditInProgress
-                                verticalSelectionEditInProgress: root.verticalSelectionEditInProgress
+                                selectionInProgress: root.selectionInProgress || root.selectionEditInProgress
                                 asymmetricStereoHeightsPossible: clipsModel.asymmetricStereoHeightsPossible
 
                                 //! NOTE: use the same integer rounding as in WaveBitmapCache
                                 selectionStart: root.context.selectionStartPosition < itemData.x ? 0 : Math.floor(root.context.selectionStartPosition - itemData.x + 0.5)
                                 selectionWidth: root.context.selectionStartPosition < itemData.x ? Math.round(root.context.selectionEndPosition - itemData.x) : Math.floor(root.context.selectionEndPosition - itemData.x + 0.5) - Math.floor(root.context.selectionStartPosition - itemData.x + 0.5)
-
-                                selectionStartFrequency: root.selectionStartFrequency
-                                selectionEndFrequency: root.selectionEndFrequency
-                                pressedSpectrogram: root.pressedSpectrogram
-                                spectralSelectionEnabled: root.spectralSelectionEnabled
 
                                 leftVisibleMargin: itemData.leftVisibleMargin
                                 rightVisibleMargin: itemData.rightVisibleMargin
@@ -321,14 +278,14 @@ TrackItemsContainer {
                                 channelHeightRatio: root.trackViewState.channelHeightRatio
                                 showChannelSplitter: clipsModel.isStereo
 
-                                navigation.name: Boolean(itemData) ? itemData.key.itemId() : ""
+                                navigation.name: Boolean(itemData) ? itemData.title + itemData.index : ""
                                 navigation.panel: root.navigationPanel
                                 navigation.column: itemData ? Math.floor(itemData.x) : 0
                                 navigation.accessible.name: Boolean(itemData) ? itemData.title : ""
                                 navigation.onActiveChanged: {
                                     if (navigation.active) {
                                         root.context.insureVisible(root.context.positionToTime(itemData.x))
-                                        root.insureVerticallyVisible()
+                                        root.insureVerticallyVisible(root.y, root.y + root.height)
                                     }
                                 }
 
@@ -493,8 +450,8 @@ TrackItemsContainer {
 
                                 Connections {
                                     target: itemData
-                                    function onContentChanged() {
-                                        updateViews()
+                                    function onWaveChanged() {
+                                        updateWave()
                                     }
                                 }
 
@@ -503,11 +460,6 @@ TrackItemsContainer {
                                     function onItemTitleEditRequested(key) {
                                         if (key === item.itemData.key) {
                                             item.editTitle()
-                                        }
-                                    }
-                                    function onItemContextMenuOpenRequested(key) {
-                                        if (key === item.itemData.key) {
-                                            item.openContextMenu()
                                         }
                                     }
                                 }
@@ -523,8 +475,6 @@ TrackItemsContainer {
 
                     visible: false
                     clipColor: root.trackColor
-
-                    currentClipStyle: clipsModel.clipStyle
 
                     Connections {
                         target: root
@@ -559,8 +509,6 @@ TrackItemsContainer {
             ItemsSelection {
                 id: clipsSelection
 
-                visible: root.selectionStartFrequency === root.selectionEndFrequency
-
                 isDataSelected: root.isDataSelected
                 selectionInProgress: root.selectionInProgress
                 context: root.context
@@ -568,8 +516,8 @@ TrackItemsContainer {
                 anchors.fill: parent
                 z: 1
 
-                onSelectionResize: function (x1, x2, completed) {
-                    root.selectionResize(x1, x2, completed)
+                onSelectionDraged: function (x1, x2, completed) {
+                    root.selectionDraged(x1, x2, completed)
                     if (completed) {
                         root.seekToX(Math.min(x1, x2))
                     }
@@ -585,36 +533,6 @@ TrackItemsContainer {
                 }
             }
 
-            TrackSpectralSelectionContainer {
-                id: spectralSelectionContainer
-
-                visible: root.isSpectrogramViewVisible
-
-                y: root.headerHeight + (root.isWaveformViewVisible ? prv.viewHeight : 0)
-                height: prv.viewHeight
-                anchors.left: parent.left
-                anchors.right: parent.right
-                z: 1
-
-                canvas: root.canvas
-                trackId: root.trackId
-                sampleRate: root.sampleRate
-                selectionStartPosition: root.context.selectionStartPosition
-                selectionEndPosition: root.context.selectionEndPosition
-                selectionStartFrequency: root.selectionStartFrequency
-                selectionEndFrequency: root.selectionEndFrequency
-                channelHeightRatio: channelSplitter.channelHeightRatio
-                isStereo: clipsModel.isStereo
-                selectionController: root.selectionController
-
-                onSelectionHorizontalResize: function (x1, x2, completed) {
-                    root.selectionResize(x1, x2, completed)
-                    if (completed) {
-                        root.seekToX(x1)
-                    }
-                }
-            }
-
             //! clip
             ChannelSplitter {
                 id: channelSplitter
@@ -624,7 +542,7 @@ TrackItemsContainer {
                 anchors.bottomMargin: 3
 
                 channelHeightRatio: prv.isMultiView ? 0.5 : root.trackViewState.channelHeightRatio
-                color: ui.theme.extra["white_color"]
+                color: "#FFFFFF"
                 opacity: 0.05
                 visible: clipsModel.isStereo
 

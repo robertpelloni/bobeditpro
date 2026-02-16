@@ -7,7 +7,6 @@ import Muse.UiComponents
 import Audacity.ProjectScene
 import Audacity.Project
 import Audacity.Playback
-import Audacity.Spectrogram
 
 Rectangle {
     id: root
@@ -30,22 +29,6 @@ Rectangle {
     property alias ctrlPressed: tracksViewState.ctrlPressed
     property alias isSplitMode: splitToolController.active
 
-    signal externalDropAreaEntered(var drop)
-    signal externalDropAreaExited
-    signal externalDropAreaDropped(var drop)
-
-    onExternalDropAreaEntered: drop => {
-        importDropArea.externalDropAreaEntered(drop)
-    }
-
-    onExternalDropAreaExited: {
-        importDropArea.externalDropAreaExited()
-    }
-
-    onExternalDropAreaDropped: drop => {
-        importDropArea.externalDropAreaDropped(drop)
-    }
-
     color: ui.theme.backgroundPrimaryColor
 
     clip: true
@@ -65,7 +48,6 @@ Rectangle {
         id: prv
 
         property bool playRegionActivated: false
-        readonly property int headerHeight: 20
 
         function cancelClipDragEdit() {
             if (mainMouseArea.pressed) {
@@ -170,18 +152,15 @@ Rectangle {
     }
 
     SelectionViewController {
-        id: selectionViewController
+        id: selectionController
         context: timeline.context
-        resistancePx: prv.headerHeight
     }
 
     Component.onCompleted: {
         //! NOTE Models depend on geometry, so let's create a page first and then initialize the models
         Qt.callLater(root.init)
 
-        playbackState.init()
-        playRegionModel.init()
-        selectionViewController.load()
+        selectionController.load()
         selectionContextMenuModel.load()
         canvasContextMenuModel.load()
 
@@ -335,7 +314,7 @@ Rectangle {
                 anchors.top: parent.verticalCenter
                 anchors.bottom: parent.bottom
 
-                color: ui.theme.extra["selection_highlight_color"]
+                color: "#ABE7FF"
                 opacity: 0.3
             }
 
@@ -468,8 +447,6 @@ Rectangle {
 
             property var lastItemClickKey: null
             property bool itemWasMoved: false
-            property point pressStartPosition: Qt.point(0, 0)
-            readonly property int moveThreshold: 5
 
             onWheel: function (wheelEvent) {
                 timeline.onWheel(wheelEvent.x, wheelEvent.pixelDelta, wheelEvent.angleDelta)
@@ -491,9 +468,8 @@ Rectangle {
                         }
 
                         if (!splitToolController.active) {
-                            const spectrogramHit = tracksItemsView.getSpectrogramHit(e.y)
-                            selectionViewController.onPressed(e.x, e.y, spectrogramHit)
-                            selectionViewController.resetSelectedItems()
+                            selectionController.onPressed(e.x, e.y)
+                            selectionController.resetSelectedItems()
                             itemsSelection.visible = true
                         }
                         handleGuideline(e.x, false)
@@ -503,7 +479,6 @@ Rectangle {
                     }
 
                     itemWasMoved = false
-                    pressStartPosition = Qt.point(e.x, e.y)
                 } else if (e.button === Qt.RightButton) {
                     if (tracksHovered)
                     //! TODO AU4: handle context menu over empty track area
@@ -517,26 +492,22 @@ Rectangle {
                 timeline.updateCursorPosition(e.x, e.y)
                 splitToolController.mouseMove(e.x)
 
-                if (root.interactionState === TracksItemsView.State.DraggingItem && !itemWasMoved) {
-                    var dx = Math.abs(e.x - pressStartPosition.x)
-                    var dy = Math.abs(e.y - pressStartPosition.y)
-                    if (dx > moveThreshold || dy > moveThreshold) {
-                        itemWasMoved = true
-                    }
+                if (root.itemHeaderHovered && mainMouseArea.pressed) {
+                    itemWasMoved = true
                 }
 
-                if (root.interactionState === TracksItemsView.State.DraggingItem && itemWasMoved) {
+                if (root.interactionState === TracksItemsView.State.DraggingItem) {
                     tracksItemsView.itemMoveRequested(hoveredItemKey, false)
                     tracksItemsView.startAutoScroll()
                 } else {
-                    selectionViewController.onPositionChanged(e.x, e.y)
+                    selectionController.onPositionChanged(e.x, e.y)
                     let trackId = tracksViewState.trackAtPosition(e.x, e.y)
 
                     handleGuideline(e.x, false)
                 }
             }
 
-            onReleased: function (e) {
+            onReleased: function(e) {
                 if (e.button !== Qt.LeftButton) {
                     return
                 }
@@ -548,19 +519,17 @@ Rectangle {
 
                 if (root.interactionState === TracksItemsView.State.DraggingItem) {
                     root.interactionState = TracksItemsView.State.Idle
-                    if (itemWasMoved) {
-                        tracksItemsView.itemMoveRequested(hoveredItemKey, true)
-                        tracksItemsView.stopAutoScroll()
-                    }
+                    tracksItemsView.itemMoveRequested(hoveredItemKey, true)
+                    tracksItemsView.stopAutoScroll()
                     tracksItemsView.itemEndEditRequested(hoveredItemKey)
                 } else {
                     splitToolController.mouseUp(e.x)
 
-                    if (selectionViewController.isLeftSelection(e.x)) {
+                    if (selectionController.isLeftSelection(e.x)) {
                         playCursorController.seekToX(e.x)
                     }
                     if (!splitToolController.active) {
-                        selectionViewController.onReleased(e.x, e.y)
+                        selectionController.onReleased(e.x, e.y)
                         itemsSelection.visible = false
                     }
                     handleGuideline(e.x, true)
@@ -583,7 +552,7 @@ Rectangle {
                 }
 
                 if (!root.itemHovered) {
-                    selectionViewController.resetSelectedItems()
+                    selectionController.resetSelectedItems()
                 }
             }
 
@@ -597,10 +566,10 @@ Rectangle {
                 }
 
                 if (root.itemHovered) {
-                    selectionViewController.selectItemData(root.hoveredItemKey)
+                    selectionController.selectItemData(root.hoveredItemKey)
                     playCursorController.setPlaybackRegion(timeline.context.selectedItemStartPosition, timeline.context.selectedItemEndPosition)
                 } else {
-                    selectionViewController.selectTrackAudioData(e.y)
+                    selectionController.selectTrackAudioData(e.y)
                     playCursorController.setPlaybackRegion(timeline.context.selectedItemStartPosition, timeline.context.selectedItemEndPosition)
                 }
                 itemsSelection.visible = false
@@ -647,29 +616,6 @@ Rectangle {
                     return false
                 }
 
-                function getSpectrogramHit(y) {
-                    var spectrogramHit = null
-                    checkIfAnyTrack(function (trackItem) {
-                        if (trackItem.getSpectrogramHit) {
-                            spectrogramHit = trackItem.getSpectrogramHit(y)
-                            if (spectrogramHit) {
-                                return true
-                            }
-                        }
-                        return false
-                    })
-                    if (spectrogramHit) {
-                        return spectrogramHit
-                    } else {
-                        return SpectrogramHitFactory.createNullSpectrogramHit()
-                    }
-                }
-
-                function insureVerticallyVisible(item) {
-                    var itemViewY = item.mapToItem(tracksItemsView.contentItem, Qt.point(0, 0)).y
-                    tracksViewState.insureVerticallyVisible(tracksItemsView.contentY, tracksItemsView.height, itemViewY, item.height)
-                }
-
                 signal itemMoveRequested(var itemKey, bool completed)
                 signal itemStartEditRequested(var itemKey)
                 signal itemEndEditRequested(var itemKey)
@@ -712,6 +658,7 @@ Rectangle {
                     target: timeline.context
 
                     function onViewContentYChangeRequested(delta) {
+                        let headerHeight = tracksItemsView.headerItem ? tracksItemsView.headerItem.height : 0
                         let totalContentHeight = tracksModel.totalTracksHeight + tracksViewState.tracksVerticalScrollPadding
                         let canMove = totalContentHeight > tracksItemsView.height
                         if (!canMove) {
@@ -722,7 +669,7 @@ Rectangle {
 
                         let maxContentY = totalContentHeight - tracksItemsView.height
                         maxContentY = Math.max(maxContentY, tracksItemsView.contentY)
-                        contentYOffset = Math.max(Math.min(contentYOffset, maxContentY), -prv.headerHeight)
+                        contentYOffset = Math.max(Math.min(contentYOffset, maxContentY), -headerHeight)
 
                         tracksItemsView.contentY = contentYOffset
                     }
@@ -764,8 +711,6 @@ Rectangle {
 
                             trackId: itemData.trackId
                             trackColor: itemData.color
-                            headerHeight: prv.headerHeight
-                            sampleRate: itemData.trackSampleRate
 
                             isDataSelected: itemData.isDataSelected
                             isTrackSelected: itemData.isTrackSelected
@@ -781,21 +726,13 @@ Rectangle {
                             altPressed: root.altPressed
                             ctrlPressed: root.ctrlPressed
 
-                            selectionInProgress: selectionViewController.selectionInProgress
-                            selectionEditInProgress: selectionViewController.selectionEditInProgress
-                            verticalSelectionEditInProgress: selectionViewController.verticalSelectionEditInProgress
-
+                            selectionEditInProgress: selectionController.selectionEditInProgress
+                            selectionInProgress: selectionController.selectionInProgress
                             onHoverChanged: function () {
                                 root.itemHovered = tracksItemsView.checkIfAnyTrack(function (trackItem) {
                                     return trackItem && trackItem.hover
                                 })
                             }
-
-                            selectionStartFrequency: itemData.frequencySelection.startFrequency
-                            selectionEndFrequency: itemData.frequencySelection.endFrequency
-                            pressedSpectrogram: selectionViewController.pressedSpectrogram
-                            spectralSelectionEnabled: selectionViewController.spectralSelectionEnabled
-                            selectionController: selectionViewController
 
                             navigationPanel: navPanels && navPanels[index] ? navPanels[index] : null
 
@@ -822,12 +759,12 @@ Rectangle {
                             }
 
                             onItemSelectedRequested: {
-                                selectionViewController.resetDataSelection()
+                                selectionController.resetDataSelection()
                                 itemsSelection.visible = false
                             }
 
                             onSelectionResetRequested: {
-                                selectionViewController.resetDataSelection()
+                                selectionController.resetDataSelection()
                             }
 
                             onUpdateMoveActive: function (completed) {
@@ -841,16 +778,21 @@ Rectangle {
                                 selectionContextMenuLoader.show(Qt.point(x + canvasIndent.width, y + timelineHeader.height), selectionContextMenuModel.items)
                             }
 
-                            onSelectionResize: function (x1, x2, completed) {
-                                selectionViewController.onSelectionHorizontalResize(x1, x2, completed)
+                            onSelectionDraged: function (x1, x2, completed) {
+                                selectionController.onSelectionDraged(x1, x2, completed)
                             }
 
                             onSeekToX: function (x) {
                                 playCursorController.seekToX(x)
                             }
 
-                            onInsureVerticallyVisible: function () {
-                                tracksItemsView.insureVerticallyVisible(this)
+                            onInsureVerticallyVisible: function (clipTop, clipBottom) {
+                                var delta = calculateVerticalScrollDelta(tracksViewState.tracksVerticalOffset, tracksViewState.tracksVerticalOffset + content.height, clipTop, clipBottom)
+                                if (tracksViewState.tracksVerticalOffset + delta < 0) {
+                                    tracksViewState.changeTracksVerticalOffset(0)
+                                } else {
+                                    tracksViewState.changeTracksVerticalOffset(tracksViewState.tracksVerticalOffset + delta)
+                                }
                             }
 
                             onInteractionStarted: {
@@ -919,14 +861,33 @@ Rectangle {
                                 root.handleGuideline(x)
                             }
 
+                            function calculateVerticalScrollDelta(viewTop, viewBottom, clipTop, clipBottom, padding = 10) {
+                                // clip fully visible
+                                if (clipTop >= viewTop && clipBottom <= viewBottom) {
+                                    return 0
+                                }
+
+                                // clip is above the view —> scroll up
+                                if (clipTop < viewTop) {
+                                    return clipTop - (viewTop + padding)
+                                }
+
+                                // clip is below the view —> scroll down
+                                if (clipBottom > viewBottom) {
+                                    return clipBottom - (viewBottom - padding)
+                                }
+
+                                return 0
+                            }
+
                             Connections {
                                 target: tracksItemsView
 
                                 function onPreviewImportClipRequested(tracksIds, startPos, durations, titles) {
                                     for (let i = 0; i < tracksIds.length; i++) {
                                         if (tracksIds[i] == trackClipsContainer.trackId) {
-                                            const startTime = timeline.context.positionToTime(startPos)
-                                            const endPos = timeline.context.timeToPosition(startTime + durations[i])
+                                            const startTime = timeline.context.positionToTime(startPos);
+                                            const endPos = timeline.context.timeToPosition(startTime + durations[i]);
                                             trackClipsContainer.movePreviewClip(startPos, endPos - startPos, titles[i])
                                         }
                                     }
@@ -966,9 +927,8 @@ Rectangle {
                             altPressed: root.altPressed
                             ctrlPressed: root.ctrlPressed
 
-                            selectionInProgress: selectionViewController.selectionInProgress
-                            selectionEditInProgress: selectionViewController.selectionEditInProgress
-                            verticalSelectionEditInProgress: selectionViewController.verticalSelectionEditInProgress
+                            selectionEditInProgress: selectionController.selectionEditInProgress
+                            selectionInProgress: selectionController.selectionInProgress
 
                             navigationPanel: navPanels && navPanels[index] ? navPanels[index] : null
 
@@ -1012,8 +972,8 @@ Rectangle {
                                 playCursorController.seekToX(x)
                             }
 
-                            onSelectionResize: function (x1, x2, completed) {
-                                selectionViewController.onSelectionHorizontalResize(x1, x2, completed)
+                            onSelectionDraged: function (x1, x2, completed) {
+                                selectionController.onSelectionDraged(x1, x2, completed)
                             }
 
                             onRequestSelectionContextMenu: function (x, y) {
@@ -1021,12 +981,12 @@ Rectangle {
                             }
 
                             onItemSelectedRequested: {
-                                selectionViewController.resetDataSelection()
+                                selectionController.resetDataSelection()
                                 itemsSelection.visible = false
                             }
 
                             onSelectionResetRequested: {
-                                selectionViewController.resetDataSelection()
+                                selectionController.resetDataSelection()
                             }
 
                             onUpdateMoveActive: function (completed) {
@@ -1043,10 +1003,6 @@ Rectangle {
 
                             onHandleTimeGuideline: function (x) {
                                 root.handleGuideline(x)
-                            }
-
-                            onInsureVerticallyVisible: function () {
-                                tracksItemsView.insureVerticallyVisible(this)
                             }
                         }
                     }
@@ -1071,7 +1027,7 @@ Rectangle {
 
             anchors.top: parent.top
             anchors.bottom: parent.bottom
-            color: ui.theme.extra["selection_highlight_color"]
+            color: "#ABE7FF"
             opacity: 0.05
             visible: false
 
@@ -1097,7 +1053,7 @@ Rectangle {
             width: 1
             x: playRegionController.guidelineVisible ? playRegionController.guidelinePosition : (root.guidelineVisible ? root.guidelinePos : -1)
 
-            color: tracksViewState.snapEnabled ? ui.theme.extra["guideline_snap_enabled_color"] : ui.theme.extra["guideline_snap_disabled_color"]
+            color: tracksViewState.snapEnabled ? "#00E5FF" : "#FFF200"
 
             visible: root.guidelineVisible || playRegionController.guidelineVisible
         }
@@ -1111,7 +1067,7 @@ Rectangle {
             width: 1
             height: splitToolController.singleTrack ? hoveredTrackHeight : content.height
 
-            color: ui.theme.extra["guideline_split_color"]
+            color: "#0121C0"
 
             visible: splitToolController.guidelineVisible
         }
@@ -1129,38 +1085,46 @@ Rectangle {
         }
     }
 
-    LoopRegionGuideline {
+    Rectangle {
         id: loopRegionGuidelineLeft
+
         anchors.top: parent.top
         anchors.bottom: parent.bottom
+        x: timeline.context.timeToPosition(playRegionModel.start) + content.x
         z: timelineHeader.z + 1
-        context: timeline.context
-        time: playRegionModel.start
-        contentX: content.x
+
+        width: 1
+
+        color: "#FFFFFF"
+        opacity: 0.8
+
         visible: playRegionModel.active
     }
 
-    LoopRegionGuideline {
+    Rectangle {
         id: loopRegionGuidelineRight
+
         anchors.top: parent.top
         anchors.bottom: parent.bottom
+        x: timeline.context.timeToPosition(playRegionModel.end) + content.x
         z: timelineHeader.z + 1
-        context: timeline.context
-        time: playRegionModel.end
-        contentX: content.x
+
+        width: 1
+
+        color: "#FFFFFF"
+        opacity: 0.8
+
         visible: playRegionModel.active
     }
 
     ImportDropArea {
-        id: importDropArea
-
-        anchors.fill: root
+        anchors.fill: content
 
         tracksItemsView: tracksItemsView
         tracksViewState: tracksViewState
         timeline: timeline
 
-        onSetGuidelineRequested: function (pos, visibility) {
+        onSetGuidelineRequested: function(pos, visibility) {
             root.guidelinePos = pos
             root.guidelineVisible = visibility
         }

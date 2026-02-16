@@ -19,7 +19,7 @@ TrackItemsContainer {
         labelsModel: labelsModel
     }
 
-    onInitRequired: function () {
+    onInitRequired: function() {
         labelsModel.init()
         layoutManager.init()
     }
@@ -38,12 +38,7 @@ TrackItemsContainer {
                         let labelLoader = repeater.itemAt(i)
                         if (labelLoader && labelLoader.item) {
                             let labelPos = labelLoader.mapFromItem(this, e.x, e.y)
-                            f(labelLoader.item, {
-                                button: e.button,
-                                modifiers: e.modifiers,
-                                x: labelPos.x,
-                                y: labelPos.y
-                            })
+                            f(labelLoader.item, {button: e.button, modifiers: e.modifiers, x: labelPos.x, y: labelPos.y})
                         }
                     }
                 }
@@ -72,33 +67,30 @@ TrackItemsContainer {
                     cursorShape: root.selectionEditInProgress ? Qt.SizeHorCursor : Qt.IBeamCursor
                     enabled: !root.selectionInProgress
 
-                    onPressed: function (e) {
+                    onPressed: function(e) {
                         e.accepted = false
                     }
 
-                    onClicked: function (e) {
+                    onClicked: function(e) {
                         e.accepted = false
                     }
 
-                    onReleased: function (e) {
+                    onReleased: function(e) {
                         e.accepted = false
                     }
 
-                    onDoubleClicked: function (e) {
+                    onDoubleClicked: function(e) {
                         e.accepted = true
                     }
 
-                    onPositionChanged: function (e) {
-                        labelsContainer.mapToAllLabels(e, function (labelItem, mouseEvent) {
+                    onPositionChanged: function(e) {
+                        labelsContainer.mapToAllLabels(e, function(labelItem, mouseEvent) {
                             labelItem.labelItemMousePositionChanged(mouseEvent.x, mouseEvent.y)
                         })
                     }
 
-                    onContainsMouseChanged: function () {
-                        labelsContainer.mapToAllLabels({
-                            x: mouseX,
-                            y: mouseY
-                        }, function (labelItem, mouseEvent) {
+                    onContainsMouseChanged: function() {
+                        labelsContainer.mapToAllLabels({x: mouseX, y: mouseY}, function(labelItem, mouseEvent) {
                             labelItem.setContainsMouse(containsMouse)
                         })
                     }
@@ -147,31 +139,26 @@ TrackItemsContainer {
                                 labelColor: Boolean(itemData) ? itemData.color : null
                                 labelKey: Boolean(itemData) ? itemData.key : null
                                 isSelected: Boolean(itemData) && itemData.selected
-                                isFocused: Boolean(itemData) && itemData.focused
-
-                                selectionInProgress: root.selectionInProgress
-                                selectionEditInProgress: root.selectionEditInProgress
-                                verticalSelectionEditInProgress: root.verticalSelectionEditInProgress
+                                enableCursorInteraction: true
 
                                 isLeftLinked: Boolean(itemData) && itemData.isLeftLinked
                                 isRightLinked: Boolean(itemData) && itemData.isRightLinked
                                 isLinkedActive: Boolean(itemData) && itemData.isLinkedActive
-                                isPoint: Boolean(itemData) && itemData.isPoint
 
                                 container: repeater
 
-                                navigation.name: Boolean(itemData) ? itemData.key.itemId() : ""
+                                navigation.name: Boolean(itemData) ? itemData.title + itemData.index : ""
                                 navigation.panel: root.navigationPanel
                                 navigation.column: Boolean(itemData) ? Math.floor(itemData.x) : 0
                                 navigation.accessible.name: Boolean(itemData) ? itemData.title : ""
                                 navigation.onActiveChanged: {
                                     if (navigation.active) {
                                         root.context.insureVisible(root.context.positionToTime(itemData.x))
-                                        root.insureVerticallyVisible()
+                                        root.insureVerticallyVisible(root.y, root.y + root.height)
                                     }
                                 }
 
-                                onLabelItemMousePositionChanged: function (xWithinLabel, yWithinLabel) {
+                                onLabelItemMousePositionChanged: function(xWithinLabel, yWithinLabel) {
                                     var yWithinTrack = yWithinLabel
                                     var xWithinTrack = xWithinLabel + itemData.x
 
@@ -198,7 +185,7 @@ TrackItemsContainer {
                                     itemData.isEditing = true
                                 }
 
-                                onTitleEditAccepted: function (newTitle) {
+                                onTitleEditAccepted: function(newTitle) {
                                     labelsModel.changeLabelTitle(itemData.key, newTitle)
                                     labelsModel.resetSelectedLabels()
                                 }
@@ -211,41 +198,41 @@ TrackItemsContainer {
                                     itemData.isEditing = false
                                 }
 
-                                onLabelStartEditRequested: function () {
+                                onLabelStartEditRequested: function() {
                                     itemData.isEditing = true
                                     labelsModel.startEditItem(itemData.key)
                                 }
 
-                                onLabelEndEditRequested: function () {
+                                onLabelEndEditRequested: function() {
                                     labelsModel.endEditItem(itemData.key)
                                     itemData.isEditing = false
                                 }
 
-                                onLabelLeftStretchRequested: function (unlink, completed) {
+                                onLabelLeftStretchRequested: function(unlink, completed) {
                                     var leftLinkedLabelKey = layoutManager.leftLinkedLabel(itemData.key)
                                     labelsModel.stretchLabelLeft(itemData.key, leftLinkedLabelKey, unlink, completed)
 
                                     handleLabelGuideline(itemData.key, Direction.Left, completed)
                                 }
 
-                                onLabelRightStretchRequested: function (unlink, completed) {
+                                onLabelRightStretchRequested: function(unlink, completed) {
                                     var rightLinkedLabelKey = layoutManager.rightLinkedLabel(itemData.key)
                                     labelsModel.stretchLabelRight(itemData.key, rightLinkedLabelKey, unlink, completed)
 
                                     handleLabelGuideline(itemData.key, Direction.Right, completed)
                                 }
 
-                                onHeaderHoveredChanged: function () {
+                                onHeaderHoveredChanged: function() {
                                     root.itemHeaderHoveredChanged(headerHovered)
                                 }
 
-                                onHoverChanged: function () {
-                                    root.hover = labelsContainer.checkIfAnyLabel(function (labelItem) {
+                                onHoverChanged: function() {
+                                    root.hover = labelsContainer.checkIfAnyLabel(function(labelItem) {
                                         return labelItem && labelItem.hover
                                     })
                                 }
 
-                                onVisualWidthChanged: function () {
+                                onVisualWidthChanged: function() {
                                     itemData.visualWidth = item.visualWidth
                                 }
 
@@ -266,11 +253,6 @@ TrackItemsContainer {
                                     function onItemTitleEditRequested(key) {
                                         if (key === item.itemData.key) {
                                             item.editTitle()
-                                        }
-                                    }
-                                    function onItemContextMenuOpenRequested(key) {
-                                        if (key === item.itemData.key) {
-                                            item.openContextMenu()
                                         }
                                     }
                                 }
@@ -296,19 +278,19 @@ TrackItemsContainer {
                 anchors.fill: parent
                 z: 1
 
-                onSelectionResize: function (x1, x2, completed) {
-                    root.selectionResize(x1, x2, completed)
+                onSelectionDraged: function(x1, x2, completed) {
+                    root.selectionDraged(x1, x2, completed)
                     if (completed) {
                         root.seekToX(Math.min(x1, x2))
                     }
                 }
 
-                onRequestSelectionContextMenu: function (x, y) {
+                onRequestSelectionContextMenu: function(x, y) {
                     let position = mapToItem(root.parent, Qt.point(x, y))
                     root.requestSelectionContextMenu(position.x, position.y)
                 }
 
-                onHandleGuideline: function (x, completed) {
+                onHandleGuideline: function(x, completed) {
                     root.handleTimeGuideline(x, completed)
                 }
             }
@@ -364,3 +346,4 @@ TrackItemsContainer {
         }
     }
 }
+

@@ -90,11 +90,6 @@ void au::effects::AudioUnitViewModel::doStartPreview()
     });
 }
 
-void au::effects::AudioUnitViewModel::doStopPreview()
-{
-    effectsProvider()->stopPreview();
-}
-
 void AudioUnitViewModel::deinit()
 {
     if (m_eventListenerRef) {

@@ -9,13 +9,12 @@
 #include "WaveMetrics.h"
 
 namespace au::projectscene {
-class MinMaxRMSPainter : public IMinMaxRMSPainter, public muse::Injectable
+class MinMaxRMSPainter : public IMinMaxRMSPainter
 {
-    muse::Inject<au::context::IGlobalContext> globalContext{ this };
+    muse::Inject<au::context::IGlobalContext> globalContext;
 
 public:
-    MinMaxRMSPainter(const muse::modularity::ContextPtr& ctx)
-        : muse::Injectable(ctx) {}
+    MinMaxRMSPainter() = default;
     void paint(QPainter& painter, const trackedit::ClipKey& clipKey, const IWavePainter::Params& params) override;
 };
 }

@@ -25,11 +25,6 @@ FlatButton {
 
         color: ui.theme.backgroundQuarternaryColor
 
-        NavigationFocusBorder {
-            navigationCtrl: root.navigation
-            drawOutsideParent: !root.drawFocusBorderInsideRect
-        }
-
         states: [
             State {
                 name: "PRESSED"

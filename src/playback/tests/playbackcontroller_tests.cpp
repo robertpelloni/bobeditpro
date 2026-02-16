@@ -34,7 +34,7 @@ class PlaybackControllerTests : public ::testing::Test
 public:
     void SetUp() override
     {
-        m_controller = new PlaybackController(muse::modularity::globalCtx());
+        m_controller = new PlaybackController();
 
         m_application = std::make_shared<muse::ApplicationMock>();
         m_controller->application.set(m_application);
@@ -151,15 +151,13 @@ TEST_F(PlaybackControllerTests, TogglePlay_WhenStopped)
     EXPECT_CALL(*m_player, playbackPosition())
     .WillRepeatedly(Return(currentPosition));
 
-    //! [GIVEN] No item selection
-    EXPECT_CALL(*m_selectionController, leftMostSelectedItemStartTime())
-    .WillOnce(Return(std::nullopt));
-    EXPECT_CALL(*m_selectionController, rightMostSelectedItemEndTime())
-    .WillOnce(Return(std::nullopt));
-
     //! [GIVEN] No time selection
     EXPECT_CALL(*m_selectionController, timeSelectionIsNotEmpty())
     .WillOnce(Return(false));
+
+    //! [GIVEN] No clip selection
+    EXPECT_CALL(*m_selectionController, selectedClips())
+    .WillOnce(Return(trackedit::ClipKeyList()));
 
     //! [GIVEN] No loop region active
     EXPECT_CALL(*m_player, isLoopRegionActive())
@@ -257,10 +255,15 @@ TEST_F(PlaybackControllerTests, TogglePlay_WithSelection_Clip)
 
     //! [GIVEN] There is single clip selection from 10 to 20 secs
     PlaybackRegion selectionRegion = { secs_t(10.0), secs_t(20.0) };
-    EXPECT_CALL(*m_selectionController, leftMostSelectedItemStartTime())
-    .WillOnce(Return(std::optional<secs_t>(selectionRegion.start)));
-    EXPECT_CALL(*m_selectionController, rightMostSelectedItemEndTime())
-    .WillOnce(Return(std::optional<secs_t>(selectionRegion.end)));
+    //! [GIVEN] No time selection
+    // EXPECT_CALL(*m_selectionController, timeSelectionIsNotEmpty())
+    // .WillOnce(Return(false)); // this isn't called 1st anymore in PlaybackController::selectionPlaybackRegion() as we 1st check the clip selection
+    EXPECT_CALL(*m_selectionController, selectedClips())
+    .WillOnce(Return(trackedit::ClipKeyList({ trackedit::ClipKey { 1, 1 } })));
+    EXPECT_CALL(*m_selectionController, selectedClipStartTime())
+    .WillOnce(Return(selectionRegion.start));
+    EXPECT_CALL(*m_selectionController, selectedClipEndTime())
+    .WillOnce(Return(selectionRegion.end));
 
     //! [THEN] Expect that we will take into account the clip's selection region
     EXPECT_CALL(*m_player, setPlaybackRegion(selectionRegion))

@@ -4,10 +4,8 @@
 #pragma once
 
 #include "modularity/imoduleinterface.h"
-
-#include "itrackdata.h"
 #include "trackedittypes.h"
-#include "io/path.h"
+#include "itrackdata.h"
 
 #include "au3wrap/au3types.h"
 
@@ -27,8 +25,5 @@ public:
 
     virtual void setMultiSelectionCopy(bool newValue) = 0;
     virtual bool isMultiSelectionCopy() const = 0;
-
-    virtual std::vector<muse::io::path_t> systemClipboardFilePaths() const = 0;
-    virtual void clearSystemClipboard() = 0;
 };
 }

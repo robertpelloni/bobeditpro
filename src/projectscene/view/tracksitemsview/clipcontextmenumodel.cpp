@@ -25,12 +25,9 @@ void ClipContextMenuModel::load()
 {
     AbstractMenuModel::load();
 
-    auto makeItemWithArg = [this](const ActionCode& actionCode, const muse::TranslatableString& title = {}) {
+    auto makeItemWithArg = [this](const ActionCode& actionCode) {
         MenuItem* item = makeMenuItem(actionCode);
         item->setArgs(ActionData::make_arg1<trackedit::ClipKey>(m_clipKey.key));
-        if (!title.isEmpty()) {
-            item->setTitle(title);
-        }
         return item;
     };
 
@@ -41,7 +38,7 @@ void ClipContextMenuModel::load()
 
     MenuItemList items {
         makeItemWithArg("clip-properties"),
-        makeItemWithArg("rename-item", muse::TranslatableString("clip", "Rename clip")),
+        makeItemWithArg("rename-clip"),
         makeMenu(muse::TranslatableString("clip", "Clip color"), colorItems, "colorMenu"),
         makeSeparator(),
         makeItemWithArg("action://trackedit/cut"),

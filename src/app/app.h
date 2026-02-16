@@ -23,7 +23,7 @@
 #ifndef MU_APP_APP_H
 #define MU_APP_APP_H
 
-#include <vector>
+#include <QList>
 
 #include "modularity/imodulesetup.h"
 #include "modularity/ioc.h"
@@ -34,13 +34,12 @@
 #include "commandlineparser.h"
 
 namespace au::app {
-class App : public muse::Injectable
+class App
 {
-    muse::GlobalInject<appshell::IAppShellConfiguration> appshellConfiguration;
-
-    muse::Inject<muse::IApplication> muapplication{ this };
-    muse::Inject<appshell::IStartupScenario> startupScenario{ this };
-    muse::Inject<muse::audioplugins::IRegisterAudioPluginsScenario> registerAudioPluginsScenario{ this };
+    muse::Inject<muse::IApplication> muapplication;
+    muse::Inject<appshell::IStartupScenario> startupScenario;
+    muse::Inject<muse::audioplugins::IRegisterAudioPluginsScenario> registerAudioPluginsScenario;
+    muse::Inject<appshell::IAppShellConfiguration> appshellConfiguration;
 
 public:
     App();
@@ -53,16 +52,7 @@ private:
     void applyCommandLineOptions(const CommandLineParser::Options& options);
     int processAudioPluginRegistration(const CommandLineParser::AudioPluginRegistration& task);
 
-    std::vector<muse::modularity::IContextSetup*>& contextSetups(const muse::modularity::ContextPtr& ctx);
-
-    std::vector<muse::modularity::IModuleSetup*> m_modules;
-
-    struct Context {
-        muse::modularity::ContextPtr ctx;
-        std::vector<muse::modularity::IContextSetup*> setups;
-    };
-
-    std::vector<Context> m_contexts;
+    QList<muse::modularity::IModuleSetup*> m_modules;
 };
 }
 

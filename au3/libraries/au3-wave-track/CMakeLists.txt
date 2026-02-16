@@ -29,8 +29,6 @@ set( SOURCES
    WaveChannelUtilities.h
    WaveClip.cpp
    WaveClip.h
-   WaveClipRealtimeEffects.cpp
-   WaveClipRealtimeEffects.h
    WaveClipUtilities.cpp
    WaveClipUtilities.h
    WaveTrack.cpp
@@ -44,7 +42,6 @@ set( SOURCES
 )
 set( LIBRARIES
    au3-project-rate-interface
-   au3-realtime-effects
    au3-sample-track-interface
    au3-stretching-sequence-interface
    au3-track-selection-interface

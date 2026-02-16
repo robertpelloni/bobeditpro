@@ -14,7 +14,6 @@
 
 #include "WideSampleSequence.h"
 class ChannelGroup;
-class BusTrack;
 
 /*!
  Extends the interface for random access into a sample stream with tests for
@@ -93,8 +92,6 @@ struct MIXER_API TransportSequences final {
 
     // This is a subset of playbackSequences
     ConstPlayableSequences prerollSequences;
-
-    std::vector<std::shared_ptr<const BusTrack>> busTracks;
 };
 
 #endif

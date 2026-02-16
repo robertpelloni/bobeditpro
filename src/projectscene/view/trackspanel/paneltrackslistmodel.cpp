@@ -19,7 +19,7 @@ using namespace au::project;
 using namespace au::trackedit;
 
 PanelTracksListModel::PanelTracksListModel(QObject* parent)
-    : QAbstractListModel(parent), muse::Injectable(muse::iocCtxForQmlObject(this))
+    : QAbstractListModel(parent)
 {
     m_selectionModel = new muse::uicomponents::ItemMultiSelectionModel(this);
     m_selectionModel->setAllowedModifiers(Qt::ShiftModifier | Qt::ControlModifier);
@@ -44,8 +44,19 @@ PanelTracksListModel::PanelTracksListModel(QObject* parent)
         updateRemovingAvailability();
     });
 
+    onSelectedTracks(selectionController()->selectedTracks());
+
+    selectionController()->tracksSelected().onReceive(this, [this](trackedit::TrackIdList tracksIds) {
+        onSelectedTracks(tracksIds);
+    });
+
     connect(this, &PanelTracksListModel::rowsInserted, this, [this]() {
         updateRemovingAvailability();
+    });
+
+    onProjectChanged();
+    globalContext()->currentTrackeditProjectChanged().onNotify(this, [this]() {
+        onProjectChanged();
     });
 }
 
@@ -61,16 +72,6 @@ void PanelTracksListModel::load()
     }
 
     TRACEFUNC;
-
-    onSelectedTracks(selectionController()->selectedTracks());
-
-    selectionController()->tracksSelected().onReceive(this, [this](trackedit::TrackIdList tracksIds) {
-        onSelectedTracks(tracksIds);
-    }, muse::async::Asyncable::Mode::SetReplace);
-
-    globalContext()->currentTrackeditProjectChanged().onNotify(this, [this]() {
-        onProjectChanged();
-    }, muse::async::Asyncable::Mode::SetReplace);
 
     const ITrackeditProjectPtr prj = globalContext()->currentTrackeditProject();
     if (!prj) {
@@ -105,12 +106,10 @@ void PanelTracksListModel::load()
 
     loadTracks(prj->trackList());
 
-    onFocusedTrack(trackNavigationController()->focusedTrack());
+    onFocusedTrack(selectionController()->focusedTrack());
 
-    trackNavigationController()->focusedTrackChanged().onReceive(this, [this](const TrackId& trackId, bool /*highlight*/) {
-        if (trackId != INVALID_TRACK) {
-            onFocusedTrack(trackId);
-        }
+    selectionController()->focusedTrackChanged().onReceive(this, [this](trackedit::TrackId trackId) {
+        onFocusedTrack(trackId);
     }, muse::async::Asyncable::Mode::SetReplace);
 
     emit isEmptyChanged();
@@ -378,6 +377,7 @@ void PanelTracksListModel::setItemsSelected(const QModelIndexList& indexes, bool
     if (selected) {
         // if selecting new tracks, add them to the existing selection
         alreadySelectedTracksIds.insert(alreadySelectedTracksIds.end(), idsToModify.begin(), idsToModify.end());
+        selectionController()->setFocusedTrack(idsToModify.back());
     } else {
         // if deselecting tracks, remove them from the existing selection
         alreadySelectedTracksIds.erase(

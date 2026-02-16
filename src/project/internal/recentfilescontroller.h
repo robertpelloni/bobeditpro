@@ -32,15 +32,17 @@
 
 #include "modularity/ioc.h"
 #include "iprojectconfiguration.h"
+#include "imscmetareader.h"
 #include "io/ifilesystem.h"
-#include "multiwindows/imultiwindowsprovider.h"
+#include "multiinstances/imultiinstancesprovider.h"
 
 namespace au::project {
 class RecentFilesController : public IRecentFilesController, public muse::async::Asyncable
 {
-    muse::GlobalInject<IProjectConfiguration> configuration;
-    muse::GlobalInject<muse::io::IFileSystem> fileSystem;
-    muse::GlobalInject<muse::mi::IMultiWindowsProvider> multiwindowsProvider;
+    muse::Inject<IProjectConfiguration> configuration;
+    muse::Inject<IMscMetaReader> mscMetaReader;
+    muse::Inject<muse::io::IFileSystem> fileSystem;
+    INJECT(muse::mi::IMultiInstancesProvider, multiInstancesProvider)
 
 public:
     void init();

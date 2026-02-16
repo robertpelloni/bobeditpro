@@ -11,7 +11,7 @@
 #include "context/iglobalcontext.h"
 
 namespace au::projectscene {
-class TracksViewStateModel : public QObject, public muse::Injectable, public muse::async::Asyncable
+class TracksViewStateModel : public QObject, public muse::async::Asyncable
 {
     Q_OBJECT
 
@@ -25,7 +25,7 @@ class TracksViewStateModel : public QObject, public muse::Injectable, public mus
 
     Q_PROPERTY(bool snapEnabled READ snapEnabled NOTIFY snapEnabledChanged FINAL)
 
-    muse::Inject<context::IGlobalContext> globalContext{ this };
+    muse::Inject<context::IGlobalContext> globalContext;
 
 public:
     TracksViewStateModel(QObject* parent = nullptr);
@@ -42,8 +42,6 @@ public:
 
     Q_INVOKABLE void changeTracksVerticalOffset(int deltaY);
     Q_INVOKABLE void setMouseY(double y);
-
-    Q_INVOKABLE void insureVerticallyVisible(int viewContentY, int viewHeight, int itemY, int itemHeight);
 
     Q_INVOKABLE void requestVerticalScrollLock();
     Q_INVOKABLE void requestVerticalScrollUnlock();

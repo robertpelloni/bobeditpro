@@ -23,19 +23,17 @@ Rectangle {
     property bool showChannelSplitter: false
     property alias channelHeightRatio: waveChannelSplitter.channelHeightRatio
     property var canvas: null
-    required property int headerHeight
-    property color clipColor: ui.theme.extra["clip_color_1"]
+    property color clipColor: "#677CE4"
     property color normalHeaderColor: root.currentClipStyle == ClipStyle.COLORFUL ? root.clipColor : root.classicHeaderColor
-    property color selectedHeaderColor: root.currentClipStyle == ClipStyle.COLORFUL ? ui.blendColors(ui.theme.extra["white_color"], root.clipColor, 0.3) : classicHeaderColor
-    property color normalHeaderHoveredColor: root.currentClipStyle == ClipStyle.COLORFUL ? ui.blendColors(ui.theme.extra["white_color"], root.clipColor, 0.8) : classicHeaderHoveredColor
-    property color selectedHeaderHoveredColor: root.currentClipStyle == ClipStyle.COLORFUL ? ui.blendColors(ui.theme.extra["white_color"], root.clipColor, 0.2) : classicHeaderHoveredColor
-    readonly property color classicHeaderColor: ui.theme.extra["classic_clip_header_color"]
-    readonly property color classicHeaderHoveredColor: ui.theme.extra["classic_clip_header_hover_color"]
+    property color selectedHeaderColor: root.currentClipStyle == ClipStyle.COLORFUL ? ui.blendColors("#ffffff", root.clipColor, 0.3) : classicHeaderColor
+    property color normalHeaderHoveredColor: root.currentClipStyle == ClipStyle.COLORFUL ? ui.blendColors("#ffffff", root.clipColor, 0.8) : classicHeaderHoveredColor
+    property color selectedHeaderHoveredColor: root.currentClipStyle == ClipStyle.COLORFUL ? ui.blendColors("#ffffff", root.clipColor, 0.2) : classicHeaderHoveredColor
+    readonly property color classicHeaderColor: "#D0D6F2"
+    readonly property color classicHeaderHoveredColor: "#B0B6D8"
     property int currentClipStyle: ClipStyle.COLORFUL
     property int groupId: -1
     property bool clipSelected: false
     property bool clipIntersectsSelection: false
-    property bool clipFocused: false
     property bool isDataSelected: false
     property bool isMultiSelectionActive: false
     property bool multiClipsSelected: root.isMultiSelectionActive && root.clipSelected
@@ -43,22 +41,12 @@ Rectangle {
     property bool isAudible: true
     property bool isLinear: false
     property real dbRange: -60.0
-    property var displayBounds: ({
-            "min": -1.0,
-            "max": 1.0
-        })
+    property var displayBounds: ({ "min": -1.0, "max": 1.0 })
     property real selectionStart: 0
     property real selectionWidth: 0
-    required property bool selectionInProgress
-    required property bool selectionEditInProgress
-    required property bool verticalSelectionEditInProgress
-    property bool enableCursorInteraction: !selectionInProgress && !selectionEditInProgress && !verticalSelectionEditInProgress && !isBrush
+    property bool selectionInProgress: false
+    property bool enableCursorInteraction: !selectionInProgress && !isBrush
     property bool isContrastFocusBorderEnabled: false
-
-    required property real selectionStartFrequency
-    required property real selectionEndFrequency
-    required property bool spectralSelectionEnabled
-    required property var pressedSpectrogram
 
     property real distanceToLeftNeighbor: -1
     property real distanceToRightNeighbor: -1
@@ -105,8 +93,8 @@ Rectangle {
     property alias navigation: navCtrl
 
     radius: 4
-    color: clipSelected ? ui.theme.extra["white_color"] : clipColor
-    border.color: ui.theme.extra["black_color"]
+    color: clipSelected ? "white" : clipColor
+    border.color: "#000000"
     opacity: root.moveActive && (clipSelected || clipIntersectsSelection) ? 0.5 : isAudible ? 1.0 : 0.3
 
     onMoveActiveChanged: {
@@ -163,7 +151,7 @@ Rectangle {
         anchors.fill: parent
         color: "transparent"
         border.width: root.enableContrastBorder ? 2 : 1
-        border.color: ui.theme.extra["black_color"]
+        border.color: "#000000"
         radius: root.enableContrastBorder ? 0 : 4
         z: root.parent.z + 1
     }
@@ -185,7 +173,7 @@ Rectangle {
 
         navigationCtrl: navCtrl
 
-        border.color: ui.theme.extra["white_color"]
+        border.color: "white"
         border.width: 2
         radius: 4
 
@@ -232,10 +220,6 @@ Rectangle {
         Qt.callLater(root.titleEditAccepted, newTitle)
     }
 
-    function openContextMenu() {
-        menuBtn.toggleMenu(menuBtn)
-    }
-
     function mousePositionChanged(x, y) {
         clipItemMousePositionChanged(x, y)
         waveView.onWaveViewPositionChanged(x, y - header.height)
@@ -249,10 +233,6 @@ Rectangle {
     function mouseReleased() {
         waveView.isNearSample = false
         waveView.onWaveViewPositionChanged(lastSample.x, lastSample.y)
-    }
-
-    function getSpectrogramHit(y /* relative to tracks canvas */) {
-        return spectrogramView.getSpectrogramHit(y)
     }
 
     function setLastSample(x, y) {
@@ -273,9 +253,8 @@ Rectangle {
         }
     }
 
-    function updateViews() {
+    function updateWave() {
         waveView.update()
-        spectrogramView.update()
     }
 
     ClipContextMenuModel {
@@ -308,7 +287,6 @@ Rectangle {
     }
 
     Component.onCompleted: {
-        playbackState.init()
         singleClipContextMenuModel.load()
         multiClipContextMenuModel.load()
     }
@@ -507,7 +485,7 @@ Rectangle {
             anchors.left: parent.left
             anchors.right: parent.right
 
-            height: root.headerHeight
+            height: 20
             z: 2
 
             visible: !root.collapsed || root.hover
@@ -559,7 +537,7 @@ Rectangle {
                         root.editTitle()
                     } else {
                         //! NOTE Handle singleClick logic
-                        if (!root.multiClipsSelected && !(root.isDataSelected && isWithinRange(e.x, headerSelectionRectangle.x, headerSelectionRectangle.width))) {
+                        if (!root.multiClipsSelected && !isWithinRange(e.x, headerSelectionRectangle.x, headerSelectionRectangle.width)) {
                             root.requestSelected()
                         }
 
@@ -815,7 +793,7 @@ Rectangle {
                     editable: root.enableCursorInteraction && root.asymmetricStereoHeightsPossible
                     asymmetricStereoHeightsPossible: root.asymmetricStereoHeightsPossible
 
-                    color: ui.theme.extra["black_color"]
+                    color: "#000000"
                     opacity: 0.10
 
                     onPositionChangeRequested: function (position) {
@@ -843,33 +821,22 @@ Rectangle {
                 }
             }
 
-            ClipSpectrogramView {
-                id: spectrogramView
-
+            SpectrogramView {
                 visible: root.isSpectrogramViewVisible
 
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
-                canvas: root.canvas
                 clipId: root.clipKey.itemId()
                 trackId: root.clipKey.trackId()
-                selectionInProgress: root.selectionInProgress
-                selectionEditInProgress: root.selectionEditInProgress
-                verticalSelectionEditInProgress: root.verticalSelectionEditInProgress
-                spectralSelectionEnabled: root.spectralSelectionEnabled
-                pressedSpectrogram: root.pressedSpectrogram
-                isStereo: root.showChannelSplitter
-                channelHeightRatio: showChannelSplitter ? root.channelHeightRatio : 1
 
                 timelineIndentWidth: root.canvas.anchors.leftMargin
+                channelHeightRatio: showChannelSplitter ? root.channelHeightRatio : 1
                 zoom: root.context.zoom
                 frameStartTime: root.context.frameStartTime
                 frameEndTime: root.context.frameEndTime
                 selectionStartTime: root.context.selectionStartTime
                 selectionEndTime: root.context.selectionEndTime
-                selectionStartFrequency: root.selectionStartFrequency
-                selectionEndFrequency: root.selectionEndFrequency
 
                 ChannelSplitter {
                     id: spectrogramChannelSplitter
@@ -882,7 +849,7 @@ Rectangle {
                     editable: root.enableCursorInteraction && root.asymmetricStereoHeightsPossible
                     asymmetricStereoHeightsPossible: root.asymmetricStereoHeightsPossible
 
-                    color: ui.theme.extra["black_color"]
+                    color: "#000000"
                     opacity: 0.10
 
                     onPositionChangeRequested: function (position) {
@@ -907,7 +874,7 @@ Rectangle {
             height: 20
             text: !root.clipSelected ? qsTrc("clips", "Select") : qsTrc("clips", "Deselect")
             visible: root.clipNavigationPanel.highlight
-            normalColor: ui.theme.extra["accessibility_clip_select_button_color"]
+            normalColor: "#2b2a33"
 
             onClicked: {
                 if (!root.clipSelected) {
@@ -932,13 +899,10 @@ Rectangle {
         id: clipHandles
 
         // +1 not to overlap with header
-        y: !root.collapsed ? header.height + 1 : 0
+        y: header.height + 1
         width: root.width
         handlesVisible: root.clipSelected && !root.moveActive
         canvas: root.canvas
-        collapsed: root.collapsed
-        clipHeight: root.height
-        headerHeight: header.height
 
         clipNavigationPanel: root.clipNavigationPanel
 
@@ -992,21 +956,21 @@ Rectangle {
             }
             PropertyChanges {
                 target: titleLabel
-                color: ui.theme.extra["black_color"]
+                color: "#000000"
             }
             PropertyChanges {
                 target: pitchBtn
-                textColor: ui.theme.extra["black_color"]
-                iconColor: ui.theme.extra["black_color"]
+                textColor: "#000000"
+                iconColor: "#000000"
             }
             PropertyChanges {
                 target: speedBtn
-                textColor: ui.theme.extra["black_color"]
-                iconColor: ui.theme.extra["black_color"]
+                textColor: "#000000"
+                iconColor: "#000000"
             }
             PropertyChanges {
                 target: menuBtn
-                iconColor: ui.theme.extra["black_color"]
+                iconColor: "#000000"
             }
         },
         State {
@@ -1018,21 +982,21 @@ Rectangle {
             }
             PropertyChanges {
                 target: titleLabel
-                color: ui.theme.extra["black_color"]
+                color: "#000000"
             }
             PropertyChanges {
                 target: pitchBtn
-                textColor: ui.theme.extra["black_color"]
-                iconColor: ui.theme.extra["black_color"]
+                textColor: "#000000"
+                iconColor: "#000000"
             }
             PropertyChanges {
                 target: speedBtn
-                textColor: ui.theme.extra["black_color"]
-                iconColor: ui.theme.extra["black_color"]
+                textColor: "#000000"
+                iconColor: "#000000"
             }
             PropertyChanges {
                 target: menuBtn
-                iconColor: ui.theme.extra["black_color"]
+                iconColor: "#000000"
             }
         },
         State {
@@ -1044,21 +1008,21 @@ Rectangle {
             }
             PropertyChanges {
                 target: titleLabel
-                color: ui.theme.extra["black_color"]
+                color: "#000000"
             }
             PropertyChanges {
                 target: pitchBtn
-                textColor: ui.theme.extra["black_color"]
-                iconColor: ui.theme.extra["black_color"]
+                textColor: "#000000"
+                iconColor: "#000000"
             }
             PropertyChanges {
                 target: speedBtn
-                textColor: ui.theme.extra["black_color"]
-                iconColor: ui.theme.extra["black_color"]
+                textColor: "#000000"
+                iconColor: "#000000"
             }
             PropertyChanges {
                 target: menuBtn
-                iconColor: ui.theme.extra["black_color"]
+                iconColor: "#000000"
             }
         },
         State {
@@ -1070,21 +1034,21 @@ Rectangle {
             }
             PropertyChanges {
                 target: titleLabel
-                color: ui.theme.extra["black_color"]
+                color: "#000000"
             }
             PropertyChanges {
                 target: pitchBtn
-                textColor: ui.theme.extra["black_color"]
-                iconColor: ui.theme.extra["black_color"]
+                textColor: "#000000"
+                iconColor: "#000000"
             }
             PropertyChanges {
                 target: speedBtn
-                textColor: ui.theme.extra["black_color"]
-                iconColor: ui.theme.extra["black_color"]
+                textColor: "#000000"
+                iconColor: "#000000"
             }
             PropertyChanges {
                 target: menuBtn
-                iconColor: ui.theme.extra["black_color"]
+                iconColor: "#000000"
             }
         }
     ]

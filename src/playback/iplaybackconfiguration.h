@@ -12,12 +12,14 @@
 #include "trackedit/trackedittypes.h"
 
 namespace au::playback {
-class IPlaybackConfiguration : MODULE_GLOBAL_EXPORT_INTERFACE
+class IPlaybackConfiguration : MODULE_EXPORT_INTERFACE
 {
     INTERFACE_ID(IPlaybackConfiguration)
 
 public:
     virtual ~IPlaybackConfiguration() = default;
+
+    virtual muse::draw::Color playColor() const = 0;
 
     virtual au::uicomponents::TimecodeFormatType playbackTimeItemFormat() const = 0;
     virtual void setPlaybackTimeItemFormat(au::uicomponents::TimecodeFormatType format) = 0;

@@ -1,12 +1,9 @@
 /*
 * Audacity: A Digital Audio Editor
 */
-#include <QApplication>
-
 #include "selectionviewcontroller.h"
 
-#include "spectrogram/view/spectrogramhit.h"
-#include "framework/global/log.h"
+#include "log.h"
 
 using namespace au::projectscene;
 using namespace au::project;
@@ -16,7 +13,7 @@ using namespace au::trackedit;
 constexpr double MIN_SELECTION_PX = 1.0;
 
 SelectionViewController::SelectionViewController(QObject* parent)
-    : QObject(parent), muse::Injectable(muse::iocCtxForQmlObject(this))
+    : QObject(parent)
 {
 }
 
@@ -28,13 +25,9 @@ void SelectionViewController::load()
             onReleased(m_startPoint.x(), m_startPoint.y());
         }
     });
-
-    spectrogramConfiguration()->spectralSelectionEnabledChanged().onReceive(this, [this] (auto) {
-        emit spectralSelectionEnabledChanged();
-    });
 }
 
-void SelectionViewController::onPressed(double x, double y, spectrogram::SpectrogramHit spectrogramHit)
+void SelectionViewController::onPressed(double x, double y)
 {
     if (!isProjectOpened()) {
         return;
@@ -73,7 +66,7 @@ void SelectionViewController::onPressed(double x, double y, spectrogram::Spectro
     }
 
     if (!tracks.empty()) {
-        trackNavigationController()->setFocusedTrack(tracks.at(0), false /*highlight*/);
+        selectionController()->setFocusedTrack(tracks.at(0));
     }
     selectionController()->setSelectedTracks(tracks, true);
 
@@ -90,43 +83,26 @@ void SelectionViewController::onPressed(double x, double y, spectrogram::Spectro
         selectionController()->setDataSelectedEndTime(m_context->positionToTime(x2, true /*withSnap*/), false);
     }
 
-    m_spectrogramHit.reset();
-    if (spectralSelectionEnabled() && spectrogramHit.trackId >= 0) {
-        m_spectrogramHit.emplace(spectrogramHit);
-    }
-    emit pressedSpectrogramChanged();
-    setFrequencySelection(y, y);
-
     viewState()->updateItemsBoundaries(true);
 
-    m_autoScrollConnection = connect(m_context, &TimelineContext::frameTimeChanged, [this]() {
-        doOnPositionChanged(m_lastPoint.x(), m_lastPoint.y());
+    m_autoScrollConnection = connect(m_context, &TimelineContext::frameTimeChanged, [this](){
+        onPositionChanged(m_lastPoint.x(), m_lastPoint.y());
     });
 }
 
 void SelectionViewController::onPositionChanged(double x, double y)
 {
-    if (m_spectrogramHit && isInExtendedSpectrogram(*m_spectrogramHit, y)) {
-        y = std::clamp(y, m_spectrogramHit->spectrogramY, m_spectrogramHit->spectrogramY + m_spectrogramHit->spectrogramHeight);
-    }
-    if (doOnPositionChanged(x, y)) {
-        setFrequencySelection(y, m_startPoint.y());
-    }
-}
-
-bool SelectionViewController::doOnPositionChanged(double x, double y)
-{
     if (!isProjectOpened()) {
-        return false;
+        return;
     }
 
     IProjectViewStatePtr vs = viewState();
     if (!vs) {
-        return false;
+        return;
     }
 
     if (!m_selectionStarted) {
-        return false;
+        return;
     }
 
     Qt::KeyboardModifiers modifiers = keyboardModifiers();
@@ -158,8 +134,6 @@ bool SelectionViewController::doOnPositionChanged(double x, double y)
     }
 
     setSelection(x1, x2, false);
-
-    return true;
 }
 
 void SelectionViewController::onReleased(double x, double y)
@@ -167,8 +141,6 @@ void SelectionViewController::onReleased(double x, double y)
     if (!isProjectOpened()) {
         return;
     }
-
-    m_spectrogramHit.reset();
 
     IProjectViewStatePtr vs = viewState();
     if (!vs) {
@@ -225,9 +197,9 @@ void SelectionViewController::onReleased(double x, double y)
     setSelectionActive(true);
 
     if (m_startPoint.y() < y) {
-        trackNavigationController()->setFocusedTrack(tracks.back());
+        selectionController()->setFocusedTrack(tracks.back());
     } else {
-        trackNavigationController()->setFocusedTrack(tracks.front());
+        selectionController()->setFocusedTrack(tracks.front());
     }
     selectionController()->setSelectedTracks(tracks, true);
 
@@ -235,7 +207,7 @@ void SelectionViewController::onReleased(double x, double y)
     setSelection(x1, x2, true);
 }
 
-void SelectionViewController::onSelectionHorizontalResize(double x1, double x2, bool completed)
+void SelectionViewController::onSelectionDraged(double x1, double x2, bool completed)
 {
     if (!isProjectOpened()) {
         return;
@@ -249,39 +221,6 @@ void SelectionViewController::onSelectionHorizontalResize(double x1, double x2, 
     setSelection(x1, x2, completed);
     m_selectionEditInProgress = !completed;
     emit selectionEditInProgressChanged();
-}
-
-void SelectionViewController::startSelectionVerticalResize(spectrogram::SpectrogramHit hit)
-{
-    IF_ASSERT_FAILED(hit.trackId >= 0) {
-        return;
-    }
-    m_spectrogramHit.emplace(hit);
-    m_verticalSelectionEditInProgress = true;
-    emit verticalSelectionEditInProgressChanged();
-}
-
-void SelectionViewController::updateSelectionVerticalResize(double y1, double y2, bool completed)
-{
-    IF_ASSERT_FAILED(m_spectrogramHit) {
-        return;
-    }
-
-    const auto vs = viewState();
-    IF_ASSERT_FAILED(vs) {
-        return;
-    }
-
-    const trackedit::TrackIdList tracks = vs->tracksInRange(y1, y2);
-    selectionController()->setSelectedTracks(tracks, completed);
-
-    setFrequencySelection(y1, y2);
-
-    if (completed) {
-        m_verticalSelectionEditInProgress = false;
-        emit verticalSelectionEditInProgressChanged();
-        m_spectrogramHit.reset();
-    }
 }
 
 void SelectionViewController::selectTrackAudioData(double y)
@@ -412,15 +351,6 @@ void SelectionViewController::setTimelineContext(TimelineContext* newContext)
     emit timelineContextChanged();
 }
 
-void SelectionViewController::setResistancePx(int value)
-{
-    if (m_resistancePx == value) {
-        return;
-    }
-    m_resistancePx = value;
-    emit resistancePxChanged();
-}
-
 bool SelectionViewController::selectionActive() const
 {
     return m_selectionActive;
@@ -431,29 +361,9 @@ bool SelectionViewController::selectionEditInProgress() const
     return m_selectionEditInProgress;
 }
 
-bool SelectionViewController::verticalSelectionEditInProgress() const
-{
-    return m_verticalSelectionEditInProgress;
-}
-
 bool SelectionViewController::selectionInProgress() const
 {
     return m_selectionStarted;
-}
-
-bool SelectionViewController::spectralSelectionEnabled() const
-{
-    return spectrogramConfiguration()->spectralSelectionEnabled();
-}
-
-QVariantMap SelectionViewController::pressedSpectrogram() const
-{
-    const auto trackId = m_spectrogramHit ? m_spectrogramHit->trackId : -1;
-    const auto channel = m_spectrogramHit ? m_spectrogramHit->channel : -1;
-    return {
-        { "trackId", trackId },
-        { "channel", channel },
-    };
 }
 
 void SelectionViewController::setSelectionActive(bool newSelectionActive)
@@ -469,29 +379,4 @@ void SelectionViewController::setSelection(double x1, double x2, bool complete)
 {
     selectionController()->setDataSelectedStartTime(m_context->positionToTime(x1, true /*withSnap*/), complete);
     selectionController()->setDataSelectedEndTime(m_context->positionToTime(x2, true /*withSnap*/), complete);
-}
-
-double SelectionViewController::spectrogramHitFrequency(const spectrogram::SpectrogramHit& hit, double y) const
-{
-    return spectrogramService()->yToFrequency(hit.trackId, y - hit.spectrogramY, hit.spectrogramHeight);
-}
-
-void SelectionViewController::setFrequencySelection(double y1, double y2)
-{
-    if (!m_spectrogramHit || !isInExtendedSpectrogram(*m_spectrogramHit, y1) || !isInExtendedSpectrogram(*m_spectrogramHit, y2)) {
-        selectionController()->resetFrequencySelection();
-        return;
-    }
-
-    auto freq1 = spectrogramHitFrequency(*m_spectrogramHit, y1);
-    auto freq2 = spectrogramHitFrequency(*m_spectrogramHit, y2);
-    if (freq1 > freq2) {
-        std::swap(freq1, freq2);
-    }
-    selectionController()->setFrequencySelection(m_spectrogramHit->trackId, std::make_pair(freq1, freq2));
-}
-
-bool SelectionViewController::isInExtendedSpectrogram(const spectrogram::SpectrogramHit& hit, double y) const
-{
-    return hit.spectrogramY - m_resistancePx <= y && y <= hit.spectrogramY + hit.spectrogramHeight + m_resistancePx;
 }

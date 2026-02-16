@@ -11,16 +11,14 @@
 #include "../iprojectsceneconfiguration.h"
 
 namespace au::projectscene {
-class ProjectSceneConfiguration : public IProjectSceneConfiguration, public muse::Injectable
+class ProjectSceneConfiguration : public IProjectSceneConfiguration
 {
 public:
-    muse::GlobalInject<muse::ui::IUiConfiguration> uiConfiguration;
-
-    muse::Inject<muse::workspace::IWorkspaceManager> workspaceManager { this };
+    muse::Inject<muse::ui::IUiConfiguration> uiConfiguration;
+    muse::Inject<muse::workspace::IWorkspaceManager> workspaceManager;
 
 public:
-    ProjectSceneConfiguration(const muse::modularity::ContextPtr& ctx)
-        : muse::Injectable(ctx) {}
+    ProjectSceneConfiguration() = default;
 
     void init();
 
@@ -71,14 +69,6 @@ public:
     void setPlaybackOnRulerClickEnabled(bool enabled) override;
     muse::async::Notification playbackOnRulerClickEnabledChanged() const override;
 
-    bool updateDisplayWhilePlayingEnabled() const;
-    void setUpdateDisplayWhilePlayingEnabled(bool enabled);
-    muse::async::Notification updateDisplayWhilePlayingEnabledChanged() const;
-
-    bool pinnedPlayHeadEnabled() const;
-    void setPinnedPlayHeadEnabled(bool enabled);
-    muse::async::Notification pinnedPlayHeadEnabledChanged() const;
-
     int labelEditorColumnFormat(const std::string& columnName) const override;
     void setLabelEditorColumnFormat(const std::string& columnName, int format) const override;
 
@@ -94,7 +84,5 @@ private:
     muse::async::Notification m_asymmetricStereoHeightsWorkspacesChanged;
     muse::async::Notification m_selectionTimecodeFormatChanged;
     muse::async::Notification m_playbackOnRulerClickEnabledChanged;
-    muse::async::Notification m_updateDisplayWhilePlayingEnabledChanged;
-    muse::async::Notification m_pinnedPlayHeadEnabledChanged;
 };
 }

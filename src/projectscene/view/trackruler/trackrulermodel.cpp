@@ -18,8 +18,9 @@ const muse::actions::ActionQuery TOGGLE_TRACK_HALF_WAVE("action://projectscene/t
 }
 
 TrackRulerModel::TrackRulerModel(QObject* parent)
-    : QObject(parent), muse::Injectable(muse::iocCtxForQmlObject(this))
+    : QObject(parent)
 {
+    m_model = buildRulerModel();
 }
 
 IProjectViewStatePtr TrackRulerModel::viewState() const
@@ -30,9 +31,6 @@ IProjectViewStatePtr TrackRulerModel::viewState() const
 
 void TrackRulerModel::init()
 {
-    if (!m_model) {
-        m_model = buildRulerModel();
-    }
     m_model->setDbRange(au::playback::PlaybackMeterDbRange::toDouble(configuration()->playbackMeterDbRange()));
     configuration()->playbackMeterDbRangeChanged().onNotify(this, [this]() {
         m_model->setDbRange(au::playback::PlaybackMeterDbRange::toDouble(configuration()->playbackMeterDbRange()));
@@ -57,12 +55,11 @@ void TrackRulerModel::init()
         emit smallStepsChanged();
     }, muse::async::Asyncable::Mode::SetReplace);
 
-    prjViewState->isHalfWave(m_trackId).ch.onReceive(this, [this](bool) {
+    prjViewState->isHalfWave(m_trackId).ch.onReceive(this, [this](bool isHalfWave) {
         emit isHalfWaveChanged();
         emit fullStepsChanged();
         emit smallStepsChanged();
     }, muse::async::Asyncable::Mode::SetReplace);
-    setInitialized(true);
 }
 
 std::vector<QVariantMap> TrackRulerModel::fullSteps() const
@@ -176,9 +173,6 @@ double TrackRulerModel::channelHeightRatio() const
 
 void TrackRulerModel::setChannelHeightRatio(double channelHeightRatio)
 {
-    if (!m_model) {
-        return;
-    }
     if (m_channelHeightRatio != channelHeightRatio) {
         m_channelHeightRatio = channelHeightRatio;
         m_model->setChannelHeightRatio(channelHeightRatio);
@@ -238,7 +232,7 @@ QVariant TrackRulerModel::displayBounds() const
     }
 
     muse::ValCh<std::pair<float, float> > bounds = prjViewState->verticalDisplayBounds(m_trackId);
-    return QVariant::fromValue(QMap<QString, QVariant> {
+    QVariant::fromValue(QMap<QString, QVariant> {
         { "min", bounds.val.first },
         { "max", bounds.val.second }
     });
@@ -396,18 +390,4 @@ void TrackRulerModel::setTrackId(const trackedit::TrackId& newTrackId)
 au::trackedit::TrackId TrackRulerModel::trackId() const
 {
     return m_trackId;
-}
-
-bool TrackRulerModel::initialized() const
-{
-    return m_initialized;
-}
-
-void TrackRulerModel::setInitialized(bool newInitialized)
-{
-    if (m_initialized == newInitialized) {
-        return;
-    }
-    m_initialized = newInitialized;
-    emit initializedChanged();
 }

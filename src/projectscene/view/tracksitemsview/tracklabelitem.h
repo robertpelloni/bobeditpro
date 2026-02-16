@@ -23,8 +23,6 @@ class TrackLabelItem : public ViewTrackItem
     Q_PROPERTY(bool isRightLinked READ isRightLinked WRITE setIsRightLinked NOTIFY isRightLinkedChanged FINAL)
     Q_PROPERTY(bool isLinkedActive READ isLinkedActive WRITE setIsLinkedActive NOTIFY isLinkedActiveChanged FINAL)
 
-    Q_PROPERTY(bool isPoint READ isPoint NOTIFY timeChanged FINAL)
-
 public:
     explicit TrackLabelItem(QObject* parent);
 
@@ -50,8 +48,6 @@ public:
 
     bool isLinkedActive() const;
     void setIsLinkedActive(bool active);
-
-    bool isPoint() const;
 
 signals:
     void levelChanged();

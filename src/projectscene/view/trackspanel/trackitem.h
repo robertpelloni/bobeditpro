@@ -11,7 +11,6 @@
 #include "modularity/ioc.h"
 #include "trackedit/itrackeditinteraction.h"
 #include "trackedit/iselectioncontroller.h"
-#include "trackedit/internal/itracknavigationcontroller.h"
 
 #include "ui/view/iconcodes.h"
 
@@ -21,7 +20,7 @@
 Q_DECLARE_METATYPE(au::trackedit::TrackType)
 
 namespace au::projectscene {
-class TrackItem : public QObject, public muse::Injectable, public muse::async::Asyncable
+class TrackItem : public QObject, public muse::async::Asyncable
 {
     Q_OBJECT
 
@@ -33,9 +32,8 @@ class TrackItem : public QObject, public muse::Injectable, public muse::async::A
     Q_PROPERTY(bool isSelected READ isSelected NOTIFY isSelectedChanged)
     Q_PROPERTY(bool isFocused READ isFocused NOTIFY isFocusedChanged)
 
-    muse::Inject<trackedit::ITrackeditInteraction> trackeditInteraction{ this };
-    muse::Inject<trackedit::ISelectionController> selectionController{ this };
-    muse::Inject<trackedit::ITrackNavigationController> trackNavigationController{ this };
+    muse::Inject<trackedit::ITrackeditInteraction> trackeditInteraction;
+    muse::Inject<trackedit::ISelectionController> selectionController;
 
 public:
     explicit TrackItem(QObject* parent = nullptr);

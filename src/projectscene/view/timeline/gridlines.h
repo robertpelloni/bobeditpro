@@ -14,8 +14,8 @@ class GridLines : public QQuickPaintedItem
 
     Q_PROPERTY(TimelineRuler * timelineRuler READ timelineRuler WRITE setTimelineRuler NOTIFY timelineRulerChanged FINAL)
 
-    muse::GlobalInject<muse::ui::IUiConfiguration> uiconfiguration;
-    muse::GlobalInject<IProjectSceneConfiguration> configuration;
+    muse::Inject<muse::ui::IUiConfiguration> uiconfiguration;
+    muse::Inject<IProjectSceneConfiguration> configuration;
 
 public:
     explicit GridLines(QQuickItem* parent = nullptr);

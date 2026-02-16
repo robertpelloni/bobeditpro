@@ -4,7 +4,7 @@
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
 
-import Muse.UiComponents
+import Muse.UiComponents 1.0
 import Muse.Ui 1.0
 
 import Audacity.Playback 1.0
@@ -20,7 +20,8 @@ Item {
     property alias rightCurrentVolumePressure: rightVolumePressure.currentVolumePressure
     property alias rightCurrentRMS: rightVolumePressure.currentRMS
 
-    property alias navigation: popupButton.navigation
+    property NavigationPanel navigationPanel: null
+    property int navigationOrder: 0
 
     property bool isPlaying: false
 
@@ -49,8 +50,6 @@ Item {
         spacing: 0
 
         FlatButton {
-            id: popupButton
-
             Layout.preferredWidth: root.height
             Layout.preferredHeight: root.height
             Layout.rightMargin: 6
@@ -126,9 +125,8 @@ Item {
 
                 enabled: root.enabled
 
-                navigation.panel: root.navigation.panel
-                navigation.row: root.navigation.row
-                navigation.column: root.navigation.column + 1
+                navigation.panel: root.navigationPanel
+                navigation.order: root.navigationOrder
 
                 onVolumeLevelMoved: function(level) {
                     leftVolumePressure.reset()
@@ -144,20 +142,6 @@ Item {
                     leftVolumePressure.resetClipped()
                     rightVolumePressure.reset()
                     rightVolumePressure.resetClipped()
-                }
-
-                onDecreaseRequested: {
-                    if (volumeLevel <= from) {
-                        return
-                    }
-                    root.volumeLevelChangeRequested(Math.round(volumeLevel * 100) / 100 - stepSize)
-                }
-
-                onIncreaseRequested: {
-                    if (volumeLevel >= to) {
-                        return
-                    }
-                    root.volumeLevelChangeRequested(Math.round(volumeLevel * 100) / 100 + stepSize)
                 }
             }
 

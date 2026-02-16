@@ -7,7 +7,7 @@
 #include "framework/actions/actionable.h"
 
 #include "framework/global/modularity/ioc.h"
-#include "framework/interactive/iinteractive.h"
+#include "framework/global/iinteractive.h"
 #include "framework/actions/iactionsdispatcher.h"
 
 #include "audio/iaudiodevicesprovider.h"
@@ -17,32 +17,25 @@
 #include "iselectioncontroller.h"
 #include "itrackeditconfiguration.h"
 #include "itrackeditinteraction.h"
-#include "internal/itracknavigationcontroller.h"
 
 #include "deletebehavioronboardingscenario.h"
 
 #include "../itrackeditactionscontroller.h"
 
 namespace au::trackedit {
-class TrackeditActionsController : public ITrackeditActionsController, public muse::actions::Actionable, public muse::async::Asyncable,
-    public muse::Injectable
+class TrackeditActionsController : public ITrackeditActionsController, public muse::actions::Actionable, public muse::async::Asyncable
 {
-    muse::GlobalInject<projectscene::IProjectSceneConfiguration> projectSceneConfiguration;
-    muse::GlobalInject<trackedit::ITrackeditConfiguration> configuration;
-
-    muse::Inject<au::context::IGlobalContext> globalContext { this };
-    muse::Inject<audio::IAudioDevicesProvider> audioDevicesProvider { this };
-    muse::Inject<muse::actions::IActionsDispatcher> dispatcher { this };
-    muse::Inject<muse::IInteractive> interactive { this };
-    muse::Inject<trackedit::IProjectHistory> projectHistory { this };
-    muse::Inject<trackedit::ISelectionController> selectionController { this };
-    muse::Inject<trackedit::ITrackeditInteraction> trackeditInteraction { this };
-    muse::Inject<trackedit::ITrackNavigationController> trackNavigationController { this };
+    muse::Inject<au::context::IGlobalContext> globalContext;
+    muse::Inject<audio::IAudioDevicesProvider> audioDevicesProvider;
+    muse::Inject<muse::actions::IActionsDispatcher> dispatcher;
+    muse::Inject<muse::IInteractive> interactive;
+    muse::Inject<projectscene::IProjectSceneConfiguration> projectSceneConfiguration;
+    muse::Inject<trackedit::IProjectHistory> projectHistory;
+    muse::Inject<trackedit::ISelectionController> selectionController;
+    muse::Inject<trackedit::ITrackeditConfiguration> configuration;
+    muse::Inject<trackedit::ITrackeditInteraction> trackeditInteraction;
 
 public:
-    TrackeditActionsController(const muse::modularity::ContextPtr& ctx)
-        : muse::Injectable(ctx), m_deleteBehaviorOnboardingScenario(ctx) {}
-
     void init();
 
     bool actionEnabled(const muse::actions::ActionCode& actionCode) const override;
@@ -55,12 +48,6 @@ public:
 private:
     void notifyActionEnabledChanged(const muse::actions::ActionCode& actionCode);
     void notifyActionCheckedChanged(const muse::actions::ActionCode& actionCode);
-
-    bool isFocusedItemClip() const;
-    ClipKeyList clipsForInteraction() const;
-
-    bool isFocusedItemLabel() const;
-    LabelKeyList labelsForInteraction() const;
 
     void undo();
     void redo();
@@ -116,7 +103,6 @@ private:
 
     void newMonoTrack();
     void newStereoTrack();
-    void newBusTrack();
     void newLabelTrack();
 
     void deleteTracks(const muse::actions::ActionData&);
@@ -159,7 +145,6 @@ private:
     void setTrackFormat(const muse::actions::ActionQuery& q);
     void setTrackRate(const muse::actions::ActionQuery& q);
 
-    void toggleGlobalSpectrogramView();
     void changeTrackViewToWaveform(const muse::actions::ActionQuery&);
     void changeTrackViewToSpectrogram(const muse::actions::ActionQuery&);
     void changeTrackViewToWaveformAndSpectrogram(const muse::actions::ActionQuery&);
@@ -177,21 +162,6 @@ private:
 
     void labelCopy(const muse::actions::ActionData& args);
     void labelCopyMulti();
-
-    void moveFocusedItemLeft();
-    void moveFocusedItemRight();
-    void moveFocusedItemUp();
-    void moveFocusedItemDown();
-    void extendFocusedItemBoundaryLeft();
-    void extendFocusedItemBoundaryRight();
-    void reduceFocusedItemBoundaryLeft();
-    void reduceFocusedItemBoundaryRight();
-
-    double zoomLevel() const;
-    double calculateStepSize() const;
-    Label focusedLabel() const;
-    TrackId resolvePreviousTrackIdForMove(const TrackId& trackId) const;
-    TrackId resolveNextTrackIdForMove(const TrackId& trackId) const;
 
     context::IPlaybackStatePtr playbackState() const;
 

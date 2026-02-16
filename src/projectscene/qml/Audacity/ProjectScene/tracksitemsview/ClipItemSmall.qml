@@ -4,14 +4,14 @@ Rectangle {
 
     id: root
 
-    required property color clipColor
+    property color clipColor: "#677CE4"
     property bool collapsed: false
 
     //radius: 4
     border.width: 1
-    border.color: ui.theme.extra["black_color"]
+    border.color: "#000000"
 
-    color: ui.blendColors(ui.theme.extra["white_color"], root.clipColor, 0.9)
+    color: ui.blendColors("#ffffff", root.clipColor, 0.9)
 
     Rectangle {
         id: header

@@ -13,7 +13,7 @@ class AddNewTrackPopupModel : public QObject
 {
     Q_OBJECT
 
-    muse::GlobalInject<muse::IGlobalConfiguration> globalConfiguration;
+    muse::Inject<muse::IGlobalConfiguration> globalConfiguration;
 
 public:
     explicit AddNewTrackPopupModel(QObject* parent = nullptr);

@@ -17,7 +17,7 @@ Item {
     property alias tracksModel: tracksModel
 
     signal openEffectsRequested()
-    signal panelActive(var trackId)
+    signal panelActive(int index)
 
     property NavigationSection trackEffectsNavigationSection: null
     property NavigationSection masterEffectsNavigationSection: null
@@ -181,11 +181,6 @@ Item {
                     height: tracksViewState.tracksVerticalScrollPadding
                 }
 
-                function insureVerticallyVisible(item) {
-                    var itemViewY = item.mapToItem(view.contentItem, Qt.point(0, 0)).y
-                    tracksViewState.insureVerticallyVisible(view.contentY, view.height, itemViewY, item.height)
-                }
-
                 delegate: Loader {
                     id: trackItemLoader
 
@@ -214,13 +209,13 @@ Item {
 
                             navigation.name: Boolean(item) ? item.title + item.index : ""
                             navigation.panel: root.navPanels && root.navPanels[index] ? root.navPanels[index] : null
-                            navigation.order: 0
+                            navigation.row: index
                             navigation.accessible.name: Boolean(item) ? item.title : ""
                             navigation.onActiveChanged: {
                                 if (navigation.active) {
+                                    root.panelActive(index)
                                     prv.currentItemNavigationName = navigation.name
-
-                                    view.insureVerticallyVisible(this)
+                                    view.positionViewAtIndex(index, ListView.Contain)
                                 }
                             }
 
@@ -245,10 +240,6 @@ Item {
                                 tracksModel.removeSelection()
                             }
 
-                            onMouseReleased: function(releasedItem, x, y) {
-                                root.panelActive(item.trackId)
-                            }
-
                             Component.onCompleted: {
                                 mousePressed.connect(dragHandler.startDrag)
                                 mouseReleased.connect(dragHandler.endDrag)
@@ -271,13 +262,13 @@ Item {
 
                             navigation.name: Boolean(item) ? item.title + item.index : ""
                             navigation.panel: root.navPanels && root.navPanels[index] ? root.navPanels[index] : null
-                            navigation.order: 0
+                            navigation.row: index
                             navigation.accessible.name: Boolean(item) ? item.title : ""
                             navigation.onActiveChanged: {
                                 if (navigation.active) {
+                                    root.panelActive(index)
                                     prv.currentItemNavigationName = navigation.name
-
-                                    view.insureVerticallyVisible(this)
+                                    view.positionViewAtIndex(index, ListView.Contain)
                                 }
                             }
 
@@ -299,10 +290,6 @@ Item {
 
                             onAddLabelToSelectionRequested: {
                                 tracksModel.addLabelToSelection()
-                            }
-
-                            onMouseReleased: function(releasedItem, x, y) {
-                                root.panelActive(item.trackId)
                             }
 
                             Component.onCompleted: {

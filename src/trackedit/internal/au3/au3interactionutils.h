@@ -3,16 +3,13 @@
  */
 #pragma once
 
-#include "framework/global/types/ret.h"
-#include "framework/interactive/iinteractive.h"
-
 #include "au3interactiontypes.h"
 #include "trackedittypes.h"
 #include "dom/clip.h"
 #include "au3wrap/au3types.h"
+#include "global/types/ret.h"
+#include "global/iinteractive.h"
 #include <cstddef>
-
-class BusTrack;
 
 namespace au::trackedit::utils {
 //! To avoid risk of `getWaveTrack(myTracks, myClipKey.trackId)` ...
@@ -41,8 +38,6 @@ au3::Au3WaveTrack* toggleStereo(au3::Au3TrackList& tracks, size_t trackIndex);
  */
 au3::Au3WaveTrack* appendWaveTrack(au3::Au3TrackList& tracks, size_t nChannels, const au3::Au3WaveTrackFactory* trackFactory = nullptr,
                                    double projectRate = 0.);
-
-BusTrack* appendBusTrack(au3::Au3TrackList& tracks);
 
 enum class VerticalDrag {
     Up,

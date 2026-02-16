@@ -12,13 +12,13 @@
 #include "audio/iaudiodevicesprovider.h"
 
 namespace au::trackedit {
-class TrackeditUiActions : public muse::ui::IUiActionsModule, public muse::async::Asyncable, public muse::Injectable
+class TrackeditUiActions : public muse::ui::IUiActionsModule, public muse::async::Asyncable
 {
-    muse::Inject<audio::IAudioDevicesProvider> audioDevicesProvider { this };
-    muse::Inject<context::IUiContextResolver> uicontextResolver { this };
+    muse::Inject<audio::IAudioDevicesProvider> audioDevicesProvider;
+    muse::Inject<context::IUiContextResolver> uicontextResolver;
 
 public:
-    TrackeditUiActions(const muse::modularity::ContextPtr& ctx, std::shared_ptr<TrackeditActionsController> controller);
+    TrackeditUiActions(std::shared_ptr<TrackeditActionsController> controller);
 
     void init();
 

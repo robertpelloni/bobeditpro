@@ -89,7 +89,6 @@ struct FFMPEG_SUPPORT_API FFmpegFunctions : AVCodecFunctions, AVFormatFunctions,
     AudacityAVCodecID (*GetAudacityCodecID)(AVCodecIDFwd) = nullptr;
 
     static std::vector<wxString> GetSearchPaths(bool fromUserPathOnly);
-    wxString GetLoadedAVFormatPath() const;
 
     std::unique_ptr<AVIOContextWrapper> CreateAVIOContext() const;
     std::unique_ptr<AVFormatContextWrapper> CreateAVFormatContext() const;

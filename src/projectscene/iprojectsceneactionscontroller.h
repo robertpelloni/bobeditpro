@@ -18,7 +18,5 @@ public:
 
     virtual bool actionChecked(const muse::actions::ActionCode& actionCode) const = 0;
     virtual muse::async::Channel<muse::actions::ActionCode> actionCheckedChanged() const = 0;
-
-    virtual muse::async::Channel<muse::actions::ActionCode> actionEnabledChanged() const = 0;
 };
 }

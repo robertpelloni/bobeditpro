@@ -5,7 +5,7 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 
 import Muse.Ui 1.0
-import Muse.UiComponents
+import Muse.UiComponents 1.0
 
 import Audacity.ProjectScene 1.0
 import Audacity.Playback 1.0
@@ -29,7 +29,7 @@ Slider {
     from: meterModel ? meterModel.dbRange : 0
     to: 0
     value: root.volumeLevel
-    stepSize: 1
+    stepSize: 0.1
     orientation: Qt.Horizontal
     wheelEnabled: true
 
@@ -72,10 +72,10 @@ Slider {
         id: tooltip
 
         parent: root.handle
-        decimalPlaces: root.meterModel ? (root.meterModel.meterType === PlaybackMeterType.Linear ? 2 : 1) : 1
-        minValue: root.meterModel ? (root.meterModel.meterType === PlaybackMeterType.Linear ? 1.0 : meterModel.dbRange) : 0
-        unitText: root.meterModel ? (root.meterModel.meterType === PlaybackMeterType.Linear ? "" : "dB") : ""
-        volume: root.meterModel ? (root.meterModel.meterType === PlaybackMeterType.Linear ? root.meterModel.position : root.volumeLevel) : 0
+        decimalPlaces: root.meterModel ? (root.meterModel.meterType == PlaybackMeterType.Linear ? 2 : 1) : 1
+        minValue: root.meterModel ? (root.meterModel.meterType == PlaybackMeterType.Linear ? 1.0 : meterModel.dbRange) : 0
+        unitText: root.meterModel ? (root.meterModel.meterType == PlaybackMeterType.Linear ? "" : "dB") : ""
+        volume: root.meterModel ? (root.meterModel.meterType ==  PlaybackMeterType.Linear ? root.meterModel.position : root.volumeLevel) : 0
     }
 
     NavigationControl {
@@ -93,11 +93,11 @@ Slider {
 
         onNavigationEvent: function(event) {
             switch(event.type) {
-            case NavigationEvent.Down:
+            case NavigationEvent.Left:
                 root.decreaseRequested()
                 event.accepted = true
                 break
-            case NavigationEvent.Up:
+            case NavigationEvent.Right:
                 root.increaseRequested()
                 event.accepted = true
                 break

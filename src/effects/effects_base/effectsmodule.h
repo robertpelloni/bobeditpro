@@ -22,7 +22,6 @@ public:
     void registerResources() override;
     void registerUiTypes() override;
     void onInit(const muse::IApplication::RunMode& mode) override;
-    void onAllInited(const muse::IApplication::RunMode& mode) override;
     void onDelayedInit() override;
 
 private:

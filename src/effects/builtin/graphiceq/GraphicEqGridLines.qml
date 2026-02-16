@@ -1,6 +1,6 @@
 import QtQuick 2.15
 import Muse.Ui
-import Muse.UiComponents
+import Muse.UiComponents 1.0
 
 Item {
     id: root
@@ -56,7 +56,7 @@ Item {
                 width: root.lineWidth
                 height: 1
                 y: root.height * (1 - (modelData - root.min) / (root.max - root.min))
-                color: ui.theme.extra["graphic_eq_gridline_color"]
+                color: ui.theme.isDark ? "#3E4449" : "#D9DADE"
             }
         }
     }

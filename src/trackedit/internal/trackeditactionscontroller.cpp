@@ -69,7 +69,6 @@ static const ActionCode RANGE_SELECTION_SPLIT_CUT("split-cut-selected");
 static const ActionCode RANGE_SELECTION_SPLIT_DELETE("split-delete-selected");
 static const ActionCode NEW_MONO_TRACK("new-mono-track");
 static const ActionCode NEW_STEREO_TRACK("new-stereo-track");
-static const ActionCode NEW_BUS_TRACK("new-bus-track");
 static const ActionCode NEW_LABEL_TRACK("new-label-track");
 static const ActionCode TRACK_DELETE("track-delete");
 static const ActionCode TRACK_DUPLICATE_CODE("track-duplicate");
@@ -108,7 +107,6 @@ static const ActionQuery TRACK_CHANGE_COLOR_QUERY("action://trackedit/track/chan
 static const ActionQuery TRACK_CHANGE_FORMAT_QUERY("action://trackedit/track/change-format");
 static const ActionQuery TRACK_CHANGE_RATE_QUERY("action://trackedit/track/change-rate");
 
-static const ActionQuery TOGGLE_GLOBAL_VIEW_SPECTROGRAM("action://trackedit/global-view-spectrogram");
 static const ActionQuery SET_TRACK_VIEW_WAVEFORM("action://trackedit/track-view-waveform");
 static const ActionQuery SET_TRACK_VIEW_SPECTROGRAM("action://trackedit/track-view-spectrogram");
 static const ActionQuery SET_TRACK_VIEW_MULTI("action://trackedit/track-view-multi");
@@ -126,17 +124,6 @@ static const ActionCode LABEL_COPY_CODE("label-copy");
 static const ActionCode LABEL_COPY_MULTI_CODE("label-copy-multi");
 
 static const ActionQuery PLAYBACK_SEEK_QUERY("action://playback/seek");
-
-static const ActionCode TRACK_VIEW_ITEM_MOVE_LEFT_CODE("track-view-item-move-left");
-static const ActionCode TRACK_VIEW_ITEM_MOVE_RIGHT_CODE("track-view-item-move-right");
-static const ActionCode TRACK_VIEW_ITEM_MOVE_UP_CODE("track-view-item-move-up");
-static const ActionCode TRACK_VIEW_ITEM_MOVE_DOWN_CODE("track-view-item-move-down");
-static const ActionCode TRACK_VIEW_ITEM_EXTEND_LEFT_CODE("track-view-item-extend-left");
-static const ActionCode TRACK_VIEW_ITEM_EXTEND_RIGHT_CODE("track-view-item-extend-right");
-static const ActionCode TRACK_VIEW_ITEM_REDUCE_LEFT_CODE("track-view-item-reduce-left");
-static const ActionCode TRACK_VIEW_ITEM_REDUCE_RIGHT_CODE("track-view-item-reduce-right");
-
-constexpr double MIN_CLIP_WIDTH = 3.0;
 
 // In principle, disabled are actions that modify the data involved in playback.
 static const std::vector<ActionCode> actionsDisabledDuringRecording {
@@ -252,7 +239,6 @@ void TrackeditActionsController::init()
     dispatcher()->reg(this, RANGE_SELECTION_SPLIT_DELETE, this, &TrackeditActionsController::splitDeleteSelected);
     dispatcher()->reg(this, NEW_MONO_TRACK, this, &TrackeditActionsController::newMonoTrack);
     dispatcher()->reg(this, NEW_STEREO_TRACK, this, &TrackeditActionsController::newStereoTrack);
-    dispatcher()->reg(this, NEW_BUS_TRACK, this, &TrackeditActionsController::newBusTrack);
     dispatcher()->reg(this, NEW_LABEL_TRACK, this, &TrackeditActionsController::newLabelTrack);
     dispatcher()->reg(this, TRACK_DELETE, this, &TrackeditActionsController::deleteTracks);
     dispatcher()->reg(this, TRACK_DUPLICATE_CODE, this, &TrackeditActionsController::duplicateTracks);
@@ -292,7 +278,6 @@ void TrackeditActionsController::init()
     dispatcher()->reg(this, TRACK_CHANGE_FORMAT_QUERY, this, &TrackeditActionsController::setTrackFormat);
     dispatcher()->reg(this, TRACK_CHANGE_RATE_QUERY, this, &TrackeditActionsController::setTrackRate);
 
-    dispatcher()->reg(this, TOGGLE_GLOBAL_VIEW_SPECTROGRAM, this, &TrackeditActionsController::toggleGlobalSpectrogramView);
     dispatcher()->reg(this, SET_TRACK_VIEW_WAVEFORM, this, &TrackeditActionsController::changeTrackViewToWaveform);
     dispatcher()->reg(this, SET_TRACK_VIEW_SPECTROGRAM, this, &TrackeditActionsController::changeTrackViewToSpectrogram);
     dispatcher()->reg(this, SET_TRACK_VIEW_MULTI, this, &TrackeditActionsController::changeTrackViewToWaveformAndSpectrogram);
@@ -308,15 +293,6 @@ void TrackeditActionsController::init()
 
     dispatcher()->reg(this, LABEL_COPY_CODE, this, &TrackeditActionsController::labelCopy);
     dispatcher()->reg(this, LABEL_COPY_MULTI_CODE, this, &TrackeditActionsController::labelCopyMulti);
-
-    dispatcher()->reg(this, TRACK_VIEW_ITEM_MOVE_LEFT_CODE, this, &TrackeditActionsController::moveFocusedItemLeft);
-    dispatcher()->reg(this, TRACK_VIEW_ITEM_MOVE_RIGHT_CODE, this, &TrackeditActionsController::moveFocusedItemRight);
-    dispatcher()->reg(this, TRACK_VIEW_ITEM_MOVE_UP_CODE, this, &TrackeditActionsController::moveFocusedItemUp);
-    dispatcher()->reg(this, TRACK_VIEW_ITEM_MOVE_DOWN_CODE, this, &TrackeditActionsController::moveFocusedItemDown);
-    dispatcher()->reg(this, TRACK_VIEW_ITEM_EXTEND_LEFT_CODE, this, &TrackeditActionsController::extendFocusedItemBoundaryLeft);
-    dispatcher()->reg(this, TRACK_VIEW_ITEM_EXTEND_RIGHT_CODE, this, &TrackeditActionsController::extendFocusedItemBoundaryRight);
-    dispatcher()->reg(this, TRACK_VIEW_ITEM_REDUCE_LEFT_CODE, this, &TrackeditActionsController::reduceFocusedItemBoundaryLeft);
-    dispatcher()->reg(this, TRACK_VIEW_ITEM_REDUCE_RIGHT_CODE, this, &TrackeditActionsController::reduceFocusedItemBoundaryRight);
 
     projectHistory()->historyChanged().onNotify(this, [this]() {
         notifyActionEnabledChanged(TRACKEDIT_UNDO);
@@ -359,56 +335,6 @@ void TrackeditActionsController::notifyActionCheckedChanged(const ActionCode& ac
     m_actionCheckedChanged.send(actionCode);
 }
 
-bool TrackeditActionsController::isFocusedItemClip() const
-{
-    TrackItemKey focusedItemKey = trackNavigationController()->focusedItem();
-    if (!focusedItemKey.isValid()) {
-        return false;
-    }
-
-    const ITrackeditProjectPtr prj = globalContext()->currentTrackeditProject();
-    return prj ? prj->track(focusedItemKey.trackId)->type != TrackType::Label : false;
-}
-
-ClipKeyList TrackeditActionsController::clipsForInteraction() const
-{
-    ClipKeyList result = selectionController()->selectedClips();
-
-    TrackItemKey focusedItemKey = trackNavigationController()->focusedItem();
-    if (focusedItemKey.isValid() && !muse::contains(result, focusedItemKey)) {
-        if (isFocusedItemClip()) {
-            result.insert(result.cbegin(), focusedItemKey);
-        }
-    }
-
-    return result;
-}
-
-bool TrackeditActionsController::isFocusedItemLabel() const
-{
-    TrackItemKey focusedItemKey = trackNavigationController()->focusedItem();
-    if (!focusedItemKey.isValid()) {
-        return false;
-    }
-
-    const ITrackeditProjectPtr prj = globalContext()->currentTrackeditProject();
-    return prj ? prj->track(focusedItemKey.trackId)->type == TrackType::Label : false;
-}
-
-LabelKeyList TrackeditActionsController::labelsForInteraction() const
-{
-    LabelKeyList result = selectionController()->selectedLabels();
-
-    TrackItemKey focusedItemKey = trackNavigationController()->focusedItem();
-    if (focusedItemKey.isValid() && !muse::contains(result, focusedItemKey)) {
-        if (isFocusedItemLabel()) {
-            result.insert(result.cbegin(), focusedItemKey);
-        }
-    }
-
-    return result;
-}
-
 void TrackeditActionsController::doGlobalCopy()
 {
     if (selectionController()->timeSelectionIsNotEmpty()) {
@@ -416,12 +342,12 @@ void TrackeditActionsController::doGlobalCopy()
         return;
     }
 
-    if (isFocusedItemClip()) {
+    if (!selectionController()->selectedClips().empty()) {
         dispatcher()->dispatch(MULTI_CLIP_COPY_CODE);
         return;
     }
 
-    if (isFocusedItemLabel()) {
+    if (!selectionController()->selectedLabels().empty()) {
         dispatcher()->dispatch(LABEL_COPY_MULTI_CODE);
         return;
     }
@@ -479,12 +405,12 @@ void TrackeditActionsController::doGlobalCut()
         return;
     }
 
-    if (isFocusedItemClip()) {
+    if (!selectionController()->selectedClips().empty()) {
         dispatcher()->dispatch(MULTI_CLIP_CUT_CODE, ActionData::make_arg1(false));
         return;
     }
 
-    if (isFocusedItemLabel()) {
+    if (!selectionController()->selectedLabels().empty()) {
         dispatcher()->dispatch(LABEL_CUT_MULTI_CODE, ActionData::make_arg1(false));
         return;
     }
@@ -498,12 +424,12 @@ void TrackeditActionsController::doGlobalCutPerClipRipple()
         return;
     }
 
-    if (isFocusedItemClip()) {
+    if (!selectionController()->selectedClips().empty()) {
         dispatcher()->dispatch(MULTI_CLIP_CUT_CODE, moveClips);
         return;
     }
 
-    if (isFocusedItemLabel()) {
+    if (!selectionController()->selectedLabels().empty()) {
         dispatcher()->dispatch(LABEL_CUT_MULTI_CODE, moveClips);
         return;
     }
@@ -517,12 +443,12 @@ void TrackeditActionsController::doGlobalCutPerTrackRipple()
         return;
     }
 
-    if (isFocusedItemClip()) {
+    if (!selectionController()->selectedClips().empty()) {
         dispatcher()->dispatch(MULTI_CLIP_CUT_CODE, moveClips);
         return;
     }
 
-    if (isFocusedItemLabel()) {
+    if (!selectionController()->selectedLabels().empty()) {
         dispatcher()->dispatch(LABEL_CUT_MULTI_CODE, moveClips);
         return;
     }
@@ -546,15 +472,26 @@ void TrackeditActionsController::doGlobalCutAllTracksRipple()
         return;
     }
 
-    auto selectedStartTime = selectionController()->leftMostSelectedItemStartTime();
-    auto selectedEndTime = selectionController()->rightMostSelectedItemEndTime();
+    if (!selectionController()->selectedClips().empty()) {
+        secs_t selectedStartTime = selectionController()->leftMostSelectedClipStartTime();
+        secs_t selectedEndTime = selectionController()->rightMostSelectedClipEndTime();
 
-    if (selectedStartTime.has_value() && selectedEndTime.has_value()) {
         trackeditInteraction()->clearClipboard();
-        trackeditInteraction()->cutItemDataIntoClipboard(tracks, selectedStartTime.value(), selectedEndTime.value(), true);
+        trackeditInteraction()->cutItemDataIntoClipboard(tracks, selectedStartTime, selectedEndTime, true);
 
         selectionController()->resetSelectedClips();
+        return;
+    }
+
+    if (!selectionController()->selectedLabels().empty()) {
+        secs_t selectedStartTime = selectionController()->leftMostSelectedLabelStartTime();
+        secs_t selectedEndTime = selectionController()->rightMostSelectedLabelEndTime();
+
+        trackeditInteraction()->clearClipboard();
+        trackeditInteraction()->cutItemDataIntoClipboard(tracks, selectedStartTime, selectedEndTime, true);
+
         selectionController()->resetSelectedLabels();
+        return;
     }
 }
 
@@ -610,13 +547,13 @@ void TrackeditActionsController::doGlobalDelete()
         return;
     }
 
-    if (isFocusedItemClip()) {
+    if (!selectionController()->selectedClips().empty()) {
         dispatcher()->dispatch(MULTI_CLIP_DELETE_CODE, ActionData::make_arg1(false));
 
         return;
     }
 
-    if (isFocusedItemLabel()) {
+    if (!selectionController()->selectedLabels().empty()) {
         dispatcher()->dispatch(LABEL_DELETE_MULTI_CODE, ActionData::make_arg1(false));
         return;
     }
@@ -644,12 +581,12 @@ void TrackeditActionsController::doGlobalDeletePerClipRipple()
         return;
     }
 
-    if (isFocusedItemClip()) {
+    if (!selectionController()->selectedClips().empty()) {
         dispatcher()->dispatch(MULTI_CLIP_DELETE_CODE, moveClips);
         return;
     }
 
-    if (isFocusedItemLabel()) {
+    if (!selectionController()->selectedLabels().empty()) {
         dispatcher()->dispatch(LABEL_DELETE_MULTI_CODE, moveClips);
         return;
     }
@@ -667,12 +604,12 @@ void TrackeditActionsController::doGlobalDeletePerTrackRipple()
         return;
     }
 
-    if (isFocusedItemClip()) {
+    if (!selectionController()->selectedClips().empty()) {
         dispatcher()->dispatch(MULTI_CLIP_DELETE_CODE, moveClips);
         return;
     }
 
-    if (isFocusedItemLabel()) {
+    if (!selectionController()->selectedLabels().empty()) {
         dispatcher()->dispatch(LABEL_DELETE_MULTI_CODE, moveClips);
         return;
     }
@@ -698,11 +635,21 @@ void TrackeditActionsController::doGlobalDeleteAllTracksRipple()
         return;
     }
 
-    auto selectedStartTime = selectionController()->leftMostSelectedItemStartTime();
-    auto selectedEndTime = selectionController()->rightMostSelectedItemEndTime();
+    if (!selectionController()->selectedClips().empty()) {
+        secs_t selectedStartTime = selectionController()->leftMostSelectedClipStartTime();
+        secs_t selectedEndTime = selectionController()->rightMostSelectedClipEndTime();
 
-    if (selectedStartTime.has_value() && selectedEndTime.has_value()) {
-        trackeditInteraction()->removeTracksData(tracks, selectedStartTime.value(), selectedEndTime.value(), true);
+        trackeditInteraction()->removeTracksData(tracks, selectedStartTime, selectedEndTime, true);
+
+        selectionController()->resetDataSelection();
+        return;
+    }
+
+    if (!selectionController()->selectedLabels().empty()) {
+        secs_t selectedStartTime = selectionController()->leftMostSelectedLabelStartTime();
+        secs_t selectedEndTime = selectionController()->rightMostSelectedLabelEndTime();
+
+        trackeditInteraction()->removeTracksData(tracks, selectedStartTime, selectedEndTime, true);
 
         selectionController()->resetDataSelection();
         return;
@@ -742,7 +689,7 @@ void TrackeditActionsController::doGlobalSplitIntoNewTrack()
         return;
     }
 
-    ClipKeyList selectedClips = clipsForInteraction();
+    ClipKeyList selectedClips = selectionController()->selectedClips();
     if (selectedClips.empty()) {
         return;
     }
@@ -772,7 +719,7 @@ void TrackeditActionsController::doGlobalDisjoin()
         return;
     }
 
-    ClipKeyList selectedClips = clipsForInteraction();
+    ClipKeyList selectedClips = selectionController()->selectedClips();
     if (selectedClips.empty()) {
         return;
     }
@@ -794,7 +741,7 @@ void TrackeditActionsController::doGlobalDuplicate()
     const auto selectedTracks = selectionController()->selectedTracks();
 
     if (!selectedTracks.empty()) {
-        const auto selectedClips = clipsForInteraction();
+        const auto selectedClips = selectionController()->selectedClips();
         if (selectedClips.empty()) {
             secs_t selectedStartTime = selectionController()->dataSelectedStartTime();
             secs_t selectedEndTime = selectionController()->dataSelectedEndTime();
@@ -854,14 +801,14 @@ void TrackeditActionsController::multiClipDelete(const ActionData& args)
         moveClips = args.arg<bool>(0);
     }
 
-    ClipKeyList selectedClips = clipsForInteraction();
-    if (selectedClips.empty()) {
+    ClipKeyList selectedClipKeys = selectionController()->selectedClips();
+    if (selectedClipKeys.empty()) {
         return;
     }
 
     selectionController()->resetSelectedClips();
 
-    trackeditInteraction()->removeClips(selectedClips, moveClips);
+    trackeditInteraction()->removeClips(selectedClipKeys, moveClips);
 }
 
 void TrackeditActionsController::labelDelete(const ActionData& args)
@@ -884,7 +831,7 @@ void TrackeditActionsController::labelDeleteMulti(const ActionData& args)
         moveLabels = args.arg<bool>(0);
     }
 
-    LabelKeyList selectedLabelKeys = labelsForInteraction();
+    LabelKeyList selectedLabelKeys = selectionController()->selectedLabels();
     if (selectedLabelKeys.empty()) {
         return;
     }
@@ -914,7 +861,7 @@ void TrackeditActionsController::labelCutMulti(const muse::actions::ActionData& 
         moveClips = args.arg<bool>(0);
     }
 
-    auto selectedLabelKeys = labelsForInteraction();
+    auto selectedLabelKeys = selectionController()->selectedLabels();
     if (selectedLabelKeys.empty()) {
         return;
     }
@@ -941,15 +888,15 @@ void TrackeditActionsController::labelCopyMulti()
 {
     project::IAudacityProjectPtr project = globalContext()->currentProject();
     auto selectedTracks = selectionController()->selectedTracks();
-    auto selectedLabels = labelsForInteraction();
+    auto selectedLabels = selectionController()->selectedLabels();
     auto tracks = project->trackeditProject()->trackList();
 
     trackeditInteraction()->clearClipboard();
 
     secs_t offset = 0.0;
-    std::optional<secs_t> leftmostItemStartTime = selectionController()->leftMostSelectedItemStartTime();
-    if (leftmostItemStartTime.has_value()) {
-        offset = -leftmostItemStartTime.value();
+    std::optional<secs_t> leftmostLabelStartTime = trackeditInteraction()->getLeftmostLabelStartTime(selectedLabels);
+    if (leftmostLabelStartTime.has_value()) {
+        offset = -leftmostLabelStartTime.value();
     }
 
     for (const auto& track : tracks) {
@@ -976,7 +923,7 @@ void TrackeditActionsController::multiClipCut(const ActionData& args)
         moveClips = args.arg<bool>(0);
     }
 
-    auto selectedClips = clipsForInteraction();
+    auto selectedClips = selectionController()->selectedClips();
     if (selectedClips.empty()) {
         return;
     }
@@ -1011,16 +958,15 @@ void TrackeditActionsController::multiClipCopy()
 {
     project::IAudacityProjectPtr project = globalContext()->currentProject();
     auto selectedTracks = selectionController()->selectedTracks();
-    auto selectedClips = clipsForInteraction();
-    auto selectedLabels = labelsForInteraction();
+    auto selectedClips = selectionController()->selectedClips();
     auto tracks = project->trackeditProject()->trackList();
 
     trackeditInteraction()->clearClipboard();
 
     secs_t offset = 0.0;
-    std::optional<secs_t> leftmostItemStartTime = selectionController()->leftMostSelectedItemStartTime();
-    if (leftmostItemStartTime.has_value()) {
-        offset = -leftmostItemStartTime.value();
+    std::optional<secs_t> leftmostClipStartTime = trackeditInteraction()->getLeftmostClipStartTime(selectionController()->selectedClips());
+    if (leftmostClipStartTime.has_value()) {
+        offset = -leftmostClipStartTime.value();
     }
 
     for (const auto& track : tracks) {
@@ -1105,7 +1051,7 @@ void TrackeditActionsController::pasteOverlap()
     auto tracks = project->trackeditProject()->trackList();
     const double selectedStartTime = playbackState()->playbackPosition();
 
-    if (selectedStartTime >= 0) {
+    if (!tracks.empty() && selectedStartTime >= 0) {
         auto ret = trackeditInteraction()->pasteFromClipboard(selectedStartTime, false);
         if (!ret && !ret.text().empty()) {
             interactive()->error(muse::trc("trackedit", "Paste error"), ret.text());
@@ -1119,7 +1065,7 @@ void TrackeditActionsController::pasteInsert()
     auto tracks = project->trackeditProject()->trackList();
     const double selectedStartTime = playbackState()->playbackPosition();
 
-    if (selectedStartTime >= 0) {
+    if (!tracks.empty() && selectedStartTime >= 0) {
         auto ret = trackeditInteraction()->pasteFromClipboard(selectedStartTime, true);
         if (!ret && !ret.text().empty()) {
             interactive()->error(muse::trc("trackedit", "Paste error"), ret.text());
@@ -1133,7 +1079,7 @@ void TrackeditActionsController::pasteInsertRipple()
     auto tracks = project->trackeditProject()->trackList();
     const double selectedStartTime = playbackState()->playbackPosition();
 
-    if (selectedStartTime >= 0) {
+    if (!tracks.empty() && selectedStartTime >= 0) {
         auto ret = trackeditInteraction()->pasteFromClipboard(selectedStartTime, false, true);
         if (!ret && !ret.text().empty()) {
             interactive()->error(muse::trc("trackedit", "Paste error"), ret.text());
@@ -1358,11 +1304,6 @@ void TrackeditActionsController::newStereoTrack()
     trackeditInteraction()->newStereoTrack();
 }
 
-void TrackeditActionsController::newBusTrack()
-{
-    trackeditInteraction()->newBusTrack();
-}
-
 void TrackeditActionsController::newLabelTrack()
 {
     trackeditInteraction()->newLabelTrack();
@@ -1559,7 +1500,7 @@ void TrackeditActionsController::toggleStretchClipToMatchTempo(const ActionData&
 
 void TrackeditActionsController::openClipPitchAndSpeed()
 {
-    auto selectedClips = clipsForInteraction();
+    auto selectedClips = selectionController()->selectedClips();
 
     if (selectedClips.empty() || selectedClips.size() > 1) {
         return;
@@ -1587,7 +1528,7 @@ void TrackeditActionsController::renderClipPitchAndSpeed(const muse::actions::Ac
 
 void TrackeditActionsController::groupClips()
 {
-    const auto selectedClips = clipsForInteraction();
+    const auto selectedClips = selectionController()->selectedClips();
 
     trackeditInteraction()->groupClips(selectedClips);
 
@@ -1597,7 +1538,7 @@ void TrackeditActionsController::groupClips()
 
 void TrackeditActionsController::ungroupClips()
 {
-    trackeditInteraction()->ungroupClips(clipsForInteraction());
+    trackeditInteraction()->ungroupClips(selectionController()->selectedClips());
 
     notifyActionEnabledChanged(GROUP_CLIPS_CODE);
     notifyActionEnabledChanged(UNGROUP_CLIPS_CODE);
@@ -1671,9 +1612,16 @@ void TrackeditActionsController::selectRightOfPlaybackPos()
 
 void TrackeditActionsController::selectTrackStartToCursor()
 {
-    std::optional<secs_t> leftmostItemStartTime = selectionController()->selectedTracksStartTime();
-    if (leftmostItemStartTime.has_value()) {
-        selectionController()->setDataSelectedStartTime(leftmostItemStartTime.value(), true);
+    ClipKeyList clipsOnSelectedTracks;
+    for (const auto& track : selectionController()->selectedTracks()) {
+        for (const auto& clip : trackeditInteraction()->clipsOnTrack(track)) {
+            clipsOnSelectedTracks.push_back(clip);
+        }
+    }
+
+    std::optional<secs_t> leftmostClipStartTime = trackeditInteraction()->getLeftmostClipStartTime(clipsOnSelectedTracks);
+    if (leftmostClipStartTime.has_value()) {
+        selectionController()->setDataSelectedStartTime(leftmostClipStartTime.value(), true);
     } else {
         selectionController()->setDataSelectedStartTime(0.0, true);
     }
@@ -1683,10 +1631,17 @@ void TrackeditActionsController::selectTrackStartToCursor()
 
 void TrackeditActionsController::selectCursorToTrackEnd()
 {
-    std::optional<secs_t> rightmostItemEndTime = selectionController()->selectedTracksEndTime();
-    if (rightmostItemEndTime.has_value()) {
+    ClipKeyList clipsOnSelectedTracks;
+    for (const auto& track : selectionController()->selectedTracks()) {
+        for (const auto& clip : trackeditInteraction()->clipsOnTrack(track)) {
+            clipsOnSelectedTracks.push_back(clip);
+        }
+    }
+
+    std::optional<secs_t> rightmostClipEndTime = trackeditInteraction()->getRightmostClipEndTime(clipsOnSelectedTracks);
+    if (rightmostClipEndTime.has_value()) {
         selectionController()->setDataSelectedStartTime(playbackState()->playbackPosition(), true);
-        selectionController()->setDataSelectedEndTime(rightmostItemEndTime.value(), true);
+        selectionController()->setDataSelectedEndTime(rightmostClipEndTime.value(), true);
     } else {
         //! NOTE: AU3 behavior
         selectTrackStartToCursor();
@@ -1695,12 +1650,19 @@ void TrackeditActionsController::selectCursorToTrackEnd()
 
 void TrackeditActionsController::selectTrackStartToEnd()
 {
-    std::optional<secs_t> leftmostItemStartTime = selectionController()->selectedTracksStartTime();
-    std::optional<secs_t> rightmostItemEndTime = selectionController()->selectedTracksEndTime();
+    ClipKeyList clipsOnSelectedTracks;
+    for (const auto& track : selectionController()->selectedTracks()) {
+        for (const auto& clip : trackeditInteraction()->clipsOnTrack(track)) {
+            clipsOnSelectedTracks.push_back(clip);
+        }
+    }
 
-    if (leftmostItemStartTime.has_value() && rightmostItemEndTime.has_value()) {
-        selectionController()->setDataSelectedStartTime(leftmostItemStartTime.value(), true);
-        selectionController()->setDataSelectedEndTime(rightmostItemEndTime.value(), true);
+    std::optional<secs_t> leftmostClipStartTime = trackeditInteraction()->getLeftmostClipStartTime(clipsOnSelectedTracks);
+    std::optional<secs_t> rightmostClipEndTime = trackeditInteraction()->getRightmostClipEndTime(clipsOnSelectedTracks);
+
+    if (leftmostClipStartTime.has_value() && rightmostClipEndTime.has_value()) {
+        selectionController()->setDataSelectedStartTime(leftmostClipStartTime.value(), true);
+        selectionController()->setDataSelectedEndTime(rightmostClipEndTime.value(), true);
     }
 }
 
@@ -1717,8 +1679,7 @@ void TrackeditActionsController::moveCursorToClosestZeroCrossing()
 
 void TrackeditActionsController::setClipColor(const muse::actions::ActionQuery& q)
 {
-    auto selectedClips = clipsForInteraction();
-    if (!selectedClips.empty()) {
+    if (!selectionController()->hasSelectedClips()) {
         return;
     }
 
@@ -1729,7 +1690,7 @@ void TrackeditActionsController::setClipColor(const muse::actions::ActionQuery& 
         newColor = "";
     }
 
-    auto clipKey = selectedClips.front();
+    auto clipKey = selectionController()->selectedClips().front();
     trackeditInteraction()->changeClipColor(clipKey, newColor);
     notifyActionCheckedChanged(q.toString());
 }
@@ -1781,7 +1742,7 @@ void TrackeditActionsController::setCustomTrackRate(const muse::actions::ActionD
         return;
     }
 
-    const TrackId focusedTrackId = trackNavigationController()->focusedTrack();
+    const TrackId focusedTrackId = selectionController()->focusedTrack();
     const std::optional<Track> focused = project->trackeditProject()->track(focusedTrackId);
     if (!focused) {
         return;
@@ -1821,15 +1782,6 @@ void TrackeditActionsController::setTrackRate(const muse::actions::ActionQuery& 
     }
 }
 
-void TrackeditActionsController::toggleGlobalSpectrogramView()
-{
-    const auto project = globalContext()->currentProject();
-    IF_ASSERT_FAILED(project) {
-        return;
-    }
-    project->viewState()->toggleGlobalSpectrogramView();
-}
-
 void TrackeditActionsController::changeTrackViewToWaveform(const muse::actions::ActionQuery& q)
 {
     changeTrackView(q, TrackViewType::Waveform);
@@ -1851,11 +1803,9 @@ void TrackeditActionsController::changeTrackView(const muse::actions::ActionQuer
         return;
     }
     const auto trackId = q.param("trackId").toInt();
-    const auto prj = globalContext()->currentProject();
-    IF_ASSERT_FAILED(prj) {
+    if (!trackeditInteraction()->changeAudioTrackViewType(trackId, trackView)) {
         return;
     }
-    prj->viewState()->setTrackViewType(trackId, trackView);
     switch (trackView) {
     case TrackViewType::Waveform:
         notifyActionCheckedChanged(SET_TRACK_VIEW_WAVEFORM.toString());
@@ -1928,7 +1878,7 @@ void TrackeditActionsController::resampleTracks(const muse::actions::ActionData&
         return;
     }
 
-    const TrackId focusedTrackId = trackNavigationController()->focusedTrack();
+    const TrackId focusedTrackId = selectionController()->focusedTrack();
     const std::optional<Track> focused = project->trackeditProject()->track(focusedTrackId);
     if (!focused) {
         return;
@@ -1979,266 +1929,12 @@ bool TrackeditActionsController::canReceiveAction(const ActionCode& actionCode) 
     } else if (actionCode == TRACKEDIT_REDO) {
         return trackeditInteraction()->canRedo();
     } else if (actionCode == GROUP_CLIPS_CODE) {
-        return clipsForInteraction().size() > 1 && !selectionController()->isSelectionGrouped();
+        return selectionController()->selectedClips().size() > 1 && !selectionController()->isSelectionGrouped();
     } else if (actionCode == UNGROUP_CLIPS_CODE) {
-        return clipsForInteraction().size() > 1 && selectionController()->selectionContainsGroup();
+        return selectionController()->selectedClips().size() > 1 && selectionController()->selectionContainsGroup();
     }
 
     return true;
-}
-
-void TrackeditActionsController::moveFocusedItemLeft()
-{
-    TrackItemKey focusedItemKey = trackNavigationController()->focusedItem();
-    if (!focusedItemKey.isValid()) {
-        return;
-    }
-
-    const double stepSize = calculateStepSize();
-    static bool completed = true;
-
-    if (isFocusedItemLabel()) {
-        trackeditInteraction()->moveLabels(labelsForInteraction(), -stepSize, 0, completed);
-    } else {
-        static bool itemsMovedToOtherTrack = false;
-        trackeditInteraction()->moveClips(clipsForInteraction(), -stepSize, 0, completed, itemsMovedToOtherTrack);
-    }
-}
-
-void TrackeditActionsController::moveFocusedItemRight()
-{
-    TrackItemKey focusedItemKey = trackNavigationController()->focusedItem();
-    if (!focusedItemKey.isValid()) {
-        return;
-    }
-
-    const double stepSize = calculateStepSize();
-    static bool completed = true;
-
-    if (isFocusedItemLabel()) {
-        trackeditInteraction()->moveLabels(labelsForInteraction(), stepSize, 0, completed);
-    } else {
-        static bool itemsMovedToOtherTrack = false;
-        trackeditInteraction()->moveClips(clipsForInteraction(), stepSize, 0, completed, itemsMovedToOtherTrack);
-    }
-}
-
-void TrackeditActionsController::moveFocusedItemUp()
-{
-    TrackItemKey focusedItemKey = trackNavigationController()->focusedItem();
-    if (!focusedItemKey.isValid()) {
-        return;
-    }
-
-    static bool completed = true;
-
-    if (isFocusedItemLabel()) {
-        muse::RetVal<LabelKeyList> result = trackeditInteraction()->moveLabels(labelsForInteraction(), 0, -1, completed);
-        if (result.ret) {
-            trackNavigationController()->setFocusedItem(result.val.front(), true /*highlight*/);
-        }
-    } else {
-        static bool itemsMovedToOtherTrack = false;
-        muse::RetVal<ClipKeyList> result
-            = trackeditInteraction()->moveClips(clipsForInteraction(), 0, -1, completed, itemsMovedToOtherTrack);
-        if (result.ret) {
-            trackNavigationController()->setFocusedItem(result.val.front(), true /*highlight*/);
-        }
-    }
-}
-
-void TrackeditActionsController::moveFocusedItemDown()
-{
-    TrackItemKey focusedItemKey = trackNavigationController()->focusedItem();
-    if (!focusedItemKey.isValid()) {
-        return;
-    }
-
-    static bool completed = true;
-
-    if (isFocusedItemLabel()) {
-        muse::RetVal<LabelKeyList> result = trackeditInteraction()->moveLabels(labelsForInteraction(), 0, 1, completed);
-        if (result.ret) {
-            trackNavigationController()->setFocusedItem(result.val.front(), true /*highlight*/);
-        }
-    } else {
-        static bool itemsMovedToOtherTrack = false;
-        muse::RetVal<ClipKeyList> result
-            = trackeditInteraction()->moveClips(clipsForInteraction(), 0, 1, completed, itemsMovedToOtherTrack);
-        if (result.ret) {
-            trackNavigationController()->setFocusedItem(result.val.front(), true /*highlight*/);
-        }
-    }
-}
-
-void TrackeditActionsController::extendFocusedItemBoundaryLeft()
-{
-    TrackItemKey focusedItemKey = trackNavigationController()->focusedItem();
-    if (!focusedItemKey.isValid()) {
-        return;
-    }
-
-    const double stepSize = calculateStepSize();
-    static bool completed = true;
-
-    if (isFocusedItemLabel()) {
-        trackeditInteraction()->stretchLabelsLeft(labelsForInteraction(), -stepSize, completed);
-    } else {
-        double minClipDuration = MIN_CLIP_WIDTH / zoomLevel();
-        trackeditInteraction()->trimClipsLeft(clipsForInteraction(), -stepSize, minClipDuration, completed, UndoPushType::CONSOLIDATE);
-    }
-}
-
-void TrackeditActionsController::extendFocusedItemBoundaryRight()
-{
-    TrackItemKey focusedItemKey = trackNavigationController()->focusedItem();
-    if (!focusedItemKey.isValid()) {
-        return;
-    }
-
-    const double stepSize = calculateStepSize();
-    static bool completed = true;
-
-    if (isFocusedItemLabel()) {
-        trackeditInteraction()->stretchLabelsRight(labelsForInteraction(), stepSize, completed);
-    } else {
-        double minClipDuration = MIN_CLIP_WIDTH / zoomLevel();
-        trackeditInteraction()->trimClipsRight(clipsForInteraction(), -stepSize, minClipDuration, completed, UndoPushType::CONSOLIDATE);
-    }
-}
-
-void TrackeditActionsController::reduceFocusedItemBoundaryLeft()
-{
-    TrackItemKey focusedItemKey = trackNavigationController()->focusedItem();
-    if (!focusedItemKey.isValid()) {
-        return;
-    }
-
-    const double stepSize = calculateStepSize();
-    static bool completed = true;
-
-    if (isFocusedItemLabel()) {
-        trackeditInteraction()->stretchLabelsRight(labelsForInteraction(), -stepSize, completed);
-    } else {
-        double minClipDuration = MIN_CLIP_WIDTH / zoomLevel();
-        trackeditInteraction()->trimClipsRight(clipsForInteraction(), stepSize, minClipDuration, completed, UndoPushType::CONSOLIDATE);
-    }
-}
-
-void TrackeditActionsController::reduceFocusedItemBoundaryRight()
-{
-    TrackItemKey focusedItemKey = trackNavigationController()->focusedItem();
-    if (!focusedItemKey.isValid()) {
-        return;
-    }
-
-    const double stepSize = calculateStepSize();
-    static bool completed = true;
-
-    if (isFocusedItemLabel()) {
-        trackeditInteraction()->stretchLabelsLeft(labelsForInteraction(), stepSize, completed);
-    } else {
-        double minClipDuration = MIN_CLIP_WIDTH / zoomLevel();
-        trackeditInteraction()->trimClipsLeft(clipsForInteraction(), stepSize, minClipDuration, completed, UndoPushType::CONSOLIDATE);
-    }
-}
-
-double TrackeditActionsController::zoomLevel() const
-{
-    auto project = globalContext()->currentProject();
-    if (!project) {
-        return 1.0;
-    }
-
-    auto viewState = project->viewState();
-    if (!viewState) {
-        return 1.0;
-    }
-
-    return viewState->zoomState().zoom;
-}
-
-double TrackeditActionsController::calculateStepSize() const
-{
-    double zoom = zoomLevel();
-    if (zoom <= 0.0) {
-        return 1.0;
-    }
-    return 10.0 / zoom;
-}
-
-Label TrackeditActionsController::focusedLabel() const
-{
-    TrackItemKey focusedItemKey = trackNavigationController()->focusedItem();
-    if (!focusedItemKey.isValid() || !isFocusedItemLabel()) {
-        return {};
-    }
-
-    const ITrackeditProjectPtr prj = globalContext()->currentTrackeditProject();
-    if (!prj) {
-        return {};
-    }
-
-    return prj->label({ focusedItemKey.trackId, focusedItemKey.itemId });
-}
-
-au::trackedit::TrackId TrackeditActionsController::resolvePreviousTrackIdForMove(const TrackId& trackId) const
-{
-    const ITrackeditProjectPtr prj = globalContext()->currentTrackeditProject();
-    if (!prj) {
-        return INVALID_TRACK;
-    }
-
-    std::vector<Track> trackList = prj->trackList();
-    TrackId lastLabelTrackId = INVALID_TRACK;
-    TrackId lastWaveTrackId = INVALID_TRACK;
-
-    for (const Track& track : trackList) {
-        bool isLabelTrack = track.type == TrackType::Label;
-
-        if (track.id == trackId) {
-            return track.type == TrackType::Label ? lastLabelTrackId : lastWaveTrackId;
-        }
-
-        if (isLabelTrack) {
-            lastLabelTrackId = track.id;
-        } else {
-            lastWaveTrackId = track.id;
-        }
-    }
-
-    return INVALID_TRACK;
-}
-
-au::trackedit::TrackId TrackeditActionsController::resolveNextTrackIdForMove(const TrackId& trackId) const
-{
-    const ITrackeditProjectPtr prj = globalContext()->currentTrackeditProject();
-    if (!prj) {
-        return INVALID_TRACK;
-    }
-
-    std::vector<Track> trackList = prj->trackList();
-
-    for (size_t i = 0; i < trackList.size(); ++i) {
-        const Track& track = trackList[i];
-
-        if (track.id != trackId) {
-            continue;
-        }
-
-        bool isLabelTrack = track.type == TrackType::Label;
-
-        while (++i < trackList.size()) {
-            const Track& nextTrack = trackList[i];
-            if (isLabelTrack && nextTrack.type == TrackType::Label) {
-                return nextTrack.id;
-            } else if (!isLabelTrack && nextTrack.type != TrackType::Label) {
-                return nextTrack.id;
-            }
-        }
-    }
-
-    return INVALID_TRACK;
 }
 
 au::context::IPlaybackStatePtr TrackeditActionsController::playbackState() const

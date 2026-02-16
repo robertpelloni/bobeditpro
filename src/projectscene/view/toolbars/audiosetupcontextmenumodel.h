@@ -12,8 +12,8 @@ class AudioSetupContextMenuModel : public muse::uicomponents::AbstractMenuModel
 {
     Q_OBJECT
 
-    muse::Inject<audio::IAudioDevicesProvider> audioDevicesProvider{ this };
-    muse::Inject<context::IGlobalContext> globalContext{ this };
+    muse::Inject<audio::IAudioDevicesProvider> audioDevicesProvider;
+    muse::Inject<context::IGlobalContext> globalContext;
 
 public:
     AudioSetupContextMenuModel() = default;

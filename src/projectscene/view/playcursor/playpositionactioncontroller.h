@@ -31,15 +31,14 @@
 #include "../timeline/timelinecontext.h"
 
 namespace au::projectscene {
-class PlayPositionActionController : public QObject, public muse::actions::Actionable, public muse::async::Asyncable,
-    public muse::Injectable
+class PlayPositionActionController : public QObject, public muse::actions::Actionable, public muse::async::Asyncable
 {
     Q_OBJECT
 
     Q_PROPERTY(TimelineContext * context READ timelineContext WRITE setTimelineContext NOTIFY timelineContextChanged FINAL)
 
-    muse::Inject<context::IGlobalContext> globalContext{ this };
-    muse::Inject<muse::actions::IActionsDispatcher> dispatcher{ this };
+    muse::Inject<context::IGlobalContext> globalContext;
+    muse::Inject<muse::actions::IActionsDispatcher> dispatcher;
 
 public:
     PlayPositionActionController(QObject* parent = nullptr);

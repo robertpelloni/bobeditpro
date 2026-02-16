@@ -8,7 +8,7 @@ using namespace au::playback;
 au::playback::IPlayerPtr Au3Playback::player(TrackSequenceId) const
 {
     if (!m_player) {
-        m_player = std::make_shared<Au3Player>(iocContext());
+        m_player = std::make_shared<Au3Player>();
     }
     return m_player;
 }
@@ -16,7 +16,7 @@ au::playback::IPlayerPtr Au3Playback::player(TrackSequenceId) const
 std::shared_ptr<au::playback::IAudioOutput> Au3Playback::audioOutput() const
 {
     if (!m_audioOutput) {
-        m_audioOutput = std::make_shared<Au3AudioOutput>(iocContext());
+        m_audioOutput = std::make_shared<Au3AudioOutput>();
     }
     return m_audioOutput;
 }

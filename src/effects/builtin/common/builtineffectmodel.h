@@ -21,9 +21,9 @@ class BuiltinEffectModel : public AbstractEffectViewModel
     Q_PROPERTY(bool usesPresets READ usesPresets CONSTANT FINAL)
 
 public:
-    muse::Inject<IRealtimeEffectService> realtimeEffectService{ this };
-    muse::Inject<trackedit::IProjectHistory> projectHistory{ this };
-    muse::Inject<IEffectsProvider> effectsProvider{ this };
+    muse::Inject<IRealtimeEffectService> realtimeEffectService;
+    muse::Inject<trackedit::IProjectHistory> projectHistory;
+    muse::Inject<IEffectsProvider> effectsProvider;
 
 public:
     BuiltinEffectModel(QObject* parent, int instanceId);
@@ -74,7 +74,6 @@ protected:
 private:
     void doInit() override;
     void doStartPreview() override;
-    void doStopPreview() override;
 
     EffectSettingsAccessPtr settingsAccess() const;
 };

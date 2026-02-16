@@ -21,7 +21,6 @@
  */
 
 #include "winframelesswindowcontroller.h"
-#include "modularity/ioc.h"
 
 #if defined(_WIN32_WINNT) && (_WIN32_WINNT < 0x600)
 #undef _WIN32_WINNT // like defined to `0x502` in _mingw.h for Qt 5.15
@@ -45,8 +44,8 @@ static void updateWindowPosition()
     SetWindowPos(s_hwnd, nullptr, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE);
 }
 
-WinFramelessWindowController::WinFramelessWindowController(QObject* parent)
-    : QObject(parent), FramelessWindowController(), muse::Injectable(muse::iocCtxForQmlObject(this))
+WinFramelessWindowController::WinFramelessWindowController()
+    : FramelessWindowController()
 {
     memset(&m_monitorInfo, 0, sizeof(MONITORINFO));
     m_monitorInfo.cbSize = sizeof(MONITORINFO);

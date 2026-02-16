@@ -22,22 +22,19 @@
 
 #pragma once
 
-#include <QAbstractListModel>
-
-#include "framework/global/modularity/ioc.h"
-#include "framework/interactive/iinteractive.h"
-
+#include "iinteractive.h"
 #include "ithumbnailcreator.h"
 #include "context/iglobalcontext.h"
+#include "modularity/ioc.h"
 
 namespace au::project {
-class ProjectPropertiesModel : public QAbstractListModel, public muse::async::Asyncable, public muse::Injectable
+class ProjectPropertiesModel : public QAbstractListModel, public muse::async::Asyncable
 {
     Q_OBJECT
 
-    muse::Inject<context::IGlobalContext> globalContext { this };
-    muse::Inject<muse::IInteractive> interactive { this };
-    muse::Inject<IThumbnailCreator> thumbnailCreator { this };
+    muse::Inject<context::IGlobalContext> globalContext;
+    muse::Inject<muse::IInteractive> interactive;
+    muse::Inject<IThumbnailCreator> thumbnailCreator;
 
     Q_PROPERTY(QString filePath READ filePath CONSTANT)
     Q_PROPERTY(QString version READ version CONSTANT)

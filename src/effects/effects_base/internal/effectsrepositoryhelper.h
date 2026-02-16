@@ -14,13 +14,12 @@ namespace au::effects {
 class EffectsRepositoryHelper final : public muse::Injectable
 {
 public:
-    muse::Inject<muse::audioplugins::IKnownAudioPluginsRegister> knownPlugins{ this };
+    muse::Inject<muse::audioplugins::IKnownAudioPluginsRegister> knownPlugins;
 
 public:
     using GetTitleFunc = std::function<muse::String (const muse::io::path_t&)>;
 
-    EffectsRepositoryHelper(const muse::modularity::ContextPtr& ctx, PluginProvider&, muse::audio::AudioResourceType,
-                            GetTitleFunc getTitle = nullptr);
+    EffectsRepositoryHelper(PluginProvider&, muse::audio::AudioResourceType, GetTitleFunc getTitle = nullptr);
 
     virtual ~EffectsRepositoryHelper() = default;
 

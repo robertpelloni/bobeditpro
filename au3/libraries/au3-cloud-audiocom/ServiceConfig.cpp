@@ -16,7 +16,8 @@
 #include <stdexcept>
 #include <string_view>
 
-#include "au3-import-export/rapidjson/document.h"
+#include <rapidjson/document.h>
+
 #include "au3-string-utils/CodeConversions.h"
 #include "au3-preferences/Prefs.h"
 
@@ -29,11 +30,11 @@ StringSetting audioComApiEndpoint { L"/CloudServices/AudioCom/ApiEndpoint",
                                     L"https://api.audio.com" };
 
 StringSetting audioComOAuthClientID { L"/CloudServices/AudioCom/OAuthClientID",
-                                      L"1856093568187764" };
+                                      L"1741964426607541" };
 
 StringSetting audioComOAuthClientSecret {
     L"/CloudServices/AudioCom/OAuthClientSecret",
-    L"k5yMf8iSaYzYa-xWOh6j5yomwV0ELXZs"
+    L"shKqnY2sLTfRK7hztwzNEVxnmhJfOy1i"
 };
 
 StringSetting audioComOAuthRedirectURL {
@@ -206,9 +207,9 @@ std::vector<std::string>
 ServiceConfig::GetPreferredAudioFormats(bool preferLossless) const
 {
     if (preferLossless) {
-        return { "audio/x-wavpack", "audio/x-flac", "audio/x-wav" };
+        return { "audio/x-wavpack", "audio/x-flac", "audio/x-wav" }
     } else {
-        return { "audio/mpeg" };
+        return { "audio/mpeg" }
     }
 }
 

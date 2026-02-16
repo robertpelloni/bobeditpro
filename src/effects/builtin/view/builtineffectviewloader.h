@@ -17,18 +17,17 @@
 
 namespace au::effects {
 //! TODO Move to builtin module
-class BuiltinEffectViewLoader : public QObject, public muse::async::Asyncable, muse::Injectable
+class BuiltinEffectViewLoader : public QObject, public muse::async::Asyncable
 {
     Q_OBJECT
 
     Q_PROPERTY(QQuickItem * contentItem READ contentItem NOTIFY contentItemChanged FINAL)
 
-    muse::Inject<IEffectsViewRegister> viewRegister { this };
-    muse::Inject<IEffectsUiEngine> engine { this };
-    muse::Inject<IEffectInstancesRegister> instancesRegister { this };
+    muse::Inject<IEffectsViewRegister> viewRegister;
+    muse::Inject<IEffectsUiEngine> engine;
+    muse::Inject<IEffectInstancesRegister> instancesRegister;
 
 public:
-    BuiltinEffectViewLoader(QObject* parent = nullptr);
     ~BuiltinEffectViewLoader() override;
 
     QQuickItem* contentItem() const;

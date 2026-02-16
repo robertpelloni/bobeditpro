@@ -5,29 +5,21 @@
 
 #include <QObject>
 
-#include "framework/global/async/asyncable.h"
-#include "framework/global/modularity/ioc.h"
-#include "framework/interactive/iinteractive.h"
+#include "async/asyncable.h"
 
+#include "modularity/ioc.h"
 #include "iexportconfiguration.h"
 #include "iexporter.h"
 #include "iffmpegoptionsaccessor.h"
-#include "iglobalconfiguration.h"
 
 namespace au::importexport {
-class CustomFFmpegPreferencesModel : public QObject, public muse::async::Asyncable, public muse::Injectable
+class CustomFFmpegPreferencesModel : public QObject, public muse::async::Asyncable
 {
     Q_OBJECT
 
-    muse::GlobalInject<IExportConfiguration> exportConfiguration;
-    muse::GlobalInject<muse::IGlobalConfiguration> globalConfiguration;
-
-    muse::Inject<IFFmpegOptionsAccessor> ffmpegOptionsAccessor { this };
-    muse::Inject<IExporter> exporter{ this };
-    muse::Inject<muse::IInteractive> interactive{ this };
-
-    Q_PROPERTY(QString ffmpegVersion READ ffmpegVersion NOTIFY ffmpegVersionChanged)
-    Q_PROPERTY(QString ffmpegLibraryPath READ ffmpegLibraryPath NOTIFY ffmpegLibraryPathChanged)
+    muse::Inject<IExportConfiguration> exportConfiguration;
+    muse::Inject<IExporter> exporter;
+    muse::Inject<IFFmpegOptionsAccessor> ffmpegOptionsAccessor;
 
     // formats
     Q_PROPERTY(int ffmpegFormatIndex READ ffmpegFormatIndex NOTIFY ffmpegFormatIndexChanged)
@@ -71,12 +63,6 @@ public:
     explicit CustomFFmpegPreferencesModel(QObject* parent = nullptr);
 
     Q_INVOKABLE void init();
-
-    QString ffmpegVersion() const;
-    QString ffmpegLibraryPath() const;
-    Q_INVOKABLE void setFFmpegLibraryPath(const QString& path);
-    Q_INVOKABLE void locateFFmpegLibrary();
-    QString avformatString() const;
 
     int ffmpegFormatIndex() const;
     QString ffmpegFormat() const;
@@ -153,8 +139,6 @@ public:
     Q_INVOKABLE void setPacketSize(int packetSize);
 
 signals:
-    void ffmpegVersionChanged();
-    void ffmpegLibraryPathChanged();
     void ffmpegFormatIndexChanged();
     void ffmpegFormatChanged();
     void ffmpegFormatListChanged();

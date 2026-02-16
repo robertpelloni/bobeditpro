@@ -12,62 +12,21 @@ import Audacity.Effects
 Rectangle {
     id: root
 
-    required property int instanceId
+    property int instanceId: -1
 
-    implicitWidth: prv.dialogWidth
-    implicitHeight: {
-        // why 5 times spaceXL?
-        // -> 5 * spaceXL accounts for the combined vertical margins and spacing:
-        // Calculate total height needed:
-        // - Top margin: prv.spaceXL (1)
-        // - Title height: titleLabel.height
-        // - Spacing after title: prv.spaceXL (2)
-        // - Flickable top margin: prv.spaceXL (3)
-        // - Content: parametersColumn.height
-        // - Flickable bottom margin: prv.spaceXL (4)
-        // - Bottom margin: prv.spaceXL (5)
-        // - Border: 2 * prv.borderWidth
-        var totalHeight = prv.spaceXL * 5 + titleLabel.height + parametersColumn.height + 2 * prv.borderWidth
-        // we automatically size the height to fit the content for plugins with few parameters
-        // we limit the height to avoid making the dialog too tall
-        return Math.min(totalHeight, prv.maxDialogHeight)
-    }
+    implicitWidth: 400
+    implicitHeight: 300
 
     color: ui.theme.backgroundPrimaryColor
 
-    QtObject {
-        id: prv
-
-        readonly property int spaceS: 4
-        readonly property int spaceM: 8
-        readonly property int spaceL: 12
-        readonly property int spaceXL: 16
-        readonly property int spaceXXL: 24
-
-        readonly property int borderWidth: 1
-        readonly property int borderRadius: 4
-
-        readonly property int dialogWidth: 640
-        readonly property int maxDialogHeight: 640
-        readonly property int maxContentWidth: 512
-    }
-
-    property var viewModel: GeneratedEffectViewerModelFactory.createModel(root, root.instanceId)
-
-    Component.onCompleted: {
-        viewModel.init()
-    }
-
     ColumnLayout {
-        id: mainLayout
         anchors.fill: parent
-        anchors.margins: prv.spaceXL
-        spacing: prv.spaceXL
+        anchors.margins: 16
+        spacing: 16
 
         StyledTextLabel {
-            id: titleLabel
             Layout.fillWidth: true
-            text: viewModel.title
+            text: qsTrc("effects", "Generated UI")
             font: ui.theme.headerBoldFont
             horizontalAlignment: Text.AlignHCenter
         }
@@ -77,65 +36,54 @@ Rectangle {
             Layout.fillHeight: true
             color: ui.theme.backgroundSecondaryColor
             border.color: ui.theme.strokeColor
-            border.width: prv.borderWidth
-            radius: prv.borderRadius
+            border.width: 1
+            radius: 4
 
-            StyledFlickable {
+            ColumnLayout {
                 anchors.fill: parent
-                anchors.margins: prv.spaceXL
-                contentHeight: parametersColumn.height
+                anchors.margins: 16
+                spacing: 12
 
-                ColumnLayout {
-                    id: parametersColumn
-                    width: Math.min(parent.width, prv.maxContentWidth)
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    spacing: prv.spaceXXL
+                StyledTextLabel {
+                    Layout.fillWidth: true
+                    text: qsTrc("effects", "Auto-generated UI based on plugin parameters")
+                    horizontalAlignment: Text.AlignHCenter
+                }
 
-                    // Show message if no parameters
-                    StyledTextLabel {
-                        Layout.fillWidth: true
-                        visible: !viewModel.hasParameters
-                        text: viewModel.noParametersMessage
-                        horizontalAlignment: Text.AlignHCenter
-                        opacity: 0.6
-                    }
+                StyledTextLabel {
+                    Layout.fillWidth: true
+                    text: qsTrc("effects", "Instance ID: %1").arg(root.instanceId)
+                    horizontalAlignment: Text.AlignHCenter
+                }
 
-                    // Parameter controls
-                    Repeater {
-                        model: viewModel.parametersModel
+                Item {
+                    Layout.fillHeight: true
+                }
 
-                        delegate: ParameterControl {
-                            Layout.fillWidth: true
-                            parameterData: model
-
-                            onGestureStarted: function (parameterId) {
-                                viewModel.parametersModel.beginGesture(parameterId)
-                            }
-
-                            onGestureEnded: function (parameterId) {
-                                viewModel.parametersModel.endGesture(parameterId)
-                            }
-
-                            onValueChanged: function (parameterId, value) {
-                                viewModel.parametersModel.setParameterValue(parameterId, value)
-                            }
-                        }
-                    }
+                StyledTextLabel {
+                    Layout.fillWidth: true
+                    text: qsTrc("effects", "Parameter extraction and UI generation coming soon...")
+                    horizontalAlignment: Text.AlignHCenter
+                    opacity: 0.6
                 }
             }
         }
     }
 
-    // Preview methods - delegate to viewModel
+    // Dummy methods to match the interface expected by DestructiveEffectsViewerDialog
+    function preview() {
+        console.log("GeneratedEffectViewer: preview() called")
+    }
+
     function startPreview() {
-        viewModel.startPreview()
+        console.log("GeneratedEffectViewer: startPreview() called")
     }
 
     function stopPreview() {
-        viewModel.stopPreview()
+        console.log("GeneratedEffectViewer: stopPreview() called")
     }
 
     property bool isApplyAllowed: true
     property bool usesPresets: true
-    property bool isPreviewing: viewModel.isPreviewing
+    property bool isPreviewing: false
 }

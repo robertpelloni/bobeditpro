@@ -41,6 +41,7 @@ public:
     virtual bool resetClipSpeed(const ClipKey& clipKey) = 0;
     virtual bool changeClipColor(const ClipKey& clipKey, const std::string& color) = 0;
     virtual bool changeTracksColor(const TrackIdList& tracksIds, const std::string& color) = 0;
+    virtual bool changeAudioTrackViewType(const trackedit::TrackId& trackId, trackedit::TrackViewType viewType) = 0;
     virtual bool changeClipOptimizeForVoice(const ClipKey& clipKey, bool optimize) = 0;
     virtual bool renderClipPitchAndSpeed(const ClipKey& clipKey) = 0;
     virtual void clearClipboard() = 0;
@@ -53,9 +54,7 @@ public:
     virtual bool removeClip(const ClipKey& clipKey) = 0;
     virtual bool removeClips(const ClipKeyList& clipKeyList, bool moveClips) = 0;
     virtual bool removeTracksData(const TrackIdList& tracksIds, secs_t begin, secs_t end, bool moveClips) = 0;
-    virtual muse::RetVal<ClipKeyList> moveClips(const ClipKeyList& clipKeyList, secs_t timePositionOffset, int trackPositionOffset,
-                                                bool completed, bool& clipsMovedToOtherTrack) = 0;
-    virtual bool moveRangeSelection(secs_t timePositionOffset, bool completed) = 0;
+    virtual bool moveClips(secs_t timePositionOffset, int trackPositionOffset, bool completed, bool& clipsMovedToOtherTrack) = 0;
     virtual void cancelItemDragEdit() = 0;
     virtual bool splitTracksAt(const TrackIdList& tracksIds, std::vector<secs_t> pivots) = 0;
     virtual bool splitClipsAtSilences(const ClipKeyList& clipKeyList) = 0;
@@ -70,23 +69,18 @@ public:
     virtual bool clipSplitDelete(const ClipKey& clipKey) = 0;
     virtual bool splitCutSelectedOnTracks(const TrackIdList tracksIds, secs_t begin, secs_t end) = 0;
     virtual bool splitDeleteSelectedOnTracks(const TrackIdList tracksIds, secs_t begin, secs_t end) = 0;
-    virtual bool trimClipsLeft(const ClipKeyList& clipKeyList, secs_t deltaSec, secs_t minClipDuration, bool completed,
-                               UndoPushType type) = 0;
-    virtual bool trimClipsRight(const ClipKeyList& clipKeyList, secs_t deltaSec, secs_t minClipDuration, bool completed,
-                                UndoPushType type) = 0;
-
-    virtual bool stretchClipsLeft(const ClipKeyList& clipKeyList, secs_t deltaSec, secs_t minClipDuration, bool completed,
-                                  UndoPushType type) = 0;
-    virtual bool stretchClipsRight(const ClipKeyList& clipKeyList, secs_t deltaSec, secs_t minClipDuration, bool completed,
-                                   UndoPushType type) = 0;
-
+    virtual bool trimClipLeft(const ClipKey& clipKey, secs_t deltaSec, secs_t minClipDuration, bool completed, UndoPushType type) = 0;
+    virtual bool trimClipRight(const ClipKey& clipKey, secs_t deltaSec, secs_t minClipDuration, bool completed, UndoPushType type) = 0;
+    virtual bool stretchClipLeft(const ClipKey& clipKey, secs_t deltaSec, secs_t minClipDuration, bool completed, UndoPushType type) = 0;
+    virtual bool stretchClipRight(const ClipKey& clipKey, secs_t deltaSec, secs_t minClipDuration, bool completed, UndoPushType type) = 0;
     virtual secs_t clipDuration(const ClipKey& clipKey) const = 0;
+    virtual std::optional<secs_t> getLeftmostClipStartTime(const ClipKeyList& clipKeys) const = 0;
+    virtual std::optional<secs_t> getRightmostClipEndTime(const ClipKeyList& clipKeys) const = 0;
     virtual double nearestZeroCrossing(double time) const = 0;
     virtual muse::Ret makeRoomForClip(const trackedit::ClipKey& clipKey) = 0;
 
     virtual bool newMonoTrack() = 0;
     virtual bool newStereoTrack() = 0;
-    virtual bool newBusTrack() = 0;
     virtual muse::RetVal<TrackId> newLabelTrack(const muse::String& title = muse::String()) = 0;
 
     virtual bool deleteTracks(const TrackIdList& trackIds) = 0;
@@ -136,16 +130,13 @@ public:
     virtual bool cutLabel(const LabelKey& labelKey) = 0;
     virtual bool copyLabel(const LabelKey& labelKey) = 0;
 
-    virtual bool moveLabels(const LabelKeyList& labelKeys, secs_t timePositionOffset, bool completed) = 0;
-    virtual muse::RetVal<LabelKeyList> moveLabels(const LabelKeyList& labelKeys, secs_t timePositionOffset, int trackPositionOffset,
-                                                  bool completed) = 0;
-    virtual muse::RetVal<LabelKeyList> moveLabelsToTrack(const LabelKeyList& labelKeys, const TrackId& toTrackId, bool completed) = 0;
+    virtual bool moveLabels(secs_t timePositionOffset, bool completed) = 0;
+    virtual muse::RetVal<LabelKeyList> moveLabels(const LabelKeyList& labelKeys, const TrackId& toTrackId, bool completed) = 0;
 
     virtual bool stretchLabelLeft(const LabelKey& labelKey, secs_t newStartTime, bool completed) = 0;
-    virtual bool stretchLabelsLeft(const LabelKeyList& labelKeyList, secs_t deltaSec, bool completed) = 0;
-
     virtual bool stretchLabelRight(const LabelKey& labelKey, secs_t newEndTime, bool completed) = 0;
-    virtual bool stretchLabelsRight(const LabelKeyList& labelKeyList, secs_t deltaSec, bool completed) = 0;
+
+    virtual std::optional<secs_t> getLeftmostLabelStartTime(const LabelKeyList& labelKeys) const = 0;
 
     virtual muse::Progress progress() const = 0;
 };

@@ -3,8 +3,6 @@
 */
 #include "tracklabelitem.h"
 
-#include "global/realfn.h"
-
 using namespace au::projectscene;
 
 TrackLabelItem::TrackLabelItem(QObject* parent)
@@ -126,9 +124,4 @@ void TrackLabelItem::setIsLinkedActive(bool active)
 
     m_isLinkedActive = active;
     emit isLinkedActiveChanged();
-}
-
-bool TrackLabelItem::isPoint() const
-{
-    return muse::RealIsEqual(m_time.startTime, m_time.endTime);
 }

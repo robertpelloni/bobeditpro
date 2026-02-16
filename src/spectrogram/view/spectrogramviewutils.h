@@ -1,7 +1,6 @@
 /*
  * Audacity: A Digital Audio Editor
  */
-#pragma once
 
 #include <QString>
 

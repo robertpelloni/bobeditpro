@@ -12,15 +12,12 @@
 #include "audio/iaudioengine.h"
 
 namespace au::au3audio {
-class Au3AudioDevicesProvider : public audio::IAudioDevicesProvider, public muse::Injectable
+class Au3AudioDevicesProvider : public audio::IAudioDevicesProvider
 {
-    muse::Inject<context::IGlobalContext> globalContext { this };
-    muse::Inject<au::audio::IAudioEngine> audioEngine { this };
+    muse::Inject<context::IGlobalContext> globalContext;
+    muse::Inject<au::audio::IAudioEngine> audioEngine;
 
 public:
-    Au3AudioDevicesProvider(const muse::modularity::ContextPtr& ctx)
-        : muse::Injectable(ctx) {}
-
     void init();
 
     std::vector<std::string> outputDevices() const override;
@@ -49,10 +46,6 @@ public:
     double bufferLength() const override;
     void setBufferLength(double newBufferLength) override;
     muse::async::Notification bufferLengthChanged() const override;
-
-    bool automaticCompensationEnabled() const override;
-    void setAutomaticCompensationEnabled(bool enabled) override;
-    muse::async::Notification automaticCompensationEnabledChanged() const override;
 
     double latencyCompensation() const override;
     void setLatencyCompensation(double newLatencyCompensation) override;
@@ -91,7 +84,6 @@ private:
     muse::async::Notification m_inputChannelsChanged;
     muse::async::Notification m_inputChannelsListChanged;
     muse::async::Notification m_bufferLengthChanged;
-    muse::async::Notification m_automaticCompensationEnabledChanged;
     muse::async::Notification m_latencyCompensationChanged;
     muse::async::Notification m_defaultSampleRateChanged;
     muse::async::Notification m_defaultSampleFormatChanged;

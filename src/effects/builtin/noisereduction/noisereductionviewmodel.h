@@ -6,7 +6,7 @@
 #include "../common/builtineffectmodel.h"
 #include "../common/params.h"
 
-#include "framework/interactive/iinteractive.h"
+#include "global/iinteractive.h"
 
 namespace au::effects {
 class NoiseReductionEffect;
@@ -31,7 +31,7 @@ class NoiseReductionViewModel : public BuiltinEffectModel
 
     Q_PROPERTY(int reductionMode READ reductionMode WRITE setReductionMode NOTIFY reductionModeChanged FINAL)
 
-    muse::Inject<muse::IInteractive> interactive{ this };
+    muse::Inject<muse::IInteractive> interactive;
 
 public:
     NoiseReductionViewModel(QObject* parent, int instanceId);

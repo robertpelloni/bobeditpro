@@ -45,17 +45,16 @@ double calculateScrollSpeed(double value, double inMin, double inMax, double out
 }
 
 TimelineContext::TimelineContext(QObject* parent)
-    : QObject(parent), muse::Injectable(muse::iocCtxForQmlObject(this))
+    : QObject(parent)
 {
+    m_snapTimeFormatter = std::make_shared<SnapTimeFormatter>();
+
+    m_scrollTimer.setInterval(16); // scroll at ~60 FPS
+    connect(&m_scrollTimer, &QTimer::timeout, [this](){ autoScrollView(m_autoScrollStep); });
 }
 
 void TimelineContext::init(double frameWidth)
 {
-    m_snapTimeFormatter = std::make_shared<SnapTimeFormatter>(iocContext());
-
-    m_scrollTimer.setInterval(16); // scroll at ~60 FPS
-    connect(&m_scrollTimer, &QTimer::timeout, [this](){ autoScrollView(m_autoScrollStep); });
-
     initToViewState(frameWidth);
 
     if (const auto vs = viewState()) {
@@ -112,18 +111,9 @@ void TimelineContext::init(double frameWidth)
     dispatcher()->reg(this, "zoom-out", this, &TimelineContext::zoomOut);
     dispatcher()->reg(this, "zoom-to-selection", this, &TimelineContext::fitSelectionToWidth);
     dispatcher()->reg(this, "zoom-to-fit-project", this, &TimelineContext::fitProjectToWidth);
-    dispatcher()->reg(this, "center-view-on-playhead", this, &TimelineContext::centerViewOnPlayhead);
 
     configuration()->playbackOnRulerClickEnabledChanged().onNotify(this, [this]() {
         emit playbackOnRulerClickEnabledChanged();
-    });
-
-    configuration()->updateDisplayWhilePlayingEnabledChanged().onNotify(this, [this]() {
-        emit updateDisplayWhilePlayingEnabledChanged();
-    });
-
-    configuration()->pinnedPlayHeadEnabledChanged().onNotify(this, [this]() {
-        emit pinnedPlayHeadEnabledChanged();
     });
 
     onProjectChanged();
@@ -210,15 +200,9 @@ void TimelineContext::onWheel(double mouseX, const QPoint& pixelDelta, const QPo
         if (modifiers.testFlag(Qt::ShiftModifier)) {
             int abs = sqrt(dx * dx + dy * dy) * (dy > -dx ? -1 : 1);
             shiftFrameTime(abs * correction);
-            emit userHorizontalScrolled();
         } else {
-            if (dx != 0) {
-                shiftFrameTime(-dx * correction);
-                emit userHorizontalScrolled();
-            }
-            if (dy != 0) {
-                emit viewContentYChangeRequested(-dy);
-            }
+            shiftFrameTime(-dx * correction);
+            emit viewContentYChangeRequested(-dy);
         }
     }
 }
@@ -242,7 +226,6 @@ void TimelineContext::scrollHorizontal(qreal newPos)
     qreal dx = horizontalScrollableSize() * scrollStep;
 
     shiftFrameTime(dx * correction);
-    emit userHorizontalScrolled();
 }
 
 void TimelineContext::scrollVertical(qreal newPos)
@@ -258,51 +241,19 @@ void TimelineContext::scrollVertical(qreal newPos)
     emit viewContentYChangeRequested(scrollStep * correction);
 }
 
-void TimelineContext::centerViewOnPlayhead(const muse::actions::ActionData& args)
-{
-    if (args.count() != 1) {
-        return;
-    }
-
-    const int onlyIfPlayheadNotVisible = args.arg<bool>(0);
-
-    const trackedit::secs_t playheadSec = playbackState()->playbackPosition();
-
-    if (muse::RealIsEqualOrMore(playheadSec, m_frameStartTime)
-        && muse::RealIsEqualOrLess(playheadSec, m_frameEndTime)
-        && onlyIfPlayheadNotVisible) {
-        return;
-    }
-
-    centerOnTime(playheadSec);
-}
-
-void TimelineContext::centerOnTime(double secs)
-{
-    const double frameTime = m_frameEndTime - m_frameStartTime;
-    const double newFrameStartTime = secs - frameTime * 0.5;
-
-    if (muse::is_equal(newFrameStartTime, m_frameStartTime)) {
-        return;
-    }
-
-    moveToFrameTime(newFrameStartTime);
-}
-
 void TimelineContext::insureVisible(double posSec)
 {
-    // paged scrolling
-    const double newPosition = timeToContentPosition(posSec);
-    const double frameStartPosition = timeToContentPosition(m_frameStartTime);
-    const double frameEndPosition = timeToContentPosition(m_frameEndTime);
+    double newPosition = timeToContentPosition(posSec);
+    double frameStartPosition = timeToContentPosition(m_frameStartTime);
+    double frameEndPosition = timeToContentPosition(m_frameEndTime);
 
     if (muse::RealIsEqualOrMore(newPosition, frameStartPosition)
         && muse::RealIsEqualOrLess(newPosition, frameEndPosition)) {
         return;
     }
 
-    const double frameTime = m_frameEndTime - m_frameStartTime;
-    const double newFrameTime = m_frameStartTime + (posSec - m_frameEndTime) + (frameTime * 0.90);
+    double frameTime = m_frameEndTime - m_frameStartTime;
+    double newFrameTime = m_frameStartTime + (posSec - m_frameEndTime) + (frameTime / 3.0);
     moveToFrameTime(newFrameTime);
 }
 
@@ -925,11 +876,12 @@ void TimelineContext::updateSingleItemSelected()
 
 void TimelineContext::updateSelectedItemTime()
 {
-    auto itemStart = selectionController()->leftMostSelectedItemStartTime();
-    auto itemEnd = selectionController()->rightMostSelectedItemEndTime();
-    if (itemStart.has_value() && itemEnd.has_value()) {
-        setItemStartTime(itemStart.value());
-        setItemEndTime(itemEnd.value());
+    if (selectionController()->selectedClips().size() == 1) {
+        setItemStartTime(selectionController()->selectedClipStartTime());
+        setItemEndTime(selectionController()->selectedClipEndTime());
+    } else if (selectionController()->selectedLabels().size() == 1) {
+        setItemStartTime(selectionController()->selectedLabelStartTime());
+        setItemEndTime(selectionController()->selectedLabelEndTime());
     }
 }
 
@@ -1055,14 +1007,4 @@ au::context::IPlaybackStatePtr TimelineContext::playbackState() const
 bool TimelineContext::playbackOnRulerClickEnabled() const
 {
     return configuration()->playbackOnRulerClickEnabled();
-}
-
-bool TimelineContext::updateDisplayWhilePlayingEnabled() const
-{
-    return configuration()->updateDisplayWhilePlayingEnabled();
-}
-
-bool TimelineContext::pinnedPlayHeadEnabled() const
-{
-    return configuration()->pinnedPlayHeadEnabled();
 }

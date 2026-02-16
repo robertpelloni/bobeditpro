@@ -11,7 +11,7 @@
 namespace au::effects {
 class EffectsConfiguration : public IEffectsConfiguration
 {
-    muse::GlobalInject<muse::IGlobalConfiguration> globalConfiguration;
+    muse::Inject<muse::IGlobalConfiguration> globalConfiguration;
 
 public:
     EffectsConfiguration() = default;

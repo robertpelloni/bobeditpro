@@ -4,20 +4,22 @@
 
 #pragma once
 
-#include "framework/global/modularity/ioc.h"
-#include "framework/vst/ivstinstancesregister.h"
-
-#include "effects/effects_base/ieffectinstancesregister.h"
 #include "effects/effects_base/internal/abstractviewlauncher.h"
+
+#include "global/modularity/ioc.h"
+#include "effects/effects_base/ieffectinstancesregister.h"
+#include "global/iinteractive.h"
+
+// from muse
+#include "vst/ivstinstancesregister.h"
 
 namespace au::effects {
 class Vst3ViewLauncher final : public AbstractViewLauncher
 {
-    muse::Inject<muse::vst::IVstInstancesRegister> museInstancesRegister{ this };
+    muse::Inject<muse::vst::IVstInstancesRegister> museInstancesRegister;
 
 public:
-    Vst3ViewLauncher(const muse::modularity::ContextPtr& ctx)
-        : AbstractViewLauncher(ctx) {}
+    Vst3ViewLauncher() = default;
 
     muse::Ret showEffect(const EffectInstanceId& instanceId) const override;
     void showRealtimeEffect(const RealtimeEffectStatePtr& state) const override;

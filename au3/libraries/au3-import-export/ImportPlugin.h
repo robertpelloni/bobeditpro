@@ -118,8 +118,6 @@ public:
 
     virtual double GetDuration() const = 0;
 
-    virtual int GetRequiredTrackCount() const = 0;
-
     virtual TranslatableString GetErrorMessage() const;
 
     // This is similar to GetPluginFormatDescription, but if possible the

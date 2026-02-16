@@ -3,13 +3,12 @@
 */
 #pragma once
 
-#include "framework/global/modularity/ioc.h"
-#include "framework/interactive/iinteractive.h"
-
+#include "modularity/ioc.h"
 #include "context/iglobalcontext.h"
 #include "trackedit/iselectioncontroller.h"
 #include "trackedit/itrackeditconfiguration.h"
 #include "trackedit/iprojecthistory.h"
+#include "iinteractive.h"
 #include "trackedit/itracksinteraction.h"
 
 #include "au3wrap/au3types.h"
@@ -22,18 +21,17 @@ namespace au::trackedit {
 class Au3TrackData;
 using Au3TrackDataPtr = std::shared_ptr<Au3TrackData>;
 
-class Au3ClipsInteraction : public IClipsInteraction, public muse::Injectable
+class Au3ClipsInteraction : public IClipsInteraction
 {
-    muse::GlobalInject<au::trackedit::ITrackeditConfiguration> configuration;
-
-    muse::Inject<au::context::IGlobalContext> globalContext{ this };
-    muse::Inject<au::trackedit::ISelectionController> selectionController{ this };
-    muse::Inject<au::trackedit::IProjectHistory> projectHistory{ this };
-    muse::Inject<muse::IInteractive> interactive{ this };
-    muse::Inject<ITracksInteraction> tracksInteraction{ this };
+    muse::Inject<au::context::IGlobalContext> globalContext;
+    muse::Inject<au::trackedit::ISelectionController> selectionController;
+    muse::Inject<au::trackedit::ITrackeditConfiguration> configuration;
+    muse::Inject<au::trackedit::IProjectHistory> projectHistory;
+    muse::Inject<muse::IInteractive> interactive;
+    muse::Inject<ITracksInteraction> tracksInteraction;
 
 public:
-    Au3ClipsInteraction(const muse::modularity::ContextPtr& ctx);
+    Au3ClipsInteraction();
 
     muse::secs_t clipStartTime(const trackedit::ClipKey& clipKey) const override;
     muse::secs_t clipEndTime(const trackedit::ClipKey& clipKey) const override;
@@ -55,8 +53,7 @@ public:
     ITrackDataPtr copyClip(const trackedit::ClipKey& clipKey) override;
     std::optional<TimeSpan> removeClip(const trackedit::ClipKey& clipKey) override;
     bool removeClips(const trackedit::ClipKeyList& clipKeyList, bool moveClips) override;
-    muse::RetVal<ClipKeyList> moveClips(const ClipKeyList& clipKeyList, secs_t timePositionOffset, int trackPositionOffset, bool completed,
-                                        bool& clipsMovedToOtherTracks) override;
+    bool moveClips(secs_t timePositionOffset, int trackPositionOffset, bool completed, bool& clipsMovedToOtherTracks) override;
     void cancelClipDragEdit() override;
 
     bool splitClipsAtSilences(const ClipKeyList& clipKeyList) override;
@@ -67,12 +64,13 @@ public:
     ITrackDataPtr clipSplitCut(const ClipKey& clipKey) override;
     bool clipSplitDelete(const ClipKey& clipKey) override;
 
-    bool trimClipsLeft(const ClipKeyList& clipKeyList, secs_t deltaSec, secs_t minClipDuration, bool completed) override;
-    bool trimClipsRight(const ClipKeyList& clipKeyList, secs_t deltaSec, secs_t minClipDuration, bool completed) override;
+    bool trimClipLeft(const ClipKey& clipKey, secs_t deltaSec, secs_t minClipDuration, bool completed) override;
+    bool trimClipRight(const ClipKey& clipKey, secs_t deltaSec, secs_t minClipDuration, bool completed) override;
+    bool stretchClipLeft(const ClipKey& clipKey, secs_t deltaSec, secs_t minClipDuration, bool completed) override;
+    bool stretchClipRight(const ClipKey& clipKey, secs_t deltaSec, secs_t minClipDuration, bool completed) override;
 
-    bool stretchClipsLeft(const ClipKeyList& clipKeyList, secs_t deltaSec, secs_t minClipDuration, bool completed) override;
-    bool stretchClipsRight(const ClipKeyList& clipKeyList, secs_t deltaSec, secs_t minClipDuration, bool completed) override;
-
+    std::optional<secs_t> getLeftmostClipStartTime(const ClipKeyList& clipKeys) const override;
+    std::optional<secs_t> getRightmostClipEndTime(const ClipKeyList& clipKeys) const override;
     muse::Ret makeRoomForClip(const trackedit::ClipKey& clipKey) override;
 
     ClipKeyList clipsOnTrack(const trackedit::TrackId trackId) override;
@@ -102,12 +100,11 @@ private:
 
     au3::Au3Project& projectRef() const;
 
-    NeedsDownmixing moveSelectedClipsUpOrDown(ClipKeyList& clipKeyList, int offset);
+    NeedsDownmixing moveSelectedClipsUpOrDown(int offset);
 
     void trimOrDeleteOverlapping(::WaveTrack* waveTrack, muse::secs_t begin, muse::secs_t end, std::shared_ptr<::WaveClip> otherClip);
 
     std::optional<secs_t> shortestClipDuration(const ClipKeyList& clipKeys) const;
-    std::optional<secs_t> leftmostClipStartTime(const ClipKeyList& clipKeys) const;
     bool anyLeftFullyUntrimmed(const ClipKeyList& clipKeys) const;
     bool anyRightFullyUntrimmed(const ClipKeyList& clipKeys) const;
     ClipKeyList determineClipsForInteraction(const ClipKey& clipKey) const;
@@ -117,6 +114,8 @@ private:
     secs_t clampRightStretchDelta(const ClipKeyList& clipKeys, secs_t deltaSec, secs_t minClipDuration) const;
     bool trimClipsLeft(const ClipKeyList& clipKeys, secs_t deltaSec, bool completed);
     bool trimClipsRight(const ClipKeyList& clipKeys, secs_t deltaSec, bool completed);
+    bool stretchClipsLeft(const ClipKeyList& clipKeys, secs_t deltaSec, bool completed);
+    bool stretchClipsRight(const ClipKeyList& clipKeys, secs_t deltaSec, bool completed);
 
     bool doChangeClipSpeed(const ClipKey& clipKey, double speed);
 

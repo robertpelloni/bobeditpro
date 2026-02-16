@@ -7,7 +7,7 @@ import Muse.Ui
 import Muse.UiComponents
 
 MenuButton {
-    id: root
+    id: menuBtn
 
     property color backgroundColor: ui.theme.backgroundQuarternaryColor
     property Border border: Border{}
@@ -17,8 +17,6 @@ MenuButton {
 
     menuAnchorItem: ui.rootItem
 
-    navigation.name: "ArrowMenuButton"
-
     backgroundItem: RoundedRectangle {
         id: background
 
@@ -27,11 +25,6 @@ MenuButton {
 
         color: root.backgroundColor
         border: root.border
-
-        NavigationFocusBorder {
-            navigationCtrl: root.navigation
-            drawOutsideParent: !root.drawFocusBorderInsideRect
-        }
 
         states: [
             State {

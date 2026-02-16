@@ -5,7 +5,7 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 
 import Muse.Ui 1.0
-import Muse.UiComponents
+import Muse.UiComponents 1.0
 
 Dial {
     id: root
@@ -85,7 +85,7 @@ Dial {
 
     NavigationControl {
         id: navCtrl
-        name: root.objectName !== "" ? root.objectName : "KnobControl"
+        name: root.objectName != "" ? root.objectName : "KnobControl"
         enabled: root.enabled && root.visible
 
         accessible.role: MUAccessible.Range
@@ -97,17 +97,14 @@ Dial {
         accessible.stepSize: root.stepSize
 
         onNavigationEvent: function(event) {
-            const handle = (stepSize) => {
-                prv.requestNewValue(root.value + stepSize)
-                event.accepted = true
-            }
-
             switch(event.type) {
-            case NavigationEvent.Up:
-                handle(root.stepSize)
+            case NavigationEvent.Left:
+                prv.requestNewValue(root.value - root.stepSize)
+                event.accepted = true
                 break
-            case NavigationEvent.Down:
-                handle(-root.stepSize)
+            case NavigationEvent.Right:
+                prv.requestNewValue(root.value + root.stepSize)
+                event.accepted = true
                 break
             }
         }

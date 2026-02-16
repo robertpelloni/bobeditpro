@@ -39,6 +39,7 @@ set( SOURCES
    PlainExportOptionsEditor.h
 )
 set( LIBRARIES
+#   rapidjson::rapidjson
    au3-tags-interface
    au3-wave-track-interface
    au3-project-interface

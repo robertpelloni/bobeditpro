@@ -9,13 +9,12 @@
 #include "WaveMetrics.h"
 
 namespace au::projectscene {
-class ConnectingDotsPainter : public IConnectingDotsPainter, public muse::Injectable
+class ConnectingDotsPainter : public IConnectingDotsPainter
 {
-    muse::Inject<au::context::IGlobalContext> globalContext{ this };
+    muse::Inject<au::context::IGlobalContext> globalContext;
 
 public:
-    ConnectingDotsPainter(const muse::modularity::ContextPtr& ctx)
-        : muse::Injectable(ctx) {}
+    ConnectingDotsPainter() = default;
     void paint(QPainter& painter, const trackedit::ClipKey& clipKey, const IWavePainter::Params& params) override;
 };
 }

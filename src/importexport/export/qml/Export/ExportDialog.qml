@@ -36,10 +36,6 @@ StyledDialogView {
 
     ExportPreferencesModel {
         id: exportPreferencesModel
-
-        onExportCompleted: {
-            root.accept()
-        }
     }
 
     CustomFFmpegPreferencesModel {
@@ -288,7 +284,7 @@ StyledDialogView {
                             RoundedRadioButton {
                                 id: monoBtn
 
-                                checked: exportPreferencesModel.exportChannelsType == ExportChannels.MONO
+                                checked: exportPreferencesModel.exportChannels == ExportChannels.MONO
                                 enabled: exportPreferencesModel.maxExportChannels > 0
                                 text: qsTrc("export", "Mono")
 
@@ -299,14 +295,14 @@ StyledDialogView {
                                 navigation.order: channelsGroup.navigationOrderStart
 
                                 onToggled: {
-                                    exportPreferencesModel.setExportChannelsType(ExportChannels.MONO)
+                                    exportPreferencesModel.setExportChannels(ExportChannels.MONO)
                                 }
                             }
 
                             RoundedRadioButton {
                                 id: stereoBtn
 
-                                checked: exportPreferencesModel.exportChannelsType == ExportChannels.STEREO
+                                checked: exportPreferencesModel.exportChannels == ExportChannels.STEREO
                                 enabled: exportPreferencesModel.maxExportChannels > 1
                                 text: qsTrc("export", "Stereo")
 
@@ -317,16 +313,16 @@ StyledDialogView {
                                 navigation.order: monoBtn.navigation.order + 1
 
                                 onToggled: {
-                                    exportPreferencesModel.setExportChannelsType(ExportChannels.STEREO)
+                                    exportPreferencesModel.setExportChannels(ExportChannels.STEREO)
                                 }
                             }
 
                             RoundedRadioButton {
                                 id: customBtn
 
-                                checked: exportPreferencesModel.exportChannelsType == ExportChannels.CUSTOM
+                                checked: exportPreferencesModel.exportChannels == ExportChannels.CUSTOM
                                 text: qsTrc("export", "Custom mapping")
-                                enabled: exportPreferencesModel.maxExportChannels > 2 // TODO: disable when master FX are on the stack
+                                enabled: false // until custom mapping grid is implemented
 
                                 spacing: 8
 
@@ -335,32 +331,9 @@ StyledDialogView {
                                 navigation.order: stereoBtn.navigation.order + 1
 
                                 onToggled: {
-                                    exportPreferencesModel.setExportChannelsType(ExportChannels.CUSTOM)
+                                    exportPreferencesModel.setExportChannels(ExportChannels.CUSTOM)
                                 }
                             }
-                        }
-                    }
-                }
-
-                RowLayout {
-                    visible: exportPreferencesModel.exportChannelsType == ExportChannels.CUSTOM
-
-                    Item {
-                        width: root.labelColumnWidth
-                    }
-
-                    FlatButton {
-                        id: customMappingBtn
-
-                        Layout.preferredWidth: 100
-
-                        text: qsTrc("export", "Edit mapping")
-
-                        navigation.panel: audioSection.navigation
-                        navigation.order: customBtn.navigation.order + 1
-
-                        onClicked: {
-                            exportPreferencesModel.openCustomMappingDialog()
                         }
                     }
                 }
@@ -392,7 +365,7 @@ StyledDialogView {
 
                         navigation.name: "SampleRateDropdown"
                         navigation.panel: audioSection.navigation
-                        navigation.order: customMappingBtn.navigation.order + 1
+                        navigation.order: customBtn.navigation.order + 1
                         navigation.accessible.name: formatLabel.text + ": " + currentText
 
                         indeterminateText: ""
@@ -644,6 +617,7 @@ StyledDialogView {
                     if (exportPreferencesModel.verifyExportPossible()) {
                         exportPreferencesModel.apply()
                         exportPreferencesModel.exportData()
+                        root.accept()
                     }
                 }
             }

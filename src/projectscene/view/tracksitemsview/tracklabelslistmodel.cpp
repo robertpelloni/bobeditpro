@@ -27,7 +27,7 @@ void TrackLabelsListModel::onInit()
         onSelectedItems(keyList);
     });
 
-    dispatcher()->reg(this, "rename-item", [this]() {
+    dispatcher()->reg(this, "label-rename", [this]() {
         requestItemTitleChange();
     });
 }
@@ -85,7 +85,7 @@ void TrackLabelsListModel::onReload()
             update();
 
             QTimer::singleShot(100, [this](){
-                dispatcher()->dispatch("rename-item");
+                dispatcher()->dispatch("label-rename");
             });
 
             break;
@@ -216,17 +216,7 @@ void TrackLabelsListModel::updateItemMetrics(ViewTrackItem* viewItem)
 
 TrackItemKeyList TrackLabelsListModel::getSelectedItemKeys() const
 {
-    TrackItemKeyList result = selectionController()->selectedLabels();
-
-    trackedit::TrackItemKey focusedItemKey = trackNavigationController()->focusedItem();
-    if (focusedItemKey.isValid() && !muse::contains(result, focusedItemKey)) {
-        const ITrackeditProjectPtr prj = globalContext()->currentTrackeditProject();
-        if (prj && prj->track(focusedItemKey.trackId)->type == TrackType::Label) {
-            result.insert(result.cbegin(), focusedItemKey);
-        }
-    }
-
-    return result;
+    return selectionController()->selectedLabels();
 }
 
 void TrackLabelsListModel::selectLabel(const LabelKey& key)
@@ -244,14 +234,8 @@ void TrackLabelsListModel::selectLabel(const LabelKey& key)
             return;
         }
 
-        if (selectionController()->timeSelectionIsNotEmpty()
-            && muse::contains(selectionController()->labelsIntersectingRangeSelection(), key.key)) {
-            selectionController()->addSelectedLabel(key.key);
-        } else {
-            selectionController()->resetDataSelection();
-            selectionController()->resetSelectedClips();
-            selectionController()->setSelectedLabels(LabelKeyList({ key.key }), true);
-        }
+        selectionController()->resetSelectedClips();
+        selectionController()->setSelectedLabels(LabelKeyList({ key.key }), true);
     }
 
     m_needToSelectTracksData = false;
@@ -316,15 +300,10 @@ bool TrackLabelsListModel::moveSelectedLabels(const LabelKey& key, bool complete
     // Labels can only be moved to label tracks
     TrackItemsListModel::MoveOffset moveOffset = calculateMoveOffset(item, key, { trackedit::TrackType::Label }, completed);
     if (vs->moveInitiated()) {
-        if (selectionController()->timeSelectionIsNotEmpty()) {
-            ok = trackeditInteraction()->moveRangeSelection(moveOffset.timeOffset, completed);
-        } else {
-            auto selectedLabels = selectionController()->selectedLabels();
-            ok = trackeditInteraction()->moveLabels(selectedLabels, moveOffset.timeOffset, moveOffset.trackOffset, completed).ret;
-        }
+        ok = trackeditInteraction()->moveLabels(moveOffset.timeOffset, completed);
     }
 
-    if (ok && !selectionController()->timeSelectionIsNotEmpty() && isTrackDataSelected()) {
+    if (ok && isTrackDataSelected()) {
         doSelectTracksData(key);
     }
 
@@ -417,7 +396,7 @@ TrackLabelItem* TrackLabelsListModel::labelItemByKey(const trackedit::LabelKey& 
 void TrackLabelsListModel::selectTracksDataFromLabelRange(const LabelKey& key)
 {
     TrackLabelItem* labelItem = labelItemByKey(key.key);
-    if (!labelItem || labelItem->isEditing() || labelItem->isPoint()) {
+    if (!labelItem || labelItem->isEditing()) {
         return;
     }
 

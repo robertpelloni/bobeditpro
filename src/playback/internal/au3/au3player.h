@@ -22,15 +22,15 @@
 
 struct TransportSequences;
 namespace au::playback {
-class Au3Player : public IPlayer, public muse::async::Asyncable, public muse::Injectable
+class Au3Player : public IPlayer, public muse::async::Asyncable
 {
-    muse::Inject<context::IGlobalContext> globalContext{ this };
-    muse::Inject<au::trackedit::ISelectionController> selectionController{ this };
-    muse::Inject<au::audio::IAudioEngine> audioEngine{ this };
+    muse::Inject<context::IGlobalContext> globalContext;
+    muse::Inject<au::trackedit::ISelectionController> selectionController;
+    muse::Inject<au::audio::IAudioEngine> audioEngine;
 
 public:
 
-    Au3Player(const muse::modularity::ContextPtr& ctx);
+    Au3Player();
 
     bool isBusy() const override;
 

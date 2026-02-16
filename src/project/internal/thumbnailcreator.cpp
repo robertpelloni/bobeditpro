@@ -1,7 +1,5 @@
 #include "thumbnailcreator.h"
 
-#include <QEventLoop>
-
 #include "global/io/fileinfo.h"
 
 using namespace au::project;

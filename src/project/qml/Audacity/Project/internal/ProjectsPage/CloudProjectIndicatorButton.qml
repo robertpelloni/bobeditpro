@@ -21,7 +21,7 @@
  */
 import QtQuick 2.15
 
-import Muse.UiComponents
+import Muse.UiComponents 1.0
 import Muse.Ui 1.0
 
 Item {
@@ -65,7 +65,7 @@ Item {
         id: background
         anchors.fill: parent
         radius: width / 2
-        color: ui.theme.extra["white_color"]
+        color: "white"
         opacity: 0.6
     }
 
@@ -100,8 +100,8 @@ Item {
 
             PropertyChanges {
                 target: foreground
-                color: Utils.colorWithAlpha(ui.theme.extra["black_color"], 0.8)
-                border.color: Utils.colorWithAlpha(ui.theme.extra["white_color"], 0.9)
+                color: Utils.colorWithAlpha("black", 0.8)
+                border.color: Utils.colorWithAlpha("white", 0.9)
                 border.width: 1
             }
         },
@@ -111,8 +111,8 @@ Item {
 
             PropertyChanges {
                 target: foreground
-                color: Utils.colorWithAlpha(ui.theme.extra["black_color"], 0.5)
-                border.color: Utils.colorWithAlpha(ui.theme.extra["white_color"], 0.9)
+                color: Utils.colorWithAlpha("black", 0.5)
+                border.color: Utils.colorWithAlpha("white", 0.9)
                 border.width: 1
             }
         },
@@ -122,8 +122,8 @@ Item {
 
             PropertyChanges {
                 target: foreground
-                color: Utils.colorWithAlpha(ui.theme.extra["black_color"], 0.65)
-                border.color: Utils.colorWithAlpha(ui.theme.extra["white_color"], 0.9)
+                color: Utils.colorWithAlpha("black", 0.65)
+                border.color: Utils.colorWithAlpha("white", 0.9)
                 border.width: 1
             }
         }
@@ -140,7 +140,7 @@ Item {
 
             iconCode: root.isProgress ? IconCode.STOP_FILL : IconCode.CLOUD_FILL
             font.pixelSize: root.isProgress ? 12 : 14
-            color: ui.theme.extra["white_color"]
+            color: "white"
         }
     }
 

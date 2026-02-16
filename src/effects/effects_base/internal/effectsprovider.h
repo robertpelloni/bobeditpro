@@ -3,13 +3,11 @@
 */
 #pragma once
 
-#include "framework/global/async/asyncable.h"
-#include "framework/global/modularity/ioc.h"
-#include "framework/interactive/iinteractive.h"
-
+#include "async/asyncable.h"
+#include "modularity/ioc.h"
+#include "global/iinteractive.h"
 #include "context/iglobalcontext.h"
 #include "playback/iplayback.h"
-
 #include "effects/builtin/ibuiltineffectsrepository.h"
 #include "effects/lv2/ilv2effectsrepository.h"
 #include "effects/vst/ivsteffectsrepository.h"
@@ -29,25 +27,21 @@ class ProgressDialog;
 }
 
 namespace au::effects {
-class EffectsProvider : public IEffectsProvider, public muse::async::Asyncable, public muse::Injectable
+class EffectsProvider : public IEffectsProvider, public muse::async::Asyncable
 {
-    muse::GlobalInject<IEffectsConfiguration> configuration;
-
-    muse::Inject<au::context::IGlobalContext> globalContext{ this };
-    muse::Inject<IBuiltinEffectsRepository> builtinEffectsRepository{ this };
-    muse::Inject<ILv2EffectsRepository> lv2EffectsRepository{ this };
-    muse::Inject<IVstEffectsRepository> vstEffectsRepository{ this };
-    muse::Inject<INyquistEffectsRepository> nyquistEffectsRepository{ this };
-    muse::Inject<IAudioUnitEffectsRepository> audioUnitEffectsRepository{ this };
-    muse::Inject<muse::IInteractive> interactive{ this };
-    muse::Inject<playback::IPlayback> playback{ this };
-    muse::Inject<IEffectViewLaunchRegister> viewLaunchRegister{ this };
-    muse::Inject<muse::audioplugins::IKnownAudioPluginsRegister> knownPluginsRegister{ this };
+    muse::Inject<au::context::IGlobalContext> globalContext;
+    muse::Inject<IEffectsConfiguration> configuration;
+    muse::Inject<IBuiltinEffectsRepository> builtinEffectsRepository;
+    muse::Inject<ILv2EffectsRepository> lv2EffectsRepository;
+    muse::Inject<IVstEffectsRepository> vstEffectsRepository;
+    muse::Inject<INyquistEffectsRepository> nyquistEffectsRepository;
+    muse::Inject<IAudioUnitEffectsRepository> audioUnitEffectsRepository;
+    muse::Inject<muse::IInteractive> interactive;
+    muse::Inject<playback::IPlayback> playback;
+    muse::Inject<IEffectViewLaunchRegister> viewLaunchRegister;
+    muse::Inject<muse::audioplugins::IKnownAudioPluginsRegister> knownPluginsRegister;
 
 public:
-    EffectsProvider(const muse::modularity::ContextPtr& ctx)
-        : muse::Injectable(ctx) {}
-
     void init();
 
     void reloadEffects();
@@ -73,7 +67,6 @@ public:
                             EffectSettings& settings) override;
 
     muse::Ret previewEffect(const EffectId& effectId, EffectSettings& settings) override;
-    void stopPreview() override;
 
 private:
     struct EffectContext {
@@ -85,13 +78,10 @@ private:
     };
 
     struct EffectPreviewState {
-        EffectPreviewState(const EffectId& effectId, const EffectContext& originContext,
-                           const std::shared_ptr<TrackList>& previewTracks, bool loopWasActive)
-            : effectId(effectId), originContext(originContext), previewTracks(previewTracks), loopWasActive(loopWasActive) {}
-        const EffectId effectId;
+        EffectPreviewState(const EffectContext& originContext, const std::shared_ptr<TrackList>& previewTracks)
+            : originContext(originContext), previewTracks(previewTracks) {}
         const EffectContext originContext;
         const std::shared_ptr<TrackList> previewTracks;
-        const bool loopWasActive;
     };
 
     bool isVstSupported() const;

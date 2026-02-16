@@ -5,14 +5,14 @@
 #include <QQmlEngine>
 #include <QtQml>
 
-#include "framework/interactive/iinteractiveuriregister.h"
-
 #include "internal/playbackconfiguration.h"
 #include "internal/playbackcontroller.h"
 #include "internal/playbackmetercontroller.h"
 #include "internal/playbackuiactions.h"
 #include "internal/au3/au3playback.h"
 #include "internal/au3/au3trackplaybackcontrol.h"
+
+#include "ui/iinteractiveuriregister.h"
 
 #include "view/common/playbackstatemodel.h"
 #include "view/common/playbackmetermodel.h"
@@ -40,14 +40,14 @@ std::string PlaybackModule::moduleName() const
 void PlaybackModule::registerExports()
 {
     m_configuration = std::make_shared<PlaybackConfiguration>();
-    m_controller = std::make_shared<PlaybackController>(iocContext());
-    m_uiActions = std::make_shared<PlaybackUiActions>(iocContext(), m_controller);
-    m_playback = std::make_shared<Au3Playback>(iocContext());
+    m_controller = std::make_shared<PlaybackController>();
+    m_uiActions = std::make_shared<PlaybackUiActions>(m_controller);
+    m_playback = std::make_shared<Au3Playback>();
 
     ioc()->registerExport<PlaybackConfiguration>(moduleName(), m_configuration);
     ioc()->registerExport<IPlaybackController>(moduleName(), m_controller);
     ioc()->registerExport<playback::IPlayback>(moduleName(), m_playback);
-    ioc()->registerExport<ITrackPlaybackControl>(moduleName(), std::make_shared<Au3TrackPlaybackControl>(iocContext()));
+    ioc()->registerExport<ITrackPlaybackControl>(moduleName(), new Au3TrackPlaybackControl());
     ioc()->registerExport<IPlaybackMeterController>(moduleName(), std::make_shared<PlaybackMeterController>());
 }
 
@@ -57,7 +57,7 @@ void PlaybackModule::resolveImports()
     if (ar) {
         ar->reg(m_uiActions);
     }
-    auto ir = ioc()->resolve<muse::interactive::IInteractiveUriRegister>(moduleName());
+    auto ir = ioc()->resolve<muse::ui::IInteractiveUriRegister>(moduleName());
     if (ir) {
         ir->registerQmlUri(muse::Uri("audacity://playback/loop_region_in_out"), "Audacity/Playback/dialogs/LoopRegionInOut.qml");
     }

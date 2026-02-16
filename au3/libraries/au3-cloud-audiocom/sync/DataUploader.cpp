@@ -216,12 +216,10 @@ void DataUploader::Upload(
     std::function<void(double)> progressCallback)
 {
     if (!callback) {
-        callback = [](auto...) {};
-    }
+        callback = [](auto...) {} }
 
     if (!progressCallback) {
-        progressCallback = [](auto...) { return true; };
-    }
+        progressCallback = [](auto...) { return true; } }
 
     if (!cancellationContex) {
         cancellationContex = concurrency::CancellationContext::Create();
@@ -244,12 +242,10 @@ void DataUploader::Upload(
     std::function<void(double)> progressCallback)
 {
     if (!callback) {
-        callback = [](auto...) {};
-    }
+        callback = [](auto...) {} }
 
     if (!progressCallback) {
-        progressCallback = [](auto...) { return true; };
-    }
+        progressCallback = [](auto...) { return true; } }
 
     if (!cancellationContex) {
         cancellationContex = concurrency::CancellationContext::Create();

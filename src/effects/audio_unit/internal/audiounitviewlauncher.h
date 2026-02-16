@@ -10,8 +10,7 @@ namespace au::effects {
 class AudioUnitViewLauncher : public AbstractViewLauncher
 {
 public:
-    AudioUnitViewLauncher(const muse::modularity::ContextPtr& ctx)
-        : AbstractViewLauncher(ctx) {}
+    AudioUnitViewLauncher() = default;
 
     muse::Ret showEffect(const EffectInstanceId& instanceId) const override;
     void showRealtimeEffect(const RealtimeEffectStatePtr& state) const override;

@@ -91,6 +91,7 @@ set(MODULE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/dynamics/timeline/painters/linesequencepainter.h
     ${CMAKE_CURRENT_LIST_DIR}/dynamics/timeline/abstractdynamicseffectinstancemodel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/dynamics/timeline/abstractdynamicseffectinstancemodel.h
+    ${CMAKE_CURRENT_LIST_DIR}/dynamics/timeline/dynamicscolors.h
     ${CMAKE_CURRENT_LIST_DIR}/dynamics/timeline/dynamicstimeline.cpp
     ${CMAKE_CURRENT_LIST_DIR}/dynamics/timeline/dynamicstimeline.h
     ${CMAKE_CURRENT_LIST_DIR}/dynamics/timeline/timelinesourcemodel.cpp
@@ -161,12 +162,6 @@ set(MODULE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/changepitch/changepitcheffect.h
     ${CMAKE_CURRENT_LIST_DIR}/changepitch/changepitchviewmodel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/changepitch/changepitchviewmodel.h
-
-    ${CMAKE_CURRENT_LIST_DIR}/spectralheal/spectralhealeffect.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/spectralheal/spectralhealeffect.h
-
-    ${CMAKE_CURRENT_LIST_DIR}/adaptivenoisereduction/adaptivenoisereductioneffect.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/adaptivenoisereduction/adaptivenoisereductioneffect.h
     )
 
 # AU3

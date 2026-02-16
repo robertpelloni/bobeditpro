@@ -67,13 +67,7 @@ int Au3AudioEngine::startStream(const TransportSequences& sequences, const doubl
     AudioIOStartStreamOptions options = ProjectAudioIO::GetDefaultOptions(project, isDefaultPlayTrackPolicy);
     options.inputMonitoring = recordConfiguration()->isInputMonitoringOn();
     options.rate = audioStreamSampleRate;
-    auto& audioIO = *AudioIO::Get();
-    const int token = audioIO.StartStream(sequences, startTime, endTime, mixerEndTime, options);
-    if (token > 0) {
-        LOGI() << "PortAudio latency report (ms): outputLatency=" << audioIO.GetHardwarePlaybackLatencyMs() <<
-            ", inputLatency=" << audioIO.GetHardwareCaptureLatencyMs();
-    }
-    return token;
+    return AudioIO::Get()->StartStream(sequences, startTime, endTime, mixerEndTime, options);
 }
 
 void Au3AudioEngine::stopStream()

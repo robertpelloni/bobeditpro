@@ -4,10 +4,6 @@
 
 #include <memory>
 
-#include <QApplication>
-#include <QEvent>
-#include <QKeyEvent>
-
 #include "framework/global/types/retval.h"
 
 #include "au3wrap/iau3project.h"
@@ -19,9 +15,7 @@
 
 #include "au3/waveformscale.h"
 #include "au3/viewinfo.h"
-#include "au3/trackheightattachment.h"
 #include "au3/trackrulertypeattachment.h"
-#include "au3/trackviewtypeattachment.h"
 
 #include "projectviewstate.h"
 
@@ -136,44 +130,16 @@ void setVerticalDisplayBounds(std::shared_ptr<au::project::IAudacityProject> pro
     cache.SetDisplayBounds(bounds.first, bounds.second);
 }
 
-au::trackedit::TrackViewType getTrackViewType(std::shared_ptr<au::project::IAudacityProject> project, const au::trackedit::TrackId& trackId)
-{
-    const au::au3::Au3Project* au3Project = reinterpret_cast<au::au3::Au3Project*>(project->au3ProjectPtr());
-
-    const au::au3::Au3WaveTrack* waveTrack = au::au3::DomAccessor::findWaveTrack(*au3Project, au::au3::Au3TrackId(trackId));
-    if (waveTrack == nullptr) {
-        return au::trackedit::TrackViewType::Undefined;
-    }
-
-    const auto& cache = au::au3::TrackViewTypeAttachment::Get(waveTrack);
-    const auto viewType = cache.GetTrackViewType();
-    return viewType == au::trackedit::TrackViewType::Undefined ? au::trackedit::TrackViewType::Waveform : viewType;
-}
-
-void setTrackViewType(std::shared_ptr<au::project::IAudacityProject> project, const au::trackedit::TrackId& trackId,
-                      au::trackedit::TrackViewType viewType)
+int getTrackRulerType(std::shared_ptr<au::project::IAudacityProject> project, const au::trackedit::TrackId& trackId)
 {
     au::au3::Au3Project* au3Project = reinterpret_cast<au::au3::Au3Project*>(project->au3ProjectPtr());
 
-    au::au3::Au3WaveTrack* waveTrack = au::au3::DomAccessor::findWaveTrack(*au3Project, au::au3::Au3TrackId(trackId));
-    if (waveTrack == nullptr) {
-        return;
-    }
-
-    auto& cache = au::au3::TrackViewTypeAttachment::Get(waveTrack);
-    cache.SetTrackViewType(viewType);
-}
-
-int getTrackRulerType(std::shared_ptr<au::project::IAudacityProject> project, const au::trackedit::TrackId& trackId)
-{
-    const au::au3::Au3Project* au3Project = reinterpret_cast<const au::au3::Au3Project*>(project->au3ProjectPtr());
-
-    const au::au3::Au3Track* track = au::au3::DomAccessor::findTrack(*au3Project, au::au3::Au3TrackId(trackId));
+    au::au3::Au3Track* track = au::au3::DomAccessor::findTrack(*au3Project, au::au3::Au3TrackId(trackId));
     if (track == nullptr) {
         return static_cast<int>(au::trackedit::TrackRulerType::Linear);
     }
 
-    const auto& cache = TrackRulerTypeAttachment::Get(track);
+    auto& cache = TrackRulerTypeAttachment::Get(track);
     return static_cast<int>(cache.GetRulerType());
 }
 
@@ -191,12 +157,7 @@ void setTrackRulerType(std::shared_ptr<au::project::IAudacityProject> project, c
 }
 }
 
-ProjectViewState::ProjectViewState(const muse::modularity::ContextPtr& ctx)
-    : muse::Injectable(ctx)
-{
-}
-
-void ProjectViewState::init(const std::shared_ptr<au3::IAu3Project>& project)
+ProjectViewState::ProjectViewState(std::shared_ptr<au::au3::IAu3Project> project)
 {
     configuration()->setIsEffectsPanelVisible(false);
     qApp->installEventFilter(this);
@@ -218,10 +179,6 @@ void ProjectViewState::init(const std::shared_ptr<au3::IAu3Project>& project)
         ZoomState zoomState = getProjectZoomState(au3Project);
         zoomState.tracksVerticalOffset = y;
         saveProjectZoomState(au3Project, zoomState);
-    });
-
-    m_spectrogramToggledTracks.ch.onReceive(this, [this](auto) {
-        m_globalSpectrogramViewToggleChanged.notify();
     });
 
     globalContext()->currentTrackeditProjectChanged().onNotify(this, [this](){
@@ -325,7 +282,6 @@ ProjectViewState::TrackData& ProjectViewState::makeTrackData(const trackedit::Tr
 
     const std::pair<float, float> defaultBounds = getVerticalDisplayBounds(prj, trackId);
     const int defaultRulerType = getTrackRulerType(prj, trackId);
-    const trackedit::TrackViewType defaultViewType = getTrackViewType(prj, trackId);
 
     TrackData d;
     d.collapsed.val = false;
@@ -333,36 +289,13 @@ ProjectViewState::TrackData& ProjectViewState::makeTrackData(const trackedit::Tr
     d.verticalDisplayBounds.val = defaultBounds;
     d.isHalfWave.val = (defaultBounds.first == 0.0f);
     d.rulerType.val = defaultRulerType;
-    d.viewType.val = defaultViewType;
-
-    d.viewType.ch.onReceive(this, [this, trackId](auto) {
-        const auto prj = globalContext()->currentTrackeditProject();
-        if (prj) {
-            const auto track = prj->track(trackId);
-            if (track) {
-                prj->notifyAboutTrackChanged(*track);
-            }
-        }
-    });
 
     trackedit::ITrackeditProjectPtr trackeditPrj = globalContext()->currentTrackeditProject();
     if (trackeditPrj) {
         std::optional<trackedit::Track> track = trackeditPrj->track(trackId);
         if (track) {
             d.channelHeightRatio.val = track->type == trackedit::TrackType::Stereo ? 0.5 : 1.0;
-            int defaultHeight = track->type == trackedit::TrackType::Label ? TRACK_LABEL_DEFAULT_HEIGHT : TRACK_DEFAULT_HEIGHT;
-
-            int height = defaultHeight;
-
-            if (prj) {
-                auto track = au::au3::DomAccessor::findTrack(
-                    *reinterpret_cast<au::au3::Au3Project*>(prj->au3ProjectPtr()), au::au3::Au3TrackId(trackId));
-                int savedHeight = au3::TrackHeightAttachment::Get(track).GetHeight();
-                savedHeight = savedHeight <= 0 ? defaultHeight : savedHeight;
-                height = std::max(savedHeight, TRACK_MIN_HEIGHT);
-            }
-            d.collapsed.val = height <= TRACK_COLLAPSE_HEIGHT;
-            d.height.val = height;
+            d.height.val = track->type == trackedit::TrackType::Label ? TRACK_LABEL_DEFAULT_HEIGHT : TRACK_DEFAULT_HEIGHT;
         }
     }
 
@@ -422,15 +355,6 @@ void ProjectViewState::changeTrackHeight(const trackedit::TrackId& trackId, int 
     d->collapsed.set(newHeight < TRACK_COLLAPSE_HEIGHT);
 
     m_totalTracksHeight.set(m_totalTracksHeight.val + (newHeight - oldHeight));
-
-    const project::IAudacityProjectPtr prj = globalContext()->currentProject();
-    if (prj) {
-        au3::Au3Project* au3Project = reinterpret_cast<au3::Au3Project*>(prj->au3ProjectPtr());
-        if (au3Project) {
-            auto track = au::au3::DomAccessor::findTrack(*au3Project, au::au3::Au3TrackId(trackId));
-            au3::TrackHeightAttachment::Get(track).SetHeight(newHeight);
-        }
-    }
 }
 
 void ProjectViewState::setTrackHeight(const trackedit::TrackId& trackId, int height)
@@ -449,15 +373,6 @@ void ProjectViewState::setTrackHeight(const trackedit::TrackId& trackId, int hei
     d->collapsed.set(height < TRACK_COLLAPSE_HEIGHT);
 
     m_totalTracksHeight.set(m_totalTracksHeight.val + (newHeight - oldHeight));
-
-    const project::IAudacityProjectPtr prj = globalContext()->currentProject();
-    if (prj) {
-        au3::Au3Project* au3Project = reinterpret_cast<au3::Au3Project*>(prj->au3ProjectPtr());
-        if (au3Project) {
-            auto track = au::au3::DomAccessor::findTrack(*au3Project, au::au3::Au3TrackId(trackId));
-            au3::TrackHeightAttachment::Get(track).SetHeight(newHeight);
-        }
-    }
 }
 
 au::trackedit::TrackId ProjectViewState::trackAtPosition(double y) const
@@ -492,36 +407,46 @@ au::trackedit::TrackIdList ProjectViewState::tracksInRange(double y1, double y2)
         return {};
     }
 
+    if (y1 < 0 && y2 < 0) {
+        return {};
+    }
+
     if (y1 > y2) {
         std::swap(y1, y2);
     }
 
-    // Tracks are sorted by index, i.e., top to bottom.
+    if (y1 < 1) {
+        y1 = 1;
+    }
+
     trackedit::TrackIdList tracks = prj->trackIdList();
+    trackedit::TrackIdList result;
 
-    int i = 0;
-    const auto numTracks = static_cast<int>(tracks.size());
-    while (i < numTracks) {
-        const trackedit::TrackId& trackId = tracks[i];
-        const auto trackTop = trackVerticalPosition(trackId);
-        const auto trackBottom = trackTop + trackHeight(trackId).val;
-        if (y1 < trackBottom) {
+    int trackTop = -m_tracksVerticalOffset.val;
+    int trackBottom = trackTop;
+
+    for (trackedit::TrackId trackId : tracks) {
+        trackTop = trackBottom;
+        trackBottom = trackTop + trackHeight(trackId).val;
+
+        if (muse::RealIsEqualOrMore(y1, trackTop) && !muse::RealIsEqualOrMore(y1, trackBottom)) {
+            result.push_back(trackId);
+        }
+
+        if (muse::RealIsEqualOrMore(y2, trackTop) && !muse::RealIsEqualOrMore(y2, trackBottom)) {
+            if (!result.empty() && result.back() != trackId) {
+                result.push_back(trackId);
+            }
             break;
         }
-        ++i;
-    }
 
-    auto j = i;
-    while (j < numTracks) {
-        const trackedit::TrackId& trackId = tracks[j];
-        const auto trackTop = trackVerticalPosition(trackId);
-        if (y2 <= trackTop) {
-            break;
+        if (!result.empty() && result.back() != trackId) {
+            result.push_back(trackId);
+            continue;
         }
-        ++j;
     }
 
-    return trackedit::TrackIdList(tracks.begin() + i, tracks.begin() + j);
+    return result;
 }
 
 void ProjectViewState::setChannelHeightRatio(const trackedit::TrackId& trackId, double ratio)
@@ -597,7 +522,7 @@ void ProjectViewState::setSplitToolEnabled(const bool enabled)
     m_splitToolEnabled.set(enabled);
 }
 
-muse::ValCh<bool> ProjectViewState::splitToolEnabled() const
+muse::ValCh<bool> ProjectViewState::splitToolEnabled()
 {
     return m_splitToolEnabled;
 }
@@ -780,105 +705,6 @@ void ProjectViewState::toggleHalfWave(const trackedit::TrackId& trackId)
         it->second.isHalfWave.set(!isHalfWave);
         m_verticalRulerWidth.set(calculateVerticalRulerWidth());
     }
-}
-
-muse::ValCh<au::trackedit::TrackViewType> ProjectViewState::trackViewType(const au::trackedit::TrackId& trackId) const
-{
-    auto it = m_tracks.find(trackId);
-    if (it != m_tracks.end()) {
-        return it->second.viewType;
-    }
-
-    const ProjectViewState::TrackData& d = makeTrackData(trackId);
-    return d.viewType;
-}
-
-void ProjectViewState::setTrackViewType(const trackedit::TrackId& trackId, trackedit::TrackViewType viewType)
-{
-    if (trackViewType(trackId).val == viewType) {
-        return;
-    }
-
-    const auto project = globalContext()->currentProject();
-    if (!project) {
-        return;
-    }
-
-    if (m_spectrogramToggledTracks.val.find(trackId) != m_spectrogramToggledTracks.val.end()) {
-        auto map = std::move(m_spectrogramToggledTracks.val);
-        map.erase(trackId);
-        m_spectrogramToggledTracks.set(std::move(map));
-    }
-
-    const auto it = m_tracks.find(trackId);
-    if (it != m_tracks.end()) {
-        it->second.viewType.set(viewType);
-        ::setTrackViewType(project, trackId, viewType);
-        m_globalSpectrogramViewToggleChanged.notify();
-        projectHistory()->modifyState();
-        projectHistory()->markUnsaved();
-    }
-}
-
-void ProjectViewState::toggleGlobalSpectrogramView()
-{
-    const auto prj = globalContext()->currentProject();
-    IF_ASSERT_FAILED(prj) {
-        return;
-    }
-    auto set = m_spectrogramToggledTracks.val;
-    auto changed = false;
-    using namespace trackedit;
-    if (set.empty()) {
-        for (auto& [trackId, trackData] : m_tracks) {
-            if (trackData.viewType.val != TrackViewType::Waveform) {
-                continue;
-            }
-            changed = true;
-            trackData.viewType.set(TrackViewType::Spectrogram);
-            ::setTrackViewType(prj, trackId, TrackViewType::Spectrogram);
-            set.insert(trackId);
-        }
-    } else {
-        for (const auto& trackId : set) {
-            const auto it = m_tracks.find(trackId);
-            if (it == m_tracks.end() || it->second.viewType.val == TrackViewType::Waveform) {
-                continue;
-            }
-            changed = true;
-            it->second.viewType.set(TrackViewType::Waveform);
-            ::setTrackViewType(prj, trackId, TrackViewType::Waveform);
-        }
-        set.clear();
-    }
-
-    m_spectrogramToggledTracks.set(std::move(set));
-
-    if (changed) {
-        projectHistory()->modifyState();
-        projectHistory()->markUnsaved();
-    }
-}
-
-bool ProjectViewState::globalSpectrogramViewToggleIsActive() const
-{
-    if (globalSpectrogramViewIsOn()) {
-        return true;
-    }
-    return std::any_of(m_tracks.begin(), m_tracks.end(),
-                       [](const auto& pair) {
-        return pair.second.viewType.val == trackedit::TrackViewType::Waveform;
-    });
-}
-
-bool ProjectViewState::globalSpectrogramViewIsOn() const
-{
-    return !m_spectrogramToggledTracks.val.empty();
-}
-
-muse::async::Notification ProjectViewState::globalSpectrogramViewToggleChanged() const
-{
-    return m_globalSpectrogramViewToggleChanged;
 }
 
 muse::ValCh<int> ProjectViewState::trackRulerType(const trackedit::TrackId& trackId) const

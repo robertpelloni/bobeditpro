@@ -11,7 +11,7 @@ class RecordMeterModel : public playback::MeterModel
 {
     Q_OBJECT
 
-    muse::Inject<IRecord> record{ this };
+    muse::Inject<IRecord> record;
 
 public:
     explicit RecordMeterModel(QObject* parent = nullptr);

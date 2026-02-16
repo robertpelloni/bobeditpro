@@ -25,7 +25,6 @@
 #include <thread>
 #include <utility>
 #include <array>
-#include <map>
 #include <wx/atomic.h> // member variable
 #include <wx/thread.h>
 
@@ -40,7 +39,6 @@ class Mixer;
 class OtherPlayableSequence;
 class RealtimeEffectState;
 class Resample;
-class BusTrack;
 
 class AudacityProject;
 
@@ -214,7 +212,7 @@ public:
     void SendVuInputMeterData(const float* inputSamples, unsigned long framesPerBuffer, const TimePoint& dacTime);
     void SendVuOutputMeterData(const float* outputMeterFloats, unsigned long framesPerBuffer, const TimePoint& dacTime);
     void PushMasterOutputMeterValues(const IMeterSenderPtr& sender, const float* values, uint8_t channels, unsigned long frames,
-                                     const TimePoint& dacTime);
+                             const TimePoint& dacTime);
     void PushTrackMeterValues(const IMeterSenderPtr& sender, unsigned long frames, const TimePoint& dacTime);
     void PushInputMeterValues(const IMeterSenderPtr& sender, const float* values, unsigned long frames, const TimePoint& dacTime);
 
@@ -243,16 +241,11 @@ public:
         size_t channelIndex{};
     };
     std::vector<TrackChannelInfo> mCaptureChannelLayout;
-    std::vector<std::vector<size_t> > mTrackChannelSourceMap;
+    std::vector<std::vector<size_t>> mTrackChannelSourceMap;
     bool mCaptureNeedsMixdown{ false };
     //!Buffers that hold outcome of transformations applied to each individual sample source.
     //!Number of buffers equals to the sum of number all source channels.
     std::vector<std::vector<float> > mProcessingBuffers;
-
-    // Bus Buffers: ID -> Channels -> Samples
-    std::map<int64_t, std::vector<std::vector<float>>> mBusBuffers;
-    std::vector<std::shared_ptr<const BusTrack>> mBusTracks;
-
     //!These buffers are used to mix and process the result of processed source channels.
     //!Number of buffers equals to number of output channels.
     std::vector<std::vector<float> > mMasterBuffers;
@@ -285,7 +278,6 @@ public:
     /// Hardware output latency in frames
     size_t mHardwarePlaybackLatencyFrames { 0u };
     double mHardwarePlaybackLatencyMs{ 0 };
-    double mHardwareCaptureLatencyMs{ 0 };
     /// Occupancy of the queue we try to maintain, with bigger batches if needed
     size_t mPlaybackQueueMinimum;
 
@@ -529,8 +521,6 @@ public:
     sampleFormat GetCaptureFormat() const { return mCaptureFormat; }
     size_t GetNumPlaybackChannels() const { return mNumPlaybackChannels; }
     size_t GetNumCaptureChannels() const { return mNumCaptureChannels; }
-    int GetHardwarePlaybackLatencyMs() const { return mHardwarePlaybackLatencyMs; }
-    int GetHardwareCaptureLatencyMs() const { return mHardwareCaptureLatencyMs; }
 
     // Meaning really capturing, not just pre-rolling
     bool IsCapturing() const;

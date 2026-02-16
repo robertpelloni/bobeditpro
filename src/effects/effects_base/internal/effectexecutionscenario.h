@@ -3,17 +3,17 @@
 */
 #pragma once
 
-#include "framework/global/modularity/ioc.h"
-#include "framework/global/async/channel.h"
-#include "framework/interactive/iinteractive.h"
+#include "modularity/ioc.h"
 
+#include "async/channel.h"
 #include "context/iglobalcontext.h"
+#include "global/iinteractive.h"
+
 #include "../ieffectinstancesregister.h"
 #include "../ieffectsprovider.h"
 #include "ieffectsconfiguration.h"
 #include "trackedit/iprojecthistory.h"
 #include "trackedit/iselectioncontroller.h"
-#include "trackedit/internal/itracknavigationcontroller.h"
 #include "au3wrap/au3types.h"
 
 #include <optional>
@@ -25,21 +25,18 @@ class EffectBase;
 class EffectInstance;
 class SimpleEffectSettingsAccess;
 namespace au::effects {
-class EffectExecutionScenario : public IEffectExecutionScenario, public muse::Injectable
+class EffectExecutionScenario : public IEffectExecutionScenario
 {
-    muse::GlobalInject<IEffectsConfiguration> effectsConfiguration;
-
-    muse::Inject<context::IGlobalContext> globalContext{ this };
-    muse::Inject<IEffectsProvider> effectsProvider{ this };
-    muse::Inject<IEffectInstancesRegister> effectInstancesRegister{ this };
-    muse::Inject<trackedit::ISelectionController> selectionController{ this };
-    muse::Inject<muse::IInteractive> interactive{ this };
-    muse::Inject<trackedit::IProjectHistory> projectHistory{ this };
-    muse::Inject<trackedit::ITrackNavigationController> trackNavigationController { this };
+    muse::Inject<context::IGlobalContext> globalContext;
+    muse::Inject<IEffectsProvider> effectsProvider;
+    muse::Inject<IEffectInstancesRegister> effectInstancesRegister;
+    muse::Inject<trackedit::ISelectionController> selectionController;
+    muse::Inject<muse::IInteractive> interactive;
+    muse::Inject<trackedit::IProjectHistory> projectHistory;
+    muse::Inject<IEffectsConfiguration> effectsConfiguration;
 
 public:
-    EffectExecutionScenario(const muse::modularity::ContextPtr& ctx)
-        : muse::Injectable(ctx) {}
+    EffectExecutionScenario() = default;
 
     muse::Ret performEffect(const EffectId& effectId) override;
     bool lastProcessorIsAvailable() const override;

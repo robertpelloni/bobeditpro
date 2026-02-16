@@ -21,12 +21,11 @@
  */
 import QtQuick 2.15
 
-import Muse.Ui
-import Muse.UiComponents
-import Muse.Vst
+import Muse.Ui 1.0
+import Muse.UiComponents 1.0
 
-import Audacity.Effects
-import Audacity.Vst
+import Audacity.Effects 1.0
+import Audacity.Vst 1.0
 
 Rectangle {
     id: root

@@ -30,7 +30,7 @@ signals:
     void groupIdChanged();
     void pitchChanged();
     void speedPercentageChanged();
-    void contentChanged();
+    void waveChanged();
 
 private:
     int m_groupId = -1;

@@ -19,8 +19,8 @@ using namespace au::record;
 using namespace au::playback;
 using namespace au::au3;
 
-Au3AudioInput::Au3AudioInput(const muse::modularity::ContextPtr& ctx)
-    : muse::Injectable(ctx), m_inputMeter{au::au3::createAudioMeter()}
+Au3AudioInput::Au3AudioInput()
+    : m_inputMeter{au::au3::createAudioMeter()}
 {
     globalContext()->currentProjectChanged().onNotify(this, [this](){
         auto currentProject = globalContext()->currentProject();
@@ -60,8 +60,7 @@ Au3AudioInput::Au3AudioInput(const muse::modularity::ContextPtr& ctx)
             updateAudioEngineMonitoring();
         }, muse::async::Asyncable::Mode::SetReplace);
 
-        trackNavigationController()->focusedTrackChanged().onReceive(this,
-                                                                     [this](const trackedit::TrackId& /*trackId*/, bool /*highlight*/) {
+        selectionController()->focusedTrackChanged().onReceive(this, [this](const trackedit::TrackId&) {
             const int focusedTrackChannels = getFocusedTrackChannels();
             if (focusedTrackChannels != m_focusedTrackChannels) {
                 m_focusedTrackChannels = focusedTrackChannels;
@@ -193,7 +192,7 @@ int Au3AudioInput::getFocusedTrackChannels() const
         return 0;
     }
 
-    const auto trackId = trackNavigationController()->focusedTrack();
+    const auto trackId = selectionController()->focusedTrack();
 
     std::optional<au::trackedit::Track> track = prj->track(trackId);
     if (!track) {

@@ -36,7 +36,7 @@ std::string Au3WrapModule::moduleName() const
 
 void Au3WrapModule::registerExports()
 {
-    m_au3BasicUi = std::make_shared<Au3BasicUI>(iocContext());
+    m_au3BasicUi = std::make_shared<Au3BasicUI>();
 
     ioc()->registerExport<IAu3ProjectCreator>(moduleName(), new Au3ProjectCreator());
 }

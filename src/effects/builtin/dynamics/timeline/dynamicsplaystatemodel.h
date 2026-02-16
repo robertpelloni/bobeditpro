@@ -12,16 +12,15 @@
 #include <QObject>
 
 namespace au::effects {
-class DynamicsPlayStateModel : public QObject, public muse::async::Asyncable, public muse::Injectable
+class DynamicsPlayStateModel : public QObject, public muse::async::Asyncable
 {
     Q_OBJECT
 
     Q_PROPERTY(au::effects::Stopwatch::PlayState playState READ playState NOTIFY playStateChanged)
 
-    muse::Inject<playback::IPlaybackController> playbackController { this };
+    muse::Inject<playback::IPlaybackController> playbackController;
 
 public:
-    DynamicsPlayStateModel(QObject* parent = nullptr);
     Q_INVOKABLE void init();
 
     Stopwatch::PlayState playState() const;

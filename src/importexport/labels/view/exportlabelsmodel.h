@@ -5,11 +5,10 @@
 
 #include <QObject>
 
-#include "framework/global/async/asyncable.h"
+#include "async/asyncable.h"
 
-#include "framework/global/modularity/ioc.h"
-#include "framework/interactive/iinteractive.h"
-
+#include "modularity/ioc.h"
+#include "iinteractive.h"
 #include "context/iglobalcontext.h"
 #include "ilabelsexporter.h"
 #include "ilabelsconfiguration.h"
@@ -28,11 +27,10 @@ class ExportLabelsModel : public QObject, public muse::async::Asyncable, public 
     Q_PROPERTY(QVariantList labelTracks READ labelTracks NOTIFY labelTracksChanged FINAL)
     Q_PROPERTY(QVariantList selectedTracks READ selectedTracks NOTIFY selectedTracksChanged FINAL)
 
-    muse::GlobalInject<ILabelsConfiguration> configuration;
-
     muse::Inject<muse::IInteractive> interactive = { this };
     muse::Inject<context::IGlobalContext> globalContext = { this };
     muse::Inject<ILabelsExporter> labelExporter = { this };
+    muse::Inject<ILabelsConfiguration> configuration = { this };
 
 public:
     explicit ExportLabelsModel(QObject* parent = nullptr);

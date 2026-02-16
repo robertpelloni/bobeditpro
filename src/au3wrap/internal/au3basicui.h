@@ -6,17 +6,13 @@
 
 #include "framework/global/async/asyncable.h"
 #include "framework/global/modularity/ioc.h"
-#include "framework/interactive/iinteractive.h"
+#include "framework/global/iinteractive.h"
 
 #include "au3-basic-ui/BasicUI.h"
 
-class Au3BasicUI final : public BasicUI::Services, public muse::async::Asyncable, public muse::Injectable
+class Au3BasicUI final : public BasicUI::Services, public muse::async::Asyncable
 {
-    muse::Inject<muse::IInteractive> interactive { this };
-
-public:
-    Au3BasicUI(const muse::modularity::ContextPtr& ctx)
-        : muse::Injectable(ctx) {}
+    muse::Inject<muse::IInteractive> interactive;
 
 protected:
     void DoCallAfter(const BasicUI::Action& action) override;

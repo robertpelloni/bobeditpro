@@ -26,14 +26,13 @@
 
 #include "../iapplicationactioncontroller.h"
 
-#include "framework/global/async/asyncable.h"
-#include "framework/global/modularity/ioc.h"
-#include "framework/actions/actionable.h"
-#include "framework/actions/iactionsdispatcher.h"
-#include "framework/interactive/iinteractive.h"
-#include "framework/ui/iuiactionsregister.h"
-#include "framework/ui/imainwindow.h"
-
+#include "modularity/ioc.h"
+#include "actions/actionable.h"
+#include "actions/iactionsdispatcher.h"
+#include "ui/iuiactionsregister.h"
+#include "async/asyncable.h"
+#include "ui/imainwindow.h"
+#include "iinteractive.h"
 #include "iappshellconfiguration.h"
 #include "iapplication.h"
 #include "startupscenario.h"
@@ -44,37 +43,34 @@
 
 //! TODO AU4
 // #include "languages/ilanguagesservice.h"
-#include "multiwindows/imultiwindowsprovider.h"
+// #include "multiinstances/imultiinstancesprovider.h"
 // #include "audio/isoundfontrepository.h"
 // #include "istartupscenario.h"
 
 namespace au::appshell {
 class ApplicationActionController : public QObject, public IApplicationActionController, public muse::actions::Actionable,
-    public muse::async::Asyncable, public muse::Injectable
+    public muse::async::Asyncable
 {
-    muse::Inject<muse::actions::IActionsDispatcher> dispatcher { this };
-    muse::Inject<muse::ui::IUiActionsRegister> actionsRegister { this };
-    muse::Inject<muse::ui::IMainWindow> mainWindow { this };
-    muse::Inject<appshell::IStartupScenario> startupScenario { this };
+    muse::Inject<muse::actions::IActionsDispatcher> dispatcher;
+    muse::Inject<muse::ui::IUiActionsRegister> actionsRegister;
+    muse::Inject<muse::ui::IMainWindow> mainWindow;
+    muse::Inject<appshell::IStartupScenario> startupScenario;
 
-    muse::Inject<muse::IInteractive> interactive { this };
-    muse::Inject<muse::IApplication> application { this };
-    muse::GlobalInject<IAppShellConfiguration> configuration;
-    muse::GlobalInject<project::IProjectFilesController> projectFilesController;
-    muse::Inject<record::IRecordController> recordController { this };
+    muse::Inject<muse::IInteractive> interactive;
+    muse::Inject<muse::IApplication> application;
+    muse::Inject<IAppShellConfiguration> configuration;
+    muse::Inject<project::IProjectFilesController> projectFilesController;
+    muse::Inject<record::IRecordController> recordController;
 
-    muse::Inject<context::IUiContextResolver> uiContextResolver { this };
-    muse::Inject<context::IGlobalContext> globalContext { this };
+    muse::Inject<context::IUiContextResolver> uiContextResolver;
+    muse::Inject<context::IGlobalContext> globalContext;
 
 //! TODO AU4
     // INJECT(languages::ILanguagesService, languagesService)
-    // INJECT(mi::IMultiWindowsProvider, multiwindowsProvider)
+    // INJECT(mi::IMultiInstancesProvider, multiInstancesProvider)
     // INJECT(audio::ISoundFontRepository, soundFontRepository)
     // INJECT(IStartupScenario, startupScenario)
 public:
-    ApplicationActionController(const muse::modularity::ContextPtr& ctx)
-        : muse::Injectable(ctx) {}
-
     void preInit();
     void init();
     const std::vector<muse::actions::ActionCode>& prohibitedActionsWhileRecording() const;
@@ -110,8 +106,6 @@ private:
     void revertToFactorySettings();
 
     bool isProjectOpened() const;
-    bool isProjectOpenedAndFocused() const;
-
     void doGlobalCopy();
     void doGlobalCut();
     void doGlobalPaste();
@@ -119,7 +113,6 @@ private:
     void doGlobalRedo();
     void doGlobalDelete();
     void doGlobalCancel();
-    void doGlobalTrigger();
 
     bool m_quiting = false;
 

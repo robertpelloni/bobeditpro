@@ -34,7 +34,7 @@ enum class TrackRulerType : int {
 };
 
 enum class TrackViewType : int {
-    Undefined = -1,
+    Unspecified = -1,
     Waveform,
     Spectrogram,
     WaveformAndSpectrogram,
@@ -61,9 +61,8 @@ struct Track {
     TrackType type = TrackType::Undefined;
     muse::draw::Color color;
     TrackFormat format = TrackFormat::Undefined;
-    uint64_t rate = 0;
-    bool solo = false;
-    bool mute = false;
+    TrackViewType viewType = TrackViewType::Unspecified;
+    uint64_t rate;
 };
 
 using TrackList = std::vector<Track>;

@@ -3,14 +3,12 @@
  */
 #pragma once
 
-#include <QAbstractListModel>
 #include <QObject>
 
-#include "framework/global/async/asyncable.h"
+#include "async/asyncable.h"
 
-#include "framework/global/modularity/ioc.h"
-#include "framework/interactive/iinteractive.h"
-
+#include "modularity/ioc.h"
+#include "iinteractive.h"
 #include "project/imetadata.h"
 #include "project/iprojectconfiguration.h"
 #include "iexportconfiguration.h"
@@ -19,16 +17,15 @@
 #include "project/types/projectmeta.h"
 
 namespace au::importexport {
-class MetadataModel : public QAbstractListModel, public muse::async::Asyncable, public muse::Injectable
+class MetadataModel : public QAbstractListModel, public muse::async::Asyncable
 {
     Q_OBJECT
 
-    muse::GlobalInject<project::IProjectConfiguration> projectConfiguration;
-    muse::GlobalInject<importexport::IExportConfiguration> exportConfiguration;
-    muse::GlobalInject<appshell::IAppShellConfiguration> configuration;
-
-    muse::Inject<muse::IInteractive> interactive{ this };
-    muse::Inject<project::IMetadata> metadata{ this };
+    muse::Inject<muse::IInteractive> interactive;
+    muse::Inject<project::IMetadata> metadata;
+    muse::Inject<project::IProjectConfiguration> projectConfiguration;
+    muse::Inject<importexport::IExportConfiguration> exportConfiguration;
+    muse::Inject<appshell::IAppShellConfiguration> configuration;
 
 public:
     explicit MetadataModel(QObject* parent = nullptr);

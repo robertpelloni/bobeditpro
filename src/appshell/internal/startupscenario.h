@@ -24,30 +24,32 @@
 
 #include "istartupscenario.h"
 
-#include "framework/global/async/asyncable.h"
-#include "framework/global/modularity/ioc.h"
-#include "framework/interactive/iinteractive.h"
-#include "framework/actions/iactionsdispatcher.h"
-#include "framework/audioplugins/iregisteraudiopluginsscenario.h"
-#include "framework/multiwindows/imultiwindowsprovider.h"
+#include "async/asyncable.h"
 
-#include "appshell/iappshellconfiguration.h"
-#include "appshell/internal/isessionsmanager.h"
+#include "modularity/ioc.h"
+#include "iinteractive.h"
+#include "actions/iactionsdispatcher.h"
+#include "iappshellconfiguration.h"
+#include "isessionsmanager.h"
+#include "audioplugins/iregisteraudiopluginsscenario.h"
+// #include "project/iprojectautosaver.h"
+
+//! TODO AU4
+// #include "multiinstances/imultiinstancesprovider.h"
 
 namespace au::appshell {
-class StartupScenario : public au::appshell::IStartupScenario, public muse::async::Asyncable, public muse::Injectable
+class StartupScenario : public au::appshell::IStartupScenario, public muse::async::Asyncable
 {
-    muse::GlobalInject<IAppShellConfiguration> configuration;
-    muse::GlobalInject<muse::mi::IMultiWindowsProvider> multiwindowsProvider;
+    muse::Inject<muse::IInteractive> interactive;
+    muse::Inject<muse::actions::IActionsDispatcher> dispatcher;
+    muse::Inject<IAppShellConfiguration> configuration;
+    muse::Inject<ISessionsManager> sessionsManager;
+    muse::Inject<muse::audioplugins::IRegisterAudioPluginsScenario> registerAudioPluginsScenario;
+    // muse::Inject<au::project::IProjectAutoSaver> projectAutoSaver; // we don't use at the moment 01/09/2025 the project auto saver as we already have the autosave table
 
-    muse::Inject<muse::IInteractive> interactive { this };
-    muse::Inject<muse::actions::IActionsDispatcher> dispatcher { this };
-    muse::Inject<ISessionsManager> sessionsManager { this };
-    muse::Inject<muse::audioplugins::IRegisterAudioPluginsScenario> registerAudioPluginsScenario { this };
-
+//! TODO AU4
+    // INJECT(mi::IMultiInstancesProvider, multiInstancesProvider)
 public:
-    StartupScenario(const muse::modularity::ContextPtr& ctx)
-        : muse::Injectable(ctx) {}
 
     void setStartupType(const std::optional<std::string>& type) override;
 
@@ -56,7 +58,7 @@ public:
     const au::project::ProjectFile& startupScoreFile() const override;
     void setStartupScoreFile(const std::optional<au::project::ProjectFile>& file) override;
 
-    muse::async::Promise<muse::Ret> runOnSplashScreen() override;
+    void runOnSplashScreen() override;
     void runAfterSplashScreen() override;
     bool startupCompleted() const override;
 

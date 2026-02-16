@@ -24,7 +24,7 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
 import Muse.Ui 1.0
-import Muse.UiComponents
+import Muse.UiComponents 1.0
 import Audacity.Project 1.0
 
 import "internal/ProjectsPage"
@@ -107,7 +107,7 @@ Item {
 
             thumbnailComponent: Rectangle {
                 anchors.fill: parent
-                color: ui.theme.extra["white_color"]
+                color: "white"
 
                 StyledIconLabel {
                     anchors.centerIn: parent
@@ -115,7 +115,7 @@ Item {
                     iconCode: IconCode.PLUS
 
                     font.pixelSize: 16
-                    color: ui.theme.extra["black_color"]
+                    color: "black"
                 }
             }
 

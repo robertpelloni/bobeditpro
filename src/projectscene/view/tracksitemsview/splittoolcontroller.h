@@ -5,7 +5,6 @@
 #pragma once
 
 #include <QObject>
-#include <QCursor>
 
 #include "modularity/ioc.h"
 #include "context/iuicontextresolver.h"
@@ -14,7 +13,7 @@
 namespace au::projectscene {
 class TapHoldShortcut;
 
-class SplitToolController : public QObject, public muse::actions::Actionable, public muse::async::Asyncable, public muse::Injectable
+class SplitToolController : public QObject, public muse::actions::Actionable, public muse::async::Asyncable
 {
     Q_OBJECT
 
@@ -26,9 +25,9 @@ class SplitToolController : public QObject, public muse::actions::Actionable, pu
     Q_PROPERTY(double guidelinePosition READ guidelinePosition NOTIFY guidelinePositionChanged FINAL)
     Q_PROPERTY(bool guidelineVisible READ guidelineVisible NOTIFY guidelineVisibleChanged FINAL)
 
-    muse::Inject<muse::actions::IActionsDispatcher> dispatcher{ this };
-    muse::Inject<context::IGlobalContext> globalContext{ this };
-    muse::Inject<context::IUiContextResolver> uicontextResolver{ this };
+    muse::Inject<muse::actions::IActionsDispatcher> dispatcher;
+    muse::Inject<context::IGlobalContext> globalContext;
+    muse::Inject<context::IUiContextResolver> uicontextResolver;
 
 public:
     SplitToolController(QObject* parent = nullptr);

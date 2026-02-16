@@ -30,10 +30,10 @@
 #include <QThreadPool>
 #endif
 
+#include "appshell/view/internal/splashscreen/splashscreen.h"
+
 #include "modularity/ioc.h"
 #include "ui/internal/uiengine.h"
-
-#include "appshell/internal/splashscreen/splashscreen.h"
 
 #include "framework/global/globalmodule.h"
 #include "framework/global/internal/baseapplication.h"
@@ -50,7 +50,6 @@ using namespace au::appshell;
 static GlobalModule globalModule;
 
 App::App()
-    : muse::Injectable(muse::modularity::globalCtx())
 {
 }
 
@@ -64,7 +63,6 @@ int App::run(QCoreApplication& app, CommandLineParser& commandLineParser)
     // ====================================================
     // Setup modules: Resources, Exports, Imports, UiTypes
     // ====================================================
-    globalModule.setApplication(muapplication());
     globalModule.registerResources();
     globalModule.registerExports();
     globalModule.registerUiTypes();
@@ -78,23 +76,12 @@ int App::run(QCoreApplication& app, CommandLineParser& commandLineParser)
         m->registerExports();
     }
 
-    modularity::ContextPtr ctx = std::make_shared<modularity::Context>();
-    ctx->id = 0;
-    std::vector<muse::modularity::IContextSetup*>& csetups = contextSetups(ctx);
-    for (modularity::IContextSetup* s : csetups) {
-        s->registerExports();
-    }
-
     globalModule.resolveImports();
     globalModule.registerApi();
     for (modularity::IModuleSetup* m : m_modules) {
         m->registerUiTypes();
         m->resolveImports();
         m->registerApi();
-    }
-
-    for (modularity::IContextSetup* s : csetups) {
-        s->resolveImports();
     }
 
     const IApplication::RunMode runMode = commandLineParser.runMode();
@@ -114,29 +101,25 @@ int App::run(QCoreApplication& app, CommandLineParser& commandLineParser)
         m->onPreInit(runMode);
     }
 
-    for (modularity::IContextSetup* s : csetups) {
-        s->onPreInit(runMode);
-    }
-
 #ifdef AU_BUILD_APPSHELL_MODULE
     au::appshell::SplashScreen* splashScreen = nullptr;
     if (runMode == IApplication::RunMode::GuiApp) {
-        splashScreen = new SplashScreen(iocContext(), SplashScreen::Default);
+        splashScreen = new SplashScreen(SplashScreen::Default);
 
         // if (multiInstancesProvider()->isMainInstance()) {
-        //     splashScreen = new SplashScreen(iocContext(), SplashScreen::Default);
+        //     splashScreen = new SplashScreen(SplashScreen::Default);
         // } else {
         //     const project::ProjectFile& file = startupScenario()->startupScoreFile();
         //     if (file.isValid()) {
         //         if (file.hasDisplayName()) {
-        //             splashScreen = new SplashScreen(iocContext(), SplashScreen::ForNewInstance, false, file.displayName(true /* includingExtension */));
+        //             splashScreen = new SplashScreen(SplashScreen::ForNewInstance, false, file.displayName(true /* includingExtension */));
         //         } else {
-        //             splashScreen = new SplashScreen(iocContext(), SplashScreen::ForNewInstance, false);
+        //             splashScreen = new SplashScreen(SplashScreen::ForNewInstance, false);
         //         }
         //     } else if (startupScenario()->isStartWithNewFileAsSecondaryInstance()) {
-        //         splashScreen = new SplashScreen(iocContext(), SplashScreen::ForNewInstance, true);
+        //         splashScreen = new SplashScreen(SplashScreen::ForNewInstance, true);
         //     } else {
-        //         splashScreen = new SplashScreen(iocContext(), SplashScreen::Default);
+        //         splashScreen = new SplashScreen(SplashScreen::Default);
         //     }
         // }
     }
@@ -154,20 +137,12 @@ int App::run(QCoreApplication& app, CommandLineParser& commandLineParser)
         m->onInit(runMode);
     }
 
-    for (modularity::IContextSetup* s : csetups) {
-        s->onInit(runMode);
-    }
-
     // ====================================================
     // Setup modules: onAllInited
     // ====================================================
     globalModule.onAllInited(runMode);
     for (modularity::IModuleSetup* m : m_modules) {
         m->onAllInited(runMode);
-    }
-
-    for (modularity::IContextSetup* s : csetups) {
-        s->onAllInited(runMode);
     }
 
     // ====================================================
@@ -221,38 +196,52 @@ int App::run(QCoreApplication& app, CommandLineParser& commandLineParser)
         // ====================================================
         // Setup Qml Engine
         // ====================================================
-        QQmlApplicationEngine* engine = modularity::ioc()->resolve<muse::ui::IUiEngine>("app")->qmlAppEngine();
+        QQmlApplicationEngine* engine = modularity::_ioc()->resolve<muse::ui::IUiEngine>("app")->qmlAppEngine();
+
+#if defined(Q_OS_WIN)
+        const QString mainQmlFile = "/platform/win/Main.qml";
+#elif defined(Q_OS_MACOS)
+        const QString mainQmlFile = "/platform/mac/Main.qml";
+#elif defined(Q_OS_LINUX) || defined(Q_OS_FREEBSD)
+        const QString mainQmlFile = "/platform/linux/Main.qml";
+#elif defined(Q_OS_WASM)
+        const QString mainQmlFile = "/Main.wasm.qml";
+#endif
+
+        const QUrl url(QStringLiteral("qrc:/qml") + mainQmlFile);
 
         QObject::connect(engine, &QQmlApplicationEngine::objectCreated,
-                         &app, [this, splashScreen](QObject* obj, const QUrl& objUrl) {
-                if (!obj) {
+                         &app, [this, url, splashScreen](QObject* obj, const QUrl& objUrl) {
+                if (!obj && url == objUrl) {
                     LOGE() << "failed Qml load\n";
                     QCoreApplication::exit(-1);
                     return;
                 }
 
-                // ====================================================
-                // Setup modules: onDelayedInit
-                // ====================================================
+                if (url == objUrl) {
+                    // ====================================================
+                    // Setup modules: onDelayedInit
+                    // ====================================================
 
-                startupScenario()->runOnSplashScreen();
+                    startupScenario()->runOnSplashScreen();
 
-                globalModule.onDelayedInit();
-                for (modularity::IModuleSetup* m : m_modules) {
-                    m->onDelayedInit();
+                    globalModule.onDelayedInit();
+                    for (modularity::IModuleSetup* m : m_modules) {
+                        m->onDelayedInit();
+                    }
+
+                    if (splashScreen) {
+                        splashScreen->close();
+                        delete splashScreen;
+                    }
+
+                    // The main window must be shown at this point so KDDockWidgets can read its size correctly
+                    // and scale all sizes properly. https://github.com/musescore/MuseScore/issues/21148
+                    QQuickWindow* w = dynamic_cast<QQuickWindow*>(obj);
+                    w->setVisible(true);
+
+                    startupScenario()->runAfterSplashScreen();
                 }
-
-                if (splashScreen) {
-                    splashScreen->close();
-                    delete splashScreen;
-                }
-
-                // The main window must be shown at this point so KDDockWidgets can read its size correctly
-                // and scale all sizes properly. https://github.com/musescore/MuseScore/issues/21148
-                QQuickWindow* w = dynamic_cast<QQuickWindow*>(obj);
-                w->setVisible(true);
-
-                startupScenario()->runAfterSplashScreen();
             }, Qt::QueuedConnection);
 
         QObject::connect(engine, &QQmlEngine::warnings, [](const QList<QQmlError>& warnings) {
@@ -269,7 +258,7 @@ int App::run(QCoreApplication& app, CommandLineParser& commandLineParser)
         //! Needs to be called before any QQuickWindows are shown.
         QQuickWindow::setDefaultAlphaBuffer(true);
 
-        engine->loadFromModule("Audacity.AppShell", "Main");
+        engine->load(url);
 #endif // MUE_BUILD_APPSHELL_MODULE
     } break;
     case IApplication::RunMode::AudioPluginRegistration: {
@@ -305,7 +294,7 @@ int App::run(QCoreApplication& app, CommandLineParser& commandLineParser)
 #ifdef AU_BUILD_APPSHELL_MODULE
     if (runMode == IApplication::RunMode::GuiApp) {
         // Engine quit
-        modularity::ioc()->resolve<muse::ui::IUiEngine>("app")->quit();
+        modularity::_ioc()->resolve<muse::ui::IUiEngine>("app")->quit();
     }
 #endif
     // Deinit
@@ -325,37 +314,9 @@ int App::run(QCoreApplication& app, CommandLineParser& commandLineParser)
     // Delete modules
     qDeleteAll(m_modules);
     m_modules.clear();
-    modularity::ioc()->reset();
+    modularity::_ioc()->reset();
 
     return retCode;
-}
-
-std::vector<muse::modularity::IContextSetup*>& App::contextSetups(const muse::modularity::ContextPtr& ctx)
-{
-    for (Context& c : m_contexts) {
-        if (c.ctx->id == ctx->id) {
-            return c.setups;
-        }
-    }
-
-    m_contexts.emplace_back();
-
-    Context& ref = m_contexts.back();
-    ref.ctx = ctx;
-
-    modularity::IContextSetup* global = globalModule.newContext(ctx);
-    if (global) {
-        ref.setups.push_back(global);
-    }
-
-    for (modularity::IModuleSetup* m : m_modules) {
-        modularity::IContextSetup* s = m->newContext(ctx);
-        if (s) {
-            ref.setups.push_back(s);
-        }
-    }
-
-    return ref.setups;
 }
 
 void App::applyCommandLineOptions(const CommandLineParser::Options& options)

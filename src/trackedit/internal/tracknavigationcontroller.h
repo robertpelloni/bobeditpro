@@ -5,14 +5,12 @@
 #pragma once
 
 #include "framework/actions/actionable.h"
-#include "framework/global/async/asyncable.h"
+#include "async/asyncable.h"
 
 #include "framework/global/modularity/ioc.h"
-#include "framework/actions/iactionsdispatcher.h"
-#include "framework/ui/inavigationcontroller.h"
 #include "trackedit/iselectioncontroller.h"
-#include "context/iglobalcontext.h"
-#include "itrackeditinteraction.h"
+#include "actions/iactionsdispatcher.h"
+#include "ui/inavigationcontroller.h"
 
 #include "trackedit/internal/itracknavigationcontroller.h"
 
@@ -22,82 +20,29 @@ enum class SelectionDirection {
     Down
 };
 
-class TrackNavigationController : public ITrackNavigationController, public muse::actions::Actionable, public muse::async::Asyncable,
-    public muse::Injectable
+class TrackNavigationController : public ITrackNavigationController, public muse::actions::Actionable, public muse::async::Asyncable
 {
-    muse::Inject<muse::actions::IActionsDispatcher> dispatcher{ this };
-    muse::Inject<muse::ui::INavigationController> navigationController{ this };
-    muse::Inject<au::context::IGlobalContext> globalContext{ this };
-    muse::Inject<au::trackedit::ISelectionController> selectionController{ this };
-    muse::Inject<au::trackedit::ITrackeditInteraction> trackeditInteraction{ this };
+    muse::Inject<muse::actions::IActionsDispatcher> dispatcher;
+    muse::Inject<au::trackedit::ISelectionController> selectionController;
+    muse::Inject<muse::ui::INavigationController> navigationController;
 
 public:
-    TrackNavigationController(const muse::modularity::ContextPtr& ctx)
-        : muse::Injectable(ctx) {}
-
     void init();
-
-    bool isNavigationEnabled() const override;
-    void setIsNavigationActive(bool active) override;
-    muse::async::Notification isNavigationActiveChanged() const override;
-
-    TrackId focusedTrack() const override;
-    void setFocusedTrack(const TrackId& trackId, bool highlight = false) override;
-    muse::async::Channel<TrackId, bool /*highlight*/> focusedTrackChanged() const override;
-
-    TrackItemKey focusedItem() const override;
-    void setFocusedItem(const TrackItemKey& key, bool highlight = false) override;
-    muse::async::Channel<TrackItemKey, bool /*highlight*/> focusedItemChanged() const override;
-
-    muse::async::Channel<TrackItemKey> openContextMenuRequested() const override;
+    void focusTrackByIndex(const muse::actions::ActionData& args) override;
+    void focusPrevTrack() override;
+    void focusNextTrack() override;
+    void navigateUp(const muse::actions::ActionData& args) override;
+    void navigateDown(const muse::actions::ActionData& args) override;
+    void toggleSelectionOnFocusedTrack() override;
+    void trackRangeSelection() override;
+    void multiSelectionUp() override;
+    void multiSelectionDown() override;
 
 private:
-    TrackItemKey focusedItemKey() const;
-    bool isFocusedItemValid() const;
-    bool isFocusedItemLabel() const;
-
-    TrackItemKeyList sortedItemsKeys(const TrackId& trackId) const;
-
-    bool isTrackItemsEmpty(const TrackId& trackId) const;
-    bool isFirstTrack(const TrackId& trackId) const;
-    bool isLastTrack(const TrackId& trackId) const;
-
-    void navigateToNextPanel();
-    void navigateToPrevPanel();
-
-    void navigateToPrevTrack();
-    void navigateToNextTrack();
-    void navigateToFirstTrack();
-    void navigateToLastTrack();
-
-    void navigateToNextItem();
-    void navigateToPrevItem();
-    void navigateToFirstItem();
-    void navigateToLastItem();
-
-    void toggleSelection();
-    void trackRangeSelection();
-
-    void multiSelectionUp();
-    void multiSelectionDown();
-
     void updateSelectionStart(SelectionDirection direction);
     void updateTrackSelection(TrackIdList& selectedTracks, const TrackId& previousFocusedTrack);
 
-    void openContextMenuForFocusedItem();
-
-    void au3SetTrackFocused(const TrackId& trackId);
-
-    bool m_isNavigationActive = false;
-    muse::async::Notification m_isNavigationActiveChannel;
-
     std::optional<TrackId> m_selectionStart;
     std::optional<TrackId> m_lastSelectedTrack;
-
-    TrackItemKey m_focusedItemKey;
-    muse::async::Channel<TrackItemKey, bool /*highlight*/> m_focusedItemChanged;
-    muse::async::Channel<TrackId, bool /*highlight*/> m_focusedTrackChanged;
-
-    muse::async::Channel<TrackItemKey> m_openContextMenuRequested;
 };
 }

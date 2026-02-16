@@ -41,8 +41,6 @@ static const ActionCode LOOP_ACTION_CODE("toggle-loop-region");
 
 static const ActionCode SPLIT_TOOL_ACTION_CODE("split-tool");
 
-static const ActionCode TOGGLE_GLOBAL_SPECTROGRAM_VIEW_ACTION_CODE("action://trackedit/global-view-spectrogram");
-
 static const ActionQuery PLAYBACK_LEVEL_QUERY("action://playback/level");
 static const ActionCode PLAYBACK_TIME("playback-time");
 static const ActionCode PLAYBACK_BPM("playback-bpm");
@@ -65,7 +63,6 @@ static PlaybackToolBarModel::ItemType itemType(const ActionCode& actionCode)
         { PLAYBACK_REWIND_END_QUERY.toString(), PlaybackToolBarModel::PLAYBACK_CONTROL },
         { LOOP_ACTION_CODE, PlaybackToolBarModel::PLAYBACK_CONTROL },
         { SPLIT_TOOL_ACTION_CODE, PlaybackToolBarModel::PLAYBACK_CONTROL },
-        { TOGGLE_GLOBAL_SPECTROGRAM_VIEW_ACTION_CODE, PlaybackToolBarModel::PLAYBACK_CONTROL },
         { SNAP_ACTION_CODE, PlaybackToolBarModel::SNAP }
     };
 
@@ -92,12 +89,9 @@ void PlaybackToolBarModel::load()
             reload();
             emit isEnabledChanged();
             if (context()->currentProject()) {
-                setupProjectConnections(*context()->currentProject());
+                context()->currentProject()->viewState()->splitToolEnabled().ch.onReceive(this, [this](bool){ updateSplitState(); });
             }
         });
-        if (context()->currentProject()) {
-            setupProjectConnections(*context()->currentProject());
-        }
 
         configuration()->playbackMeterPositionChanged().onNotify(this, [this]() {
             reload();
@@ -115,13 +109,6 @@ void PlaybackToolBarModel::reload()
 {
     load();
     updateStates();
-}
-
-void PlaybackToolBarModel::setupProjectConnections(project::IAudacityProject& project)
-{
-    const auto vs = project.viewState();
-    vs->splitToolEnabled().ch.onReceive(this, [this](bool){ updateSplitState(); });
-    vs->globalSpectrogramViewToggleChanged().onNotify(this, [this] { updateGlobalSpectrogramViewState(); });
 }
 
 void PlaybackToolBarModel::onActionsStateChanges(const muse::actions::ActionCodeList& codes)
@@ -153,7 +140,6 @@ void PlaybackToolBarModel::updateStates()
     updateRecordState();
     updateLoopState();
     updateSplitState();
-    updateGlobalSpectrogramViewState();
 }
 
 void PlaybackToolBarModel::updatePlayState()
@@ -177,11 +163,11 @@ void PlaybackToolBarModel::updatePlayState()
 
     item->setSelected(isPlaying);
 
-    QColor iconColor = uiConfiguration()->currentTheme().values.value(muse::ui::PLAY_COLOR).value<QColor>();
+    QColor iconColor = QColor(configuration()->playColor().toQColor());
     QColor backgroundColor = QColor(uiConfiguration()->currentTheme().values.value(muse::ui::BUTTON_COLOR).toString());
     if (isPlaying) {
         iconColor = QColor(uiConfiguration()->currentTheme().values.value(muse::ui::FONT_PRIMARY_COLOR).toString());
-        backgroundColor = uiConfiguration()->currentTheme().values.value(muse::ui::PLAY_COLOR).value<QColor>();
+        backgroundColor = QColor(configuration()->playColor().toQColor());
     } else if (isRecording) {
         iconColor = QColor(uiConfiguration()->currentTheme().values.value(muse::ui::FONT_PRIMARY_COLOR).toString());
     }
@@ -218,11 +204,11 @@ void PlaybackToolBarModel::updateRecordState()
 
     item->setSelected(isRecording);
 
-    QColor iconColor = uiConfiguration()->currentTheme().values.value(muse::ui::RECORD_COLOR).value<QColor>();
+    QColor iconColor = QColor(recordConfiguration()->recordColor().toQColor());
     QColor backgroundColor = QColor(uiConfiguration()->currentTheme().values.value(muse::ui::BUTTON_COLOR).toString());
     if (isRecording) {
         iconColor = QColor(uiConfiguration()->currentTheme().values.value(muse::ui::BACKGROUND_PRIMARY_COLOR).toString());
-        backgroundColor = uiConfiguration()->currentTheme().values.value(muse::ui::RECORD_COLOR).value<QColor>();
+        backgroundColor = QColor(recordConfiguration()->recordColor().toQColor());
     }
 
     item->setIconColor(iconColor);
@@ -270,35 +256,14 @@ void PlaybackToolBarModel::updateSplitState()
     bool splitToolEnabled = vs->splitToolEnabled().val;
     item->setSelected(splitToolEnabled);
 
+    QColor iconColor = QColor(uiConfiguration()->currentTheme().values.value(muse::ui::FONT_PRIMARY_COLOR).toString());
     QColor backgroundColor = QColor(uiConfiguration()->currentTheme().values.value(muse::ui::BUTTON_COLOR).toString());
     if (splitToolEnabled) {
+        iconColor = QColor(uiConfiguration()->currentTheme().values.value(muse::ui::FONT_PRIMARY_COLOR).toString());
         backgroundColor = QColor(uiConfiguration()->currentTheme().values.value(muse::ui::ACCENT_COLOR).toString());
     }
 
-    item->setBackgroundColor(backgroundColor);
-}
-
-void PlaybackToolBarModel::updateGlobalSpectrogramViewState()
-{
-    auto prj = context()->currentProject();
-
-    if (!prj) {
-        return;
-    }
-
-    PlaybackToolBarControlItem* const item
-        = dynamic_cast<PlaybackToolBarControlItem*>(findItemPtr(TOGGLE_GLOBAL_SPECTROGRAM_VIEW_ACTION_CODE));
-
-    if (item == nullptr) {
-        return;
-    }
-
-    const auto vs = prj->viewState();
-    const bool isOn = vs->globalSpectrogramViewIsOn();
-    item->setSelected(isOn);
-
-    const QColor backgroundColor{ uiConfiguration()->currentTheme().values.value(isOn ? muse::ui::ACCENT_COLOR : muse::ui::BUTTON_COLOR).
-                                  toString() };
+    item->setIconColor(iconColor);
     item->setBackgroundColor(backgroundColor);
 }
 

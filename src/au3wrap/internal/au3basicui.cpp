@@ -2,15 +2,14 @@
 * Audacity: A Digital Audio Editor
 */
 
-#include "framework/global/runtime.h"
-#include "framework/global/async/async.h"
-
-#include "progressdialog.h"
 #include "au3basicui.h"
+#include "progressdialog.h"
+
+#include "global/async/async.h"
 
 void Au3BasicUI::DoCallAfter(const BasicUI::Action& action)
 {
-    muse::async::Async::call(this, action, muse::runtime::mainThreadId());
+    muse::async::Async::call(this, action);
 }
 
 void Au3BasicUI::DoYield()
@@ -102,7 +101,7 @@ std::unique_ptr<BasicUI::ProgressDialog> Au3BasicUI::DoMakeProgress(const Transl
 {
     Q_UNUSED(flags);
     Q_UNUSED(remainingLabelText);
-    auto dialog = std::make_unique<ProgressDialog>(iocContext());
+    auto dialog = std::make_unique<ProgressDialog>();
     dialog->SetDialogTitle(title);
     dialog->SetMessage(message);
     return dialog;

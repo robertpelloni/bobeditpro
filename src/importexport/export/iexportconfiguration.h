@@ -10,10 +10,9 @@
 #include "modularity/imoduleinterface.h"
 
 #include "types/exporttypes.h"
-#include "types/val.h"
 
 namespace au::importexport {
-class IExportConfiguration : MODULE_GLOBAL_EXPORT_INTERFACE
+class IExportConfiguration : MODULE_EXPORT_INTERFACE
 {
     INTERFACE_ID(IExportConfiguration)
 
@@ -33,17 +32,9 @@ public:
     virtual void setCurrentFormat(const std::string& format) = 0;
     virtual muse::async::Notification currentFormatChanged() const = 0;
 
-    virtual int exportChannelsType() const = 0;
-    virtual void setExportChannelsType(int channels) = 0;
-    virtual muse::async::Notification exportChannelsTypeChanged() const = 0;
-
     virtual int exportChannels() const = 0;
     virtual void setExportChannels(int channels) = 0;
     virtual muse::async::Notification exportChannelsChanged() const = 0;
-
-    virtual muse::Val exportCustomChannelMapping() const = 0;
-    virtual void setExportCustomChannelMapping(const muse::Val& mapping) = 0;
-    virtual muse::async::Notification exportCustomChannelMappingChanged() const = 0;
 
     virtual int exportSampleRate() const = 0;
     virtual void setExportSampleRate(int newRate) = 0;

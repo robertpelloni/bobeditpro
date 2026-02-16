@@ -28,7 +28,6 @@
 #include "Sequence.h"
 #include "au3-time-and-pitch/TimeAndPitchInterface.h"
 #include "au3-exceptions/UserException.h"
-#include "WaveClipRealtimeEffects.h"
 
 #include "framework/global/realfn.h"
 
@@ -44,20 +43,11 @@ void WaveClipListener::WriteXMLAttributes(XMLWriter&) const
 {
 }
 
-void WaveClipListener::WriteXMLTags(XMLWriter&) const
-{
-}
-
 bool WaveClipListener::HandleXMLAttribute(
     const std::string_view&, const XMLAttributeValueView&)
 {
     return false;
 }
-
- XMLTagHandler* WaveClipListener::HandleXMLChild(const std::string_view&)
- {
-     return nullptr;
- }
 
 void WaveClipListener::MakeStereo(WaveClipListener&&, bool)
 {
@@ -303,8 +293,6 @@ WaveClip::WaveClip(
 
     mColor = orig.mColor;
 
-    mSelected = orig.mSelected;
-
     assert(NChannels() == (token.emptyCopy ? 0 : orig.NChannels()));
     assert(token.emptyCopy || CheckInvariants());
     assert(!copyCutlines || NumCutLines() == orig.NumCutLines());
@@ -369,8 +357,6 @@ WaveClip::WaveClip(
     }
 
     mColor = orig.mColor;
-
-    mSelected = orig.mSelected;
 
     assert(NChannels() == orig.NChannels());
     assert(CheckInvariants());
@@ -1111,7 +1097,6 @@ static constexpr auto ClipTempo_attr = "clipTempo";
 static constexpr auto Name_attr = "name";
 static constexpr auto GroupId_attr = "groupId";
 static constexpr auto Color_attr = "color";
-static constexpr auto Selected_attr = "isSelected";
 
 bool WaveClip::HandleXMLTag(const std::string_view& tag, const AttributesList& attrs)
 {
@@ -1185,8 +1170,6 @@ bool WaveClip::HandleXMLTag(const std::string_view& tag, const AttributesList& a
                 if (value.IsStringView()) {
                     SetColor(value.ToWString());
                 }
-            } else if (attr == Selected_attr && value.TryGet(boolValue)) {
-                SetSelected(boolValue);
             } else if (Attachments::FindIf(
                            [&](WaveClipListener& listener){
                 return listener.HandleXMLAttribute(attr, value);
@@ -1239,14 +1222,7 @@ XMLTagHandler* WaveClip::HandleXMLChild(const std::string_view& tag)
         mCutLines.push_back(WaveClip::NewShared(1, pFirst->GetFactory(), format, mRate));
         return mCutLines.back().get();
     } else {
-         if (tag == RealtimeEffectList::XMLTag()) {
-             // Force creation if missing, to support loading
-             return static_cast<XMLTagHandler*>(&WaveClipRealtimeEffects::Get(*this));
-         }
-         auto pHandler = Attachments::FindIf([&](WaveClipListener& listener){
-             return listener.HandleXMLChild(tag);
-         });
-         return pHandler ? dynamic_cast<XMLTagHandler*>(pHandler) : nullptr;
+        return nullptr;
     }
 }
 
@@ -1273,7 +1249,6 @@ void WaveClip::WriteXML(size_t ii, XMLWriter& xmlFile) const
     xmlFile.WriteAttr(Name_attr, mName);
     xmlFile.WriteAttr(GroupId_attr, static_cast<long>(mGroupId));
     xmlFile.WriteAttr(Color_attr, mColor);
-    xmlFile.WriteAttr(Selected_attr, mSelected);
 
     if (mClipTempo) {
         xmlFile.WriteAttr(ClipTempo_attr, *mClipTempo, 8);
@@ -1288,10 +1263,6 @@ void WaveClip::WriteXML(size_t ii, XMLWriter& xmlFile) const
 
     mSequences[ii]->WriteXML(xmlFile);
     mEnvelope->WriteXML(xmlFile);
-
-    Attachments::ForEach([&](const WaveClipListener& listener){
-        listener.WriteXMLTags(xmlFile);
-    });
 
     for (const auto& clip: mCutLines) {
         clip->WriteXML(ii, xmlFile);
@@ -1954,16 +1925,6 @@ void WaveClip::SetColor(const wxString& color)
 const wxString& WaveClip::GetColor() const
 {
     return mColor;
-}
-
-void WaveClip::SetSelected(bool selected)
-{
-    mSelected = selected;
-}
-
-bool WaveClip::GetSelected() const
-{
-    return mSelected;
 }
 
 sampleCount WaveClip::TimeToSamples(double time) const

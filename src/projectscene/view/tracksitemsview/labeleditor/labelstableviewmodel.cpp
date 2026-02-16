@@ -3,8 +3,6 @@
 */
 #include "labelstableviewmodel.h"
 
-#include <QTimer>
-
 #include "framework/global/translation.h"
 #include "framework/global/log.h"
 
@@ -48,7 +46,7 @@ static std::vector<std::string> importExportFilter(const std::vector<au::importe
 }
 
 LabelsTableViewModel::LabelsTableViewModel(QObject* parent)
-    : AbstractTableViewModel(parent), muse::Injectable(muse::iocCtxForQmlObject(this))
+    : AbstractTableViewModel(parent)
 {
 }
 
@@ -191,7 +189,7 @@ void LabelsTableViewModel::handleTrackMenuItem(int row, int column, const QStrin
     QString labelTrackItemId = itemId;
 
     if (labelTrackItemId == NEW_LABEL_TRACK_CODE) {
-        labelTrackItemId = createNewLabelTrack(row).val;
+        labelTrackItemId = createNewLabelTrack(row);
     }
 
     if (labelTrackItemId.isEmpty()) {
@@ -221,10 +219,8 @@ void LabelsTableViewModel::addNewLabel()
 
     std::vector<trackedit::Track> labelTracks = allLabelTracks();
     if (labelTracks.empty()) {
-        muse::RetVal<QString> retVal = createNewLabelTrack(-1);
-        if (retVal.ret) {
-            addNewLabel();
-        }
+        createNewLabelTrack(-1);
+        addNewLabel();
         return;
     }
 
@@ -472,8 +468,8 @@ bool LabelsTableViewModel::moveLabel(int row, const Val& value)
 
     trackedit::LabelKey labelKey = verticalHeader->labelKey().key;
 
-    muse::RetVal<trackedit::LabelKeyList> retVal = trackeditInteraction()->moveLabelsToTrack({ labelKey }, cell->currentTrackId(),
-                                                                                             true /* completed */);
+    muse::RetVal<trackedit::LabelKeyList> retVal = trackeditInteraction()->moveLabels({ labelKey }, cell->currentTrackId(),
+                                                                                      true /* completed */);
     if (!retVal.ret) {
         return false;
     }
@@ -574,14 +570,11 @@ bool LabelsTableViewModel::changeLabelHighFrequency(int row, const Val& value)
     return trackeditInteraction()->changeLabelHighFrequency(labelKey, value.toDouble());
 }
 
-muse::RetVal<QString> LabelsTableViewModel::createNewLabelTrack(int currentRow)
+QString LabelsTableViewModel::createNewLabelTrack(int currentRow)
 {
-    muse::RetVal<QString> result;
-
     RetVal<muse::Val> rv = interactive()->openSync("audacity://projectscene/addnewlabeltrack");
     if (!rv.ret) {
-        result.ret = rv.ret;
-        return result;
+        return QString();
     }
 
     trackedit::TrackId newTrackId = rv.val.toInt();
@@ -607,10 +600,7 @@ muse::RetVal<QString> LabelsTableViewModel::createNewLabelTrack(int currentRow)
         }
     }
 
-    result.ret = make_ok();
-    result.val = newLabelTrackItemId;
-
-    return result;
+    return newLabelTrackItemId;
 }
 
 io::path_t LabelsTableViewModel::selectFileForExport()

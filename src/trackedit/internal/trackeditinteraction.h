@@ -13,11 +13,11 @@
 namespace au::trackedit {
 class TrackeditInteraction : public ITrackeditInteraction, public muse::Injectable
 {
-    muse::Inject<au::record::IRecordController> recordController { this };
-    muse::Inject<au::playback::IPlaybackController> playbackController { this };
+    muse::Inject<au::record::IRecordController> recordController;
+    muse::Inject<au::playback::IPlaybackController> playbackController;
 
 public:
-    TrackeditInteraction(const muse::modularity::ContextPtr& ctx, std::unique_ptr<ITrackeditInteraction> interaction);
+    TrackeditInteraction(std::unique_ptr<ITrackeditInteraction> interaction);
 
 private:
     muse::secs_t clipStartTime(const trackedit::ClipKey& clipKey) const override;
@@ -34,6 +34,7 @@ private:
     bool resetClipSpeed(const ClipKey& clipKey) override;
     bool changeClipColor(const ClipKey& clipKey, const std::string& color) override;
     bool changeTracksColor(const TrackIdList& tracksIds, const std::string& color) override;
+    bool changeAudioTrackViewType(const trackedit::TrackId& trackId, trackedit::TrackViewType viewType) override;
     bool changeClipOptimizeForVoice(const ClipKey& clipKey, bool optimize) override;
     bool renderClipPitchAndSpeed(const ClipKey& clipKey) override;
     void clearClipboard() override;
@@ -46,9 +47,7 @@ private:
     bool removeClip(const trackedit::ClipKey& clipKey) override;
     bool removeClips(const ClipKeyList& clipKeyList, bool moveClips) override;
     bool removeTracksData(const TrackIdList& tracksIds, secs_t begin, secs_t end, bool moveClips) override;
-    muse::RetVal<ClipKeyList> moveClips(const ClipKeyList& clipKeyList, secs_t timePositionOffset, int trackPositionOffset, bool completed,
-                                        bool&) override;
-    bool moveRangeSelection(secs_t timePositionOffset, bool completed) override;
+    bool moveClips(secs_t timePositionOffset, int trackPositionOffset, bool completed, bool&) override;
     void cancelItemDragEdit() override;
     bool splitTracksAt(const TrackIdList& tracksIds, std::vector<secs_t> pivots) override;
     bool splitClipsAtSilences(const ClipKeyList& clipKeyList) override;
@@ -63,20 +62,18 @@ private:
     bool clipSplitDelete(const ClipKey& clipKey) override;
     bool splitCutSelectedOnTracks(const TrackIdList tracksIds, secs_t begin, secs_t end) override;
     bool splitDeleteSelectedOnTracks(const TrackIdList tracksIds, secs_t begin, secs_t end) override;
-    bool trimClipsLeft(const ClipKeyList& clipKeyList, secs_t deltaSec, secs_t minClipDuration, bool completed, UndoPushType type) override;
-    bool trimClipsRight(const ClipKeyList& clipKeyList, secs_t deltaSec, secs_t minClipDuration, bool completed,
-                        UndoPushType type) override;
-    bool stretchClipsLeft(const ClipKeyList& clipKeyList, secs_t deltaSec, secs_t minClipDuration, bool completed,
-                          UndoPushType type) override;
-    bool stretchClipsRight(const ClipKeyList& clipKeyList, secs_t deltaSec, secs_t minClipDuration, bool completed,
-                           UndoPushType type) override;
+    bool trimClipLeft(const ClipKey& clipKey, secs_t deltaSec, secs_t minClipDuration, bool completed, UndoPushType type) override;
+    bool trimClipRight(const ClipKey& clipKey, secs_t deltaSec, secs_t minClipDuration, bool completed, UndoPushType type) override;
+    bool stretchClipLeft(const ClipKey& clipKey, secs_t deltaSec, secs_t minClipDuration, bool completed, UndoPushType type) override;
+    bool stretchClipRight(const ClipKey& clipKey, secs_t deltaSec, secs_t minClipDuration, bool completed, UndoPushType type) override;
     muse::secs_t clipDuration(const trackedit::ClipKey& clipKey) const override;
+    std::optional<secs_t> getLeftmostClipStartTime(const ClipKeyList& clipKeys) const override;
+    std::optional<secs_t> getRightmostClipEndTime(const ClipKeyList& clipKeys) const override;
     double nearestZeroCrossing(double time) const override;
     muse::Ret makeRoomForClip(const trackedit::ClipKey& clipKey) override;
 
     bool newMonoTrack() override;
     bool newStereoTrack() override;
-    bool newBusTrack() override;
     muse::RetVal<TrackId> newLabelTrack(const muse::String& title = muse::String()) override;
 
     bool deleteTracks(const TrackIdList& trackIds) override;
@@ -126,16 +123,13 @@ private:
     bool cutLabel(const LabelKey& labelKey) override;
     bool copyLabel(const LabelKey& labelKey) override;
 
-    bool moveLabels(const LabelKeyList& labelKeys, secs_t timePositionOffset, bool completed) override;
-    muse::RetVal<LabelKeyList> moveLabels(const LabelKeyList& labelKeys, secs_t timePositionOffset, int trackPositionOffset,
-                                          bool completed) override;
-    muse::RetVal<LabelKeyList> moveLabelsToTrack(const LabelKeyList& labelKeys, const TrackId& toTrackId, bool completed) override;
+    bool moveLabels(secs_t timePositionOffset, bool completed) override;
+    muse::RetVal<LabelKeyList> moveLabels(const LabelKeyList& labelKeys, const TrackId& toTrackId, bool completed) override;
 
     bool stretchLabelLeft(const LabelKey& labelKey, secs_t newStartTime, bool completed) override;
-    bool stretchLabelsLeft(const LabelKeyList& labelKeyList, secs_t deltaSec, bool completed) override;
-
     bool stretchLabelRight(const LabelKey& labelKey, secs_t newEndTime, bool completed) override;
-    bool stretchLabelsRight(const LabelKeyList& labelKeyList, secs_t deltaSec, bool completed) override;
+
+    std::optional<secs_t> getLeftmostLabelStartTime(const LabelKeyList& labelKeys) const override;
 
     muse::Progress progress() const override;
 
@@ -173,7 +167,7 @@ private:
     template<typename Func, typename ... Args>
     muse::Ret withProgress(Func&& method, Args&&... args) const
     {
-        auto progressDialog = std::make_unique<ProgressDialog>(iocContext());
+        auto progressDialog = std::make_unique<ProgressDialog>();
         progress().progressChanged().onReceive(progressDialog.get(),
                                                [&](int64_t current, int64_t total, const std::string&) {
             const auto result = progressDialog->Poll(current, total);

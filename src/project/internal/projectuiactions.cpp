@@ -1,7 +1,6 @@
 #include "projectuiactions.h"
 
 #include "context/uicontext.h"
-#include "modularity/ioc.h"
 #include "types/translatablestring.h"
 #include "context/shortcutcontext.h"
 
@@ -97,11 +96,11 @@ const UiActionList ProjectUiActions::m_actions = {
              TranslatableString("action", "Insert"),
              TranslatableString("action", "Insert")
              ),
-    UiAction("rename-item",
+    UiAction("rename-clip",
              au::context::UiCtxAny,
              au::context::CTX_ANY,
-             TranslatableString("action", "Rename item"),
-             TranslatableString("action", "Rename item")
+             TranslatableString("action", "Rename clip"),
+             TranslatableString("action", "Rename clip")
              ),
     UiAction("trim-clip",
              au::context::UiCtxUnknown,
@@ -758,7 +757,7 @@ const UiActionList ProjectUiActions::m_actions = {
 };
 
 ProjectUiActions::ProjectUiActions(const std::shared_ptr<ProjectActionsController>& controller)
-    : muse::Injectable(controller->iocContext()), m_controller(controller)
+    : m_controller(controller)
 {
 }
 

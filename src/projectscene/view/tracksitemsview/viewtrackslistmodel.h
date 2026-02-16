@@ -13,16 +13,15 @@
 #include "context/iglobalcontext.h"
 #include "projectscene/iprojectsceneconfiguration.h"
 #include "trackedit/iselectioncontroller.h"
+#include "trackedit/iprojecthistory.h"
 #include "trackedit/itrackeditinteraction.h"
-#include "trackedit/internal/itracknavigationcontroller.h"
 #include "playback/itrackplaybackcontrol.h"
 #include "playback/iplaybackconfiguration.h"
 
 #include "trackedit/dom/track.h"
 
 namespace au::projectscene {
-class ViewTracksListModel : public QAbstractListModel, public muse::async::Asyncable, public muse::actions::Actionable,
-    public muse::Injectable
+class ViewTracksListModel : public QAbstractListModel, public muse::async::Asyncable, public muse::actions::Actionable
 {
     Q_OBJECT
 
@@ -30,14 +29,14 @@ class ViewTracksListModel : public QAbstractListModel, public muse::async::Async
     Q_PROPERTY(int verticalRulerWidth READ verticalRulerWidth NOTIFY verticalRulerWidthChanged FINAL)
     Q_PROPERTY(int totalTracksHeight READ totalTracksHeight NOTIFY totalTracksHeightChanged FINAL)
 
-    muse::GlobalInject<projectscene::IProjectSceneConfiguration> projectSceneConfiguration;
-    muse::GlobalInject<playback::IPlaybackConfiguration> playbackConfiguration;
+    muse::Inject<au::context::IGlobalContext> globalContext;
+    muse::Inject<projectscene::IProjectSceneConfiguration> projectSceneConfiguration;
+    muse::Inject<trackedit::ISelectionController> selectionController;
+    muse::Inject<trackedit::IProjectHistory> projectHistory;
+    muse::Inject<trackedit::ITrackeditInteraction> trackeditInteraction;
+    muse::Inject<playback::ITrackPlaybackControl> trackPlaybackControl;
+    muse::Inject<playback::IPlaybackConfiguration> playbackConfiguration;
 
-    muse::Inject<au::context::IGlobalContext> globalContext{ this };
-    muse::Inject<trackedit::ISelectionController> selectionController{ this };
-    muse::Inject<trackedit::ITrackeditInteraction> trackeditInteraction{ this };
-    muse::Inject<playback::ITrackPlaybackControl> trackPlaybackControl{ this };
-    muse::Inject<trackedit::ITrackNavigationController> trackNavigationController{ this };
 public:
     explicit ViewTracksListModel(QObject* parent = nullptr);
 
@@ -64,7 +63,6 @@ private:
     enum RoleNames {
         TypeRole = Qt::UserRole + 1,
         TrackIdRole,
-        TrackSampleRateRole,
         IsDataSelectedRole,
         IsTrackSelectedRole,
         IsTrackFocusedRole,
@@ -73,12 +71,9 @@ private:
         IsStereoRole,
         IsWaveformViewVisibleRole,
         IsSpectrogramViewVisibleRole,
-        FrequencySelectionRole,
         DbRangeRole,
         ColorRole,
     };
-
-    QModelIndex indexOf(trackedit::TrackId trackId);
 
     std::vector<trackedit::Track> m_trackList;
 };

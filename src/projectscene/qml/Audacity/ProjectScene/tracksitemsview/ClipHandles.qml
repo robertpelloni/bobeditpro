@@ -12,14 +12,6 @@ Item {
     property bool handlesHovered: false
     property bool handlesVisible: false
 
-    property bool collapsed: false
-    property int clipHeight: 114
-    property int headerHeight: 20
-    readonly property int handleMinH: 22
-    readonly property int handleMaxH: 32
-    readonly property int handleHeight: Math.min(handleMaxH,
-                    Math.max(handleMinH, collapsed ? Math.round(clipHeight / 2) : Math.round((clipHeight - headerHeight) / 2)))
-
     property int animationDuration: 100
 
     property bool debugRectsVisible: false
@@ -53,7 +45,7 @@ Item {
         id: leftTrimHandle
 
         x: -24
-        height: root.handleHeight
+        height: 32
         width: 36
 
         visible: handlesVisible
@@ -77,9 +69,9 @@ Item {
 
             iconCode: IconCode.SMALL_ARROW_LEFT
             font.pixelSize: 30
-            color: ui.theme.extra["black_color"]
+            color: "black"
             style: Text.Outline
-            styleColor: ui.theme.extra["white_color"]
+            styleColor: "white"
 
             Rectangle {
                 height: 12
@@ -198,7 +190,7 @@ Item {
         id: rightTrimHandle
 
         x: parent.width - 12
-        height: root.handleHeight
+        height: 32
         width: 36
 
         visible: handlesVisible
@@ -222,9 +214,9 @@ Item {
 
             iconCode: IconCode.SMALL_ARROW_RIGHT
             font.pixelSize: 30
-            color: ui.theme.extra["black_color"]
+            color: "black"
             style: Text.Outline
-            styleColor: ui.theme.extra["white_color"]
+            styleColor: "white"
 
             Rectangle {
                 height: 12
@@ -344,7 +336,7 @@ Item {
 
         x: -24
         y: leftTrimHandle.height
-        height: root.handleHeight
+        height: 32
         width: 36
 
         visible: handlesVisible
@@ -369,7 +361,7 @@ Item {
             anchors.left: leftTimecode.left
             anchors.leftMargin: 4
 
-            color: ui.theme.extra["black_color"]
+            color: "black"
 
             StyledIconLabel {
                 id: leftClockIcon
@@ -378,7 +370,7 @@ Item {
 
                 iconCode: IconCode.CLOCK
                 font.pixelSize: 14
-                color: ui.theme.extra["white_color"]
+                color: "white"
 
                 Rectangle {
                     height: 12
@@ -506,7 +498,7 @@ Item {
 
         x: parent.width - 12
         y: rightTrimHandle.height
-        height: root.handleHeight
+        height: 32
         width: 36
 
         visible: handlesVisible
@@ -530,7 +522,7 @@ Item {
             anchors.right: rightTimecode.right
             anchors.rightMargin: 4
 
-            color: ui.theme.extra["black_color"]
+            color: "black"
 
             StyledIconLabel {
                 id: rightClockIcon
@@ -538,7 +530,7 @@ Item {
                 anchors.centerIn: parent
                 iconCode: IconCode.CLOCK
                 font.pixelSize: 14
-                color: ui.theme.extra["white_color"]
+                color: "white"
 
                 Rectangle {
                     height: 12

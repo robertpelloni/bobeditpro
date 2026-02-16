@@ -3,7 +3,6 @@
 */
 #pragma once
 
-#include <QColor>
 #include <QString>
 
 #include "ui/view/iconcodes.h"

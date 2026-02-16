@@ -11,7 +11,7 @@
 namespace au::importexport {
 class LabelsConfiguration : public ILabelsConfiguration
 {
-    muse::GlobalInject<muse::IGlobalConfiguration> globalConfiguration;
+    muse::Inject<muse::IGlobalConfiguration> globalConfiguration;
 
 public:
     LabelsConfiguration() = default;

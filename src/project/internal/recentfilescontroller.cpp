@@ -26,7 +26,7 @@
 #include "global/defer.h"
 #include "global/serialization/json.h"
 
-#include "multiwindows/resourcelockguard.h"
+#include "multiinstances/resourcelockguard.h"
 
 using namespace au::project;
 using namespace muse;
@@ -40,7 +40,7 @@ void RecentFilesController::init()
 
     m_dirty = true;
 
-    multiwindowsProvider()->resourceChanged().onReceive(this, [this](const std::string& resourceName) {
+    multiInstancesProvider()->resourceChanged().onReceive(this, [this](const std::string& resourceName) {
         if (resourceName == RECENT_FILES_RESOURCE_NAME) {
             if (!m_isSaving) {
                 m_dirty = true;
@@ -131,7 +131,7 @@ void RecentFilesController::loadRecentFilesList()
 
     RetVal<ByteArray> data;
     {
-        mi::ReadResourceLockGuard lock_guard(multiwindowsProvider(), RECENT_FILES_RESOURCE_NAME);
+        mi::ReadResourceLockGuard lock_guard(multiInstancesProvider(), RECENT_FILES_RESOURCE_NAME);
         data = fileSystem()->readFile(configuration()->recentFilesJsonPath());
     }
 
@@ -239,7 +239,7 @@ void RecentFilesController::saveRecentFilesList() const
 
     JsonDocument json(jsonArray);
 
-    mi::WriteResourceLockGuard resource_guard(multiwindowsProvider(), RECENT_FILES_RESOURCE_NAME);
+    mi::WriteResourceLockGuard resource_guard(multiInstancesProvider(), RECENT_FILES_RESOURCE_NAME);
     Ret ret = fileSystem()->writeFile(configuration()->recentFilesJsonPath(), json.toJson());
     if (!ret) {
         LOGE() << "Failed to save recent files list: " << ret.toString();
@@ -248,7 +248,6 @@ void RecentFilesController::saveRecentFilesList() const
 
 Promise<QPixmap> RecentFilesController::thumbnail(const muse::io::path_t& filePath) const
 {
-    // TODO: doublecheck if this code is used anywhere
     return Promise<QPixmap>([this, filePath](const auto& resolve, const auto& reject) {
         if (filePath.empty()) {
             return reject(static_cast<int>(Ret::Code::UnknownError), "Invalid file specified");
@@ -265,6 +264,15 @@ Promise<QPixmap> RecentFilesController::thumbnail(const muse::io::path_t& filePa
                     (void)resolve(it->second.thumbnail);
                     return;
                 }
+            }
+
+            RetVal<ProjectMeta> rv = mscMetaReader()->readMeta(filePath);
+            if (!rv.ret) {
+                m_thumbnailCache[filePath] = CachedThumbnail();
+                (void)reject(rv.ret.code(), rv.ret.toString());
+            } else {
+                m_thumbnailCache[filePath] = CachedThumbnail { rv.val.thumbnail, lastModified };
+                (void)resolve(rv.val.thumbnail);
             }
         });
 

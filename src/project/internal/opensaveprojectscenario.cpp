@@ -114,10 +114,6 @@ RetVal<muse::io::path_t> OpenSaveProjectScenario::askLocalPath(IAudacityProjectP
 
     muse::io::path_t selectedPath = interactive()->selectSavingFileSync(dialogTitle, defaultPath, filter);
 
-    if (selectedPath.empty()) {
-        return make_ret(Ret::Code::Cancel);
-    }
-
     // force save to aup4 format
     std::string suffix = muse::io::suffix(selectedPath);
     std::string correctedPath = selectedPath.toStdString();
@@ -132,6 +128,10 @@ RetVal<muse::io::path_t> OpenSaveProjectScenario::askLocalPath(IAudacityProjectP
     correctedPath += "aup4";
 
     selectedPath = correctedPath;
+
+    if (selectedPath.empty()) {
+        return make_ret(Ret::Code::Cancel);
+    }
 
     configuration()->setLastSavedProjectsPath(io::dirpath(selectedPath));
 
@@ -198,7 +198,7 @@ RetVal<CloudAudioInfo> OpenSaveProjectScenario::askShareAudioLocation(IAudacityP
     QUrl uploadUrl = QUrl();
     cloud::Visibility defaultVisibility = cloud::Visibility::Public;
 
-    UriQuery query("audacity://project/savetocloud");
+    UriQuery query("musescore://project/savetocloud");
     query.addParam("isPublishShare", Val(true));
     query.addParam("name", Val(defaultName));
     query.addParam("visibility", Val(defaultVisibility));
@@ -215,7 +215,7 @@ RetVal<CloudAudioInfo> OpenSaveProjectScenario::askShareAudioLocation(IAudacityP
     }
 
     QVariantMap vals = rv.val.toQVariant().toMap();
-    using Response = cloud::SaveToCloudResponse::SaveToCloudResponse;
+    using Response = cloud::QMLSaveToCloudResponse::SaveToCloudResponse;
     auto response = static_cast<Response>(vals["response"].toInt());
     switch (response) {
     case Response::Cancel:

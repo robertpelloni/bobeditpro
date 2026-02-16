@@ -17,26 +17,19 @@ using namespace muse;
 using namespace au::project;
 
 static const muse::Uri PROJECT_PAGE_URI("audacity://project");
-static const muse::Uri HOME_PAGE_URI("audacity://home");
+static const muse::Uri HOME_PAGE_URI("musescore://home");
 static const muse::Uri NEW_PROJECT_URI("audacity://project/new");
 
 static const muse::Uri EXPORT_URI("audacity://project/export");
 static const muse::Uri CUSTOM_FFMPEG_OPTIONS("audacity://project/export/ffmpeg");
 static const muse::Uri METADATA_DIALOG_URI("audacity://project/export/metadata");
 static const muse::Uri EXPORT_LABELS_URI("audacity://project/export/labels");
-static const muse::Uri CUSTOM_MAPPING("audacity://project/export/mapping");
 
 static const QString AUDACITY_URL_SCHEME("audacity");
 static const QString OPEN_PROJECT_URL_HOSTNAME("open-project");
 
 static const muse::actions::ActionCode OPEN_CUSTOM_FFMPEG_OPTIONS("open-custom-ffmpeg-options");
 static const muse::actions::ActionCode OPEN_METADATA_DIALOG("open-metadata-dialog");
-static const muse::actions::ActionCode OPEN_CUSTOM_MAPPING("open-custom-mapping");
-
-ProjectActionsController::ProjectActionsController(muse::modularity::ContextPtr ctx)
-    : muse::Injectable(ctx)
-{
-}
 
 void ProjectActionsController::init()
 {
@@ -63,13 +56,12 @@ void ProjectActionsController::init()
         exportConfiguration()->setExportSampleRate(-1);
 
         //! TODO AU4
-        bool quitApp = false; //multiwindowsProvider()->instances().size() > 1;
+        bool quitApp = false; //multiInstancesProvider()->instances().size() > 1;
         closeOpenedProject(quitApp);
     });
 
     dispatcher()->reg(this, OPEN_CUSTOM_FFMPEG_OPTIONS, this, &ProjectActionsController::openCustomFFmpegOptions);
     dispatcher()->reg(this, OPEN_METADATA_DIALOG, this, &ProjectActionsController::openMetadataDialog);
-    dispatcher()->reg(this, OPEN_CUSTOM_MAPPING, this, &ProjectActionsController::openCustomMapping);
 }
 
 const muse::actions::ActionCodeList& ProjectActionsController::prohibitedActionsWhileRecording() const
@@ -146,7 +138,7 @@ Ret ProjectActionsController::openProject(const ProjectFile& file)
 void ProjectActionsController::newProject()
 {
     //! NOTE This method is synchronous,
-    //! but inside `multiwindowsProvider` there can be an event loop
+    //! but inside `multiInstancesProvider` there can be an event loop
     //! to wait for the responses from other instances, accordingly,
     //! the events (like user click) can be executed and this method can be called several times,
     //! before the end of the current call.
@@ -164,22 +156,22 @@ void ProjectActionsController::newProject()
 #ifdef MU_BUILD_MULTIINSTANCE_MODULE
         //! Check, if any project is already open in the current window
         //! and there is already a created instance without a project, then activate it
-        if (multiwindowsProvider()->isHasAppInstanceWithoutProject()) {
-            multiwindowsProvider()->activateWindowWithoutProject();
+        if (multiInstancesProvider()->isHasAppInstanceWithoutProject()) {
+            multiInstancesProvider()->activateWindowWithoutProject();
             return;
         }
 
         //! Otherwise, we will create a new instance
         QStringList args;
         args << "--session-type" << "start-with-new";
-        multiwindowsProvider()->openNewAppInstance(args);
+        multiInstancesProvider()->openNewAppInstance(args);
 #else
         LOGE() << "Has current project, but no multiinstance module, create new unable, need close current";
 #endif
         return;
     }
 
-    IAudacityProjectPtr project = std::make_shared<Audacity4Project>(iocContext());
+    IAudacityProjectPtr project = std::make_shared<Audacity4Project>();
     project->createNew();
 
     globalContext()->setCurrentProject(project);
@@ -353,7 +345,7 @@ muse::io::path_t ProjectActionsController::selectOpeningFile()
 io::path_t ProjectActionsController::selectImportFile()
 {
     std::string audioFileExt
-        = "*.aac *.ac3 *.mp2 *.mp3 *.wma *.wav *.flac *.ogg *.opus *.aif *.aiff *.amr *.ape *.au *.dts *.mpc *.tta *.wv *.shn *.voc *.mmf";
+        = "*.aac *.ac3 *.mp3 *.wma *.wav *.flac *.ogg *.opus *.aif *.aiff *.amr *.ape *.au *.dts *.mpc *.tta *.wv *.shn *.voc *.mmf";
     std::string videoFileExt
         = "*.avi *.mp4 *.mkv *.mov *.flv *.wmv *.asf *.webm *.mpg *.mpeg *.m4v *.ts *.gxf *.mxf *.nut *.dv *.3gp *.3g2 *.mj2";
     std::string gameMediaFileExt
@@ -483,7 +475,7 @@ bool ProjectActionsController::saveProjectAt(const SaveLocation& location, SaveM
 muse::Ret ProjectActionsController::openProject(const muse::io::path_t& givenPath, const String& displayNameOverride)
 {
     //! NOTE This method is synchronous,
-    //! but inside `multiwindowsProvider` there can be an event loop
+    //! but inside `multiInstancesProvider` there can be an event loop
     //! to wait for the responses from other instances, accordingly,
     //! the events (like user click) can be executed and this method can be called several times,
     //! before the end of the current call.
@@ -511,8 +503,8 @@ muse::Ret ProjectActionsController::openProject(const muse::io::path_t& givenPat
 
     //! Step 3. Check, if the project already opened in another window, then activate the window with the project
 #ifdef MU_BUILD_MULTIINSTANCE_MODULE
-    if (multiwindowsProvider()->isProjectAlreadyOpened(actualPath)) {
-        multiwindowsProvider()->activateWindowWithProject(actualPath);
+    if (multiInstancesProvider()->isProjectAlreadyOpened(actualPath)) {
+        multiInstancesProvider()->activateWindowWithProject(actualPath);
         return make_ret(Ret::Code::Ok);
     }
 #endif
@@ -524,10 +516,10 @@ muse::Ret ProjectActionsController::openProject(const muse::io::path_t& givenPat
         args << actualPath.toQString();
 
         if (!displayNameOverride.isEmpty()) {
-            args << "--project-display-name-override" << displayNameOverride;
+            args << "--score-display-name-override" << displayNameOverride;
         }
 #ifdef MU_BUILD_MULTIINSTANCE_MODULE
-        multiwindowsProvider()->openNewAppInstance(args);
+        multiInstancesProvider()->openNewAppInstance(args);
         return make_ret(Ret::Code::Ok);
 #else
         return muse::make_ret(muse::Ret::Code::NotSupported);
@@ -588,7 +580,7 @@ RetVal<IAudacityProjectPtr> ProjectActionsController::loadProject(const io::path
     // IF_ASSERT_FAILED(project) {
     //     return make_ret(Ret::Code::InternalError);
     // }
-    IAudacityProjectPtr project = std::make_shared<Audacity4Project>(iocContext());
+    IAudacityProjectPtr project = std::make_shared<Audacity4Project>();
 
     //! TODO AU4
     // bool hasUnsavedChanges = project->hasUnsavedChanges();
@@ -741,9 +733,4 @@ void ProjectActionsController::openCustomFFmpegOptions()
 void ProjectActionsController::openMetadataDialog()
 {
     interactive()->open(METADATA_DIALOG_URI);
-}
-
-void ProjectActionsController::openCustomMapping()
-{
-    interactive()->open(CUSTOM_MAPPING);
 }

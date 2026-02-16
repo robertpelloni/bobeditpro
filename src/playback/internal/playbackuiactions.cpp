@@ -31,14 +31,14 @@ static const ActionQuery PLAYBACK_LEVEL_QUERY("action://playback/level");
 const UiActionList PlaybackUiActions::m_mainActions = {
     UiAction(PLAYBACK_PLAY_QUERY.toString(),
              au::context::UiCtxProjectOpened,
-             au::context::CTX_PROJECT_OPENED,
+             au::context::CTX_PROJECT_PLAYBACK,
              TranslatableString("action", "Play"),
              TranslatableString("action", "Play"),
              IconCode::Code::PLAY_FILL
              ),
     UiAction(PLAYBACK_PAUSE_QUERY.toString(),
              au::context::UiCtxProjectOpened,
-             au::context::CTX_PROJECT_OPENED,
+             au::context::CTX_PROJECT_PLAYBACK,
              TranslatableString("action", "Pause"),
              TranslatableString("action", "Pause"),
              IconCode::Code::PAUSE_FILL
@@ -214,8 +214,8 @@ const UiActionList PlaybackUiActions::m_settingsActions = {
              ),
 };
 
-PlaybackUiActions::PlaybackUiActions(const muse::modularity::ContextPtr& ctx, std::shared_ptr<PlaybackController> controller)
-    : muse::Injectable(ctx), m_controller(controller)
+PlaybackUiActions::PlaybackUiActions(std::shared_ptr<PlaybackController> controller)
+    : m_controller(controller)
 {
 }
 

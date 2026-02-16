@@ -62,77 +62,53 @@ endif()
 # Dependency library declaration
 ###########################################
 
-macro(add_to_link_if_exists lib)
-
-# NOTE There may be cases:
-# 1. The module is enabled and the target exists.
-# 2. The module is disabled, but there is a stub, the target exists
-# 3. The module is disabled and the target does not exist.
-# This macro also adds qml parts to the link
-
-    if (TARGET ${lib})
-        list(APPEND LINK_LIB ${lib})
-
-        if (TARGET ${lib}_qml)
-            list(APPEND LINK_LIB ${lib}_qml)
-        endif()
-    endif()
-endmacro()
-
 set(LINK_LIB
     ${QT_LIBRARIES}
     muse::global
     muse::draw
+    muse::actions
+    muse::ui
+    muse::ui_qml
+    muse::ui_dialogs_qml
+    muse::uicomponents
+    muse::uicomponents_qml
+    muse::graphicaleffects_qml
+    muse::dockwindow
+    muse::shortcuts
+    muse::workspace
+    muse::accessibility
+    muse::cloud
+    muse::network
+    muse::multiinstances
+    muse::learn
+    muse::learn_qml
+    muse::languages
+    muse::diagnostics
+    muse::audioplugins
+
+    appshell
+    au3wrap
+    au3audio
+    audio
+    context
+    effects_audio_unit
+    effects_lv2
+    effects_vst
+    project
+    projectscene
+    playback
+    record
+    spectrogram
+    effects_base
+    effects_builtin
+    effects_nyquist
+    importer
+    exporter
+    iex_labels
 )
 
-add_to_link_if_exists(muse::accessibility)
-add_to_link_if_exists(muse::actions)
-add_to_link_if_exists(muse::audioplugins)
-add_to_link_if_exists(muse::autobot)
-add_to_link_if_exists(muse::cloud_qml)
-add_to_link_if_exists(muse::cloud)
-add_to_link_if_exists(muse::diagnostics)
-add_to_link_if_exists(muse::dockwindow)
-add_to_link_if_exists(muse::extensions)
-add_to_link_if_exists(muse::graphicaleffects_qml)
-add_to_link_if_exists(muse::interactive)
-add_to_link_if_exists(muse::languages)
-add_to_link_if_exists(muse::learn)
-add_to_link_if_exists(muse::legacytreeview_qml)
-add_to_link_if_exists(muse::multiwindows)
-add_to_link_if_exists(muse::muse::vst)
-add_to_link_if_exists(muse::network)
-add_to_link_if_exists(muse::shortcuts)
-add_to_link_if_exists(muse::tours)
-add_to_link_if_exists(muse::ui_dialogs_qml)
-add_to_link_if_exists(muse::ui)
-add_to_link_if_exists(muse::uicomponents)
-add_to_link_if_exists(muse::workspace)
-
-add_to_link_if_exists(appshell)
-add_to_link_if_exists(au3audio)
-add_to_link_if_exists(au3wrap)
-add_to_link_if_exists(au3cloud)
-add_to_link_if_exists(audio)
-add_to_link_if_exists(context)
-add_to_link_if_exists(effects_audio_unit)
-add_to_link_if_exists(effects_base)
-add_to_link_if_exists(effects_builtin)
-add_to_link_if_exists(effects_lv2)
-add_to_link_if_exists(effects_nyquist)
-add_to_link_if_exists(effects_vst)
-add_to_link_if_exists(exporter)
-add_to_link_if_exists(iex_labels)
-add_to_link_if_exists(importer)
-add_to_link_if_exists(playback)
-add_to_link_if_exists(preferences)
-add_to_link_if_exists(project)
-add_to_link_if_exists(projectscene)
-add_to_link_if_exists(record)
-add_to_link_if_exists(spectrogram)
-add_to_link_if_exists(toast)
-
 if (AU_MODULE_EFFECTS_VST)
+    list(APPEND LINK_LIB muse::vst)
     add_definitions(-DAU_MODULE_EFFECTS_VST)
 endif()
 
@@ -142,6 +118,14 @@ endif()
 
 if (AU_MODULE_EFFECTS_AUDIO_UNIT)
     add_definitions(-DAU_MODULE_EFFECTS_AUDIO_UNIT)
+endif()
+
+if (MUSE_MODULE_AUTOBOT)
+    list(APPEND LINK_LIB muse::autobot)
+endif()
+
+if (MUSE_MODULE_EXTENSIONS)
+    list(APPEND LINK_LIB muse::extensions)
 endif()
 
 set (AUDACITY_APPEND_SRC)
@@ -164,12 +148,8 @@ qt_add_executable(${EXECUTABLE_NAME}
     ${APP_RCC_SOURCES}
     ${AUDACITY_APPEND_SRC}
     main.cpp
-    appfactory.cpp
-    appfactory.h
-    guiapp.cpp
-    guiapp.h
-    pluginregistrationapp.cpp
-    pluginregistrationapp.h
+    app.cpp
+    app.h
     commandlineparser.cpp
     commandlineparser.h
 )

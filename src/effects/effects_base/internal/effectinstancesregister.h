@@ -5,21 +5,13 @@
 
 #include <map>
 
-#include "framework/global/modularity/ioc.h"
-
 #include "../ieffectinstancesregister.h"
-#include "../iparameterextractorregistry.h"
-#include "../ieffectsprovider.h"
 
 namespace au::effects {
-class EffectInstancesRegister : public IEffectInstancesRegister, public muse::Injectable
+class EffectInstancesRegister : public IEffectInstancesRegister
 {
-    muse::Inject<IParameterExtractorRegistry> parameterExtractorRegistry{ this };
-    muse::Inject<IEffectsProvider> effectsProvider{ this };
-
 public:
-    EffectInstancesRegister(const muse::modularity::ContextPtr& ctx)
-        : muse::Injectable(ctx) {}
+    EffectInstancesRegister() = default;
 
     EffectInstanceId regInstance(const EffectId& effectId, const std::shared_ptr<EffectInstance>& i, EffectSettingsAccessPtr) override;
     void unregInstance(const std::shared_ptr<EffectInstance>& i) override;

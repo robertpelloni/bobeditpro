@@ -5,7 +5,6 @@
 #pragma once
 
 #include <QObject>
-#include <QKeyEvent>
 #include <QTimer>
 
 #include "modularity/ioc.h"
@@ -14,15 +13,15 @@
 #include "shortcuts/ishortcutsregister.h"
 
 namespace au::projectscene {
-class TapHoldShortcut : public QObject, public muse::Injectable, public muse::async::Asyncable
+class TapHoldShortcut : public QObject, muse::async::Asyncable
 {
     Q_OBJECT
 
-    muse::Inject<muse::shortcuts::IShortcutsRegister> shortcutsRegister{ this };
-    muse::Inject<context::IUiContextResolver> uicontextResolver{ this };
+    muse::Inject<muse::shortcuts::IShortcutsRegister> shortcutsRegister;
+    muse::Inject<context::IUiContextResolver> uicontextResolver;
 
 public:
-    explicit TapHoldShortcut(muse::modularity::ContextPtr ctx, const std::string& action, QObject* target = nullptr);
+    explicit TapHoldShortcut(const std::string& action, QObject* target = nullptr);
 
     void setAction(const std::string& action);
 

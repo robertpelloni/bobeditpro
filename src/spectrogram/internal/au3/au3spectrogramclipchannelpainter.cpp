@@ -8,8 +8,8 @@
 #include "internal/spectrogramcolors.h"
 #include "internal/spectrogramutils.h"
 #include "internal/clipparameters.h"
-#include "internal/numberscale.h"
 
+#include "au3-screen-geometry/NumberScale.h"
 #include "au3-wave-track/WaveClip.h"
 
 namespace au::spectrogram {
@@ -62,8 +62,20 @@ float findValue(const float* spectrum, float bin0, float bin1, unsigned nBins, b
     return value;
 }
 
-inline SpectrogramColors::ColorGradientChoice ChooseColorSet(float bin0, float bin1, float selBinLo, float selBinHi)
+constexpr auto DASH_LENGTH = 10; // pixel
+
+inline SpectrogramColors::ColorGradientChoice
+ChooseColorSet(float bin0, float bin1, float selBinLo, float selBinCenter, float selBinHi, int dashCount)
 {
+    if ((selBinCenter >= 0) && (bin0 <= selBinCenter)
+        && (selBinCenter < bin1)) {
+        return SpectrogramColors::ColorGradientEdge;
+    }
+    if ((0 == dashCount % 2)
+        && (((selBinLo >= 0) && (bin0 <= selBinLo) && (selBinLo < bin1))
+            || ((selBinHi >= 0) && (bin0 <= selBinHi) && (selBinHi < bin1)))) {
+        return SpectrogramColors::ColorGradientEdge;
+    }
     if ((selBinLo < 0 || selBinLo < bin1) && (selBinHi < 0 || selBinHi > bin0)) {
         return SpectrogramColors::ColorGradientTimeAndFrequencySelected;
     }
@@ -77,14 +89,6 @@ void Au3SpectrogramClipChannelPainter::fillImage(QImage& image,
                                                  const SelectionInfo& selectionInfo,
                                                  const SpectrogramTrackContext& tc, WaveClipChannel& clipChannel)
 {
-    auto& spectrumCache = WaveClipSpectrumCache::Get(clipChannel);
-
-    if (clipChannel.GetChannelIndex() != 0 && !spectrumCache.IsStereo()) {
-        // This happens while dragging a mono clip over a stereo track: the clip won't be converted to stereo until released. In the meantime, just keep it blank.
-        image.fill(Qt::white);
-        return;
-    }
-
     Au3SpectrogramSettings& settings = tc.settings;
     const QRect paintableRect{ 0, 0, viewportWidth(viewInfo), image.height() };
     const ClipTimes clipTimes{
@@ -105,6 +109,9 @@ void Au3SpectrogramClipChannelPainter::fillImage(QImage& image,
     const double stretchRatio = clipChannel.GetStretchRatio();
     const double leftOffset = clipParams.leftOffset();
 
+    const double startFrequency = selectionInfo.startFrequency;
+    const double endFrequency = selectionInfo.endFrequency;
+
     const SpectrogramColorScheme colorScheme = settings.colorScheme;
     const int& range = settings.range;
     const int& gain = settings.gain;
@@ -113,18 +120,19 @@ void Au3SpectrogramClipChannelPainter::fillImage(QImage& image,
     const long long* where = nullptr;
     const auto half = settings.GetFFTLength() / 2;
     const double binUnit = sampleRate / (2 * half);
-    const bool updated = spectrumCache.GetSpectrogram(clipChannel, spectrogram, settings, where, imageWidth,
-                                                      visibleStartTime, viewInfo.pixelsPerSecond);
+    const bool updated = WaveClipSpectrumCache::Get(clipChannel).GetSpectrogram(clipChannel, spectrogram, settings, where, imageWidth,
+                                                                                visibleStartTime, viewInfo.pixelsPerSecond);
 
     auto nBins = settings.NBins();
 
     const SpectrogramScale scaleType = settings.scaleType;
-    const NumberScale numberScale(settings.scaleType, tc.minFreq, tc.maxFreq);
 
     // nearest frequency to each pixel row from number scale, for selecting
     // the desired fft bin(s) for display on that row
     float* bins = (float*)alloca(sizeof(*bins) * (imageHeight + 1));
     {
+        const NumberScale numberScale(settings.GetScale(tc.minFreq, tc.maxFreq));
+
         NumberScale::Iterator it = numberScale.begin(imageHeight);
         float nextBin = std::max(0.0f, std::min(float(nBins - 1),
                                                 settings.findBin(*it, binUnit)));
@@ -170,11 +178,11 @@ void Au3SpectrogramClipChannelPainter::fillImage(QImage& image,
         }
     } // updating cache
 
-    const float selBinLo = settings.findBin(selectionInfo.startFrequency, binUnit);
-    const float selBinHi = settings.findBin(selectionInfo.endFrequency, binUnit);
-    const auto normStartFreq = numberScale.valueToPosition(selectionInfo.startFrequency);
-    const auto normEndFreq = numberScale.valueToPosition(selectionInfo.endFrequency);
-    const int selYCenter = image.height() * (1 - (normStartFreq + normEndFreq) / 2);
+    float selBinLo = settings.findBin(startFrequency, binUnit);
+    float selBinHi = settings.findBin(endFrequency, binUnit);
+    float selBinCenter = (startFrequency < 0 || endFrequency < 0)
+                         ? -1
+                         : settings.findBin(sqrt(startFrequency * endFrequency), binUnit);
 
     SpecCache specCache;
 
@@ -187,7 +195,7 @@ void Au3SpectrogramClipChannelPainter::fillImage(QImage& image,
     }
 
     // Bug 2389 - always draw at least one pixel of selection.
-    int selectedX = static_cast<int>(timeToPosition(viewInfo, selectionInfo.startTime) - leftOffset);
+    int selectedX = timeToPosition(viewInfo, selectionInfo.startTime) - leftOffset;
 
     // There used to be a pragma omp parallel for here. Can/Should we use QtConcurrent?
     for (int xx = 0; xx < imageWidth; ++xx) {
@@ -213,11 +221,7 @@ void Au3SpectrogramClipChannelPainter::fillImage(QImage& image,
 
             // If we are in the time selected range, then we may use a different color set.
             if (maybeSelected) {
-                if (imageHeight - yy - 1 == selYCenter) {
-                    selected = SpectrogramColors::ColorGradientEdge;
-                } else {
-                    selected = ChooseColorSet(bin, nextBin, selBinLo, selBinHi);
-                }
+                selected = ChooseColorSet(bin, nextBin, selBinLo, selBinCenter, selBinHi, (xx + leftOffset - leftOffset) / DASH_LENGTH);
             }
 
             const float value = specPxCache->values[xx * imageHeight + yy];

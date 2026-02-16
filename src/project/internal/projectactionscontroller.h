@@ -1,44 +1,40 @@
 #ifndef AU_PROJECT_PROJECTACTIONSCONTROLLER_H
 #define AU_PROJECT_PROJECTACTIONSCONTROLLER_H
 
-#include "framework/global/async/asyncable.h"
-#include "framework/global/modularity/ioc.h"
-#include "framework/global/io/ifilesystem.h"
+#include "actions/actionable.h"
+#include "async/asyncable.h"
 
-#include "framework/actions/actionable.h"
-#include "framework/actions/iactionsdispatcher.h"
-#include "framework/interactive/iinteractive.h"
-
+#include "modularity/ioc.h"
+#include "actions/iactionsdispatcher.h"
 #include "context/iglobalcontext.h"
+#include "global/iinteractive.h"
+#include "project/iprojectconfiguration.h"
+#include "global/io/ifilesystem.h"
 #include "project/irecentfilescontroller.h"
 #include "iopensaveprojectscenario.h"
 #include "trackedit/iprojecthistory.h"
 #include "record/irecordcontroller.h"
 #include "importexport/export/internal/exportconfiguration.h"
 
-#include "project/iprojectconfiguration.h"
 #include "project/iprojectfilescontroller.h"
 #include "project/iaudacityproject.h"
 
 namespace au::project {
-class ProjectActionsController : public IProjectFilesController, public muse::actions::Actionable, public muse::async::Asyncable,
-    public muse::Injectable
+class ProjectActionsController : public IProjectFilesController, public muse::actions::Actionable, public muse::async::Asyncable
 {
-    muse::GlobalInject<IProjectConfiguration> configuration;
-    muse::GlobalInject<muse::io::IFileSystem> fileSystem;
-    muse::GlobalInject<importexport::ExportConfiguration> exportConfiguration;
-
-    muse::GlobalInject<IRecentFilesController> recentFilesController;
-
-    muse::Inject<muse::actions::IActionsDispatcher> dispatcher { this };
-    muse::Inject<au::context::IGlobalContext> globalContext { this };
-    muse::Inject<muse::IInteractive> interactive { this };
-    muse::Inject<IOpenSaveProjectScenario> openSaveProjectScenario { this };
-    muse::Inject<trackedit::IProjectHistory> projectHistory { this };
-    muse::Inject<record::IRecordController> recordController { this };
+    muse::Inject<muse::actions::IActionsDispatcher> dispatcher;
+    muse::Inject<au::context::IGlobalContext> globalContext;
+    muse::Inject<muse::IInteractive> interactive;
+    muse::Inject<IProjectConfiguration> configuration;
+    muse::Inject<muse::io::IFileSystem> fileSystem;
+    muse::Inject<IRecentFilesController> recentFilesController;
+    muse::Inject<IOpenSaveProjectScenario> openSaveProjectScenario;
+    muse::Inject<trackedit::IProjectHistory> projectHistory;
+    muse::Inject<record::IRecordController> recordController;
+    muse::Inject<importexport::ExportConfiguration> exportConfiguration;
 
 public:
-    ProjectActionsController(muse::modularity::ContextPtr ctx = nullptr);
+    ProjectActionsController() = default;
 
     void init();
 
@@ -95,7 +91,6 @@ private:
 
     void openCustomFFmpegOptions();
     void openMetadataDialog();
-    void openCustomMapping();
 
     bool m_isProjectSaving = false;
     bool m_isProjectClosing = false;

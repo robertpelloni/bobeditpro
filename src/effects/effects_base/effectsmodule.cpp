@@ -6,9 +6,9 @@
 #include "au3-module-manager/PluginManager.h"
 #include "au3-files/FileNames.h"
 
-#include "framework/ui/iuiactionsregister.h"
-#include "framework/interactive/iinteractiveuriregister.h"
-#include "framework/diagnostics/idiagnosticspathsregister.h"
+#include "ui/iuiactionsregister.h"
+#include "ui/iinteractiveuriregister.h"
+#include "diagnostics/idiagnosticspathsregister.h"
 
 #include "internal/effectconfigsettings.h"
 #include "internal/effectsprovider.h"
@@ -22,15 +22,11 @@
 #include "internal/effectpresetsprovider.h"
 #include "internal/effectpresetsscenario.h"
 #include "internal/effectviewlaunchregister.h"
-#include "internal/effectparametersprovider.h"
-#include "internal/parameterextractorregistry.h"
 
 #include "view/effectmanagemenu.h"
 #include "view/effectsuiengine.h"
-#include "view/effectsviewutils.h"
 #include "view/destructiveeffectviewerdialogmodel.h"
 #include "view/realtimeeffectviewerdialogmodel.h"
-#include "view/generatedeffectviewermodel.h"
 
 using namespace au::effects;
 
@@ -46,29 +42,27 @@ std::string EffectsModule::moduleName() const
 
 void EffectsModule::registerExports()
 {
-    m_effectsProvider = std::make_shared<EffectsProvider>(iocContext());
-    m_effectsMenuProvider = std::make_shared<EffectsMenuProvider>(iocContext());
+    m_effectsProvider = std::make_shared<EffectsProvider>();
+    m_effectsMenuProvider = std::make_shared<EffectsMenuProvider>();
     m_configuration = std::make_shared<EffectsConfiguration>();
-    m_actionsController = std::make_shared<EffectsActionsController>(iocContext());
-    m_realtimeEffectService = std::make_shared<RealtimeEffectService>(iocContext());
+    m_actionsController = std::make_shared<EffectsActionsController>();
+    m_realtimeEffectService = std::make_shared<RealtimeEffectService>();
 
     ioc()->registerExport<IEffectsProvider>(moduleName(), m_effectsProvider);
     ioc()->registerExport<IEffectsMenuProvider>(moduleName(), m_effectsMenuProvider);
     ioc()->registerExport<IEffectsConfiguration>(moduleName(), m_configuration);
-    ioc()->registerExport<IEffectsUiEngine>(moduleName(), std::make_shared<EffectsUiEngine>(iocContext()));
-    ioc()->registerExport<IEffectInstancesRegister>(moduleName(), new EffectInstancesRegister(iocContext()));
-    ioc()->registerExport<IEffectExecutionScenario>(moduleName(), std::make_shared<EffectExecutionScenario>(iocContext()));
+    ioc()->registerExport<IEffectsUiEngine>(moduleName(), new EffectsUiEngine());
+    ioc()->registerExport<IEffectInstancesRegister>(moduleName(), new EffectInstancesRegister());
+    ioc()->registerExport<IEffectExecutionScenario>(moduleName(), new EffectExecutionScenario());
     ioc()->registerExport<IRealtimeEffectService>(moduleName(), m_realtimeEffectService);
-    ioc()->registerExport<IEffectPresetsProvider>(moduleName(), std::make_shared<EffectPresetsProvider>(iocContext()));
-    ioc()->registerExport<IEffectPresetsScenario>(moduleName(), std::make_shared<EffectPresetsScenario>(iocContext()));
+    ioc()->registerExport<IEffectPresetsProvider>(moduleName(), new EffectPresetsProvider());
+    ioc()->registerExport<IEffectPresetsScenario>(moduleName(), new EffectPresetsScenario());
     ioc()->registerExport<IEffectViewLaunchRegister>(moduleName(), new EffectViewLaunchRegister());
-    ioc()->registerExport<IEffectParametersProvider>(moduleName(), new EffectParametersProvider(iocContext()));
-    ioc()->registerExport<IParameterExtractorRegistry>(moduleName(), new ParameterExtractorRegistry());
 }
 
 void EffectsModule::resolveImports()
 {
-    auto ir = ioc()->resolve<muse::interactive::IInteractiveUriRegister>(moduleName());
+    auto ir = ioc()->resolve<muse::ui::IInteractiveUriRegister>(moduleName());
     if (ir) {
         ir->registerQmlUri(muse::Uri("audacity://effects/destructive_viewer"), "Audacity/Effects/DestructiveEffectsViewerDialog.qml");
         ir->registerQmlUri(muse::Uri("audacity://effects/realtime_viewer"), "Audacity/Effects/RealtimeEffectViewerDialog.qml");
@@ -86,7 +80,6 @@ void EffectsModule::registerUiTypes()
     qmlRegisterType<EffectManageMenu>("Audacity.Effects", 1, 0, "EffectManageMenu");
     qmlRegisterType<DestructiveEffectViewerDialogModel>("Audacity.Effects", 1, 0, "DestructiveEffectViewerDialogModel");
     qmlRegisterType<RealtimeEffectViewerDialogModel>("Audacity.Effects", 1, 0, "RealtimeEffectViewerDialogModel");
-    REGISTER_AUDACITY_EFFECTS_SINGLETON_TYPE(GeneratedEffectViewerModelFactory);
     qmlRegisterUncreatableType<EffectFamilies>("Audacity.Effects", 1, 0, "EffectFamily", "Not creatable from QML");
     qmlRegisterUncreatableType<ViewerComponentTypes>("Audacity.Effects", 1, 0, "ViewerComponentType", "Not creatable from QML");
 }
@@ -108,11 +101,6 @@ void EffectsModule::onInit(const muse::IApplication::RunMode&)
     if (pr) {
         pr->reg("pluginsettings", FileNames::PluginSettings().ToStdString());
     }
-}
-
-void EffectsModule::onAllInited(const muse::IApplication::RunMode& mode)
-{
-    m_effectsProvider->reloadEffects();
 }
 
 void EffectsModule::onDelayedInit()

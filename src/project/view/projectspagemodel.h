@@ -24,27 +24,24 @@
 
 #include <QObject>
 
-#include "framework/global/modularity/ioc.h"
-
-#include "framework/actions/iactionsdispatcher.h"
-#include "framework/interactive/iinteractive.h"
-#include "framework/cloud/musescorecom/imusescorecomservice.h"
-#include "framework/cloud/audiocom/iaudiocomservice.h"
-
+#include "modularity/ioc.h"
 #include "iprojectconfiguration.h"
+#include "actions/iactionsdispatcher.h"
+#include "iinteractive.h"
+#include "cloud/musescorecom/imusescorecomservice.h"
+#include "cloud/audiocom/iaudiocomservice.h"
 
 class QString;
 
 namespace au::project {
-class ProjectsPageModel : public QObject, public muse::Injectable
+class ProjectsPageModel : public QObject
 {
     Q_OBJECT
 
-    muse::GlobalInject<IProjectConfiguration> configuration;
-
-    muse::Inject<muse::actions::IActionsDispatcher> dispatcher { this };
-    muse::Inject<muse::IInteractive> interactive { this };
-    muse::Inject<muse::cloud::IAudioComService> audioComService { this };
+    muse::Inject<IProjectConfiguration> configuration;
+    muse::Inject<muse::actions::IActionsDispatcher> dispatcher;
+    muse::Inject<muse::IInteractive> interactive;
+    muse::Inject<muse::cloud::IAudioComService> audioComService;
 
     Q_PROPERTY(int tabIndex READ tabIndex WRITE setTabIndex NOTIFY tabIndexChanged)
     Q_PROPERTY(ViewType viewType READ viewType WRITE setViewType NOTIFY viewTypeChanged)

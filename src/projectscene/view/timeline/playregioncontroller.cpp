@@ -5,13 +5,11 @@
 
 #include <cmath>
 
-#include <QApplication>
-
 #include "framework/global/log.h"
 
 namespace au::projectscene {
 PlayRegionController::PlayRegionController(QObject* parent)
-    : QObject(parent), muse::Injectable(muse::iocCtxForQmlObject(this))
+    : QObject(parent)
 {
 }
 

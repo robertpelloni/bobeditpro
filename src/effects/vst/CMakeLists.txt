@@ -20,11 +20,13 @@ set(MODULE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/internal/vst3pluginsmetareader.h
     ${CMAKE_CURRENT_LIST_DIR}/internal/vst3viewlauncher.cpp
     ${CMAKE_CURRENT_LIST_DIR}/internal/vst3viewlauncher.h
-    ${CMAKE_CURRENT_LIST_DIR}/internal/vstparameterextractorservice.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/internal/vstparameterextractorservice.h
 
     ${CMAKE_CURRENT_LIST_DIR}/view/vstviewmodel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/view/vstviewmodel.h
+
+    # from muse
+    ${MUSE_FRAMEWORK_SRC_PATH}/vst/view/vstview.cpp
+    ${MUSE_FRAMEWORK_SRC_PATH}/vst/view/vstview.h
 
     # for muse
     ${CMAKE_CURRENT_LIST_DIR}/internal/musevstplugininstance.cpp
@@ -35,18 +37,29 @@ set(MODULE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/internal/musevstmodulesrepository.h
 )
 
+if (OS_IS_WIN)
+    set(MODULE_SRC
+        ${MODULE_SRC}
+       ${MUSE_FRAMEWORK_SRC_PATH}/vst/view/platform/windows/flickeringworkaround.cpp
+       ${MUSE_FRAMEWORK_SRC_PATH}/vst/view/platform/windows/flickeringworkaround.h
+    )
+endif()
+
+if(OS_IS_LIN OR OS_IS_FBSD)
+    set(MODULE_SRC
+        ${MODULE_SRC}
+        ${MUSE_FRAMEWORK_SRC_PATH}/vst/view/platform/linux/runloop.cpp
+        ${MUSE_FRAMEWORK_SRC_PATH}/vst/view/platform/linux/runloop.h
+    )
+endif()
+
 # AU3
 include(${CMAKE_CURRENT_LIST_DIR}/../../au3wrap/au3wrapDefs.cmake)
 
 set(MODULE_INCLUDE ${AU3_INCLUDE} ${MUSE_FRAMEWORK_SRC_PATH}/vst)
 set(MODULE_DEF ${AU3_DEF})
 
-set(MODULE_LINK au3wrap)
-# Note: vst_sdk_3 is transitively provided by au3-vst3 (via au3wrap)
-
-if(MUSE_MODULE_VST_QML)
-    list(APPEND MODULE_LINK muse::vst_qml)
-endif()
+set(MODULE_LINK au3wrap vst_sdk_3)
 
 set(MODULE_USE_UNITY OFF)
 setup_module()

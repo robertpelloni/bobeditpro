@@ -34,12 +34,10 @@ set(CMAKE_MODULE_PATH
     ${CMAKE_CURRENT_LIST_DIR}
     ${CMAKE_CURRENT_LIST_DIR}/buildscripts/cmake
     ${MUSE_FRAMEWORK_PATH}/buildscripts/cmake
-    ${MUSE_FRAMEWORK_PATH}/framework/cmake
     ${CMAKE_MODULE_PATH}
     )
 
 include(${MUSE_FRAMEWORK_SRC_PATH}/cmake/MuseDeclareOptions.cmake)
-include(DeclareModuleSetup)
 
 ###########################################
 # AudacityDependencies
@@ -88,7 +86,7 @@ set(MUSE_MODULE_LANGUAGES ON)
 set(MUSE_MODULE_LEARN ON)
 set(MUSE_MODULE_MIDI OFF)
 set(MUSE_MODULE_MPE OFF)
-set(MUSE_MODULE_MULTIWINDOWS OFF)
+set(MUSE_MODULE_MULTIINSTANCES OFF)
 set(MUSE_MODULE_MUSESAMPLER OFF)
 set(MUSE_MODULE_NETWORK ON)
 set(MUSE_MODULE_SHORTCUTS ON)
@@ -96,12 +94,9 @@ set(MUSE_MODULE_UI ON)
 set(MUSE_MODULE_UI_TESTS OFF)
 set(MUSE_MODULE_UPDATE OFF)
 set(MUSE_MODULE_WORKSPACE ON)
-set(MUSE_MODULE_VST ON)
-set(MUSE_MODULE_VST_QML ON)
 
 # Modules (alphabetical order please)
 option(AU_BUILD_APPSHELL_MODULE "Build appshell module" ON)
-option(AU_BUILD_CLOUD_AUDIOCOM "Build cloud audiocom module" ON)
 option(AU_BUILD_CONTEXT_TESTS "Build context tests" ON)
 option(AU_BUILD_EFFECTS_BUILTIN_TESTS "Build builtin-effect tests" ON)
 option(AU_BUILD_EFFECTS_MODULE "Build effects module" ON)
@@ -164,9 +159,9 @@ include(SetupBuildEnvironment)
 include(GetPlatformInfo)
 include(SetupDevEnvironment)
 
-if (MUSE_COMPILE_USE_CCACHE)
-    include(SetupCompilerCache)
-endif(MUSE_COMPILE_USE_CCACHE)
+if (MUE_COMPILE_USE_CCACHE)
+    include(TryUseCcache)
+endif(MUE_COMPILE_USE_CCACHE)
 
 
 ###########################################

@@ -5,12 +5,12 @@
 
 #include <QObject>
 
-#include "framework/global/async/asyncable.h"
-#include "framework/global/modularity/ioc.h"
-#include "framework/global/io/ifilesystem.h"
-#include "framework/actions/iactionsdispatcher.h"
-#include "framework/interactive/iinteractive.h"
+#include "async/asyncable.h"
 
+#include "modularity/ioc.h"
+#include "actions/iactionsdispatcher.h"
+#include "iinteractive.h"
+#include "io/ifilesystem.h"
 #include "appshell/iappshellconfiguration.h"
 #include "context/iglobalcontext.h"
 #include "iexportconfiguration.h"
@@ -19,20 +19,19 @@
 #include "trackedit/iselectioncontroller.h"
 
 namespace au::importexport {
-class ExportPreferencesModel : public QObject, public muse::async::Asyncable, public muse::Injectable
+class ExportPreferencesModel : public QObject, public muse::async::Asyncable
 {
     Q_OBJECT
 
-    muse::GlobalInject<muse::io::IFileSystem> fileSystem;
-    muse::GlobalInject<appshell::IAppShellConfiguration> configuration;
-    muse::GlobalInject<IExportConfiguration> exportConfiguration;
-
-    muse::Inject<muse::actions::IActionsDispatcher> dispatcher{ this };
-    muse::Inject<muse::IInteractive> interactive{ this };
-    muse::Inject<context::IGlobalContext> globalContext{ this };
-    muse::Inject<IExporter> exporter{ this };
-    muse::Inject<au::playback::IPlaybackController> playbackController{ this };
-    muse::Inject<trackedit::ISelectionController> selectionController{ this };
+    muse::Inject<muse::actions::IActionsDispatcher> dispatcher;
+    muse::Inject<muse::IInteractive> interactive;
+    muse::Inject<muse::io::IFileSystem> fileSystem;
+    muse::Inject<appshell::IAppShellConfiguration> configuration;
+    muse::Inject<context::IGlobalContext> globalContext;
+    muse::Inject<IExportConfiguration> exportConfiguration;
+    muse::Inject<IExporter> exporter;
+    muse::Inject<au::playback::IPlaybackController> playbackController;
+    muse::Inject<trackedit::ISelectionController> selectionController;
 
     Q_PROPERTY(QString currentProcess READ currentProcess NOTIFY currentProcessChanged)
     Q_PROPERTY(QVariantList processList READ processList NOTIFY processListChanged)
@@ -44,8 +43,9 @@ class ExportPreferencesModel : public QObject, public muse::async::Asyncable, pu
     Q_PROPERTY(QString currentFormat READ currentFormat NOTIFY currentFormatChanged)
     Q_PROPERTY(QStringList formatsList READ formatsList NOTIFY formatsListChanged)
 
-    Q_PROPERTY(importexport::ExportChannelsPref::ExportChannels exportChannelsType READ exportChannelsType NOTIFY exportChannelsTypeChanged)
+    Q_PROPERTY(importexport::ExportChannelsPref::ExportChannels exportChannels READ exportChannels NOTIFY exportChannelsChanged)
     Q_PROPERTY(int maxExportChannels READ maxExportChannels NOTIFY maxExportChannelsChanged)
+    // TODO: add custom mapping as a separate property
 
     Q_PROPERTY(QString exportSampleRate READ exportSampleRate NOTIFY exportSampleRateChanged)
     Q_PROPERTY(QVariantList exportSampleRateList READ exportSampleRateList NOTIFY exportSampleRateListChanged)
@@ -78,8 +78,8 @@ public:
     Q_INVOKABLE void setCurrentFormat(const QString& format);
     QStringList formatsList() const;
 
-    importexport::ExportChannelsPref::ExportChannels exportChannelsType() const;
-    Q_INVOKABLE void setExportChannelsType(importexport::ExportChannelsPref::ExportChannels type);
+    importexport::ExportChannelsPref::ExportChannels exportChannels() const;
+    Q_INVOKABLE void setExportChannels(importexport::ExportChannelsPref::ExportChannels exportChannels);
     Q_INVOKABLE int maxExportChannels() const;
 
     QString exportSampleRate() const;
@@ -88,7 +88,6 @@ public:
 
     Q_INVOKABLE void openCustomFFmpegDialog();
     Q_INVOKABLE void openMetadataDialog();
-    Q_INVOKABLE void openCustomMappingDialog();
     Q_INVOKABLE void setFilePickerPath(const QString& path);
     Q_INVOKABLE bool verifyExportPossible();
     Q_INVOKABLE QStringList fileFilter();
@@ -110,7 +109,7 @@ signals:
     void directoryPathChanged();
     void currentFormatChanged();
     void formatsListChanged();
-    void exportChannelsTypeChanged();
+    void exportChannelsChanged();
     void maxExportChannelsChanged();
     void exportSampleRateChanged();
     void exportSampleRateListChanged();
@@ -120,8 +119,6 @@ signals:
     void hasMetadataChanged();
     void optionsCountChanged();
     void optionTitleListChanged();
-
-    void exportCompleted();
 
 private:
     void updateCurrentSampleRate();

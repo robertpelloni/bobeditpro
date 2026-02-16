@@ -6,8 +6,6 @@
 #include "global/realfn.h"
 #include "global/async/async.h"
 
-#include "global/containers.h"
-
 #include "types/projectscenetypes.h"
 
 #include "log.h"
@@ -52,7 +50,7 @@ void TrackClipsListModel::onInit()
         emit asymmetricStereoHeightsPossibleChanged();
     });
 
-    dispatcher()->reg(this, "rename-item", [this]() {
+    dispatcher()->reg(this, "rename-clip", [this]() {
         requestItemTitleChange();
     });
 
@@ -390,17 +388,7 @@ bool TrackClipsListModel::moveSelectedClips(const ClipKey& key, bool completed)
     }, completed);
 
     if (vs->moveInitiated()) {
-        if (selectionController()->timeSelectionIsNotEmpty()) {
-            trackeditInteraction()->moveRangeSelection(moveOffset.timeOffset, completed);
-        } else {
-            ClipKeyList selectedClips = selectionController()->selectedClipsInTrackOrder();
-            muse::RetVal<ClipKeyList> result = trackeditInteraction()->moveClips(selectedClips, moveOffset.timeOffset,
-                                                                                 moveOffset.trackOffset,
-                                                                                 completed, clipsMovedToOtherTrack);
-            if (result.ret) {
-                selectionController()->setSelectedClips(result.val);
-            }
-        }
+        trackeditInteraction()->moveClips(moveOffset.timeOffset, moveOffset.trackOffset, completed, clipsMovedToOtherTrack);
     }
 
     // Update key if clip moved to another track
@@ -481,7 +469,7 @@ bool TrackClipsListModel::trimLeftClip(const ClipKey& key, bool completed, ClipB
 
     newStartTime = std::max(newStartTime, 0.0);
 
-    bool ok = trackeditInteraction()->trimClipsLeft({ key.key }, newStartTime - item->time().startTime, minClipTime, completed, undoType);
+    bool ok = trackeditInteraction()->trimClipLeft(key.key, newStartTime - item->time().startTime, minClipTime, completed, undoType);
 
     if (ok) {
         vs->setLastEditedClip(key.key);
@@ -544,7 +532,7 @@ bool TrackClipsListModel::trimRightClip(const ClipKey& key, bool completed, Clip
         newEndTime = item->time().startTime + minClipTime;
     }
 
-    bool ok = trackeditInteraction()->trimClipsRight({ key.key }, item->time().endTime - newEndTime, minClipTime, completed, undoType);
+    bool ok = trackeditInteraction()->trimClipRight(key.key, item->time().endTime - newEndTime, minClipTime, completed, undoType);
 
     if (ok) {
         vs->setLastEditedClip(key.key);
@@ -609,8 +597,7 @@ bool TrackClipsListModel::stretchLeftClip(const ClipKey& key, bool completed, Cl
 
     newStartTime = std::max(newStartTime, 0.0);
 
-    bool ok
-        = trackeditInteraction()->stretchClipsLeft({ key.key }, newStartTime - item->time().startTime, minClipTime, completed, undoType);
+    bool ok = trackeditInteraction()->stretchClipLeft(key.key, newStartTime - item->time().startTime, minClipTime, completed, undoType);
 
     if (ok) {
         vs->setLastEditedClip(key.key);
@@ -673,7 +660,7 @@ bool TrackClipsListModel::stretchRightClip(const ClipKey& key, bool completed, C
         newEndTime = item->time().startTime + minClipTime;
     }
 
-    bool ok = trackeditInteraction()->stretchClipsRight({ key.key }, item->time().endTime - newEndTime, minClipTime, completed, undoType);
+    bool ok = trackeditInteraction()->stretchClipRight(key.key, item->time().endTime - newEndTime, minClipTime, completed, undoType);
 
     if (ok) {
         vs->setLastEditedClip(key.key);
@@ -701,7 +688,7 @@ void TrackClipsListModel::selectClip(const ClipKey& key)
         } else {
             selectionController()->resetSelectedLabels();
             selectionController()->setSelectedClips(trackeditInteraction()->clipsInGroup(clipGroupId), complete);
-            trackNavigationController()->setFocusedTrack(key.key.trackId);
+            selectionController()->setFocusedTrack(key.key.trackId);
         }
     } else {
         if (modifiers.testFlag(Qt::ShiftModifier)) {
@@ -724,17 +711,7 @@ void TrackClipsListModel::resetSelectedClips()
 
 TrackItemKeyList TrackClipsListModel::getSelectedItemKeys() const
 {
-    TrackItemKeyList result = selectionController()->selectedClips();
-
-    trackedit::TrackItemKey focusedItemKey = trackNavigationController()->focusedItem();
-    if (focusedItemKey.isValid() && !muse::contains(result, focusedItemKey)) {
-        const ITrackeditProjectPtr prj = globalContext()->currentTrackeditProject();
-        if (prj && prj->track(focusedItemKey.trackId)->type != TrackType::Label) {
-            result.insert(result.cbegin(), focusedItemKey);
-        }
-    }
-
-    return result;
+    return selectionController()->selectedClips();
 }
 
 bool TrackClipsListModel::isStereo() const

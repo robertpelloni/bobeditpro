@@ -12,15 +12,13 @@
 
 namespace au::effects {
 class QmlApiEngine;
-class EffectsUiEngine : public QObject, public IEffectsUiEngine, public muse::Injectable
+class EffectsUiEngine : public QObject, public IEffectsUiEngine
 {
     Q_OBJECT
 
-    muse::Inject<muse::ui::IUiEngine> uiEngine{ this };
+    muse::Inject<muse::ui::IUiEngine> uiEngine;
 
 public:
-    EffectsUiEngine(const muse::modularity::ContextPtr& ctx)
-        : muse::Injectable(ctx) {}
     ~EffectsUiEngine() override;
 
     QQmlEngine* qmlEngine() const override;

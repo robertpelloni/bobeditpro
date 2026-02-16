@@ -6,19 +6,19 @@
 
 #include "au3-basic-ui/BasicUI.h" // For ProgressResult
 
+#include "framework/global/iinteractive.h"
 #include "framework/global/modularity/ioc.h"
 #include "framework/global/async/asyncable.h"
-#include "framework/interactive/iinteractive.h"
 
 using ProgressResult = BasicUI::ProgressResult;
 
-class ProgressDialog : public BasicUI::ProgressDialog, public muse::async::Asyncable, public muse::Injectable
+class ProgressDialog : public BasicUI::ProgressDialog, public muse::async::Asyncable
 {
-    muse::Inject<muse::IInteractive> interactive { this };
+    muse::Inject<muse::IInteractive> interactive;
 
 public:
-    ProgressDialog(const muse::modularity::ContextPtr& ctx, const TranslatableString& title = {});
-    ProgressDialog(const muse::modularity::ContextPtr& ctx, const std::string& title);
+    ProgressDialog(const TranslatableString& title = {});
+    ProgressDialog(const std::string& title);
 
 public:
     virtual ~ProgressDialog();

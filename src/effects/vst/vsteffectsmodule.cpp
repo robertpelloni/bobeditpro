@@ -3,18 +3,19 @@
 */
 #include "vsteffectsmodule.h"
 
+#include "ui/iinteractiveuriregister.h"
+#include "vst/view/vstview.h"
+
 #include "audioplugins/iaudiopluginsscannerregister.h"
 #include "audioplugins/iaudiopluginmetareaderregister.h"
 
 #include "effects/effects_base/ieffectviewlaunchregister.h"
-#include "effects/effects_base/iparameterextractorregistry.h"
 #include "effects/effects_base/view/effectsviewutils.h"
 
 #include "internal/vsteffectsrepository.h"
 #include "internal/vst3pluginsscanner.h"
 #include "internal/vst3pluginsmetareader.h"
 #include "internal/vst3viewlauncher.h"
-#include "internal/vstparameterextractorservice.h"
 
 #include "internal/musevstpluginsregister.h"
 #include "internal/musevstmodulesrepository.h"
@@ -22,6 +23,7 @@
 #include "view/vstviewmodel.h"
 
 using namespace muse;
+using namespace muse::ui;
 using namespace au::effects;
 
 static void vst_init_qrc()
@@ -32,7 +34,6 @@ static void vst_init_qrc()
 VstEffectsModule::VstEffectsModule()
     : m_vstMetaReader(std::make_shared<Vst3PluginsMetaReader>())
 {
-    vst_init_qrc();
 }
 
 std::string VstEffectsModule::moduleName() const
@@ -42,7 +43,7 @@ std::string VstEffectsModule::moduleName() const
 
 void VstEffectsModule::registerExports()
 {
-    m_vstEffectsRepository = std::make_shared<VstEffectsRepository>(iocContext());
+    m_vstEffectsRepository = std::make_shared<VstEffectsRepository>();
     m_museVstModulesRepository = std::make_shared<MuseVstModulesRepository>();
 
     ioc()->registerExport<IVstEffectsRepository>(moduleName(), m_vstEffectsRepository);
@@ -66,21 +67,18 @@ void VstEffectsModule::resolveImports()
 
     auto lr = ioc()->resolve<IEffectViewLaunchRegister>(moduleName());
     if (lr) {
-        lr->regLauncher("VST3", std::make_shared<Vst3ViewLauncher>(iocContext()));
-    }
-
-    auto paramExtractorRegistry = ioc()->resolve<IParameterExtractorRegistry>(moduleName());
-    if (paramExtractorRegistry) {
-        paramExtractorRegistry->registerExtractor(std::make_shared<VstParameterExtractorService>());
+        lr->regLauncher("VST3", std::make_shared<Vst3ViewLauncher>());
     }
 }
 
 void VstEffectsModule::registerResources()
 {
+    vst_init_qrc();
 }
 
 void VstEffectsModule::registerUiTypes()
 {
+    qmlRegisterType<muse::vst::VstView>("Audacity.Vst", 1, 0, "VstView");
     REGISTER_AUDACITY_EFFECTS_SINGLETON_TYPE(VstViewModelFactory);
 }
 

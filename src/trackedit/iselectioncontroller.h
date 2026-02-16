@@ -30,7 +30,6 @@ public:
     virtual void resetSelectedTracks() = 0;
     virtual TrackIdList selectedTracks() const = 0;
     virtual void setSelectedTracks(const TrackIdList& trackIds, bool complete = true) = 0;
-    virtual muse::async::Channel<TrackIdList> selectedTracksChanged() const = 0;
     virtual muse::async::Channel<TrackIdList> tracksSelected() const = 0;
 
     // clip selection
@@ -43,12 +42,12 @@ public:
     virtual void removeClipSelection(const ClipKey& clipKey) = 0;
     virtual muse::async::Channel<ClipKeyList> clipsSelected() const = 0;
 
-    virtual std::optional<secs_t> selectedClipStartTime() const = 0;
-    virtual std::optional<secs_t> selectedClipEndTime() const = 0;
+    virtual double selectedClipStartTime() const = 0;
+    virtual double selectedClipEndTime() const = 0;
 
     // used to get range-like boundaries of multiple selected clips
-    virtual std::optional<secs_t> leftMostSelectedClipStartTime() const = 0;
-    virtual std::optional<secs_t> rightMostSelectedClipEndTime() const = 0;
+    virtual double leftMostSelectedClipStartTime() const = 0;
+    virtual double rightMostSelectedClipEndTime() const = 0;
 
     // label selection
     virtual void resetSelectedLabels() = 0;
@@ -60,17 +59,12 @@ public:
     virtual void removeLabelSelection(const LabelKey& labelKey) = 0;
     virtual muse::async::Channel<LabelKeyList> labelsSelected() const = 0;
 
-    virtual std::optional<secs_t> selectedLabelStartTime() const = 0;
-    virtual std::optional<secs_t> selectedLabelEndTime() const = 0;
+    virtual double selectedLabelStartTime() const = 0;
+    virtual double selectedLabelEndTime() const = 0;
 
-    virtual std::optional<secs_t> leftMostSelectedLabelStartTime() const = 0;
-    virtual std::optional<secs_t> rightMostSelectedLabelEndTime() const = 0;
-
-    virtual std::optional<secs_t> leftMostSelectedItemStartTime() const = 0;
-    virtual std::optional<secs_t> rightMostSelectedItemEndTime() const = 0;
-
-    virtual std::optional<secs_t> selectedTracksStartTime() const = 0;
-    virtual std::optional<secs_t> selectedTracksEndTime() const = 0;
+    // used to get range-like boundaries of multiple selected labels
+    virtual double leftMostSelectedLabelStartTime() const = 0;
+    virtual double rightMostSelectedLabelEndTime() const = 0;
 
     // data selection
     virtual void setSelectedTrackAudioData(trackedit::TrackId trackId) = 0;
@@ -83,8 +77,6 @@ public:
     virtual ClipKeyList clipsIntersectingRangeSelection() const = 0;
     virtual void setClipsIntersectingRangeSelection(const ClipKeyList& clipKeys) = 0;
     virtual muse::async::Channel<ClipKeyList> clipsIntersectingRangeSelectionChanged() const = 0;
-    virtual LabelKeyList labelsIntersectingRangeSelection() const = 0;
-    virtual void setLabelsIntersectingRangeSelection(const LabelKeyList& labelKeys) = 0;
 
     virtual secs_t dataSelectedStartTime() const = 0;
     virtual void setDataSelectedStartTime(secs_t time, bool complete) = 0;
@@ -96,11 +88,6 @@ public:
     virtual muse::async::Channel<secs_t> dataSelectedEndTimeChanged() const = 0;
     virtual muse::async::Channel<secs_t> dataSelectedEndTimeSelected() const = 0;
 
-    virtual std::pair<double, double> frequencySelection(trackedit::TrackId trackId) const = 0;
-    virtual void setFrequencySelection(trackedit::TrackId, const std::pair<double, double>& selection) = 0;
-    virtual void resetFrequencySelection() = 0;
-    virtual muse::async::Channel<trackedit::TrackId> frequencySelectionChanged() const = 0;
-
     virtual trackedit::secs_t selectionStartTime() const = 0;
     virtual void setSelectionStartTime(trackedit::secs_t time) = 0;
 
@@ -109,6 +96,15 @@ public:
     virtual bool isSelectionGrouped() const = 0;
 
     virtual void resetTimeSelection() = 0;
+
+    // track focus state
+    virtual TrackId focusedTrack() const = 0;
+    virtual void setFocusedTrack(TrackId trackId) = 0;
+    virtual muse::async::Channel<trackedit::TrackId> focusedTrackChanged() const = 0;
+
+    virtual void focusPreviousTrack() = 0;
+    virtual void focusNextTrack() = 0;
+    virtual void focusTrackByIndex(int index) = 0;
 
     virtual int trackDistance(const TrackId previous, const TrackId next) const = 0;
     virtual TrackIdList orderedTrackList() const = 0;

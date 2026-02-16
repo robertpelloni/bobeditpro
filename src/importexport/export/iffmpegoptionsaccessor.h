@@ -3,7 +3,6 @@
 */
 #pragma once
 
-#include "io/path.h"
 #include "modularity/imoduleinterface.h"
 
 namespace au::importexport {
@@ -24,9 +23,5 @@ public:
 
     virtual std::vector<std::string> profileList() const = 0;
     virtual std::vector<std::string> predictionOrderMethodList() const = 0;
-
-    virtual std::string ffmpegVersion() const = 0;
-    virtual std::string ffmpegLibraryPath() const = 0;
-    virtual bool setFFmpegLibraryPath(const muse::io::path_t& path) = 0;
 };
 }

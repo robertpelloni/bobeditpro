@@ -21,16 +21,16 @@
  */
 #include "projectmodule.h"
 
-#include "framework/global/modularity/ioc.h"
-
-#include "framework/ui/iuiactionsregister.h"
-#include "framework/interactive/iinteractiveuriregister.h"
+#include "modularity/ioc.h"
 
 #include "internal/projectconfiguration.h"
 #include "internal/projectuiactions.h"
 #include "internal/thumbnailcreator.h"
 #include "internal/projectautosaver.h"
 #include "internal/au3/au3metadata.h"
+
+#include "ui/iuiactionsregister.h"
+#include "ui/iinteractiveuriregister.h"
 
 #include "context/iglobalcontext.h"
 #include "internal/audacityproject.h"
@@ -69,10 +69,10 @@ std::string ProjectModule::moduleName() const
 void ProjectModule::registerExports()
 {
     m_configuration = std::make_shared<ProjectConfiguration>();
-    m_actionsController = std::make_shared<ProjectActionsController>(iocContext());
+    m_actionsController = std::make_shared<ProjectActionsController>();
     m_uiActions = std::make_shared<ProjectUiActions>(m_actionsController);
     m_thumbnailCreator = std::make_shared<ThumbnailCreator>();
-    m_tagsAccessor = std::make_shared<Au3Metadata>(iocContext());
+    m_tagsAccessor = std::make_shared<Au3Metadata>();
     // m_projectAutoSaver = std::make_shared<ProjectAutoSaver>(); // we don't use at the moment 01/09/2025 the project auto saver as we already have the autosave table
 
 #ifdef Q_OS_MAC
@@ -85,7 +85,7 @@ void ProjectModule::registerExports()
 
     ioc()->registerExport<IProjectConfiguration>(moduleName(), m_configuration);
     ioc()->registerExport<IRecentFilesController>(moduleName(), m_recentFilesController);
-    ioc()->registerExport<IOpenSaveProjectScenario>(moduleName(), new OpenSaveProjectScenario(iocContext()));
+    ioc()->registerExport<IOpenSaveProjectScenario>(moduleName(), new OpenSaveProjectScenario());
     ioc()->registerExport<IProjectFilesController>(moduleName(), m_actionsController);
     ioc()->registerExport<IThumbnailCreator>(moduleName(), m_thumbnailCreator);
     ioc()->registerExport<IMetadata>(moduleName(), m_tagsAccessor);
@@ -98,7 +98,7 @@ void ProjectModule::resolveImports()
     if (ar) {
         ar->reg(m_uiActions);
     }
-    auto ir = ioc()->resolve<muse::interactive::IInteractiveUriRegister>(moduleName());
+    auto ir = ioc()->resolve<muse::ui::IInteractiveUriRegister>(moduleName());
     if (ir) {
         ir->registerQmlUri(muse::Uri("audacity://project/new"), "Audacity/Project/NewProjectDialog.qml");
         ir->registerQmlUri(muse::Uri("audacity://project/asksavelocationtype"), "Audacity/Project/AskSaveLocationTypeDialog.qml");

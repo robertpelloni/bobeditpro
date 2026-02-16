@@ -24,7 +24,7 @@ void TrackSpectrogramSettingsUpdater::maybeApplyGlobalSettingsToTrack()
 {
     forEachTrack([this](ITrackeditProject& trackeditProject, const Track& track, spectrogram::ITrackSpectrogramConfiguration& config){
         if (config.useGlobalSettings()) {
-            spectrogramService()->copyConfiguration(*globalSpectrogramConfiguration(), config);
+            trackSpectrogramConfigurationProvider()->copyConfiguration(*globalSpectrogramConfiguration(), config);
             trackeditProject.notifyAboutTrackChanged(track);
         }
     });
@@ -41,7 +41,7 @@ void TrackSpectrogramSettingsUpdater::forEachTrack(std::function<void(ITrackedit
         if (track.type != TrackType::Mono && track.type != TrackType::Stereo) {
             continue;
         }
-        const auto trackConfig = spectrogramService()->trackSpectrogramConfiguration(track.id);
+        const auto trackConfig = trackSpectrogramConfigurationProvider()->trackSpectrogramConfiguration(track.id);
         IF_ASSERT_FAILED(trackConfig) {
             continue;
         }

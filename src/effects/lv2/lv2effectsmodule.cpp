@@ -40,7 +40,7 @@ std::string Lv2EffectsModule::moduleName() const
 
 void Lv2EffectsModule::registerExports()
 {
-    ioc()->registerExport<ILv2EffectsRepository>(moduleName(), std::make_shared<Lv2EffectsRepository>(iocContext()));
+    ioc()->registerExport<ILv2EffectsRepository>(moduleName(), new Lv2EffectsRepository());
 }
 
 void Lv2EffectsModule::resolveImports()
@@ -57,7 +57,7 @@ void Lv2EffectsModule::resolveImports()
 
     auto lr = ioc()->resolve<IEffectViewLaunchRegister>(moduleName());
     if (lr) {
-        lr->regLauncher("LV2", std::make_shared<Lv2ViewLauncher>(iocContext()));
+        lr->regLauncher("LV2", std::make_shared<Lv2ViewLauncher>());
     }
 
     // auto ir = ioc()->resolve<IInteractiveUriRegister>(moduleName());

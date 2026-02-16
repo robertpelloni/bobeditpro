@@ -7,6 +7,7 @@
 #include "playback/iplayback.h"
 #include "playback/itrackplaybackcontrol.h"
 #include "record/irecord.h"
+#include "trackedit/iprojecthistory.h"
 
 #include "trackitem.h"
 
@@ -28,10 +29,11 @@ class WaveTrackItem : public TrackItem
     Q_PROPERTY(bool solo READ solo WRITE setSolo NOTIFY soloChanged)
     Q_PROPERTY(bool muted READ muted WRITE setMuted NOTIFY mutedChanged)
 
-    muse::Inject<playback::ITrackPlaybackControl> trackPlaybackControl{ this };
-    muse::Inject<playback::IPlayback> playback{ this };
-    muse::Inject<record::IRecord> record{ this };
-    muse::Inject<audio::IAudioDevicesProvider> audioDevicesProvider{ this };
+    muse::Inject<playback::ITrackPlaybackControl> trackPlaybackControl;
+    muse::Inject<playback::IPlayback> playback;
+    muse::Inject<record::IRecord> record;
+    muse::Inject<audio::IAudioDevicesProvider> audioDevicesProvider;
+    muse::Inject<trackedit::IProjectHistory> projectHistory;
 
 public:
     explicit WaveTrackItem(QObject* parent = nullptr);

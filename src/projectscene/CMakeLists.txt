@@ -35,12 +35,8 @@ set(MODULE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/internal/tapholdshortcut.cpp
     ${CMAKE_CURRENT_LIST_DIR}/internal/tapholdshortcut.h
 
-    ${CMAKE_CURRENT_LIST_DIR}/internal/au3/trackheightattachment.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/internal/au3/trackheightattachment.h
     ${CMAKE_CURRENT_LIST_DIR}/internal/au3/trackrulertypeattachment.cpp
     ${CMAKE_CURRENT_LIST_DIR}/internal/au3/trackrulertypeattachment.h
-    ${CMAKE_CURRENT_LIST_DIR}/internal/au3/trackviewtypeattachment.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/internal/au3/trackviewtypeattachment.h
     ${CMAKE_CURRENT_LIST_DIR}/internal/au3/viewinfo.cpp
     ${CMAKE_CURRENT_LIST_DIR}/internal/au3/viewinfo.h
     ${CMAKE_CURRENT_LIST_DIR}/internal/au3/waveformscale.cpp
@@ -231,10 +227,7 @@ set(MODULE_SRC
 
 set(MODULE_QML_IMPORT ${CMAKE_CURRENT_LIST_DIR}/qml )
 
-set(MODULE_LINK au3wrap trackedit spectrogram uicomponents)
-if(MUSE_MODULE_WORKSPACE)
-    set(MODULE_LINK ${MODULE_LINK} muse::workspace_qml)
-endif()
+set(MODULE_LINK au3wrap trackedit uicomponents)
 
 set(MODULE_INCLUDE ${CLIPSVIEW_V1_INC})
 

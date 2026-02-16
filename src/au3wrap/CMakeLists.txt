@@ -50,6 +50,8 @@ set(MODULE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/internal/projectsnap.h
     ${CMAKE_CURRENT_LIST_DIR}/internal/trackcolor.cpp
     ${CMAKE_CURRENT_LIST_DIR}/internal/trackcolor.h
+    ${CMAKE_CURRENT_LIST_DIR}/internal/trackviewtypeattachment.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/internal/trackviewtypeattachment.h
     )
 
 # ==================================
@@ -65,7 +67,6 @@ add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/thirdparty/soxr au3-soxr)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/thirdparty/pffft au3-pffft)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/thirdparty/portmixer au3-portmixer)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/thirdparty/twolame au3-twolame)
-add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/thirdparty/tft)
 list(APPEND AU3_LINK twolame)
 
 # Conditional time-stretching and pitch-shifting libraries
@@ -93,6 +94,11 @@ add_subdirectory(${AU3_LIBRARIES} au3-libraries)
 # Additional linking setup for conditional libraries
 if (AU_MODULE_EFFECTS_LV2)
     set(AU3_LINK ${AU3_LINK} lv2sdk)
+endif()
+
+if(AU_MODULE_EFFECTS_VST)
+    set(AU3_INCLUDE ${AU3_INCLUDE} ${AU_MODULE_VST_VST3_SDK_PATH})
+    set(AU3_LINK ${AU3_LINK} vst_sdk_3)
 endif()
 
 # We currently have some AU3 modules that are still compiled as sources (not yet converted to libraries)
@@ -261,8 +267,4 @@ target_no_warning(${MODULE} -w)
 
 if (CC_IS_CLANG)
     set_property(TARGET ${MODULE} APPEND_STRING PROPERTY COMPILE_FLAGS "-fobjc-arc")
-endif()
-
-if (AU_BUILD_PROJECT_TESTS)
-    add_subdirectory(tests)
 endif()

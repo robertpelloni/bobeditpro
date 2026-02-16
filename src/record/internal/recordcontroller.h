@@ -5,13 +5,12 @@
 #define AU_RECORD_RECORDCONTROLLER_H
 
 #include "framework/global/async/asyncable.h"
-#include "framework/global/modularity/ioc.h"
-
 #include "framework/actions/actionable.h"
-#include "framework/actions/iactionsdispatcher.h"
-#include "framework/interactive/iinteractive.h"
 
+#include "modularity/ioc.h"
 #include "context/iglobalcontext.h"
+#include "framework/actions/iactionsdispatcher.h"
+#include "framework/global/iinteractive.h"
 #include "playback/iplaybackcontroller.h"
 #include "record/irecordconfiguration.h"
 
@@ -21,18 +20,14 @@
 namespace au::record {
 class RecordController : public IRecordController, public muse::actions::Actionable, public muse::async::Asyncable, public muse::Injectable
 {
-    muse::GlobalInject<record::IRecordConfiguration> configuration;
-
-    muse::Inject<muse::actions::IActionsDispatcher> dispatcher{ this };
-    muse::Inject<au::context::IGlobalContext> globalContext{ this };
-    muse::Inject<muse::IInteractive> interactive{ this };
-    muse::Inject<IRecord> record{ this };
-    muse::Inject<playback::IPlaybackController> playbackController{ this };
+    muse::Inject<muse::actions::IActionsDispatcher> dispatcher;
+    muse::Inject<au::context::IGlobalContext> globalContext;
+    muse::Inject<muse::IInteractive> interactive;
+    muse::Inject<IRecord> record;
+    muse::Inject<playback::IPlaybackController> playbackController;
+    muse::Inject<record::IRecordConfiguration> configuration;
 
 public:
-    RecordController(const muse::modularity::ContextPtr& ctx)
-        : muse::Injectable(ctx) {}
-
     void init();
     void deinit();
 

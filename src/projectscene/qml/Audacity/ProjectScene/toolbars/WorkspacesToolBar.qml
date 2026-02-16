@@ -62,11 +62,6 @@ StyledToolBarView {
 
                     allowOptionToggle: false
 
-                    navigation.panel: root.navigationPanel
-                    navigation.order: 1
-
-                    drawFocusBorderInsideRect: true
-
                     onHandleMenuItem: function(itemId) {
                         Qt.callLater(root.model.handleWorkspacesMenuItem, itemId)
                     }
@@ -81,9 +76,6 @@ StyledToolBarView {
 
                     icon: IconCode.WORKSPACE
                     enabled: true
-
-                    navigation.panel: root.navigationPanel
-                    navigation.order: 2
                 }
             }
         }

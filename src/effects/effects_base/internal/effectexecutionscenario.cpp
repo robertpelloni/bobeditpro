@@ -101,8 +101,8 @@ muse::Ret EffectExecutionScenario::doPerformEffect(au3::Au3Project& project, con
         if (numSelectedClips != 0) {
             // If multiple clips are selected, we have checked that the effect supports it, in which case these global time boundaries shouldn't be relevant.
             // If this is just a single-clip selection, though, that will just be start and end times of the selected clip.
-            t0 = selectionController()->selectedClipStartTime().value_or(0.0);
-            t1 = selectionController()->selectedClipEndTime().value_or(0.0);
+            t0 = selectionController()->selectedClipStartTime();
+            t1 = selectionController()->selectedClipEndTime();
         } else {
             t0 = selectionController()->dataSelectedStartTime();
             t1 = selectionController()->dataSelectedEndTime();
@@ -418,7 +418,7 @@ muse::Ret EffectExecutionScenario::performEffectOnEachSelectedClip(au3::Au3Proje
     for (const auto& clip : clipsToProcess) {
         selectionController()->setSelectedClips({ clip }, complete);
         selectionController()->setSelectedTracks({ clip.trackId }, complete);
-        trackNavigationController()->setFocusedTrack(clip.trackId);
+        selectionController()->setFocusedTrack(clip.trackId);
 
         WaveTrack* waveTrack = au3::DomAccessor::findWaveTrack(project, ::TrackId(clip.trackId));
         IF_ASSERT_FAILED(waveTrack) {

@@ -13,6 +13,7 @@ StyledPopupView {
 
     placementPolicies: PopupView.PreferAbove
     openPolicies: PopupView.NoActivateFocus
+    closePolicies: PopupView.NoAutoClose
 
     property double volume
     property rect contentRect: fontMetrics.boundingRect(minValue.toFixed(root.decimalPlaces) + unitText)
@@ -53,7 +54,7 @@ StyledPopupView {
         repeat: false
 
         onTriggered: {
-            root.open()
+            open()
         }
     }
 
@@ -64,13 +65,13 @@ StyledPopupView {
         repeat: false
 
         onTriggered: {
-            root.close()
+            close()
         }
     }
 
     function show(noDelay = false) {
         if (noDelay) {
-            root.open()
+            open()
         } else {
             openTimer.restart()
         }
@@ -79,7 +80,7 @@ StyledPopupView {
 
     function hide(noDelay = false) {
         if (noDelay) {
-            root.close()
+            close()
         } else {
             closeTimer.restart()
         }

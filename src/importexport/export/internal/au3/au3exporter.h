@@ -16,20 +16,18 @@
 namespace au::importexport {
 using OptionsEditorUPtr = std::unique_ptr<ExportOptionsEditor>;
 
-class Au3Exporter : public IExporter, public muse::Injectable
+class Au3Exporter : public IExporter
 {
-    muse::GlobalInject<au::importexport::ExportConfiguration> exportConfiguration;
-
-    muse::Inject<au::context::IGlobalContext> globalContext{ this };
-    muse::Inject<au::trackedit::ISelectionController> selectionController{ this };
-    muse::Inject<au::playback::IPlaybackController> playbackController{ this };
+    muse::Inject<au::context::IGlobalContext> globalContext;
+    muse::Inject<au::importexport::ExportConfiguration> exportConfiguration;
+    muse::Inject<au::trackedit::ISelectionController> selectionController;
+    muse::Inject<au::playback::IPlaybackController> playbackController;
 
 public:
-    Au3Exporter(const muse::modularity::ContextPtr& ctx)
-        : muse::Injectable(ctx) {}
+    Au3Exporter() = default;
 
     void init() override;
-    muse::Ret exportData(const muse::io::path_t& path) override;
+    muse::Ret exportData(std::string filename) override;
 
     std::vector<std::string> formatsList() const override;
     int formatIndex(const std::string& format) const override;
@@ -47,8 +45,6 @@ public:
     void setValue(int id, const OptionValue&) override;
 
     OptionsEditorUPtr optionsEditor() const;
-
-    std::vector<bool> prepareChannelMask() const;
 
 private:
     double m_t0 {};

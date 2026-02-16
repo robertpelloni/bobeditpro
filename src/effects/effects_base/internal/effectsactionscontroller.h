@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "framework/interactive/iinteractive.h"
+#include "framework/global/iinteractive.h"
 #include "framework/global/modularity/ioc.h"
 #include "framework/global/async/asyncable.h"
 #include "framework/global/async/channel.h"
@@ -21,24 +21,20 @@
 
 namespace au::effects {
 class EffectsUiActions;
-class EffectsActionsController : public muse::actions::Actionable, public muse::async::Asyncable, public muse::Injectable,
+class EffectsActionsController : public muse::actions::Actionable, public muse::async::Asyncable,
     public std::enable_shared_from_this<EffectsActionsController>
 {
-    muse::GlobalInject<IEffectsConfiguration> configuration;
-
-    muse::Inject<muse::actions::IActionsDispatcher> dispatcher{ this };
-    muse::Inject<muse::ui::IUiActionsRegister> uiActionsRegister{ this };
-    muse::Inject<IEffectExecutionScenario> effectExecutionScenario{ this };
-    muse::Inject<IEffectsProvider> effectsProvider{ this };
-    muse::Inject<IEffectPresetsScenario> presetsScenario{ this };
-    muse::Inject<IEffectInstancesRegister> instancesRegister{ this };
-    muse::Inject<muse::IInteractive> interactive{ this };
-    muse::Inject<au::playback::IPlaybackController> playbackController{ this };
+    muse::Inject<muse::actions::IActionsDispatcher> dispatcher;
+    muse::Inject<muse::ui::IUiActionsRegister> uiActionsRegister;
+    muse::Inject<IEffectExecutionScenario> effectExecutionScenario;
+    muse::Inject<IEffectsProvider> effectsProvider;
+    muse::Inject<IEffectPresetsScenario> presetsScenario;
+    muse::Inject<IEffectsConfiguration> configuration;
+    muse::Inject<IEffectInstancesRegister> instancesRegister;
+    muse::Inject<muse::IInteractive> interactive;
+    muse::Inject<au::playback::IPlaybackController> playbackController;
 
 public:
-    EffectsActionsController(const muse::modularity::ContextPtr& ctx)
-        : muse::Injectable(ctx) {}
-
     void init();
     bool canReceiveAction(const muse::actions::ActionCode&) const override;
     muse::async::Channel<muse::actions::ActionCodeList> canReceiveActionsChanged() const;

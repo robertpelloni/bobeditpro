@@ -28,7 +28,6 @@ void FFmpegStartup();
 bool LoadFFmpeg(bool showerror);
 
 bool FindFFmpegLibs();
-bool SetFFmpegPath(const wxString& path);
 
 //! TODO AU4:
 //! bool FindFFmpegLibs(); - should open a window and allow to select FFmpeg path manually

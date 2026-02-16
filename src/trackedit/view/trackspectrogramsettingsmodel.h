@@ -3,11 +3,9 @@
  */
 #pragma once
 
-#include <QQmlParserStatus>
-
 #include "spectrogram/view/abstractspectrogramsettingsmodel.h"
 #include "spectrogram/iglobalspectrogramconfiguration.h"
-#include "spectrogram/ispectrogramservice.h"
+#include "spectrogram/itrackspectrogramconfigurationprovider.h"
 #include "context/iglobalcontext.h"
 
 #include "framework/global/modularity/ioc.h"
@@ -22,10 +20,9 @@ class TrackSpectrogramSettingsModel : public spectrogram::AbstractSpectrogramSet
     Q_PROPERTY(QString trackTitle READ trackTitle NOTIFY trackIdChanged)
     Q_PROPERTY(bool useGlobalSettings READ useGlobalSettings WRITE setUseGlobalSettings NOTIFY useGlobalSettingsChanged)
 
-    muse::GlobalInject<spectrogram::IGlobalSpectrogramConfiguration> globalSpectrogramConfiguration;
-
-    muse::Inject<au::context::IGlobalContext> globalContext { this };
-    muse::Inject<spectrogram::ISpectrogramService> spectrogramService { this };
+    muse::Inject<spectrogram::IGlobalSpectrogramConfiguration> globalSpectrogramConfiguration;
+    muse::Inject<au::context::IGlobalContext> globalContext;
+    muse::Inject<spectrogram::ITrackSpectrogramConfigurationProvider> trackSpectrogramConfigurationProvider;
 
 public:
     TrackSpectrogramSettingsModel(QObject* parent = nullptr);

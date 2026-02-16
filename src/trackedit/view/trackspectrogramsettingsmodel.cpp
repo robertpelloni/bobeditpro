@@ -3,6 +3,7 @@
  */
 #include "trackspectrogramsettingsmodel.h"
 #include "internal/snapshotspectrogramconfiguration.h"
+#include "spectrogram/itrackspectrogramconfigurationprovider.h"
 
 #include "framework/global/log.h"
 
@@ -40,7 +41,7 @@ TrackSpectrogramSettingsModel::TrackSpectrogramSettingsModel(QObject* parent)
 TrackSpectrogramSettingsModel::~TrackSpectrogramSettingsModel()
 {
     if (m_initialTrackConfig) {
-        spectrogramService()->copyConfiguration(*m_initialTrackConfig, *m_trackConfig);
+        trackSpectrogramConfigurationProvider()->copyConfiguration(*m_initialTrackConfig, *m_trackConfig);
         m_trackConfig->setUseGlobalSettings(m_initialTrackConfig->useGlobalSettings());
         sendRepaintRequest();
     }
@@ -48,7 +49,7 @@ TrackSpectrogramSettingsModel::~TrackSpectrogramSettingsModel()
 
 void TrackSpectrogramSettingsModel::componentComplete()
 {
-    m_trackConfig = spectrogramService()->trackSpectrogramConfiguration(m_trackId);
+    m_trackConfig = trackSpectrogramConfigurationProvider()->trackSpectrogramConfiguration(m_trackId);
     IF_ASSERT_FAILED(m_trackConfig) {
         return;
     }
@@ -128,7 +129,7 @@ void TrackSpectrogramSettingsModel::setUseGlobalSettings(bool value)
     }
     m_trackConfig->setUseGlobalSettings(value);
     if (value) {
-        spectrogramService()->copyConfiguration(*globalSpectrogramConfiguration(), *m_trackConfig);
+        trackSpectrogramConfigurationProvider()->copyConfiguration(*globalSpectrogramConfiguration(), *m_trackConfig);
         emit minFreqChanged();
         emit maxFreqChanged();
         emit colorGainDbChanged();

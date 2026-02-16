@@ -21,13 +21,7 @@ ListItemBlank {
     property bool isFocused: false
 
     property alias headerTrailingControlsComponent: headerTrailingControls.sourceComponent
-    property int headerTrailingControlsNavigationStart: collapsed ? title.navigation.order + 1 : extraControlsNavigationEnd + 1
-    property int headerTrailingControlsNavigationEnd: 0
-
     property alias extraControlsComponent: extraControlsLoader.sourceComponent
-    property int extraControlsNavigationStart: menuButton.navigation.order + 1
-    property int extraControlsNavigationEnd: 0
-
     property alias rightSideContainerComponent: rightSideContainer.sourceComponent
 
     property alias bottomSeparatorHeight: bottomSeparator.height
@@ -157,9 +151,6 @@ ListItemBlank {
 
                     text: Boolean(root.item) ? root.item.title : ""
 
-                    navigation.panel: root.navigation.panel
-                    navigation.order: root.navigation.order + 1
-
                     onTextEdited: function(text) {
                         if (Boolean(root.item)) {
                             root.item.title = text
@@ -170,12 +161,7 @@ ListItemBlank {
                 Loader { id: headerTrailingControls }
 
                 MenuButton {
-                    id: menuButton
-
                     menuModel: contextMenuModel
-
-                    navigation.panel: root.navigation.panel
-                    navigation.order: root.collapsed ? root.headerTrailingControlsNavigationEnd + 1 : title.navigation.order + 1
 
                     onClicked: {
                         root.selectionRequested(true)
@@ -304,7 +290,7 @@ ListItemBlank {
 
         color: "transparent"
 
-        border.color: ui.theme.extra["focus_state_color"]
+        border.color: "#7EB1FF"
         border.width: 2
 
         radius: 6

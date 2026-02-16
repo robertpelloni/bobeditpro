@@ -34,11 +34,6 @@
 
 using namespace au::effects;
 
-BuiltinEffectViewLoader::BuiltinEffectViewLoader(QObject* parent)
-    : QObject(parent), muse::Injectable(muse::iocCtxForQmlObject(this))
-{
-}
-
 BuiltinEffectViewLoader::~BuiltinEffectViewLoader()
 {
     if (m_contentItem) {

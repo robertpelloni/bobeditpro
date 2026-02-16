@@ -13,17 +13,16 @@
 
 #include "trackedittypes.h"
 #include "../../iselectioncontroller.h"
-#include "../../iprojecthistory.h"
 
 namespace au::trackedit {
-class Au3SelectionController : public ISelectionController, public muse::async::Asyncable, public muse::Injectable
+struct ClipAndTimeSelection;
+
+class Au3SelectionController : public ISelectionController, public muse::async::Asyncable
 {
-    muse::Inject<au::context::IGlobalContext> globalContext { this };
-    muse::Inject<IProjectHistory> projectHistory { this };
+    muse::Inject<au::context::IGlobalContext> globalContext;
 
 public:
-    Au3SelectionController(const muse::modularity::ContextPtr& ctx)
-        : muse::Injectable(ctx) {}
+    Au3SelectionController() = default;
 
     void init();
 
@@ -31,7 +30,6 @@ public:
     void resetSelectedTracks() override;
     trackedit::TrackIdList selectedTracks() const override;
     void setSelectedTracks(const trackedit::TrackIdList& trackIds, bool complete) override;
-    muse::async::Channel<TrackIdList> selectedTracksChanged() const override;
     muse::async::Channel<trackedit::TrackIdList> tracksSelected() const override;
 
     // clip selection
@@ -43,10 +41,10 @@ public:
     void addSelectedClip(const ClipKey& clipKey) override;
     void removeClipSelection(const ClipKey& clipKey) override;
     muse::async::Channel<ClipKeyList> clipsSelected() const override;
-    std::optional<secs_t> selectedClipStartTime() const override;
-    std::optional<secs_t> selectedClipEndTime() const override;
-    std::optional<secs_t> leftMostSelectedClipStartTime() const override;
-    std::optional<secs_t> rightMostSelectedClipEndTime() const override;
+    double selectedClipStartTime() const override;
+    double selectedClipEndTime() const override;
+    double leftMostSelectedClipStartTime() const override;
+    double rightMostSelectedClipEndTime() const override;
 
     // label selection
     void resetSelectedLabels() override;
@@ -57,16 +55,10 @@ public:
     void addSelectedLabel(const LabelKey& labelKey) override;
     void removeLabelSelection(const LabelKey& labelKey) override;
     muse::async::Channel<LabelKeyList> labelsSelected() const override;
-    std::optional<secs_t> selectedLabelStartTime() const override;
-    std::optional<secs_t> selectedLabelEndTime() const override;
-    std::optional<secs_t> leftMostSelectedLabelStartTime() const override;
-    std::optional<secs_t> rightMostSelectedLabelEndTime() const override;
-
-    std::optional<secs_t> leftMostSelectedItemStartTime() const override;
-    std::optional<secs_t> rightMostSelectedItemEndTime() const override;
-
-    std::optional<secs_t> selectedTracksStartTime() const override;
-    std::optional<secs_t> selectedTracksEndTime() const override;
+    double selectedLabelStartTime() const override;
+    double selectedLabelEndTime() const override;
+    double leftMostSelectedLabelStartTime() const override;
+    double rightMostSelectedLabelEndTime() const override;
 
     // data selection
     void setSelectedTrackAudioData(trackedit::TrackId trackId) override;
@@ -79,8 +71,6 @@ public:
     ClipKeyList clipsIntersectingRangeSelection() const override;
     void setClipsIntersectingRangeSelection(const ClipKeyList& clipKeys) override;
     muse::async::Channel<ClipKeyList> clipsIntersectingRangeSelectionChanged() const override;
-    LabelKeyList labelsIntersectingRangeSelection() const override;
-    void setLabelsIntersectingRangeSelection(const LabelKeyList& labelKeys) override;
 
     trackedit::secs_t dataSelectedStartTime() const override;
     void setDataSelectedStartTime(trackedit::secs_t time, bool complete) override;
@@ -95,16 +85,19 @@ public:
     trackedit::secs_t selectionStartTime() const override;
     void setSelectionStartTime(trackedit::secs_t time) override;
 
-    std::pair<double, double> frequencySelection(trackedit::TrackId trackId) const override;
-    void setFrequencySelection(trackedit::TrackId, const std::pair<double, double>& selection) override;
-    void resetFrequencySelection() override;
-    muse::async::Channel<trackedit::TrackId> frequencySelectionChanged() const override;
-
     // grouping
     bool selectionContainsGroup() const override;
     bool isSelectionGrouped() const override;
 
     void resetTimeSelection() override;
+
+    trackedit::TrackId focusedTrack() const override;
+    void setFocusedTrack(TrackId trackId) override;
+    muse::async::Channel<trackedit::TrackId> focusedTrackChanged() const override;
+
+    void focusPreviousTrack() override;
+    void focusNextTrack() override;
+    void focusTrackByIndex(int index) override;
 
     int trackDistance(const TrackId previous, const TrackId next) const override;
     TrackIdList orderedTrackList() const override;
@@ -112,9 +105,8 @@ public:
 private:
     void addSelectedTrack(const trackedit::TrackId& trackId);
     void updateSelectionController();
-    void onUndoRedo();
+    void restoreSelection(const ClipAndTimeSelection& selection);
     ClipKeyList findClipsIntersectingRangeSelection() const;
-    LabelKeyList findLabelsIntersectingRangeSelection() const;
 
     au3::Au3Project& projectRef() const;
     Observer::Subscription m_tracksSubc;
@@ -155,32 +147,10 @@ private:
     Val<trackedit::secs_t> m_selectedStartTime;
     Val<trackedit::secs_t> m_selectedEndTime;
     Val<ClipKeyList> m_clipsIntersectingRangeSelection;
-    Val<LabelKeyList> m_labelsIntersectingRangeSelection;
 
     Val<trackedit::secs_t> m_selectionStartTime; // indicates where user started selection
 
     // track focus state
     Val<TrackId> m_focusedTrack = Val<TrackId> { TrackId(-1) };
-
-    struct TrackFrequencySelection {
-        const int trackId;
-        const double startFrequency;
-        const double endFrequency;
-
-        constexpr bool operator==(const TrackFrequencySelection& other) const
-        {
-            return trackId == other.trackId
-                   && startFrequency == other.startFrequency
-                   && endFrequency == other.endFrequency;
-        }
-
-        constexpr bool operator!=(const TrackFrequencySelection& other) const
-        {
-            return !(*this == other);
-        }
-    };
-
-    std::optional<TrackFrequencySelection> m_frequencySelection;
-    muse::async::Channel<trackedit::TrackId> m_frequencySelectionChanged;
 };
 }

@@ -2,8 +2,6 @@
  * Audacity: A Digital Audio Editor
  */
 
-#include <QFile>
-
 #include "global/translation.h"
 
 #include "project/internal/au3/au3metadata.h"
@@ -15,7 +13,7 @@ using namespace muse;
 using namespace muse::io;
 
 MetadataModel::MetadataModel(QObject* parent)
-    : QAbstractListModel(parent), muse::Injectable(muse::iocCtxForQmlObject(this))
+    : QAbstractListModel(parent)
 {
 }
 

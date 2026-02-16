@@ -44,9 +44,6 @@ void ProjectConfiguration::init()
     });
 
     initTempDir();
-    if (!userProjectsPath().empty()) {
-        fileSystem()->makePath(userProjectsPath());
-    }
 }
 
 muse::io::path_t ProjectConfiguration::recentFilesJsonPath() const
@@ -117,20 +114,20 @@ muse::io::path_t ProjectConfiguration::defaultSavingFilePath(IAudacityProjectPtr
     // NOLINTNEXTLINE
     if (isLocalProject) {
         if (project->isNewlyCreated()) {
-            if (!lastSavedProjectsPath().empty()) {
-                folderPath = lastSavedProjectsPath();
-            } else {
-                folderPath = userProjectsPath();
+            if (muse::io::isAbsolute(projectPath)) {
+                folderPath = muse::io::dirpath(projectPath);
             }
 
             filename = muse::io::filename(projectPath, false);
         } else {
-            folderPath = muse::io::dirpath(projectPath);
-            filename = muse::io::filename(projectPath, false);
+            //! TODO AU4
+            // projectPath = engraving::containerPath(projectPath);
+            // folderPath = muse::io::dirpath(projectPath);
+            // filename = muse::io::filename(projectPath, false);
 
-            if (theSuffix.empty()) {
-                theSuffix = muse::io::suffix(projectPath);
-            }
+            // if (theSuffix.empty()) {
+            //     theSuffix = muse::io::suffix(projectPath);
+            // }
         }
     }
 
@@ -146,9 +143,10 @@ muse::io::path_t ProjectConfiguration::defaultSavingFilePath(IAudacityProjectPtr
         folderPath = defaultUserProjectsPath();
     }
 
-    if (filename.empty()) {
-        filename = project->title();
-    }
+    //! TODO AU4
+    // if (filename.empty()) {
+    //     filename = project->metaInfo().title;
+    // }
 
     if (filename.empty()) {
         filename = muse::qtrc("project", "Untitled");

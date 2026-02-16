@@ -28,19 +28,14 @@ using namespace au::context;
 using namespace muse;
 using namespace muse::ui;
 
-static const Uri HOME_PAGE_URI("audacity://home");
+static const Uri HOME_PAGE_URI("musescore://home");
 static const Uri PROJECT_PAGE_URI("audacity://project");
 
 //! TODO AU4: this should point to sth like ProjectView
 //! but we don't have that yet, so binding it to
 //! area that's being focused when opening a project
 static const QString PROJECT_NAVIGATION_PANEL("MainToolBar");
-static const QString DEFAULT_NAVIGATION_SECTION("TrackViewSection");
-
-UiContextResolver::UiContextResolver(const muse::modularity::ContextPtr& ctx)
-    : muse::Injectable(ctx)
-{
-}
+static const QString DEFAULT_NAVIGATION_PANEL("Main Panel");
 
 void UiContextResolver::init()
 {
@@ -116,10 +111,12 @@ muse::ui::UiContext UiContextResolver::resolveUiContext() const
             return context::UiCtxUnknown;
         }
 
-        INavigationSection* activeSection = navigationController()->activeSection();
-        if (activeSection) {
-            if (activeSection->name() == DEFAULT_NAVIGATION_SECTION && trackNavigationController()->isNavigationEnabled()) {
+        INavigationPanel* activePanel = navigationController()->activePanel();
+        if (activePanel) {
+            if (activePanel->name() == DEFAULT_NAVIGATION_PANEL) {
                 return context::UiCtxProjectFocused;
+            } else {
+                return context::UiCtxProjectPlayback;
             }
         }
 
@@ -142,8 +139,15 @@ bool UiContextResolver::match(const ui::UiContext& currentCtx, const ui::UiConte
         return true;
     }
 
-    //! NOTE If the current context is `UiCtxProjectFocused`, then we allow `UiCtxProjectOpened` too
-    if (currentCtx == context::UiCtxProjectFocused && actCtx == context::UiCtxProjectOpened) {
+    //! NOTE If the current context is `UiCtxProjectFocused` or `UiCtxProjectPlayback`, then we allow `UiCtxProjectOpened` too
+    if ((currentCtx == context::UiCtxProjectFocused || currentCtx == context::UiCtxProjectPlayback)
+        && actCtx == context::UiCtxProjectOpened) {
+        return true;
+    }
+
+    //! SEE There's a problem here, see https://github.com/audacity/audacity/pull/9662#issuecomment-3405088750
+    //! NOTE If the current context is `UiCtxProjectPlayback`, then we allow `UiCtxProjectFocused` too
+    if (currentCtx == context::UiCtxProjectFocused && actCtx == context::UiCtxProjectPlayback) {
         return true;
     }
 
@@ -178,6 +182,8 @@ bool UiContextResolver::isShortcutContextAllowed(const std::string& scContext) c
 
     if (CTX_PROJECT_OPENED == scContext) {
         return matchWithCurrent(context::UiCtxProjectOpened);
+    } else if (CTX_PROJECT_PLAYBACK == scContext) {
+        return matchWithCurrent(context::UiCtxProjectPlayback);
     } else if (CTX_PROJECT_FOCUSED == scContext) {
         return matchWithCurrent(context::UiCtxProjectFocused);
     } else if (CTX_NOT_PROJECT_FOCUSED == scContext) {

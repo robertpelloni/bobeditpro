@@ -12,7 +12,7 @@
 class AUControl;
 
 namespace au::effects {
-class AudioUnitView : public QQuickItem, public muse::Injectable
+class AudioUnitView : public QQuickItem
 {
     Q_OBJECT
     Q_PROPERTY(int instanceId READ instanceId WRITE setInstanceId NOTIFY instanceIdChanged FINAL)
@@ -21,9 +21,8 @@ class AudioUnitView : public QQuickItem, public muse::Injectable
     Q_PROPERTY(int bottomPadding READ bottomPadding WRITE setBottomPadding NOTIFY bottomPaddingChanged FINAL)
     Q_PROPERTY(int minimumWidth READ minimumWidth WRITE setMinimumWidth NOTIFY minimumWidthChanged FINAL)
 
-    muse::GlobalInject<IEffectsConfiguration> configuration;
-
-    muse::Inject<IEffectInstancesRegister> instancesRegister{ this };
+    muse::Inject<IEffectInstancesRegister> instancesRegister;
+    muse::Inject<IEffectsConfiguration> configuration;
 
 public:
     AudioUnitView(QQuickItem* parent = nullptr);

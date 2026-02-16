@@ -1,7 +1,6 @@
 #pragma once
 
 #include <QColor>
-#include <QPainter>
 #include <QRect>
 
 #include "modularity/imoduleinterface.h"
@@ -22,7 +21,6 @@ public:
         QColor selectedSamplePen;
         QColor sampleBrush;
         QColor rmsPen;
-        QColor rmsSelectedPen;
         QColor clippedPen;
         QColor highlight;
         QColor centerLine;
