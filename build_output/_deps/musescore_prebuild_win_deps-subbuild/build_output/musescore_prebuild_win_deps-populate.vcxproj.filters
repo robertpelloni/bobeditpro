@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\hyper\workspace\bobeditpro\build_output\_deps\musescore_prebuild_win_deps-subbuild\build_output\CMakeFiles\db29bcfc2fa175e76bf119768706b0ce\musescore_prebuild_win_deps-populate-mkdir.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\hyper\workspace\bobeditpro\build_output\_deps\musescore_prebuild_win_deps-subbuild\build_output\CMakeFiles\db29bcfc2fa175e76bf119768706b0ce\musescore_prebuild_win_deps-populate-download.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\hyper\workspace\bobeditpro\build_output\_deps\musescore_prebuild_win_deps-subbuild\build_output\CMakeFiles\db29bcfc2fa175e76bf119768706b0ce\musescore_prebuild_win_deps-populate-update.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\hyper\workspace\bobeditpro\build_output\_deps\musescore_prebuild_win_deps-subbuild\build_output\CMakeFiles\db29bcfc2fa175e76bf119768706b0ce\musescore_prebuild_win_deps-populate-patch.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\hyper\workspace\bobeditpro\build_output\_deps\musescore_prebuild_win_deps-subbuild\build_output\CMakeFiles\db29bcfc2fa175e76bf119768706b0ce\musescore_prebuild_win_deps-populate-configure.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\hyper\workspace\bobeditpro\build_output\_deps\musescore_prebuild_win_deps-subbuild\build_output\CMakeFiles\db29bcfc2fa175e76bf119768706b0ce\musescore_prebuild_win_deps-populate-build.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\hyper\workspace\bobeditpro\build_output\_deps\musescore_prebuild_win_deps-subbuild\build_output\CMakeFiles\db29bcfc2fa175e76bf119768706b0ce\musescore_prebuild_win_deps-populate-install.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\hyper\workspace\bobeditpro\build_output\_deps\musescore_prebuild_win_deps-subbuild\build_output\CMakeFiles\db29bcfc2fa175e76bf119768706b0ce\musescore_prebuild_win_deps-populate-test.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\hyper\workspace\bobeditpro\build_output\_deps\musescore_prebuild_win_deps-subbuild\build_output\CMakeFiles\148c842fa6608a78b4a433227ffd1056\musescore_prebuild_win_deps-populate-complete.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\hyper\workspace\bobeditpro\build_output\_deps\musescore_prebuild_win_deps-subbuild\build_output\CMakeFiles\2f715f01969ee4db64acadc14c308b82\musescore_prebuild_win_deps-populate.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\hyper\workspace\bobeditpro\build_output\_deps\musescore_prebuild_win_deps-subbuild\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\Users\hyper\workspace\bobeditpro\build_output\_deps\musescore_prebuild_win_deps-subbuild\build_output\CMakeFiles\musescore_prebuild_win_deps-populate" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{B8F3DCC5-3EA6-373B-B20F-66FE220AC96A}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
