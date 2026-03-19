@@ -11,7 +11,6 @@
 #include "trackedit/itrackeditproject.h"
 
 namespace au::projectscene {
-
 class MixerBoardModel : public QAbstractListModel
 {
     Q_OBJECT
@@ -82,5 +81,4 @@ private:
 signals:
     void availableRoutesChanged();
 };
-
 } // namespace au::projectscene

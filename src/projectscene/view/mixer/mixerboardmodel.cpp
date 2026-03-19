@@ -44,8 +44,9 @@ void MixerBoardModel::updateTrackList()
     m_availableRouteIds.append(0);
 
     auto prj = globalContext()->currentProject();
-    if (!prj)
+    if (!prj) {
         return;
+    }
 
     auto trackeditPrj = globalContext()->currentTrackeditProject();
     if (!trackeditPrj) {
