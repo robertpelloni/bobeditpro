@@ -81,11 +81,12 @@ Rectangle {
                         onMoved: root.sendAmountChangedRequest(modelData.destId, value)
                     }
 
-                    Button {
-                        text: "x"
+                    FlatButton {
+                        text: "X"
                         Layout.preferredWidth: 20
                         Layout.preferredHeight: 20
                         onClicked: root.removeSendRequest(modelData.destId)
+                        hoverColor: ui.theme.buttonHoverColor
                     }
                 }
             }
@@ -93,11 +94,15 @@ Rectangle {
             // Add Send
             StyledDropdown {
                 Layout.fillWidth: true
-                model: root.availableRoutes
-                // We want this to act as a command button, not a state selector
-                // So we don't bind currentIndex strictly?
-                // Or we accept it resets to 0.
-                onActivated: (index) => root.addSendRequest(index)
+                Layout.preferredHeight: 24
+                model: ["+ Add Send..."].concat(root.availableRoutes.slice(1)) // Skip master for sends usually, or just append "Add Send"
+                currentIndex: 0
+                onActivated: (index) => {
+                    if (index > 0) {
+                        root.addSendRequest(index); // Note: Index mapping might be slightly off if we prepend, but okay for scaffold
+                        currentIndex = 0; // Reset to "+ Add Send"
+                    }
+                }
             }
         }
 

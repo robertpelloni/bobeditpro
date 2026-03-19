@@ -278,6 +278,11 @@ muse::Ret TrackeditInteraction::makeRoomForClip(const ClipKey& clipKey)
     return m_interaction->makeRoomForClip(clipKey);
 }
 
+bool TrackeditInteraction::newBusTrack()
+{
+    return withPlaybackStop(&ITrackeditInteraction::newBusTrack);
+}
+
 bool TrackeditInteraction::newMonoTrack()
 {
     return withPlaybackStop(&ITrackeditInteraction::newMonoTrack);

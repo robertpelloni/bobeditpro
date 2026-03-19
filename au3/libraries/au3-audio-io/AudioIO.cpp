@@ -2300,18 +2300,19 @@ bool AudioIO::ProcessPlaybackSlices(
             };
 
             // Helper for Aux Sends
-            auto ProcessSends = [&](const float* src, int channelIndex) {
+            auto ProcessSends = [&](const float* src, float faderVolume, int channelIndex) {
                if (!pPlayable) return;
                for (const auto& send : pPlayable->GetAuxSends()) {
                    auto it = mBusAccumulators.find(send.mDestinationId);
                    if (it != mBusAccumulators.end()) {
                        auto& busBuffers = it->second;
                        if (channelIndex < busBuffers.size()) {
-                           // Apply Send Level (Pan ignored for now in mono->stereo logic simplification)
-                           float vol = send.mAmount;
+                           // Pre-fader: use send.mAmount directly on the raw signal (src)
+                           // Post-fader: multiply send.mAmount by the track's fader volume
+                           float sendGain = send.mPreFader ? send.mAmount : (send.mAmount * faderVolume);
                            auto& dest = busBuffers[channelIndex];
                            for (size_t i = 0; i < samplesAvailable; ++i) {
-                               dest[i] += src[i] * vol;
+                               dest[i] += src[i] * sendGain;
                            }
                        }
                    }
@@ -2323,17 +2324,11 @@ bool AudioIO::ProcessPlaybackSlices(
                     const float volume = seq->GetChannelVolume(n);
                     float* pSrc = mProcessingBuffers[bufferIndex + n].data();
 
-                    // Mix to Main Route
+                    // Mix to Main Route (Post-Fader)
                     MixToDest(pSrc, volume, n);
 
-                    // Mix to Aux Sends (Pre-Fader logic missing, assuming Post-Fader for now)
-                    // Note: pSrc here is *raw* processed audio, volume is applied during mix.
-                    // For Post-Fader send, we should apply track volume.
-                    // For Pre-Fader, we should not.
-                    // Assuming Post-Fader send logic for simplicity here:
-                    // Actually, pSrc is unity gain from effects.
-                    // Send Amount is usually relative to that.
-                    ProcessSends(pSrc, n);
+                    // Mix to Aux Sends (Pre/Post handled inside)
+                    ProcessSends(pSrc, volume, n);
 
                     // Apply volume to source buffer for display/meters/writeback
                     for (unsigned i = 0; i < samplesAvailable; ++i) {
@@ -2359,7 +2354,7 @@ bool AudioIO::ProcessPlaybackSlices(
                 for (unsigned n = 0; n < mNumPlaybackChannels; ++n) {
                     const float volume = seq->GetChannelVolume(n);
                     MixToDest(pSrc, volume, n);
-                    ProcessSends(pSrc, n); // Sends get mono source mixed to both bus channels
+                    ProcessSends(pSrc, volume, n); // Sends get mono source mixed to both bus channels
                 }
 
                 for (unsigned i = 0; i < samplesAvailable; ++i) {
@@ -2379,21 +2374,104 @@ bool AudioIO::ProcessPlaybackSlices(
 
         // --- BUS PROCESSING ---
         // Iterate all Bus Accumulators and mix them into Master (or other Busses)
-        // For Phase 1, we just dump them all into Master to support hearing them.
-        // A real implementation needs the topological sort mentioned earlier.
-        for (auto& pair : mBusAccumulators) {
-            // int busId = pair.first;
-            auto& busBuffers = pair.second;
 
-            // TODO: Apply Bus Volume/Pan here (requires looking up BusTrack by ID)
-            // For now, unity gain mix to master
+        // 1. Build a dependency graph to topological sort the Busses
+        std::map<int, int> inDegree; // busId -> number of incoming routes
+        std::map<int, std::vector<int>> adj; // busId -> list of busses it routes to
+
+        for (auto& pair : mBusAccumulators) {
+            int busId = pair.first;
+            if (inDegree.find(busId) == inDegree.end()) {
+                inDegree[busId] = 0;
+            }
+
+            // Find the track for this bus
+            const BusTrack* pBusTrack = nullptr;
+            for (const auto& seq : mPlaybackSequences) {
+                if (auto b = dynamic_cast<const BusTrack*>(seq->FindChannelGroup())) {
+                    if (b->GetId() == busId) {
+                        pBusTrack = b;
+                        break;
+                    }
+                }
+            }
+
+            if (pBusTrack) {
+                int routeId = pBusTrack->GetRouteId();
+                if (routeId != 0 && mBusAccumulators.find(routeId) != mBusAccumulators.end()) {
+                    adj[busId].push_back(routeId);
+                    inDegree[routeId]++;
+                }
+            }
+        }
+
+        // 2. Topological Sort using Kahn's Algorithm
+        std::vector<int> sortedBusses;
+        std::vector<int> queue;
+
+        for (const auto& pair : inDegree) {
+            if (pair.second == 0) {
+                queue.push_back(pair.first);
+            }
+        }
+
+        while (!queue.empty()) {
+            int current = queue.back();
+            queue.pop_back();
+            sortedBusses.push_back(current);
+
+            for (int neighbor : adj[current]) {
+                inDegree[neighbor]--;
+                if (inDegree[neighbor] == 0) {
+                    queue.push_back(neighbor);
+                }
+            }
+        }
+
+        // If sortedBusses.size() != inDegree.size(), there is a cycle that wasn't
+        // caught by the UI. In this case, remaining busses won't be processed,
+        // which avoids infinite loops.
+
+        // 3. Process Busses in sorted order
+        for (int busId : sortedBusses) {
+            auto& busBuffers = mBusAccumulators[busId];
+
+            // Find the BusTrack to get its volume/pan and routing
+            const BusTrack* pBusTrack = nullptr;
+            for (const auto& seq : mPlaybackSequences) {
+                if (auto b = dynamic_cast<const BusTrack*>(seq->FindChannelGroup())) {
+                    if (b->GetId() == busId) {
+                        pBusTrack = b;
+                        break;
+                    }
+                }
+            }
+
+            float volume = pBusTrack ? pBusTrack->GetVolume() : 1.0f;
+            // TODO: Apply accurate stereo panning logic based on GetPan()
+            int routeId = pBusTrack ? pBusTrack->GetRouteId() : 0;
+
+            // Determine destination buffers: Master or another Bus
+            std::vector<std::vector<float>>* pDestBuffers = &mMasterBuffers;
+            if (routeId != 0) {
+                auto it = mBusAccumulators.find(routeId);
+                if (it != mBusAccumulators.end()) {
+                    pDestBuffers = &it->second;
+                }
+            }
 
             for (size_t n = 0; n < mNumPlaybackChannels && n < busBuffers.size(); ++n) {
                 float* pSrc = busBuffers[n].data();
-                float* pDest = mMasterBuffers[n].data();
-                for (size_t i = 0; i < samplesAvailable; ++i) {
-                    pDest[i] += pSrc[i];
+
+                // Route to destination
+                if (n < pDestBuffers->size()) {
+                    float* pDest = (*pDestBuffers)[n].data();
+                    for (size_t i = 0; i < samplesAvailable; ++i) {
+                        pDest[i] += pSrc[i] * volume;
+                    }
                 }
+
+                // Note: Busses can also have Aux Sends, similar logic would go here
             }
         }
     }
