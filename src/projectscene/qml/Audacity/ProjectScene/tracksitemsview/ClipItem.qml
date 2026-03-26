@@ -824,6 +824,10 @@ Rectangle {
             SpectrogramView {
                 visible: root.isSpectrogramViewVisible
 
+                ToolTip.visible: maSpectrogram.containsMouse
+                ToolTip.text: "Spectrogram View:\nDrag to create a Time/Frequency selection for spectral editing.\nHigher values = higher frequencies."
+                MouseArea { id: maSpectrogram; anchors.fill: parent; hoverEnabled: true; acceptedButtons: Qt.NoButton }
+
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
@@ -837,6 +841,8 @@ Rectangle {
                 frameEndTime: root.context.frameEndTime
                 selectionStartTime: root.context.selectionStartTime
                 selectionEndTime: root.context.selectionEndTime
+                selectionStartFrequency: root.context.selectionStartFrequency
+                selectionEndFrequency: root.context.selectionEndFrequency
 
                 ChannelSplitter {
                     id: spectrogramChannelSplitter

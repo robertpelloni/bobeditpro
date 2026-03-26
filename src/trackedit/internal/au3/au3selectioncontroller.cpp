@@ -1,3 +1,4 @@
+#include "ViewInfo.h"
 /*
 * Audacity: A Digital Audio Editor
 */

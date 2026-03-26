@@ -52,15 +52,28 @@ Item {
                     }
                 }
 
-                // Master Fader (Placeholder)
+                // Master Fader
                 Rectangle {
                     Layout.fillHeight: true
-                    Layout.preferredWidth: 120
+                    Layout.preferredWidth: 200
                     color: ui.theme.backgroundSecondaryColor
 
-                    StyledTextLabel {
-                        anchors.centerIn: parent
-                        text: "Master"
+                    ColumnLayout {
+                        anchors.fill: parent
+                        anchors.margins: 4
+                        spacing: 4
+
+                        StyledTextLabel {
+                            text: "Master"
+                            Layout.alignment: Qt.AlignHCenter
+                            font.bold: true
+                        }
+
+                        TrackEffectsSection {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            isMasterTrack: true
+                        }
                     }
                 }
             }

@@ -31,7 +31,7 @@ This document tracks the implementation of features required to achieve parity w
 ### 1.4 Real-time Effects (In Progress)
 - [x] Effect Stack architecture (`au3-realtime-effects`).
 - [x] Clip-level effects.
-- [ ] **Master Effects:** UI for Master Fader effects rack.
+- [x] **Master Effects:** UI for Master Fader effects rack.
 - [ ] **Side-chaining:** Routing track output to effect inputs.
 
 ## Phase 2: Spectral Editing (The "Restoration" Suite)

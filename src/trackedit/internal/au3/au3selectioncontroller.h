@@ -82,6 +82,26 @@ public:
     muse::async::Channel<trackedit::secs_t> dataSelectedEndTimeChanged() const override;
     muse::async::Channel<trackedit::secs_t> dataSelectedEndTimeSelected() const override;
 
+    double dataSelectedStartFrequency() const override;
+    void setDataSelectedStartFrequency(double freq, bool complete) override;
+    muse::async::Channel<double> dataSelectedStartFrequencyChanged() const override;
+    muse::async::Channel<double> dataSelectedStartFrequencySelected() const override;
+
+    double dataSelectedEndFrequency() const override;
+    void setDataSelectedEndFrequency(double freq, bool complete) override;
+    muse::async::Channel<double> dataSelectedEndFrequencyChanged() const override;
+    muse::async::Channel<double> dataSelectedEndFrequencySelected() const override;
+
+    double dataSelectedStartFrequency() const override;
+    void setDataSelectedStartFrequency(double freq, bool complete) override;
+    muse::async::Channel<double> dataSelectedStartFrequencyChanged() const override;
+    muse::async::Channel<double> dataSelectedStartFrequencySelected() const override;
+
+    double dataSelectedEndFrequency() const override;
+    void setDataSelectedEndFrequency(double freq, bool complete) override;
+    muse::async::Channel<double> dataSelectedEndFrequencyChanged() const override;
+    muse::async::Channel<double> dataSelectedEndFrequencySelected() const override;
+
     trackedit::secs_t selectionStartTime() const override;
     void setSelectionStartTime(trackedit::secs_t time) override;
 

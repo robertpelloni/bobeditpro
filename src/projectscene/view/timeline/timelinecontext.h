@@ -40,6 +40,10 @@ class TimelineContext : public QObject, public muse::async::Asyncable, public mu
     Q_PROPERTY(double selectionEndTime READ selectionEndTime NOTIFY selectionEndTimeChanged FINAL)
     Q_PROPERTY(double selectionStartPosition READ selectionStartPosition NOTIFY selectionStartPositionChanged FINAL)
     Q_PROPERTY(double selectionEndPosition READ selectionEndPosition NOTIFY selectionEndPositionChanged FINAL)
+    Q_PROPERTY(
+        double selectionStartFrequency READ selectionStartFrequency WRITE setSelectionStartFrequency NOTIFY selectionStartFrequencyChanged FINAL)
+    Q_PROPERTY(
+        double selectionEndFrequency READ selectionEndFrequency WRITE setSelectionEndFrequency NOTIFY selectionEndFrequencyChanged FINAL)
     Q_PROPERTY(bool selectionActive READ selectionActive NOTIFY selectionActiveChanged FINAL)
 
     Q_PROPERTY(double selectedItemStartTime READ selectedItemStartTime NOTIFY selectedItemStartTimeChanged FINAL)
@@ -88,6 +92,10 @@ public:
     double selectionEndTime() const;
     double selectionStartPosition() const;
     double selectionEndPosition() const;
+    double selectionStartFrequency() const;
+    void setSelectionStartFrequency(double freq);
+    double selectionEndFrequency() const;
+    void setSelectionEndFrequency(double freq);
     bool selectionActive() const;
 
     double selectedItemStartTime() const;
@@ -152,6 +160,8 @@ signals:
     void selectionEndTimeChanged();
     void selectionStartPositionChanged();
     void selectionEndPositionChanged();
+    void selectionStartFrequencyChanged();
+    void selectionEndFrequencyChanged();
     void selectionActiveChanged();
 
     void selectedItemStartTimeChanged();
@@ -227,6 +237,8 @@ private:
 
     trackedit::secs_t m_selectionStartTime = -1.0;
     trackedit::secs_t m_selectionEndTime = -1.0;
+    double m_selectionStartFreq = -1.0;
+    double m_selectionEndFreq = -1.0;
     bool m_selectionActive = false;
 
     trackedit::secs_t m_selectedItemStartTime = -1.0;

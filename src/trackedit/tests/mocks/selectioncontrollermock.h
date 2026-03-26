@@ -64,6 +64,16 @@ public:
     MOCK_METHOD(muse::async::Channel<secs_t>, dataSelectedEndTimeChanged, (), (const, override));
     MOCK_METHOD(muse::async::Channel<secs_t>, dataSelectedEndTimeSelected, (), (const, override));
 
+    MOCK_METHOD(double, dataSelectedStartFrequency, (), (const, override));
+    MOCK_METHOD(void, setDataSelectedStartFrequency, (double, bool), (override));
+    MOCK_METHOD(muse::async::Channel<double>, dataSelectedStartFrequencyChanged, (), (const, override));
+    MOCK_METHOD(muse::async::Channel<double>, dataSelectedStartFrequencySelected, (), (const, override));
+
+    MOCK_METHOD(double, dataSelectedEndFrequency, (), (const, override));
+    MOCK_METHOD(void, setDataSelectedEndFrequency, (double, bool), (override));
+    MOCK_METHOD(muse::async::Channel<double>, dataSelectedEndFrequencyChanged, (), (const, override));
+    MOCK_METHOD(muse::async::Channel<double>, dataSelectedEndFrequencySelected, (), (const, override));
+
     MOCK_METHOD(trackedit::secs_t, selectionStartTime, (), (const override));
     MOCK_METHOD(void, setSelectionStartTime, (trackedit::secs_t), (override));
 

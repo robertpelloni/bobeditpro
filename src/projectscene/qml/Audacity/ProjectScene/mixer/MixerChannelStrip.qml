@@ -44,6 +44,9 @@ Rectangle {
             Layout.preferredHeight: 24
             text: root.trackName
             horizontalAlignment: Text.AlignHCenter
+            ToolTip.visible: maTrackName.containsMouse
+            ToolTip.text: "Track Name: " + root.trackName + "\nThis represents the current track's name."
+            MouseArea { id: maTrackName; anchors.fill: parent; hoverEnabled: true; }
             elide: Text.ElideRight
         }
 
@@ -57,6 +60,9 @@ Rectangle {
             StyledTextLabel {
                 text: "Sends"
                 font.bold: true
+                ToolTip.visible: maSendsTitle.containsMouse
+                ToolTip.text: "Auxiliary Sends:\nRoute a portion of this track's signal to a Bus track for parallel processing (e.g. Reverb, Delay)."
+                MouseArea { id: maSendsTitle; anchors.fill: parent; hoverEnabled: true; }
                 font.pixelSize: 10
             }
 
@@ -84,6 +90,8 @@ Rectangle {
                     FlatButton {
                         text: "X"
                         Layout.preferredWidth: 20
+                        ToolTip.visible: hovered
+                        ToolTip.text: "Remove this Send"
                         Layout.preferredHeight: 20
                         onClicked: root.removeSendRequest(modelData.destId)
                         hoverColor: ui.theme.buttonHoverColor
@@ -117,6 +125,9 @@ Rectangle {
                 Layout.alignment: Qt.AlignHCenter
                 text: "Pan: " + Math.round(root.pan * 100) + "%"
                 font.pixelSize: 10
+                ToolTip.visible: maPanTitle.containsMouse
+                ToolTip.text: "Pan Control:\nAdjusts the stereo balance of the track. -100% is Hard Left, 100% is Hard Right."
+                MouseArea { id: maPanTitle; anchors.fill: parent; hoverEnabled: true; }
             }
 
             StyledSlider {
@@ -182,6 +193,8 @@ Rectangle {
                 Layout.fillWidth: true
                 text: "M"
                 checkable: true
+                ToolTip.visible: hovered
+                ToolTip.text: "Mute:\nSilences the track so it cannot be heard in the mix."
                 checked: root.mute
                 onClicked: root.muteChangedRequest(checked)
 
@@ -191,6 +204,8 @@ Rectangle {
                 Layout.fillWidth: true
                 text: "S"
                 checkable: true
+                ToolTip.visible: hovered
+                ToolTip.text: "Solo:\nIsolates the track by silencing all other non-soloed tracks in the mix."
                 checked: root.solo
                 onClicked: root.soloChangedRequest(checked)
 
@@ -200,6 +215,8 @@ Rectangle {
 
         // Output/Bus Selection
         StyledDropdown {
+            ToolTip.visible: hovered
+            ToolTip.text: "Output Routing:\nSelects the destination for this track's audio signal. Default is the Master track, but you can route it to a Bus for group mixing."
             Layout.fillWidth: true
             model: root.availableRoutes
             currentIndex: {

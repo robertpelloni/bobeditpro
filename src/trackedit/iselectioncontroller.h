@@ -88,6 +88,26 @@ public:
     virtual muse::async::Channel<secs_t> dataSelectedEndTimeChanged() const = 0;
     virtual muse::async::Channel<secs_t> dataSelectedEndTimeSelected() const = 0;
 
+    virtual double dataSelectedStartFrequency() const = 0;
+    virtual void setDataSelectedStartFrequency(double freq, bool complete) = 0;
+    virtual muse::async::Channel<double> dataSelectedStartFrequencyChanged() const = 0;
+    virtual muse::async::Channel<double> dataSelectedStartFrequencySelected() const = 0;
+
+    virtual double dataSelectedEndFrequency() const = 0;
+    virtual void setDataSelectedEndFrequency(double freq, bool complete) = 0;
+    virtual muse::async::Channel<double> dataSelectedEndFrequencyChanged() const = 0;
+    virtual muse::async::Channel<double> dataSelectedEndFrequencySelected() const = 0;
+
+    virtual double dataSelectedStartFrequency() const = 0;
+    virtual void setDataSelectedStartFrequency(double freq, bool complete) = 0;
+    virtual muse::async::Channel<double> dataSelectedStartFrequencyChanged() const = 0;
+    virtual muse::async::Channel<double> dataSelectedStartFrequencySelected() const = 0;
+
+    virtual double dataSelectedEndFrequency() const = 0;
+    virtual void setDataSelectedEndFrequency(double freq, bool complete) = 0;
+    virtual muse::async::Channel<double> dataSelectedEndFrequencyChanged() const = 0;
+    virtual muse::async::Channel<double> dataSelectedEndFrequencySelected() const = 0;
+
     virtual trackedit::secs_t selectionStartTime() const = 0;
     virtual void setSelectionStartTime(trackedit::secs_t time) = 0;
 

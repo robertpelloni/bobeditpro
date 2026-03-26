@@ -83,6 +83,16 @@ void TimelineContext::init(double frameWidth)
         setSelectionEndTime(time);
     });
 
+    m_selectionStartFreq = selectionController()->dataSelectedStartFrequency();
+    selectionController()->dataSelectedStartFrequencyChanged().onReceive(this, [this](double freq) {
+        setSelectionStartFrequency(freq);
+    });
+
+    m_selectionEndFreq = selectionController()->dataSelectedEndFrequency();
+    selectionController()->dataSelectedEndFrequencyChanged().onReceive(this, [this](double freq) {
+        setSelectionEndFrequency(freq);
+    });
+
     globalContext()->currentTrackeditProjectChanged().onNotify(this, [this]() {
         onProjectChanged();
     });
@@ -798,6 +808,32 @@ void TimelineContext::setSelectionEndTime(double time)
         emit selectionEndTimeChanged();
         emit selectionEndPositionChanged();
         updateSelectionActive();
+    }
+}
+
+double TimelineContext::selectionStartFrequency() const
+{
+    return m_selectionStartFreq;
+}
+
+void TimelineContext::setSelectionStartFrequency(double freq)
+{
+    if (!muse::is_equal(m_selectionStartFreq, freq)) {
+        m_selectionStartFreq = freq;
+        emit selectionStartFrequencyChanged();
+    }
+}
+
+double TimelineContext::selectionEndFrequency() const
+{
+    return m_selectionEndFreq;
+}
+
+void TimelineContext::setSelectionEndFrequency(double freq)
+{
+    if (!muse::is_equal(m_selectionEndFreq, freq)) {
+        m_selectionEndFreq = freq;
+        emit selectionEndFrequencyChanged();
     }
 }
 
