@@ -1,5 +1,6 @@
 #include "SpectralHealEffect.h"
-#include "au3-translations/au3-translations.h"
+
+#include <algorithm>
 
 namespace au::effects {
 const ComponentInterfaceSymbol SpectralHealEffect::Symbol{
