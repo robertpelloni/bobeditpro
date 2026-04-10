@@ -127,6 +127,15 @@ set(MODULE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/noisegen/noiseviewmodel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/noisegen/noiseviewmodel.h
 
+    ${CMAKE_CURRENT_LIST_DIR}/multibandcompressor/MultibandCompressorEffect.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/multibandcompressor/MultibandCompressorEffect.h
+
+    ${CMAKE_CURRENT_LIST_DIR}/spectralheal/SpectralHealEffect.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/spectralheal/SpectralHealEffect.h
+
+    ${CMAKE_CURRENT_LIST_DIR}/adaptivenoisereduction/AdaptiveNoiseReductionEffect.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/adaptivenoisereduction/AdaptiveNoiseReductionEffect.h
+
     ${CMAKE_CURRENT_LIST_DIR}/noisereduction/noisereductioneffect.cpp
     ${CMAKE_CURRENT_LIST_DIR}/noisereduction/noisereductioneffect.h
     ${CMAKE_CURRENT_LIST_DIR}/noisereduction/noisereductionviewmodel.cpp

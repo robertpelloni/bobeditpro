@@ -2,6 +2,9 @@
 * Audacity: A Digital Audio Editor
 */
 #include "builtineffectsrepository.h"
+#include "../adaptivenoisereduction/AdaptiveNoiseReductionEffect.h"
+#include "../spectralheal/SpectralHealEffect.h"
+#include "../multibandcompressor/MultibandCompressorEffect.h"
 
 #include <QtQml>
 
@@ -311,6 +314,30 @@ void BuiltinEffectsRepository::updateEffectMetaList()
                     muse::mtrc("effects/noise", "Generates noise"),
                     BuiltinEffectCategoryId::None,
                     false
+                    );
+                } else if (symbol == AdaptiveNoiseReductionEffect::Symbol) {
+                        regView(AdaptiveNoiseReductionEffect::Symbol, u"qrc:/adaptivenoisereduction/AdaptiveNoiseReductionView.qml");
+            regMeta(desc,
+                    muse::mtrc("effects/adaptivenoisereduction", "Adaptive Noise Reduction"),
+                    muse::mtrc("effects/adaptivenoisereduction", "Removes noise automatically based on the incoming audio profile."),
+                    BuiltinEffectCategoryId::NoiseRemovalAndRepair,
+                    true
+                    );
+                        } else if (symbol == MultibandCompressorEffect::Symbol) {
+            regView(MultibandCompressorEffect::Symbol, u"qrc:/multibandcompressor/MultibandCompressorView.qml");
+            regMeta(desc,
+                    muse::mtrc("effects/multibandcompressor", "Multiband Compressor"),
+                    muse::mtrc("effects/multibandcompressor", "Compresses audio independently across multiple frequency bands."),
+                    BuiltinEffectCategoryId::VolumeAndCompression,
+                    true
+                    );
+        } else if (symbol == SpectralHealEffect::Symbol) {
+            regView(SpectralHealEffect::Symbol, u"qrc:/spectralheal/SpectralHealView.qml");
+            regMeta(desc,
+                    muse::mtrc("effects/spectralheal", "Spectral Healing Brush"),
+                    muse::mtrc("effects/spectralheal", "Spot healing brush for spectral editing."),
+                    BuiltinEffectCategoryId::NoiseRemovalAndRepair,
+                    true
                     );
         } else if (symbol == NoiseReductionEffect::Symbol) {
             REGISTER_AUDACITY_EFFECTS_SINGLETON_TYPE(NoiseReductionViewModelFactory);
