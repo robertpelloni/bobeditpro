@@ -369,6 +369,7 @@ ReverbEffect::LoadFactoryPreset(int id, EffectSettings& settings) const
     return { nullptr };
 }
 
+namespace au::effects {
 bool operator==(const ReverbSettings& a, const ReverbSettings& b)
 {
     // With C++20, all of this can be replaced by =default
@@ -407,4 +408,5 @@ bool OnlySimpleParametersChanged(
         && muse::is_equal(a.mStereoWidth, b.mStereoWidth);
 
     return oneSimpleParameterChanged && allNonSimpleParametersStayedTheSame;
+}
 }
