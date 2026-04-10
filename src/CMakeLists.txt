@@ -32,6 +32,12 @@ endif()
 add_subdirectory(au3wrap)
 
 add_subdirectory(audio)
+<<<<<<< HEAD
+=======
+if (AU_BUILD_CLOUD_AUDIOCOM)
+    add_subdirectory(au3cloud)
+endif()
+>>>>>>> upstream/master
 add_subdirectory(context)
 add_subdirectory(project)
 
@@ -40,6 +46,8 @@ if (AU_BUILD_PROJECTSCENE_MODULE)
 endif()
 
 add_subdirectory(spectrogram)
+
+add_subdirectory(automation)
 
 add_subdirectory(trackedit)
 

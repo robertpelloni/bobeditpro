@@ -23,6 +23,16 @@ RowLayout {
 
     property int currentFormat: 0
 
+<<<<<<< HEAD
+=======
+    property NavigationPanel navigationPanel: null
+    property alias navigationColumnEnd: endTimecode.navigationColumnEnd
+    property alias navigationRow: endTimecode.navigationRow
+
+    property alias startAccessibleName: startTimecode.accessibleName
+    property alias endAccessibleName: endTimecode.accessibleName
+
+>>>>>>> upstream/master
     signal startValueChangeRequested(var newValue)
     signal endValueChangeRequested(var newValue)
     signal formatChangeRequested(var newFormat)
@@ -42,7 +52,15 @@ RowLayout {
 
         showMenu: false
 
+<<<<<<< HEAD
         onValueChangeRequested: function(newValue) {
+=======
+        navigation.panel: root.navigationPanel
+        navigation.row: 1
+        navigation.column: 1
+
+        onValueChangeRequested: function (newValue) {
+>>>>>>> upstream/master
             root.startValueChangeRequested(newValue)
         }
     }
@@ -60,11 +78,19 @@ RowLayout {
 
         backgroundLeftRadius: 0
 
+<<<<<<< HEAD
         onValueChangeRequested: function(newValue) {
+=======
+        navigation.panel: root.navigationPanel
+        navigation.row: startTimecode.navigation.row
+        navigation.column: startTimecode.navigationColumnEnd + 1
+
+        onValueChangeRequested: function (newValue) {
+>>>>>>> upstream/master
             root.endValueChangeRequested(newValue)
         }
 
-        onCurrentFormatChanged: function() {
+        onCurrentFormatChanged: function () {
             root.formatChangeRequested(currentFormat)
         }
     }

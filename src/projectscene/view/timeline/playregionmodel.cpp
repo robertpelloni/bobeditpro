@@ -8,7 +8,15 @@
 
 namespace au {
 PlayRegionModel::PlayRegionModel(QObject* parent)
+<<<<<<< HEAD
     : QObject{parent}
+=======
+    : QObject{parent}, muse::Contextable(muse::iocCtxForQmlObject(this))
+{
+}
+
+void PlayRegionModel::init()
+>>>>>>> upstream/master
 {
     playbackController()->loopRegionChanged().onNotify(this, [this]() {
         onLoopRegionChanged();

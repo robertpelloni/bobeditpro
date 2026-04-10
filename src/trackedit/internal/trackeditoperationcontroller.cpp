@@ -5,8 +5,14 @@
 #include "trackediterrors.h"
 
 namespace au::trackedit {
+<<<<<<< HEAD
 TrackeditOperationController::TrackeditOperationController(std::unique_ptr<IUndoManager> undoManager)
     : m_undoManager{std::move(undoManager)} {}
+=======
+TrackeditOperationController::TrackeditOperationController(const muse::modularity::ContextPtr& ctx,
+                                                           std::unique_ptr<IUndoManager> undoManager)
+    : muse::Contextable(ctx), m_undoManager{std::move(undoManager)} {}
+>>>>>>> upstream/master
 
 secs_t TrackeditOperationController::clipStartTime(const ClipKey& clipKey) const
 {
@@ -104,14 +110,14 @@ bool TrackeditOperationController::resetClipSpeed(const ClipKey& clipKey)
     return false;
 }
 
-bool TrackeditOperationController::changeClipColor(const ClipKey& clipKey, const std::string& color)
+bool TrackeditOperationController::changeClipColor(const ClipKey& clipKey, ClipColorIndex colorIndex)
 {
-    return clipsInteraction()->changeClipColor(clipKey, color);
+    return clipsInteraction()->changeClipColor(clipKey, colorIndex);
 }
 
-bool TrackeditOperationController::changeTracksColor(const TrackIdList& tracksIds, const std::string& color)
+bool TrackeditOperationController::changeTracksColor(const TrackIdList& tracksIds, ClipColorIndex colorIndex)
 {
-    if (tracksInteraction()->changeTracksColor(tracksIds, color)) {
+    if (tracksInteraction()->changeTracksColor(tracksIds, colorIndex)) {
         projectHistory()->pushHistoryState("Changed track color", "Changed track color");
         return true;
     }
@@ -410,9 +416,28 @@ bool TrackeditOperationController::trimClipLeft(const ClipKey& clipKey, secs_t d
 bool TrackeditOperationController::trimClipRight(const ClipKey& clipKey, secs_t deltaSec, secs_t minClipDuration, bool completed,
                                                  UndoPushType type)
 {
+<<<<<<< HEAD
     const auto success = clipsInteraction()->trimClipRight(clipKey, deltaSec, minClipDuration, completed);
     if (success && completed) {
         projectHistory()->pushHistoryState("Clip right trimmed", "Trim clip right", type);
+=======
+    const auto labelKeys = selectedLabels();
+    deltaSec = clampBoundaryDeltaToSelectedItems(deltaSec, minClipDuration, labelKeys);
+
+    const auto success = clipsInteraction()->trimClipsLeft(clipKeyList, deltaSec, minClipDuration, completed);
+    if (!success) {
+        return success;
+    }
+
+    bool hasLabels = isLabelsSelected();
+    if (hasLabels) {
+        labelsInteraction()->stretchLabelsLeft(labelKeys, deltaSec, completed);
+    }
+
+    if (completed) {
+        std::string msg = hasLabels ? "Trim items left" : "Trim clip left";
+        projectHistory()->pushHistoryState("Trim", msg, type);
+>>>>>>> upstream/master
     }
     return success;
 }
@@ -420,9 +445,27 @@ bool TrackeditOperationController::trimClipRight(const ClipKey& clipKey, secs_t 
 bool TrackeditOperationController::stretchClipLeft(const ClipKey& clipKey, secs_t deltaSec, secs_t minClipDuration, bool completed,
                                                    UndoPushType type)
 {
+<<<<<<< HEAD
     const auto success = clipsInteraction()->stretchClipLeft(clipKey, deltaSec, minClipDuration, completed);
     if (success && completed) {
         projectHistory()->pushHistoryState("Clip left stretched", "Stretch clip left", type);
+=======
+    const auto labelKeys = selectedLabels();
+    deltaSec = clampBoundaryDeltaToSelectedItems(deltaSec, minClipDuration, labelKeys);
+
+    const auto success = clipsInteraction()->trimClipsRight(clipKeyList, deltaSec, minClipDuration, completed);
+    if (!success) {
+        return success;
+    }
+
+    bool hasLabels = isLabelsSelected();
+    if (hasLabels) {
+        labelsInteraction()->stretchLabelsRight(labelKeys, -deltaSec, completed);
+    }
+    if (completed) {
+        std::string msg = hasLabels ? "Trim items right" : "Trim clip right";
+        projectHistory()->pushHistoryState("Trim", msg, type);
+>>>>>>> upstream/master
     }
     return success;
 }
@@ -430,10 +473,56 @@ bool TrackeditOperationController::stretchClipLeft(const ClipKey& clipKey, secs_
 bool TrackeditOperationController::stretchClipRight(const ClipKey& clipKey, secs_t deltaSec, secs_t minClipDuration, bool completed,
                                                     UndoPushType type)
 {
+<<<<<<< HEAD
     const auto success = clipsInteraction()->stretchClipRight(clipKey, deltaSec, minClipDuration, completed);
     if (success && completed) {
         projectHistory()->pushHistoryState("Clip right stretched", "Stretch clip right", type);
     }
+=======
+    const auto labelKeys = selectedLabels();
+    deltaSec = clampBoundaryDeltaToSelectedItems(deltaSec, minClipDuration, labelKeys);
+
+    const auto success = clipsInteraction()->stretchClipsLeft(clipKeyList, deltaSec, minClipDuration, completed);
+    if (!success) {
+        return success;
+    }
+
+    bool hasLabels = isLabelsSelected();
+    if (hasLabels) {
+        labelsInteraction()->stretchLabelsLeft(labelKeys, deltaSec, completed);
+    }
+
+    if (completed) {
+        std::string msg = hasLabels ? "Stretch items left" : "Stretch clip left";
+        projectHistory()->pushHistoryState("Stretch", msg, type);
+    }
+
+    return success;
+}
+
+bool TrackeditOperationController::stretchClipsRight(const ClipKeyList& clipKeyList, secs_t deltaSec, secs_t minClipDuration,
+                                                     bool completed,
+                                                     UndoPushType type)
+{
+    const auto labelKeys = selectedLabels();
+    deltaSec = clampBoundaryDeltaToSelectedItems(deltaSec, minClipDuration, labelKeys);
+
+    const auto success = clipsInteraction()->stretchClipsRight(clipKeyList, deltaSec, minClipDuration, completed);
+    if (!success) {
+        return success;
+    }
+
+    bool hasLabels = isLabelsSelected();
+    if (hasLabels) {
+        labelsInteraction()->stretchLabelsRight(labelKeys, -deltaSec, completed);
+    }
+
+    if (completed) {
+        std::string msg = hasLabels ? "Stretch items right" : "Stretch clips right";
+        projectHistory()->pushHistoryState("Stretch", msg, type);
+    }
+
+>>>>>>> upstream/master
     return success;
 }
 
@@ -816,4 +905,79 @@ void TrackeditOperationController::pushProjectHistoryDeleteState(secs_t start, s
     ss << "Delete " << duration << " seconds at " << start;
     projectHistory()->pushHistoryState(ss.str(), "Delete");
 }
+<<<<<<< HEAD
+=======
+
+std::optional<secs_t> TrackeditOperationController::shortestLabelDuration(const LabelKeyList& labelKeys) const
+{
+    const auto prj = globalContext()->currentTrackeditProject();
+    if (!prj) {
+        return std::nullopt;
+    }
+
+    std::optional<secs_t> shortestDuration;
+    for (const auto& labelKey : labelKeys) {
+        const auto label = prj->label(labelKey);
+        if (!label.isValid()) {
+            continue;
+        }
+
+        const secs_t duration = label.endTime - label.startTime;
+        if (!shortestDuration.has_value() || duration < shortestDuration.value()) {
+            shortestDuration = duration;
+        }
+    }
+
+    return shortestDuration;
+}
+
+secs_t TrackeditOperationController::clampBoundaryDeltaToSelectedItems(secs_t deltaSec,
+                                                                       secs_t minClipDuration,
+                                                                       const LabelKeyList& labelKeys) const
+{
+    if (!muse::RealIsEqualOrMore(deltaSec, 0.0) || labelKeys.empty()) {
+        return deltaSec;
+    }
+
+    std::optional<secs_t> maxShrinkDelta;
+    for (const auto& clipKey : selectedClips()) {
+        const secs_t duration = clipDuration(clipKey);
+        const secs_t clipShrinkDelta = std::max(0.0, (duration - minClipDuration).to_double());
+        if (!maxShrinkDelta.has_value() || clipShrinkDelta < maxShrinkDelta.value()) {
+            maxShrinkDelta = clipShrinkDelta;
+        }
+    }
+
+    if (const auto labelDuration = shortestLabelDuration(labelKeys); labelDuration.has_value()) {
+        const secs_t labelShrinkDelta = std::max(0.0, labelDuration.value().to_double());
+        maxShrinkDelta = std::min(labelShrinkDelta, maxShrinkDelta.value_or(labelShrinkDelta));
+    }
+
+    if (!maxShrinkDelta.has_value() || muse::RealIsEqualOrLess(deltaSec, maxShrinkDelta.value())) {
+        return deltaSec;
+    }
+
+    return maxShrinkDelta.value();
+}
+
+bool TrackeditOperationController::isClipsSelected() const
+{
+    return selectionController()->hasSelectedClips();
+}
+
+ClipKeyList TrackeditOperationController::selectedClips() const
+{
+    return selectionController()->selectedClips();
+}
+
+bool TrackeditOperationController::isLabelsSelected() const
+{
+    return selectionController()->hasSelectedLabels();
+}
+
+LabelKeyList TrackeditOperationController::selectedLabels() const
+{
+    return selectionController()->selectedLabels();
+}
+>>>>>>> upstream/master
 }

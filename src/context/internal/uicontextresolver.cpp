@@ -35,7 +35,16 @@ static const Uri PROJECT_PAGE_URI("audacity://project");
 //! but we don't have that yet, so binding it to
 //! area that's being focused when opening a project
 static const QString PROJECT_NAVIGATION_PANEL("MainToolBar");
+<<<<<<< HEAD
 static const QString DEFAULT_NAVIGATION_PANEL("Main Panel");
+=======
+static const QString DEFAULT_NAVIGATION_SECTION("TrackViewSection");
+
+UiContextResolver::UiContextResolver(const muse::modularity::ContextPtr& ctx)
+    : muse::Contextable(ctx)
+{
+}
+>>>>>>> upstream/master
 
 void UiContextResolver::init()
 {

@@ -13,12 +13,24 @@
 #include "project/imetadata.h"
 
 namespace au::project {
+<<<<<<< HEAD
 class Au3Metadata : public IMetadata
 {
     muse::Inject<au::context::IGlobalContext> globalContext;
     muse::Inject<muse::IInteractive> interactive;
 
 public:
+=======
+class Au3Metadata : public IMetadata, public muse::Contextable
+{
+    muse::ContextInject<au::context::IGlobalContext> globalContext { this };
+    muse::ContextInject<muse::IInteractive> interactive { this };
+
+public:
+    Au3Metadata(const muse::modularity::ContextPtr& ctx)
+        : muse::Contextable(ctx) {}
+
+>>>>>>> upstream/master
     void init();
 
     project::ProjectMeta tags() const override;

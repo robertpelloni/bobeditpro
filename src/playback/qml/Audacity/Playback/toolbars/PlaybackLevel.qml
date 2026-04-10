@@ -23,6 +23,8 @@ Item {
     property NavigationPanel navigationPanel: null
     property int navigationOrder: 0
 
+    property alias backgroundRadius: popupButton.backgroundRadius
+
     property bool isPlaying: false
 
     signal volumeLevelChangeRequested(var level)

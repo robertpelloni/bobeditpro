@@ -7,7 +7,11 @@ using namespace muse;
 using namespace au::projectscene;
 
 RealtimeEffectSectionModel::RealtimeEffectSectionModel(QObject* parent)
+<<<<<<< HEAD
     : QObject(parent)
+=======
+    : QObject(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
+>>>>>>> upstream/master
 {
 }
 
@@ -18,11 +22,19 @@ void RealtimeEffectSectionModel::load()
     });
 
     dispatcher()->reg(this, "toggle-effects", [this] {
-        configuration()->setIsEffectsPanelVisible(!configuration()->isEffectsPanelVisible());
+        const bool shouldShow = !configuration()->isEffectsPanelVisible();
+        configuration()->setIsEffectsPanelVisible(shouldShow);
+        if (shouldShow) {
+            emit focusEffectsPanelRequested();
+        }
     });
 
     dispatcher()->reg(this, "add-realtime-effects", [this] {
-        configuration()->setIsEffectsPanelVisible(!configuration()->isEffectsPanelVisible());
+        const bool shouldShow = !configuration()->isEffectsPanelVisible();
+        configuration()->setIsEffectsPanelVisible(shouldShow);
+        if (shouldShow) {
+            emit focusEffectsPanelRequested();
+        }
     });
 
     emit showEffectsSectionChanged();

@@ -22,12 +22,22 @@
 
 #pragma once
 
+<<<<<<< HEAD
 #include "iinteractive.h"
+=======
+#include <QAbstractListModel>
+#include <QVariant>
+
+#include "framework/global/modularity/ioc.h"
+#include "framework/interactive/iplatforminteractive.h"
+
+>>>>>>> upstream/master
 #include "ithumbnailcreator.h"
 #include "context/iglobalcontext.h"
 #include "modularity/ioc.h"
 
 namespace au::project {
+<<<<<<< HEAD
 class ProjectPropertiesModel : public QAbstractListModel, public muse::async::Asyncable
 {
     Q_OBJECT
@@ -35,6 +45,16 @@ class ProjectPropertiesModel : public QAbstractListModel, public muse::async::As
     muse::Inject<context::IGlobalContext> globalContext;
     muse::Inject<muse::IInteractive> interactive;
     muse::Inject<IThumbnailCreator> thumbnailCreator;
+=======
+class ProjectPropertiesModel : public QAbstractListModel, public muse::async::Asyncable, public muse::Contextable
+{
+    Q_OBJECT
+
+    muse::GlobalInject<muse::IPlatformInteractive> platformInteractive;
+
+    muse::ContextInject<context::IGlobalContext> globalContext { this };
+    muse::ContextInject<IThumbnailCreator> thumbnailCreator { this };
+>>>>>>> upstream/master
 
     Q_PROPERTY(QString filePath READ filePath CONSTANT)
     Q_PROPERTY(QString version READ version CONSTANT)
@@ -45,7 +65,7 @@ public:
     explicit ProjectPropertiesModel(QObject* parent = nullptr);
 
     Q_INVOKABLE void init();
-    Q_INVOKABLE void onThumbnailCreated(bool success);
+    Q_INVOKABLE void onThumbnailCreated(const QVariant& image);
 
     QVariant data(const QModelIndex& index, int role) const override;
     bool setData(const QModelIndex& index, const QVariant& value, int role) override;
@@ -65,7 +85,7 @@ public:
 
 signals:
     void propertyAdded(int index);
-    void captureThumbnail(QString path);
+    void captureThumbnail();
 
 private:
     enum Roles {

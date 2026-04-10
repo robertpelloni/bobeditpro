@@ -9,7 +9,11 @@
 using namespace au::importexport;
 
 CustomFFmpegPreferencesModel::CustomFFmpegPreferencesModel(QObject* parent)
+<<<<<<< HEAD
     : QObject(parent)
+=======
+    : QObject(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
+>>>>>>> upstream/master
 {
 }
 

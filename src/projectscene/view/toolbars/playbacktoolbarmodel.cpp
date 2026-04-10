@@ -39,6 +39,7 @@ static const ActionQuery PLAYBACK_REWIND_START_QUERY("action://playback/rewind-s
 static const ActionQuery PLAYBACK_REWIND_END_QUERY("action://playback/rewind-end");
 static const ActionCode LOOP_ACTION_CODE("toggle-loop-region");
 
+static const ActionCode CLIP_GAIN_AUTOMATION_CODE("clip-gain");
 static const ActionCode SPLIT_TOOL_ACTION_CODE("split-tool");
 
 static const ActionQuery PLAYBACK_LEVEL_QUERY("action://playback/level");
@@ -62,6 +63,7 @@ static PlaybackToolBarModel::ItemType itemType(const ActionCode& actionCode)
         { PLAYBACK_REWIND_START_QUERY.toString(), PlaybackToolBarModel::PLAYBACK_CONTROL },
         { PLAYBACK_REWIND_END_QUERY.toString(), PlaybackToolBarModel::PLAYBACK_CONTROL },
         { LOOP_ACTION_CODE, PlaybackToolBarModel::PLAYBACK_CONTROL },
+        { CLIP_GAIN_AUTOMATION_CODE, PlaybackToolBarModel::PLAYBACK_CONTROL },
         { SPLIT_TOOL_ACTION_CODE, PlaybackToolBarModel::PLAYBACK_CONTROL },
         { SNAP_ACTION_CODE, PlaybackToolBarModel::SNAP }
     };
@@ -77,7 +79,7 @@ PlaybackToolBarModel::PlaybackToolBarModel(QObject* parent)
 void PlaybackToolBarModel::load()
 {
     if (!m_inited) {
-        uiConfiguration()->toolConfigChanged(TOOLBAR_NAME).onNotify(this, [this]() {
+        uiState()->toolConfigChanged(TOOLBAR_NAME).onNotify(this, [this]() {
             reload();
         });
 
@@ -111,6 +113,17 @@ void PlaybackToolBarModel::reload()
     updateStates();
 }
 
+<<<<<<< HEAD
+=======
+void PlaybackToolBarModel::setupProjectConnections(project::IAudacityProject& project)
+{
+    const auto vs = project.viewState();
+    vs->clipGainAutomationEnabled().ch.onReceive(this, [this](bool){ updateClipGainAutomationState(); });
+    vs->splitToolEnabled().ch.onReceive(this, [this](bool){ updateSplitState(); });
+    vs->globalSpectrogramToggleIsOnChanged().onNotify(this, [this] { updateGlobalSpectrogramViewState(); });
+}
+
+>>>>>>> upstream/master
 void PlaybackToolBarModel::onActionsStateChanges(const muse::actions::ActionCodeList& codes)
 {
     if (containsAction(codes, PLAYBACK_PLAY_QUERY.toString()) || containsAction(codes, PLAYBACK_PAUSE_QUERY.toString())
@@ -139,6 +152,7 @@ void PlaybackToolBarModel::updateStates()
     updateStopState();
     updateRecordState();
     updateLoopState();
+    updateClipGainAutomationState();
     updateSplitState();
 }
 
@@ -152,20 +166,23 @@ void PlaybackToolBarModel::updatePlayState()
 
     bool isPlaying = playbackController()->isPlaying();
     bool isRecording = recordController()->isRecording();
+    bool isLeadIn = recordController()->isLeadInRecording();
 
-    ActionCode code = isPlaying ? PLAYBACK_PAUSE_QUERY.toString() : PLAYBACK_PLAY_QUERY.toString();
-    if (isRecording) {
+    ActionCode code = (isPlaying || isLeadIn) ? PLAYBACK_PAUSE_QUERY.toString() : PLAYBACK_PLAY_QUERY.toString();
+    if (isRecording && !isLeadIn) {
         code = RECORD_PAUSE_QUERY.toString();
     }
 
     UiAction action = uiActionsRegister()->action(code);
     item->setAction(action);
 
-    item->setSelected(isPlaying);
+    // During lead-in, show as playing (green background) since audio is playing back
+    bool showAsPlaying = isPlaying || isLeadIn;
+    item->setSelected(showAsPlaying);
 
     QColor iconColor = QColor(configuration()->playColor().toQColor());
     QColor backgroundColor = QColor(uiConfiguration()->currentTheme().values.value(muse::ui::BUTTON_COLOR).toString());
-    if (isPlaying) {
+    if (showAsPlaying) {
         iconColor = QColor(uiConfiguration()->currentTheme().values.value(muse::ui::FONT_PRIMARY_COLOR).toString());
         backgroundColor = QColor(configuration()->playColor().toQColor());
     } else if (isRecording) {
@@ -201,12 +218,14 @@ void PlaybackToolBarModel::updateRecordState()
     }
 
     bool isRecording = recordController()->isRecording();
+    bool isLeadIn = recordController()->isLeadInRecording();
 
-    item->setSelected(isRecording);
+    // During lead-in pre-roll, the button should not appear as actively recording
+    item->setSelected(isRecording && !isLeadIn);
 
     QColor iconColor = QColor(recordConfiguration()->recordColor().toQColor());
     QColor backgroundColor = QColor(uiConfiguration()->currentTheme().values.value(muse::ui::BUTTON_COLOR).toString());
-    if (isRecording) {
+    if (isRecording && !isLeadIn) {
         iconColor = QColor(uiConfiguration()->currentTheme().values.value(muse::ui::BACKGROUND_PRIMARY_COLOR).toString());
         backgroundColor = QColor(recordConfiguration()->recordColor().toQColor());
     }
@@ -237,6 +256,33 @@ void PlaybackToolBarModel::updateLoopState()
     item->setBackgroundColor(backgroundColor);
 }
 
+void PlaybackToolBarModel::updateClipGainAutomationState()
+{
+    auto prj = context()->currentProject();
+
+    if (!prj) {
+        return;
+    }
+
+    PlaybackToolBarControlItem* item = dynamic_cast<PlaybackToolBarControlItem*>(findItemPtr(CLIP_GAIN_AUTOMATION_CODE));
+
+    if (item == nullptr) {
+        return;
+    }
+
+    auto vs = prj->viewState();
+
+    bool clipGainAutomationEnabled = vs->clipGainAutomationEnabled().val;
+    item->setSelected(clipGainAutomationEnabled);
+
+    QColor backgroundColor = QColor(uiConfiguration()->currentTheme().values.value(muse::ui::BUTTON_COLOR).toString());
+    if (clipGainAutomationEnabled) {
+        backgroundColor = QColor(uiConfiguration()->currentTheme().values.value(muse::ui::ACCENT_COLOR).toString());
+    }
+
+    item->setBackgroundColor(backgroundColor);
+}
+
 void PlaybackToolBarModel::updateSplitState()
 {
     auto prj = context()->currentProject();
@@ -263,7 +309,33 @@ void PlaybackToolBarModel::updateSplitState()
         backgroundColor = QColor(uiConfiguration()->currentTheme().values.value(muse::ui::ACCENT_COLOR).toString());
     }
 
+<<<<<<< HEAD
     item->setIconColor(iconColor);
+=======
+    item->setBackgroundColor(backgroundColor);
+}
+
+void PlaybackToolBarModel::updateGlobalSpectrogramViewState()
+{
+    auto prj = context()->currentProject();
+
+    if (!prj) {
+        return;
+    }
+
+    PlaybackToolBarControlItem* const item
+        = dynamic_cast<PlaybackToolBarControlItem*>(findItemPtr(TOGGLE_GLOBAL_SPECTROGRAM_VIEW_ACTION_CODE));
+
+    if (item == nullptr) {
+        return;
+    }
+
+    const auto vs = prj->viewState();
+    const bool isOn = vs->globalSpectrogramToggleIsOn();
+    item->setSelected(isOn);
+    const auto key = isOn ? muse::ui::ThemeStyleKey::ACCENT_COLOR : muse::ui::ThemeStyleKey::BUTTON_COLOR;
+    const QColor backgroundColor{ uiConfiguration()->currentTheme().values.value(key).toString() };
+>>>>>>> upstream/master
     item->setBackgroundColor(backgroundColor);
 }
 
@@ -271,8 +343,8 @@ void PlaybackToolBarModel::updateActions()
 {
     ToolBarItemList items;
 
-    muse::ui::ToolConfig playbackConfig = uiConfiguration()->toolConfig(TOOLBAR_NAME,
-                                                                        ProjectSceneUiActions::defaultPlaybackToolBarConfig());
+    muse::ui::ToolConfig playbackConfig = uiState()->toolConfig(TOOLBAR_NAME,
+                                                                ProjectSceneUiActions::defaultPlaybackToolBarConfig());
 
     for (const muse::ui::ToolConfig::Item& citem : playbackConfig.items) {
         if (!citem.show) {

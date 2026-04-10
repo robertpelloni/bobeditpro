@@ -5,7 +5,11 @@
 using namespace au::playback;
 
 PlaybackMeterPanelModel::PlaybackMeterPanelModel(QObject* parent)
+<<<<<<< HEAD
     : QObject(parent)
+=======
+    : QObject(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
+>>>>>>> upstream/master
 {
     m_meterModel = new PlaybackMeterModel(this);
 }
@@ -27,10 +31,8 @@ void PlaybackMeterPanelModel::init()
         emit levelChanged();
     });
 
-    playback()->audioOutput()->playbackVolume().onResolve(this, [this](float volume) {
-        m_meterModel->setVolume(volume);
-        emit levelChanged();
-    });
+    m_meterModel->setVolume(playback()->audioOutput()->playbackVolume());
+    emit levelChanged();
 
     playbackController()->isPlayingChanged().onNotify(this, [this]() {
         emit isPlayingChanged();

@@ -32,7 +32,11 @@ static const ActionCode PLAY_POSITION_INCREASE("play-position-increase");
 static const ActionQuery PLAYBACK_SEEK_QUERY("action://playback/seek");
 
 au::projectscene::PlayPositionActionController::PlayPositionActionController(QObject* parent)
+<<<<<<< HEAD
     : QObject(parent)
+=======
+    : QObject(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
+>>>>>>> upstream/master
 {
 }
 

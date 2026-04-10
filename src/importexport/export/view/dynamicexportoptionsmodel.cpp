@@ -59,7 +59,12 @@ static bool valuesEqual(const au::importexport::OptionValue& a, const au::import
 }
 }
 
+<<<<<<< HEAD
 DynamicExportOptionsModel::DynamicExportOptionsModel(QObject*)
+=======
+DynamicExportOptionsModel::DynamicExportOptionsModel(QObject* parent)
+    : QAbstractListModel(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
+>>>>>>> upstream/master
 {
 }
 

@@ -24,7 +24,18 @@
 
 #include <QObject>
 
+<<<<<<< HEAD
 #include "modularity/ioc.h"
+=======
+#include "framework/global/modularity/ioc.h"
+
+#include "framework/actions/iactionsdispatcher.h"
+#include "framework/interactive/iplatforminteractive.h"
+#include "framework/cloud/musescorecom/imusescorecomservice.h"
+#include "framework/cloud/audiocom/iaudiocomservice.h"
+#include "au3cloud/iau3audiocomservice.h"
+
+>>>>>>> upstream/master
 #include "iprojectconfiguration.h"
 #include "actions/iactionsdispatcher.h"
 #include "iinteractive.h"
@@ -34,6 +45,7 @@
 class QString;
 
 namespace au::project {
+<<<<<<< HEAD
 class ProjectsPageModel : public QObject
 {
     Q_OBJECT
@@ -42,12 +54,27 @@ class ProjectsPageModel : public QObject
     muse::Inject<muse::actions::IActionsDispatcher> dispatcher;
     muse::Inject<muse::IInteractive> interactive;
     muse::Inject<muse::cloud::IAudioComService> audioComService;
+=======
+class ProjectsPageModel : public QObject, public muse::Contextable
+{
+    Q_OBJECT
 
+    muse::GlobalInject<IProjectConfiguration> configuration;
+    muse::GlobalInject<muse::cloud::IAudioComService> audioComService;
+    muse::GlobalInject<muse::IPlatformInteractive> platformInteractive;
+
+    muse::ContextInject<au3cloud::IAu3AudioComService> au3CloudService { this };
+    muse::ContextInject<muse::actions::IActionsDispatcher> dispatcher { this };
+>>>>>>> upstream/master
+
+    Q_PROPERTY(bool cloudEnabled READ cloudEnabled CONSTANT)
     Q_PROPERTY(int tabIndex READ tabIndex WRITE setTabIndex NOTIFY tabIndexChanged)
     Q_PROPERTY(ViewType viewType READ viewType WRITE setViewType NOTIFY viewTypeChanged)
 
 public:
     explicit ProjectsPageModel(QObject* parent = nullptr);
+
+    bool cloudEnabled() const;
 
     int tabIndex() const;
     void setTabIndex(int index);
@@ -64,6 +91,7 @@ public:
     Q_INVOKABLE void createNewProject();
     Q_INVOKABLE void openOther();
     Q_INVOKABLE void openProject(const QString& scorePath, const QString& displayNameOverride);
+    Q_INVOKABLE void openCloudProject(const QString& cloudProjectId, const QString& localPath, const QString& displayNameOverride);
     Q_INVOKABLE void openProjectManager();
 
 signals:

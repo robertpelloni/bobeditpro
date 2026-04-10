@@ -3,7 +3,7 @@
 */
 #pragma once
 
-#include "modularity/imodulesetup.h"
+#include "framework/global/modularity/imodulesetup.h"
 
 #include "iglobalconfiguration.h"
 
@@ -18,20 +18,26 @@ class Au3Record;
 class Au3AudioDevicesProvider;
 class Au3WrapModule : public muse::modularity::IModuleSetup
 {
+<<<<<<< HEAD
     muse::Inject<muse::IGlobalConfiguration> globalConfiguration;
     muse::Inject<au::project::IProjectConfiguration> projectConfiguration;
+=======
+    muse::GlobalInject<muse::IGlobalConfiguration> globalConfiguration;
+    muse::GlobalInject<au::project::IProjectConfiguration> projectConfiguration;
+    muse::GlobalInject<muse::IApplication> application;
+>>>>>>> upstream/master
 public:
 
     std::string moduleName() const override;
     void registerExports() override;
     void onPreInit(const muse::IApplication::RunMode&) override;
     void onInit(const muse::IApplication::RunMode& mode) override;
+    void onAllInited(const muse::IApplication::RunMode& mode) override;
     void onDeinit() override;
 
 private:
 
     WxLogWrap* m_wxLog = nullptr;
-
     std::shared_ptr<Au3BasicUI> m_au3BasicUi;
 };
 }

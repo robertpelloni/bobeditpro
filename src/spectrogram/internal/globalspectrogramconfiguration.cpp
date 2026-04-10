@@ -27,13 +27,13 @@ void GlobalSpectrogramConfiguration::init()
 {
     muse::settings()->setDefaultValue(MIN_FREQ, muse::Val(0));
     muse::settings()->valueChanged(MIN_FREQ).onReceive(this, [this](const muse::Val& val) {
-        m_minFreqChanged.send(val.toInt());
+        m_minFreqChanged.send(val.toDouble());
         m_someSettingChanged.notify();
     });
 
     muse::settings()->setDefaultValue(MAX_FREQ, muse::Val(20000));
     muse::settings()->valueChanged(MAX_FREQ).onReceive(this, [this](const muse::Val& val) {
-        m_maxFreqChanged.send(val.toInt());
+        m_maxFreqChanged.send(val.toDouble());
         m_someSettingChanged.notify();
     });
 
@@ -98,12 +98,12 @@ void GlobalSpectrogramConfiguration::init()
     });
 }
 
-int GlobalSpectrogramConfiguration::minFreq() const
+double GlobalSpectrogramConfiguration::minFreq()
 {
-    return muse::settings()->value(MIN_FREQ).toInt();
+    return muse::settings()->value(MIN_FREQ).toDouble();
 }
 
-void GlobalSpectrogramConfiguration::setMinFreq(int value)
+void GlobalSpectrogramConfiguration::setMinFreq(double value)
 {
     if (minFreq() == value) {
         return;
@@ -111,17 +111,17 @@ void GlobalSpectrogramConfiguration::setMinFreq(int value)
     muse::settings()->setSharedValue(MIN_FREQ, muse::Val(value));
 }
 
-muse::async::Channel<int> GlobalSpectrogramConfiguration::minFreqChanged() const
+muse::async::Channel<double> GlobalSpectrogramConfiguration::minFreqChanged() const
 {
     return m_minFreqChanged;
 }
 
-int GlobalSpectrogramConfiguration::maxFreq() const
+double GlobalSpectrogramConfiguration::maxFreq()
 {
-    return muse::settings()->value(MAX_FREQ).toInt();
+    return muse::settings()->value(MAX_FREQ).toDouble();
 }
 
-void GlobalSpectrogramConfiguration::setMaxFreq(int value)
+void GlobalSpectrogramConfiguration::setMaxFreq(double value)
 {
     if (maxFreq() == value) {
         return;
@@ -129,7 +129,7 @@ void GlobalSpectrogramConfiguration::setMaxFreq(int value)
     muse::settings()->setSharedValue(MAX_FREQ, muse::Val(value));
 }
 
-muse::async::Channel<int> GlobalSpectrogramConfiguration::maxFreqChanged() const
+muse::async::Channel<double> GlobalSpectrogramConfiguration::maxFreqChanged() const
 {
     return m_maxFreqChanged;
 }
@@ -152,7 +152,7 @@ muse::async::Channel<bool> GlobalSpectrogramConfiguration::spectralSelectionEnab
     return m_spectralSelectionEnabledChanged;
 }
 
-SpectrogramColorScheme GlobalSpectrogramConfiguration::colorScheme() const
+SpectrogramColorScheme GlobalSpectrogramConfiguration::colorScheme()
 {
     return muse::settings()->value(COLOR_SCHEME).toEnum<SpectrogramColorScheme>();
 }
@@ -170,7 +170,7 @@ muse::async::Channel<SpectrogramColorScheme> GlobalSpectrogramConfiguration::col
     return m_colorSchemeChanged;
 }
 
-int GlobalSpectrogramConfiguration::colorGainDb() const
+int GlobalSpectrogramConfiguration::colorGainDb()
 {
     return muse::settings()->value(COLOR_GAIN_DB).toInt();
 }
@@ -188,7 +188,7 @@ muse::async::Channel<int> GlobalSpectrogramConfiguration::colorGainDbChanged() c
     return m_colorGainDbChanged;
 }
 
-int GlobalSpectrogramConfiguration::colorRangeDb() const
+int GlobalSpectrogramConfiguration::colorRangeDb()
 {
     return muse::settings()->value(COLOR_RANGE_DB).toInt();
 }
@@ -206,7 +206,7 @@ muse::async::Channel<int> GlobalSpectrogramConfiguration::colorRangeDbChanged() 
     return m_colorRangeDbChanged;
 }
 
-int GlobalSpectrogramConfiguration::colorHighBoostDbPerDec() const
+int GlobalSpectrogramConfiguration::colorHighBoostDbPerDec()
 {
     return muse::settings()->value(COLOR_HIGH_BOOST_DB_PER_DEC).toInt();
 }
@@ -224,7 +224,7 @@ muse::async::Channel<int> GlobalSpectrogramConfiguration::colorHighBoostDbPerDec
     return m_colorHighBoostDbPerDecChanged;
 }
 
-SpectrogramScale GlobalSpectrogramConfiguration::scale() const
+SpectrogramScale GlobalSpectrogramConfiguration::scale()
 {
     return muse::settings()->value(SCALE).toEnum<SpectrogramScale>();
 }
@@ -242,7 +242,7 @@ muse::async::Channel<SpectrogramScale> GlobalSpectrogramConfiguration::scaleChan
     return m_scaleChanged;
 }
 
-SpectrogramAlgorithm GlobalSpectrogramConfiguration::algorithm() const
+SpectrogramAlgorithm GlobalSpectrogramConfiguration::algorithm()
 {
     return muse::settings()->value(ALGORITHM).toEnum<SpectrogramAlgorithm>();
 }
@@ -260,7 +260,7 @@ muse::async::Channel<SpectrogramAlgorithm> GlobalSpectrogramConfiguration::algor
     return m_algorithmChanged;
 }
 
-SpectrogramWindowType GlobalSpectrogramConfiguration::windowType() const
+SpectrogramWindowType GlobalSpectrogramConfiguration::windowType()
 {
     return muse::settings()->value(WINDOW_TYPE).toEnum<SpectrogramWindowType>();
 }
@@ -278,7 +278,7 @@ muse::async::Channel<SpectrogramWindowType> GlobalSpectrogramConfiguration::wind
     return m_windowTypeChanged;
 }
 
-int GlobalSpectrogramConfiguration::winSizeLog2() const
+int GlobalSpectrogramConfiguration::winSizeLog2()
 {
     return muse::settings()->value(WIN_SIZE_LOG2).toInt();
 }
@@ -296,7 +296,7 @@ muse::async::Channel<int> GlobalSpectrogramConfiguration::winSizeLog2Changed() c
     return m_winSizeLog2Changed;
 }
 
-int GlobalSpectrogramConfiguration::zeroPaddingFactor() const
+int GlobalSpectrogramConfiguration::zeroPaddingFactor()
 {
     return muse::settings()->value(ZERO_PADDING_FACTOR).toInt();
 }

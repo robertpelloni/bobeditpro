@@ -30,7 +30,7 @@ Item {
 
     property string path: ""
     property string suffix: ""
-    property string thumbnailUrl: ""
+    property string placeholder: ""
 
     ProjectThumbnailLoader {
         id: thumbnailLoader
@@ -38,16 +38,8 @@ Item {
         projectPath: root.path
     }
 
-    Image {
-        id: image
-        anchors.fill: parent
-        visible: status == Image.Ready
-        source: root.thumbnailUrl
-    }
-
     Loader {
         anchors.fill: parent
-        visible: !image.visible
         active: visible
 
         sourceComponent: {
@@ -72,18 +64,21 @@ Item {
 
             Rectangle {
                 anchors.fill: parent
+<<<<<<< HEAD
                 color: "white"
+=======
+                color: ui.theme.backgroundSecondaryColor
+>>>>>>> upstream/master
 
                 Image {
                     anchors.centerIn: parent
 
-                    width: 80/172 * parent.width
-                    height: 110/80 * width
+                    width: parent.width / 2
 
                     source: {
                         switch (root.suffix) {
                         default:
-                            return "qrc:/resources/Placeholder_Other.png"
+                            return root.placeholder || "qrc:/resources/ProjectPlaceholder.svg"
                         }
                     }
 

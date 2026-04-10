@@ -26,8 +26,9 @@ import Muse.UiComponents
 import Muse.Dock 1.0
 
 import Audacity.Project 1.0
-import Muse.Cloud 1.0
 import Muse.Learn
+
+import "."
 
 DockPage {
     id: root
@@ -37,10 +38,14 @@ DockPage {
 
     property var window: null
 
+    ProjectsPageModel {
+        id: projectsPageHelper
+    }
+
     objectName: "Home"
     uri: "musescore://home"
 
-    onSetParamsRequested: function(params) {
+    onSetParamsRequested: function (params) {
         if (Boolean(params["section"])) {
             setCurrentCentral(params["section"])
 
@@ -62,9 +67,15 @@ DockPage {
         section = name
 
         switch (name) {
-        case "projects": root.central = projetsComp; break
-        case "learn": root.central = learnComp; break
-        case "account": root.central = accountComp; break
+        case "projects":
+            root.central = projetsComp
+            break
+        case "learn":
+            root.central = learnComp
+            break
+        case "account":
+            root.central = accountComp
+            break
         }
     }
 
@@ -76,9 +87,7 @@ DockPage {
 
             readonly property int maxFixedWidth: 260
             readonly property int minFixedWidth: 76
-            readonly property bool iconsOnly: root.window
-                                                ? root.window.width < (root.window.minimumWidth + maxFixedWidth - minFixedWidth)
-                                                : false
+            readonly property bool iconsOnly: root.window ? root.window.width < (root.window.minimumWidth + maxFixedWidth - minFixedWidth) : false
             readonly property int currentFixedWidth: iconsOnly ? minFixedWidth : maxFixedWidth
 
             width: currentFixedWidth
@@ -91,8 +100,9 @@ DockPage {
             HomeMenu {
                 currentPageName: root.section
                 iconsOnly: menuPanel.iconsOnly
+                cloudEnabled: projectsPageHelper.cloudEnabled
 
-                onSelected: function(name) {
+                onSelected: function (name) {
                     root.setCurrentCentral(name)
                 }
             }
@@ -103,7 +113,9 @@ DockPage {
 
     Component {
         id: accountComp
-        AccountPage {}
+        Loader {
+            source: "AccountPage.qml"
+        }
     }
 
     Component {

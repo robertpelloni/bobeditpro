@@ -7,8 +7,13 @@
 #include <QKeyEvent>
 
 namespace au::projectscene {
+<<<<<<< HEAD
 TapHoldShortcut::TapHoldShortcut(const std::string& action, QObject* target)
     : QObject(nullptr), m_action(action)
+=======
+TapHoldShortcut::TapHoldShortcut(muse::modularity::ContextPtr ctx, const std::string& action, QObject* target)
+    : QObject(nullptr), muse::Contextable(ctx), m_action(action)
+>>>>>>> upstream/master
 {
     connect(&m_holdTimer, &QTimer::timeout, this, &TapHoldShortcut::onHoldTimeout);
     m_holdTimer.setSingleShot(true);

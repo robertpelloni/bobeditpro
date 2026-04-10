@@ -34,6 +34,7 @@ class RecentFilesController;
 class ThumbnailCreator;
 class ProjectAutoSaver;
 class Au3Metadata;
+
 class ProjectModule : public muse::modularity::IModuleSetup
 {
 public:
@@ -44,16 +45,29 @@ public:
     void registerResources() override;
     void registerUiTypes() override;
     void onInit(const muse::IApplication::RunMode& mode) override;
-    void onDeinit() override;
+
+    muse::modularity::IContextSetup* newContext(const muse::modularity::ContextPtr& ctx) const override;
 
 private:
     std::shared_ptr<ProjectConfiguration> m_configuration;
-    std::shared_ptr<ProjectActionsController> m_actionsController;
     std::shared_ptr<RecentFilesController> m_recentFilesController;
-    std::shared_ptr<ThumbnailCreator> m_thumbnailCreator;
+};
+
+class ProjectContext : public muse::modularity::IContextSetup
+{
+public:
+    ProjectContext(const muse::modularity::ContextPtr& ctx)
+        : muse::modularity::IContextSetup(ctx) {}
+
+    void registerExports() override;
+    void onInit(const muse::IApplication::RunMode& mode) override;
+    void onDeinit() override;
+
+private:
+    std::shared_ptr<ProjectActionsController> m_actionsController;
     std::shared_ptr<ProjectUiActions> m_uiActions;
+    std::shared_ptr<ThumbnailCreator> m_thumbnailCreator;
     std::shared_ptr<Au3Metadata> m_tagsAccessor;
-    // std::shared_ptr<ProjectAutoSaver> m_projectAutoSaver;
 };
 }
 

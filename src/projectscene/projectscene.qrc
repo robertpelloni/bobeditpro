@@ -33,9 +33,14 @@
         <file>qml/Audacity/ProjectScene/trackspanel/audio/VolumePressureRuler.qml</file>
         <file>qml/Audacity/ProjectScene/trackspanel/audio/VolumeSlider.qml</file>
         <file>qml/Audacity/ProjectScene/trackspanel/audio/VolumeTooltip.qml</file>
+        <file>qml/Audacity/ProjectScene/trackspanel/audio/GainTooltip.qml</file>
         <file>qml/Audacity/ProjectScene/toolbars/ProjectToolBar.qml</file>
+        <file>qml/Audacity/ProjectScene/toolbars/GetEffectsDialog.qml</file>
+        <file>qml/Audacity/ProjectScene/toolbars/GetEffectsMenu.qml</file>
+        <file>qml/Audacity/ProjectScene/toolbars/EffectCard.qml</file>
         <file>qml/Audacity/ProjectScene/toolbars/UndoRedoToolBar.qml</file>
         <file>qml/Audacity/ProjectScene/tracksitemsview/PlayCursorLine.qml</file>
+        <file>qml/Audacity/ProjectScene/tracksitemsview/PlaybackSeekLine.qml</file>
         <file>qml/Audacity/ProjectScene/tracksitemsview/PlayCursorHead.qml</file>
         <file>qml/Audacity/ProjectScene/tracksitemsview/VerticalRulersPanel.qml</file>
         <file>qml/Audacity/ProjectScene/statusbar/SelectionStatus.qml</file>
@@ -70,7 +75,7 @@
         <file>qml/Audacity/ProjectScene/tracksitemsview/PlayRegion.qml</file>
         <file>qml/Audacity/ProjectScene/trackruler/TrackRulerCustomizePopup.qml</file>
         <file>qml/Audacity/ProjectScene/trackruler/WaveformRuler.qml</file>
-        <file>qml/Audacity/ProjectScene/trackruler/SpectrogramRuler.qml</file>
+        <file>qml/Audacity/ProjectScene/trackruler/SpectrogramTrackRulers.qml</file>
         <file>qml/Audacity/ProjectScene/tracksitemsview/labeleditor/LabelEditorDialog.qml</file>
         <file>qml/Audacity/ProjectScene/tracksitemsview/labeleditor/LabelEditorTopPanel.qml</file>
         <file>qml/Audacity/ProjectScene/tracksitemsview/labeleditor/LabelEditorLabelsTableView.qml</file>

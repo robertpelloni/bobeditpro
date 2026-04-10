@@ -10,7 +10,11 @@
 #include "iaudacityproject.h"
 
 namespace au::project {
+<<<<<<< HEAD
 class IProjectConfiguration : MODULE_EXPORT_INTERFACE
+=======
+class IProjectConfiguration : MODULE_GLOBAL_INTERFACE
+>>>>>>> upstream/master
 {
     INTERFACE_ID(IProjectConfiguration)
 
@@ -25,6 +29,10 @@ public:
     virtual void setUserProjectsPath(const muse::io::path_t& path) = 0;
     virtual muse::async::Channel<muse::io::path_t> userProjectsPathChanged() const = 0;
     virtual muse::io::path_t defaultUserProjectsPath() const = 0;
+
+    virtual muse::io::path_t cloudProjectsPath() const = 0;
+    virtual void setCloudProjectsPath(const muse::io::path_t& path) = 0;
+    virtual bool isCloudProject(const muse::io::path_t& projectPath) const = 0;
 
     virtual muse::io::path_t lastOpenedProjectsPath() const = 0;
     virtual void setLastOpenedProjectsPath(const muse::io::path_t& path) = 0;

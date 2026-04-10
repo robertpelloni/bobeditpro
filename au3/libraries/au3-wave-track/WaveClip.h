@@ -483,19 +483,19 @@ public:
     sampleCount GetVisibleSampleCount() const override;
 
     //! Sets the play start offset in seconds from the beginning of the underlying sequence
-    void SetTrimLeft(double trim);
+    bool SetTrimLeft(double trim);
     //! Returns the play start offset in seconds from the beginning of the underlying sequence
     double GetTrimLeft() const noexcept;
 
     //! Sets the play end offset in seconds from the ending of the underlying sequence
-    void SetTrimRight(double trim);
+    bool SetTrimRight(double trim);
     //! Returns the play end offset in seconds from the ending of the underlying sequence
     double GetTrimRight() const noexcept;
 
     //! Moves play start position by deltaTime
-    void TrimLeft(double deltaTime);
+    bool TrimLeft(double deltaTime);
     //! Moves play end position by deltaTime
-    void TrimRight(double deltaTime);
+    bool TrimRight(double deltaTime);
     //! Same as `TrimRight`, but expressed as quarter notes
     void TrimQuarternotesFromRight(double quarters);
 
@@ -842,8 +842,8 @@ public:
     int64_t GetGroupId() const;
     void SetGroupId(int64_t id);
 
-    void SetColor(const wxString& color);
-    const wxString& GetColor() const;
+    void SetColorIndex(int colorIndex);
+    int GetColorIndex() const;
 
     // TimeToSamples and SamplesToTime take clip stretch ratio into account.
     // Use them to convert time / sample offsets.
@@ -1063,7 +1063,13 @@ private:
 
     int64_t mGroupId = -1;
 
+<<<<<<< HEAD
     wxString mColor;
+=======
+    int mColorIndex = 0;
+
+    bool mSelected{ false };
+>>>>>>> upstream/master
 };
 
 #endif

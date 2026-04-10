@@ -6,14 +6,12 @@ using namespace au::appshell;
 using namespace muse;
 
 WorkspaceLayoutPageModel::WorkspaceLayoutPageModel(QObject* parent)
+<<<<<<< HEAD:src/appshell/view/firstlaunchsetup/workspacelayoutpagemodel.cpp
     : QObject(parent)
+=======
+    : QObject(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
+>>>>>>> upstream/master:src/appshell/qml/Audacity/AppShell/FirstLaunchSetup/workspacelayoutpagemodel.cpp
 {
-#ifdef MUSE_MODULE_WORKSPACE
-    // Listen to workspace changes to update selection
-    m_workspaceManager()->currentWorkspaceChanged().onNotify(this, [this]() {
-        updateWorkspaces();
-    });
-#endif
 }
 
 void WorkspaceLayoutPageModel::load()
@@ -22,6 +20,12 @@ void WorkspaceLayoutPageModel::load()
     m_workspaces.clear();
 
 #ifdef MUSE_MODULE_WORKSPACE
+    // Listen to workspace changes to update selection
+    if (m_workspaceManager()) {
+        m_workspaceManager()->currentWorkspaceChanged().onNotify(this, [this]() {
+            updateWorkspaces();
+        });
+    }
     // Get current workspace from workspace manager
     std::string currentWorkspaceName;
     if (m_workspaceManager() && m_workspaceManager()->currentWorkspace()) {
@@ -151,7 +155,7 @@ QString WorkspaceLayoutPageModel::availableWorkspaceText()
 
 QString WorkspaceLayoutPageModel::additionalInfoText()
 {
-    return qtrc("appshell/gettingstarted", "You can change between these layouts at any time using our new 'workspaces' feature.");
+    return qtrc("appshell/gettingstarted", "You can change between these layouts at any time using our new ‘workspaces’ feature.");
 }
 
 QString WorkspaceLayoutPageModel::additionalInfoAccessibleName()

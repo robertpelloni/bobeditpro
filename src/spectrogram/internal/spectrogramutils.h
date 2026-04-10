@@ -21,4 +21,13 @@ void findCorrection(
 void fillWhere(
     std::vector<long long>& where, size_t len, bool addBias, double correction, double t0, double sampleRate, double stretchRatio,
     double samplesPerPixel);
+<<<<<<< HEAD
+=======
+
+int fftLength(ISpectrogramConfiguration& config);
+
+std::pair<float, float> spectrogramBounds(ISpectrogramConfiguration&, double sampleRate);
+
+SpectrogramRulerTicks spectrogramRulerTicks(ISpectrogramConfiguration&, double labelHeight, double rulerHeight);
+>>>>>>> upstream/master
 }

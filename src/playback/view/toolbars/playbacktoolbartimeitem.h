@@ -27,10 +27,18 @@ class PlaybackToolBarTimeItem : public muse::uicomponents::ToolBarItem
     Q_PROPERTY(int upperTimeSignature READ upperTimeSignature NOTIFY timeSignatureChanged FINAL)
     Q_PROPERTY(int lowerTimeSignature READ lowerTimeSignature NOTIFY timeSignatureChanged FINAL)
 
+<<<<<<< HEAD
     muse::Inject<context::IGlobalContext> globalContext;
     muse::Inject<muse::actions::IActionsDispatcher> dispatcher;
     muse::Inject<IPlayback> playback;
     muse::Inject<IPlaybackConfiguration> configuration;
+=======
+    muse::GlobalInject<IPlaybackConfiguration> configuration;
+
+    muse::ContextInject<context::IGlobalContext> globalContext{ this };
+    muse::ContextInject<muse::actions::IActionsDispatcher> dispatcher{ this };
+    muse::ContextInject<IPlayback> playback{ this };
+>>>>>>> upstream/master
 
 public:
     explicit PlaybackToolBarTimeItem(const muse::ui::UiAction& action, muse::uicomponents::ToolBarItemType::Type type,

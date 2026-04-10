@@ -12,14 +12,24 @@
 #include <map>
 
 namespace au::projectscene {
+<<<<<<< HEAD
 class RealtimeEffectSectionModel : public QObject, public muse::actions::Actionable, public muse::async::Asyncable
+=======
+class RealtimeEffectSectionModel : public QObject, public muse::actions::Actionable, public muse::async::Asyncable, public muse::Contextable
+>>>>>>> upstream/master
 {
     Q_OBJECT
 
     Q_PROPERTY(bool showEffectsSection READ prop_showEffectsSection WRITE prop_setShowEffectsSection NOTIFY showEffectsSectionChanged)
 
+<<<<<<< HEAD
     muse::Inject<IProjectSceneConfiguration> configuration;
     muse::Inject<muse::actions::IActionsDispatcher> dispatcher;
+=======
+    muse::GlobalInject<IProjectSceneConfiguration> configuration;
+
+    muse::ContextInject<muse::actions::IActionsDispatcher> dispatcher{ this };
+>>>>>>> upstream/master
 
 public:
     explicit RealtimeEffectSectionModel(QObject* parent = nullptr);
@@ -31,5 +41,6 @@ public:
 
 signals:
     void showEffectsSectionChanged();
+    void focusEffectsPanelRequested();
 };
 }

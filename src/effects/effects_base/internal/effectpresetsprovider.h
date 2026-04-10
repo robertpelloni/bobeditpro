@@ -13,6 +13,7 @@
 
 class EffectSettingsManager;
 namespace au::effects {
+<<<<<<< HEAD
 class EffectPresetsProvider : public IEffectPresetsProvider
 {
     muse::Inject<IEffectsProvider> effectsProvider;
@@ -20,10 +21,21 @@ class EffectPresetsProvider : public IEffectPresetsProvider
 
 public:
     EffectPresetsProvider() = default;
+=======
+class EffectPresetsProvider : public IEffectPresetsProvider, public muse::Contextable
+{
+    muse::ContextInject<IEffectsProvider> effectsProvider{ this };
+    muse::ContextInject<IEffectInstancesRegister> instancesRegister{ this };
+
+public:
+    EffectPresetsProvider(const muse::modularity::ContextPtr& ctx)
+        : muse::Contextable(ctx) {}
+>>>>>>> upstream/master
 
     PresetIdList factoryPresets(const EffectId& effectId) const override;
     PresetIdList userPresets(const EffectId& effectId) const override;
     muse::async::Channel<EffectId> userPresetsChanged() const override;
+    muse::async::Channel<PresetSavedInfo> presetSaved() const override;
 
     muse::Ret applyPreset(const EffectInstanceId& effectInstanceId, const PresetId& presetId) override;
     bool hasUserPresetWithName(const EffectId& effectId, const std::string& presetName) const override;
@@ -37,5 +49,6 @@ private:
     const EffectSettingsManager& settingsManager(const EffectId& effectId) const;
 
     muse::async::Channel<EffectId> m_userPresetsChanged;
+    muse::async::Channel<PresetSavedInfo> m_presetSaved;
 };
 }

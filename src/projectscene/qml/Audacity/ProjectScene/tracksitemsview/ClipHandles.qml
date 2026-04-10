@@ -64,12 +64,17 @@ Item {
             id: leftArrow
             anchors.verticalCenter: leftTrimHandle.verticalCenter
             anchors.left: leftTrimHandle.left
-            // specific icon pivot
-            anchors.leftMargin: -5
+            anchors.leftMargin: 2
 
+<<<<<<< HEAD
             iconCode: IconCode.SMALL_ARROW_LEFT
             font.pixelSize: 30
             color: "black"
+=======
+            iconCode: IconCode.TRIM_HANDLE_LEFT
+            font.pixelSize: 17
+            color: ui.theme.extra["black_color"]
+>>>>>>> upstream/master
             style: Text.Outline
             styleColor: "white"
 
@@ -209,12 +214,17 @@ Item {
             id: rightArrow
             anchors.verticalCenter: rightTrimHandle.verticalCenter
             anchors.right: rightTrimHandle.right
-            // specific icon pivot
-            anchors.rightMargin: -5
+            anchors.rightMargin: 2
 
+<<<<<<< HEAD
             iconCode: IconCode.SMALL_ARROW_RIGHT
             font.pixelSize: 30
             color: "black"
+=======
+            iconCode: IconCode.TRIM_HANDLE_RIGHT
+            font.pixelSize: 17
+            color: ui.theme.extra["black_color"]
+>>>>>>> upstream/master
             style: Text.Outline
             styleColor: "white"
 
@@ -663,11 +673,11 @@ Item {
             when: leftTrimMa.containsMouse
             PropertyChanges {
                 target: leftArrow
-                font.pixelSize: 40
+                font.pixelSize: 22
             }
             PropertyChanges {
                 target: leftArrow
-                anchors.leftMargin: -10
+                anchors.leftMargin: -1
             }
         },
         State {
@@ -675,11 +685,11 @@ Item {
             when: rightTrimMa.containsMouse
             PropertyChanges {
                 target: rightArrow
-                font.pixelSize: 40
+                font.pixelSize: 22
             }
             PropertyChanges {
                 target: rightArrow
-                anchors.rightMargin: -10
+                anchors.rightMargin: -1
             }
         },
         State {

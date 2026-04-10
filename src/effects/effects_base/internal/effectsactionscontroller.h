@@ -12,6 +12,9 @@
 #include "framework/actions/iactionsdispatcher.h"
 #include "framework/ui/iuiactionsregister.h"
 
+#include "spectrogram/ispectraleffectsregister.h"
+#include "spectrogram/ifrequencyselectioncontroller.h"
+
 #include "playback/iplaybackcontroller.h"
 #include "../ieffectexecutionscenario.h"
 #include "../ieffectsprovider.h"
@@ -21,6 +24,7 @@
 
 namespace au::effects {
 class EffectsUiActions;
+<<<<<<< HEAD
 class EffectsActionsController : public muse::actions::Actionable, public muse::async::Asyncable,
     public std::enable_shared_from_this<EffectsActionsController>
 {
@@ -35,18 +39,42 @@ class EffectsActionsController : public muse::actions::Actionable, public muse::
     muse::Inject<au::playback::IPlaybackController> playbackController;
 
 public:
+=======
+class EffectsActionsController : public muse::actions::Actionable, public muse::async::Asyncable, public muse::Contextable,
+    public std::enable_shared_from_this<EffectsActionsController>
+{
+    muse::GlobalInject<IEffectsConfiguration> configuration;
+    muse::GlobalInject<spectrogram::ISpectralEffectsRegister> spectralEffectsRegister;
+
+    muse::ContextInject<muse::actions::IActionsDispatcher> dispatcher{ this };
+    muse::ContextInject<muse::ui::IUiActionsRegister> uiActionsRegister{ this };
+    muse::ContextInject<IEffectExecutionScenario> effectExecutionScenario{ this };
+    muse::ContextInject<IEffectsProvider> effectsProvider{ this };
+    muse::ContextInject<IEffectPresetsScenario> presetsScenario{ this };
+    muse::ContextInject<IEffectInstancesRegister> instancesRegister{ this };
+    muse::ContextInject<muse::IInteractive> interactive{ this };
+    muse::ContextInject<au::playback::IPlaybackController> playbackController{ this };
+    muse::ContextInject<spectrogram::IFrequencySelectionController> frequencySelectionController{ this };
+
+public:
+    EffectsActionsController(const muse::modularity::ContextPtr& ctx)
+        : muse::Contextable(ctx) {}
+
+>>>>>>> upstream/master
     void init();
     bool canReceiveAction(const muse::actions::ActionCode&) const override;
     muse::async::Channel<muse::actions::ActionCodeList> canReceiveActionsChanged() const;
 
 private:
     void registerActions();
+    void notifyAboutSpectralEffectsAvailability();
 
     void onEffectTriggered(const muse::actions::ActionQuery& q);
     void repeatLastEffect();
 
     void applyPreset(const muse::actions::ActionQuery& q);
-    void saveAsPreset(const muse::actions::ActionQuery& q);
+    void savePreset(const muse::actions::ActionQuery& q);
+    void savePresetAs(const muse::actions::ActionQuery& q);
     void deletePreset(const muse::actions::ActionQuery& q);
     void importPreset(const muse::actions::ActionQuery& q);
     void exportPreset(const muse::actions::ActionQuery& q);

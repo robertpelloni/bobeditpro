@@ -15,8 +15,13 @@ class PlaybackMeterModel : public MeterModel
 {
     Q_OBJECT
 
+<<<<<<< HEAD
     muse::Inject<IPlayback> playback;
     muse::Inject<record::IRecord> record;
+=======
+    muse::ContextInject<IPlayback> playback{ this };
+    muse::ContextInject<record::IRecord> record{ this };
+>>>>>>> upstream/master
 
 public:
     explicit PlaybackMeterModel(QObject* parent = nullptr);

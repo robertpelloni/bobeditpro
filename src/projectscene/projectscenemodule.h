@@ -13,6 +13,7 @@ class ProjectSceneUiActions;
 class ProjectSceneActionsController;
 class ProjectSceneConfiguration;
 class RealtimeEffectPanelTrackSelection;
+
 class ProjectSceneModule : public muse::modularity::IModuleSetup
 {
 public:
@@ -24,10 +25,25 @@ public:
     void registerUiTypes() override;
     void onInit(const muse::IApplication::RunMode& mode) override;
 
+    muse::modularity::IContextSetup* newContext(const muse::modularity::ContextPtr& ctx) const override;
+
+private:
+    std::shared_ptr<ProjectSceneConfiguration> m_configuration;
+};
+
+class ProjectSceneContext : public muse::modularity::IContextSetup
+{
+public:
+    ProjectSceneContext(const muse::modularity::ContextPtr& ctx)
+        : muse::modularity::IContextSetup(ctx) {}
+
+    void registerExports() override;
+    void onInit(const muse::IApplication::RunMode& mode) override;
+    void onDeinit() override;
+
 private:
     std::shared_ptr<ProjectSceneUiActions> m_uiActions;
     std::shared_ptr<ProjectSceneActionsController> m_projectSceneActionsController;
-    std::shared_ptr<ProjectSceneConfiguration> m_configuration;
     std::shared_ptr<RealtimeEffectPanelTrackSelection> m_realtimeEffectPanelTrackSelection;
 };
 }

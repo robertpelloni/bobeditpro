@@ -4,11 +4,22 @@
 #include "async/notification.h"
 
 #include "modularity/imoduleinterface.h"
+#include "modularity/ioc.h"
 
+#include "global/types/color.h"
+#include "trackedit/trackedittypes.h"
 #include "types/projectscenetypes.h"
 
 namespace au::projectscene {
+<<<<<<< HEAD
 class IProjectSceneConfiguration : MODULE_EXPORT_INTERFACE
+=======
+struct ClipColorInfo {
+    std::string name;
+    trackedit::ClipColorIndex index = 0;
+};
+class IProjectSceneConfiguration : MODULE_GLOBAL_INTERFACE
+>>>>>>> upstream/master
 {
     INTERFACE_ID(IProjectSceneConfiguration)
 public:
@@ -26,7 +37,7 @@ public:
     virtual void setClippingInWaveformVisible(bool visible) = 0;
     virtual muse::async::Channel<bool> isClippingInWaveformVisibleChanged() const = 0;
 
-    virtual double zoom() const = 0;
+    virtual double zoom(const muse::modularity::ContextPtr& ctx) const = 0;
 
     virtual int mouseZoomPrecision() const = 0;
     virtual void setMouseZoomPrecision(int precision) = 0;
@@ -38,7 +49,9 @@ public:
     virtual void setIsEffectsPanelVisible(bool visible) = 0;
     virtual muse::async::Notification isEffectsPanelVisibleChanged() const = 0;
 
-    virtual const std::vector<std::pair<std::string, std::string> >& clipColors() const = 0;
+    virtual const std::vector<ClipColorInfo>& clipColorInfos() const = 0;
+    virtual muse::Color clipColor(trackedit::ClipColorIndex index) const = 0;
+    virtual muse::Color clipSelectedColor(trackedit::ClipColorIndex index) const = 0;
 
     virtual ClipStyles::Style clipStyle() const = 0;
     virtual void setClipStyle(ClipStyles::Style style) = 0;
@@ -56,11 +69,21 @@ public:
     virtual void setSelectionTimecodeFormat(int) = 0;
     virtual muse::async::Notification selectionTimecodeFormatChanged() const = 0;
 
+    virtual int durationTimecodeFormat() const = 0;
+    virtual void setDurationTimecodeFormat(int) = 0;
+    virtual muse::async::Notification durationTimecodeFormatChanged() const = 0;
+
     virtual bool playbackOnRulerClickEnabled() const = 0;
     virtual void setPlaybackOnRulerClickEnabled(bool enabled) = 0;
     virtual muse::async::Notification playbackOnRulerClickEnabledChanged() const = 0;
 
     virtual int labelEditorColumnFormat(const std::string& columnName) const = 0;
     virtual void setLabelEditorColumnFormat(const std::string& columnName, int format) const = 0;
+
+    virtual ZoomPresets::Preset zoomPreset1() const = 0;
+    virtual void setZoomPreset1(ZoomPresets::Preset preset) = 0;
+
+    virtual ZoomPresets::Preset zoomPreset2() const = 0;
+    virtual void setZoomPreset2(ZoomPresets::Preset preset) = 0;
 };
 }

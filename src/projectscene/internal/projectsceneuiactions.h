@@ -13,10 +13,18 @@
 #include "projectsceneactionscontroller.h"
 
 namespace au::projectscene {
+<<<<<<< HEAD
 class ProjectSceneUiActions : public muse::ui::IUiActionsModule, public muse::async::Asyncable
 {
     muse::Inject<context::IUiContextResolver> uicontextResolver;
     muse::Inject<IProjectSceneConfiguration> configuration;
+=======
+class ProjectSceneUiActions : public muse::ui::IUiActionsModule, public muse::Contextable, public muse::async::Asyncable
+{
+    muse::GlobalInject<IProjectSceneConfiguration> configuration;
+
+    muse::ContextInject<context::IUiContextResolver> uicontextResolver{ this };
+>>>>>>> upstream/master
 
 public:
     ProjectSceneUiActions(std::shared_ptr<ProjectSceneActionsController> controller);

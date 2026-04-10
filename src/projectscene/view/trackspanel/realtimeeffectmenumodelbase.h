@@ -19,8 +19,13 @@ class RealtimeEffectMenuModelBase : public muse::uicomponents::AbstractMenuModel
     Q_OBJECT
     Q_PROPERTY(bool isMasterTrack READ isMasterTrack WRITE prop_setIsMasterTrack NOTIFY isMasterTrackChanged)
 
+<<<<<<< HEAD
     muse::Inject<effects::IEffectsMenuProvider> effectsMenuProvider;
     muse::Inject<IRealtimeEffectPanelTrackSelection> trackSelection;
+=======
+    muse::ContextInject<effects::IEffectsMenuProvider> effectsMenuProvider{ this };
+    muse::ContextInject<IRealtimeEffectPanelTrackSelection> trackSelection{ this };
+>>>>>>> upstream/master
 
 public:
     explicit RealtimeEffectMenuModelBase(QObject* parent = nullptr);
@@ -33,8 +38,13 @@ protected:
     bool isMasterTrack() const { return m_isMasterTrack; }
     muse::uicomponents::MenuItemList effectMenus();
 
+<<<<<<< HEAD
     muse::Inject<effects::IEffectsProvider> effectsProvider;
     muse::Inject<effects::IRealtimeEffectService> realtimeEffectService;
+=======
+    muse::ContextInject<effects::IEffectsProvider> effectsProvider{ this };
+    muse::ContextInject<effects::IRealtimeEffectService> realtimeEffectService{ this };
+>>>>>>> upstream/master
 
 signals:
     void isMasterTrackChanged();

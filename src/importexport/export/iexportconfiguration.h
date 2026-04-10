@@ -12,7 +12,11 @@
 #include "types/exporttypes.h"
 
 namespace au::importexport {
+<<<<<<< HEAD
 class IExportConfiguration : MODULE_EXPORT_INTERFACE
+=======
+class IExportConfiguration : MODULE_GLOBAL_INTERFACE
+>>>>>>> upstream/master
 {
     INTERFACE_ID(IExportConfiguration)
 

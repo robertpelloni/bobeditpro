@@ -16,11 +16,11 @@ using namespace muse::ui;
 using namespace muse::actions;
 
 static UiActionList STATIC_ACTIONS = {
-    UiAction("automation",
-             au::context::UiCtxUnknown,
+    UiAction("clip-gain",
+             au::context::UiCtxProjectOpened,
              au::context::CTX_PROJECT_OPENED,
-             TranslatableString("action", "Automation"),
-             TranslatableString("action", "Automation"),
+             TranslatableString("action", "Clip gain"),
+             TranslatableString("action", "Clip gain"),
              IconCode::Code::AUTOMATION
              ),
     UiAction("split-tool",
@@ -29,13 +29,6 @@ static UiActionList STATIC_ACTIONS = {
              TranslatableString("action", "Split Tool"),
              TranslatableString("action", "Split Tool"),
              IconCode::Code::SPLIT_TOOL
-             ),
-    UiAction("zoom",
-             au::context::UiCtxUnknown,
-             au::context::CTX_ANY,
-             TranslatableString("action", "Zoom toggle"),
-             TranslatableString("action", "Zoom toggle"),
-             IconCode::Code::ZOOM_TOGGLE
              ),
     UiAction("zoom-in",
              au::context::UiCtxProjectOpened,
@@ -51,11 +44,17 @@ static UiActionList STATIC_ACTIONS = {
              TranslatableString("action", "Zoom out"),
              IconCode::Code::ZOOM_OUT
              ),
-    UiAction("fit-selection",
+    UiAction("zoom-default",
              au::context::UiCtxProjectOpened,
              au::context::CTX_ANY,
-             TranslatableString("action", "Fit selection to width"),
-             TranslatableString("action", "Fit selection to width"),
+             TranslatableString("action", "Zoom default"),
+             TranslatableString("action", "Zoom default")
+             ),
+    UiAction("zoom-to-selection",
+             au::context::UiCtxProjectOpened,
+             au::context::CTX_ANY,
+             TranslatableString("action", "Zoom to selection"),
+             TranslatableString("action", "Zoom to selection"),
              IconCode::Code::FIT_SELECTION
              ),
     UiAction("zoom-to-fit-project",
@@ -65,11 +64,32 @@ static UiActionList STATIC_ACTIONS = {
              TranslatableString("action", "Zoom to fit project"),
              IconCode::Code::FIT_PROJECT
              ),
+<<<<<<< HEAD
     UiAction("spectral-editing",
              au::context::UiCtxProjectOpened,
              au::context::CTX_ANY,
              TranslatableString("action", "Spectral editing"),
              TranslatableString("action", "Spectral editing"),
+=======
+    UiAction("zoom-toggle",
+             au::context::UiCtxProjectOpened,
+             au::context::CTX_ANY,
+             TranslatableString("action", "Zoom toggle"),
+             TranslatableString("action", "Zoom toggle"),
+             IconCode::Code::ZOOM_TOGGLE
+             ),
+    UiAction("center-view-on-playhead",
+             au::context::UiCtxProjectOpened,
+             au::context::CTX_ANY,
+             TranslatableString("action", "Center view on playhead"),
+             TranslatableString("action", "Center view on playhead")
+             ),
+    UiAction("action://trackedit/global-view-spectrogram",
+             au::context::UiCtxProjectOpened,
+             au::context::CTX_PROJECT_FOCUSED,
+             TranslatableString("action", "Toggle spectral view"),
+             TranslatableString("action", "Toggle spectral view"),
+>>>>>>> upstream/master
              IconCode::Code::SPECTROGRAM
              ),
     UiAction("spectral-box-select",
@@ -154,6 +174,14 @@ static UiActionList STATIC_ACTIONS = {
              au::context::CTX_ANY,
              TranslatableString("action", "Rename clip"),
              TranslatableString("action", "Rename clip"),
+             Checkable::Yes
+             ),
+    UiAction("action://delete",
+             au::context::UiCtxProjectOpened,
+             au::context::CTX_PROJECT_OPENED,
+             TranslatableString("action", "Delete"),
+             TranslatableString("action", "Delete"),
+             IconCode::Code::DELETE_TANK,
              Checkable::Yes
              ),
     UiAction("action://trackedit/clip/change-color-auto",
@@ -243,42 +271,62 @@ static UiActionList STATIC_ACTIONS = {
              au::context::CTX_PROJECT_OPENED,
              TranslatableString("action", "Show label editor"),
              TranslatableString("action", "Show label editor")
+             ),
+    UiAction("realtime-effect-move-up",
+             au::context::UiCtxAny,
+             au::context::CTX_ANY,
+             TranslatableString("action", "Move realtime effect up"),
+             TranslatableString("action", "Move realtime effect up")
+             ),
+    UiAction("realtime-effect-move-down",
+             au::context::UiCtxAny,
+             au::context::CTX_ANY,
+             TranslatableString("action", "Move realtime effect down"),
+             TranslatableString("action", "Move realtime effect down")
              )
 };
 
+<<<<<<< HEAD
 ProjectSceneUiActions::ProjectSceneUiActions(std::shared_ptr<ProjectSceneActionsController> controller)
     : m_controller(controller)
+=======
+ProjectSceneUiActions::ProjectSceneUiActions(const muse::modularity::ContextPtr& ctx,
+                                             std::shared_ptr<ProjectSceneActionsController> controller)
+    : muse::Contextable(ctx), m_controller(controller)
+>>>>>>> upstream/master
 {
     m_actions = STATIC_ACTIONS;
 }
 
 void ProjectSceneUiActions::init()
 {
-    const auto& colors = configuration()->clipColors();
+    const auto& colorInfos = configuration()->clipColorInfos();
     m_actions.clear();
-    m_actions.reserve(2 * colors.size() + STATIC_ACTIONS.size());
+    m_actions.reserve(2 * colorInfos.size() + STATIC_ACTIONS.size());
 
-    for (const auto& color : colors) {
+    for (const auto& info : colorInfos) {
+        muse::Color resolved = configuration()->clipColor(info.index);
+
         UiAction clipColorAction;
-        clipColorAction.code = muse::actions::ActionQuery(makeClipColorChangeAction(color.second)).toString();
+        clipColorAction.code = muse::actions::ActionQuery(makeClipColorChangeAction(info.index)).toString();
         clipColorAction.uiCtx = context::UiCtxProjectOpened;
         clipColorAction.scCtx = context::CTX_PROJECT_FOCUSED;
         clipColorAction.description = muse::TranslatableString("action", "Change clip color");
         clipColorAction.title = muse::TranslatableString("action", "Change clip color");
         clipColorAction.iconCode = IconCode::Code::FRETBOARD_MARKER_CIRCLE_FILLED;
-        clipColorAction.iconColor = QString::fromStdString(color.second);
+        clipColorAction.iconColor = QString::fromStdString(resolved.toString());
         clipColorAction.checkable = Checkable::Yes;
 
         m_actions.push_back(std::move(clipColorAction));
 
         UiAction trackColorAction;
-        trackColorAction.code = muse::actions::ActionQuery(makeTrackColorChangeAction(color.second)).toString();
+        trackColorAction.code = muse::actions::ActionQuery(makeTrackColorChangeAction(info.index)).toString();
         trackColorAction.uiCtx = context::UiCtxProjectOpened;
         trackColorAction.scCtx = context::CTX_PROJECT_FOCUSED;
         trackColorAction.description = muse::TranslatableString("action", "Change track color");
         trackColorAction.title = muse::TranslatableString("action", "Change track color");
         trackColorAction.iconCode = IconCode::Code::FRETBOARD_MARKER_CIRCLE_FILLED;
-        trackColorAction.iconColor = QString::fromStdString(color.second);
+        trackColorAction.iconColor = QString::fromStdString(resolved.toString());
         trackColorAction.checkable = Checkable::Yes;
 
         m_actions.push_back(std::move(trackColorAction));
@@ -332,15 +380,19 @@ const ToolConfig& ProjectSceneUiActions::defaultPlaybackToolBarConfig()
             { "action://playback/rewind-end", true },
             { "toggle-loop-region", true },
             { "", true },
-            { "automation", true },
+            { "clip-gain", true },
             { "split-tool", true },
             { "zoom-in", true },
             { "zoom-out", true },
             { "zoom-to-selection", true },
             { "zoom-to-fit-project", true },
+<<<<<<< HEAD
             { "zoom", true },
             { "", true },
             // { "spectral-editing", false },
+=======
+            { "zoom-toggle", true },
+>>>>>>> upstream/master
             // { "spectral-box-select", false },
             // { "spectral-brush", false },
             // { "", true },

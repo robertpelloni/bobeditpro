@@ -9,6 +9,8 @@ set( SOURCES
    CloudLibrarySettings.h
    CloudSyncService.cpp
    CloudSyncService.h
+   TaskExecutionService.cpp
+   TaskExecutionService.h
    NetworkUtils.cpp
    NetworkUtils.h
    OAuthService.cpp
@@ -63,6 +65,7 @@ PUBLIC
       au3-import-export-interface
       wavpack::wavpack # Required for the WavPackCompressor
       wxBase # Required to retrieve the OS information
+      rapidjson::rapidjson
 )
 
 set ( DEFINES

@@ -32,17 +32,22 @@ static UiActionList STATIC_ACTIONS = {
     UiAction("action://effects/presets/apply",
              au::context::UiCtxAny,
              au::context::CTX_ANY,
-             TranslatableString("action", "&Apply Presets")
+             TranslatableString("action", "&Apply preset")
+             ),
+    UiAction("action://effects/presets/save_as",
+             au::context::UiCtxAny,
+             au::context::CTX_ANY,
+             TranslatableString("action", "Save preset as…")
              ),
     UiAction("action://effects/presets/save",
              au::context::UiCtxAny,
              au::context::CTX_ANY,
-             TranslatableString("action", "&Save Presets…")
+             TranslatableString("action", "&Save preset")
              ),
     UiAction("action://effects/presets/delete",
              au::context::UiCtxAny,
              au::context::CTX_ANY,
-             TranslatableString("action", "&Delete Preset"),
+             TranslatableString("action", "&Delete preset"),
              IconCode::Code::DELETE_TANK
              ),
     UiAction("action://effects/presets/import",
@@ -60,14 +65,19 @@ static UiActionList STATIC_ACTIONS = {
     UiAction("action://effects/toggle_vendor_ui",
              au::context::UiCtxAny,
              au::context::CTX_ANY,
-             TranslatableString("effects", "Use Vendor UI"),
+             TranslatableString("effects", "Use vendor UI"),
              TranslatableString("effects", "Toggle between vendor UI and fallback UI"),
              Checkable::Yes
              )
 };
 
+<<<<<<< HEAD
 EffectsUiActions::EffectsUiActions(std::shared_ptr<EffectsActionsController> controller)
     : m_controller{controller}
+=======
+EffectsUiActions::EffectsUiActions(const muse::modularity::ContextPtr& ctx, std::shared_ptr<EffectsActionsController> controller)
+    : muse::Contextable(ctx), m_controller{controller}
+>>>>>>> upstream/master
 {
     effectExecutionScenario()->lastProcessorIdChanged().onReceive(this, [this](const EffectId& effectId) {
         const auto it = std::find_if(m_actions.begin(), m_actions.end(), [](const UiAction& action) {

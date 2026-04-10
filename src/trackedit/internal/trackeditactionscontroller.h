@@ -13,6 +13,8 @@
 #include "audio/iaudiodevicesprovider.h"
 #include "context/iglobalcontext.h"
 #include "projectscene/iprojectsceneconfiguration.h"
+#include "spectrogram/ifrequencyselectioncontroller.h"
+#include "spectrogram/ispectraleffectsregister.h"
 #include "iprojecthistory.h"
 #include "iselectioncontroller.h"
 #include "itrackeditconfiguration.h"
@@ -23,6 +25,7 @@
 #include "../itrackeditactionscontroller.h"
 
 namespace au::trackedit {
+<<<<<<< HEAD
 class TrackeditActionsController : public ITrackeditActionsController, public muse::actions::Actionable, public muse::async::Asyncable
 {
     muse::Inject<au::context::IGlobalContext> globalContext;
@@ -36,6 +39,29 @@ class TrackeditActionsController : public ITrackeditActionsController, public mu
     muse::Inject<trackedit::ITrackeditInteraction> trackeditInteraction;
 
 public:
+=======
+class TrackeditActionsController : public ITrackeditActionsController, public muse::actions::Actionable, public muse::async::Asyncable,
+    public muse::Contextable
+{
+    muse::GlobalInject<projectscene::IProjectSceneConfiguration> projectSceneConfiguration;
+    muse::GlobalInject<trackedit::ITrackeditConfiguration> configuration;
+    muse::GlobalInject<spectrogram::ISpectralEffectsRegister> spectralEffectsRegister;
+
+    muse::ContextInject<au::context::IGlobalContext> globalContext { this };
+    muse::ContextInject<audio::IAudioDevicesProvider> audioDevicesProvider { this };
+    muse::ContextInject<muse::actions::IActionsDispatcher> dispatcher { this };
+    muse::ContextInject<muse::IInteractive> interactive { this };
+    muse::ContextInject<trackedit::IProjectHistory> projectHistory { this };
+    muse::ContextInject<trackedit::ISelectionController> selectionController { this };
+    muse::ContextInject<trackedit::ITrackeditInteraction> trackeditInteraction { this };
+    muse::ContextInject<trackedit::ITrackNavigationController> trackNavigationController { this };
+    muse::ContextInject<spectrogram::IFrequencySelectionController> frequencySelectionController { this };
+
+public:
+    TrackeditActionsController(const muse::modularity::ContextPtr& ctx)
+        : muse::Contextable(ctx), m_deleteBehaviorOnboardingScenario(ctx) {}
+
+>>>>>>> upstream/master
     void init();
 
     bool actionEnabled(const muse::actions::ActionCode& actionCode) const override;
@@ -149,8 +175,6 @@ private:
     void changeTrackViewToSpectrogram(const muse::actions::ActionQuery&);
     void changeTrackViewToWaveformAndSpectrogram(const muse::actions::ActionQuery&);
     void changeTrackView(const muse::actions::ActionQuery&, TrackViewType);
-
-    void openTrackSpectrogramSettings(const muse::actions::ActionQuery&);
 
     void addLabel();
 

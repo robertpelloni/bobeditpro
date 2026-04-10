@@ -3,12 +3,12 @@
 */
 #pragma once
 
-#include "modularity/imoduleinterface.h"
+#include "framework/global/modularity/imoduleinterface.h"
 
 #include "effects/effects_base/effectstypes.h"
 
 namespace au::effects {
-class IVstEffectsRepository : MODULE_EXPORT_INTERFACE
+class IVstEffectsRepository : MODULE_GLOBAL_INTERFACE
 {
     INTERFACE_ID(IVstEffectsRepository)
 public:

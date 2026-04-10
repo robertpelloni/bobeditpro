@@ -58,7 +58,7 @@ StyledDialogView {
         spacing: 12
 
         onImplicitHeightChanged: {
-            Qt.callLater(function() {
+            Qt.callLater(function () {
                 root.contentHeight = implicitHeight
             })
         }
@@ -103,7 +103,6 @@ StyledDialogView {
                         currentIndex: indexOfValue(exportPreferencesModel.currentProcess)
                         model: exportPreferencesModel.processList
 
-
                         navigation.name: "TypeDropdown"
                         navigation.panel: typeSection.navigation
                         navigation.order: 1
@@ -111,7 +110,7 @@ StyledDialogView {
 
                         indeterminateText: ""
 
-                        onActivated: function(index, value) {
+                        onActivated: function (index, value) {
                             exportPreferencesModel.setCurrentProcess(value)
                         }
                     }
@@ -158,7 +157,7 @@ StyledDialogView {
                         navigation.order: 1
                         navigation.accessible.name: filenameLabel.text + ": " + currentText
 
-                        onTextChanged: function(newTextValue) {
+                        onTextChanged: function (newTextValue) {
                             exportPreferencesModel.setFilename(newTextValue)
                         }
                     }
@@ -194,7 +193,7 @@ StyledDialogView {
                         navigation: fileSection.navigation
                         navigationRowOrderStart: filenameField.navigation.order + 1
 
-                        onPathEdited: function(newPath) {
+                        onPathEdited: function (newPath) {
                             exportPreferencesModel.setFilePickerPath(newPath)
                         }
                     }
@@ -232,7 +231,7 @@ StyledDialogView {
 
                         indeterminateText: ""
 
-                        onActivated: function(index, value) {
+                        onActivated: function (index, value) {
                             exportPreferencesModel.setCurrentFormat(value)
                         }
                     }
@@ -322,7 +321,11 @@ StyledDialogView {
 
                                 checked: exportPreferencesModel.exportChannels == ExportChannels.CUSTOM
                                 text: qsTrc("export", "Custom mapping")
+<<<<<<< HEAD
                                 enabled: false // until custom mapping grid is implemented
+=======
+                                enabled: exportPreferencesModel.maxExportChannels > 2
+>>>>>>> upstream/master
 
                                 spacing: 8
 
@@ -370,7 +373,7 @@ StyledDialogView {
 
                         indeterminateText: ""
 
-                        onActivated: function(index, value) {
+                        onActivated: function (index, value) {
                             exportPreferencesModel.setExportSampleRate(value)
                         }
                     }
@@ -411,7 +414,7 @@ StyledDialogView {
                             StyledTextLabel {
                                 anchors.verticalCenter: parent.verticalCenter
 
-                                text: qsTrc("export", "Format: ")
+                                text: qsTrc("export", "Format:")
                             }
                         }
 
@@ -470,14 +473,14 @@ StyledDialogView {
                             enabled: !model.readOnly
 
                             property var option: ({
-                                index: model.index,
-                                type: model.type,
-                                value: model.value,
-                                values: model.values,
-                                names: model.names,
-                                min: model.min,
-                                max: model.max
-                            })
+                                    index: model.index,
+                                    type: model.type,
+                                    value: model.value,
+                                    values: model.values,
+                                    names: model.names,
+                                    min: model.min,
+                                    max: model.max
+                                })
 
                             Item {
                                 width: root.labelColumnWidth
@@ -498,14 +501,19 @@ StyledDialogView {
 
                                 sourceComponent: {
                                     switch (type) {
-                                    case ExportOptionType.TypeEnum:   return enumComp
-                                    case ExportOptionType.TypeBool:   return boolComp
-                                    case ExportOptionType.TypeRange:  return rangeComp
-                                    case ExportOptionType.TypeString: return strComp
+                                    case ExportOptionType.TypeEnum:
+                                        return enumComp
+                                    case ExportOptionType.TypeBool:
+                                        return boolComp
+                                    case ExportOptionType.TypeRange:
+                                        return rangeComp
+                                    case ExportOptionType.TypeString:
+                                        return strComp
                                     }
                                 }
 
-                                onLoaded: if (item) item.option = option
+                                onLoaded: if (item)
+                                    item.option = option
                             }
                         }
                     }
@@ -521,7 +529,7 @@ StyledDialogView {
                         StyledTextLabel {
                             id: oggWarning
 
-                            text: qsTrc("export", "Effective bitrate may vary")
+                            text: qsTrc("export", "Effective bit rate may vary")
                         }
                     }
                 }
@@ -637,10 +645,8 @@ StyledDialogView {
             navigation.panel: audioSection.navigation
             navigation.order: sampleRateDropdown.navigation.order + 1 + option.index
 
-            onActivated: function(index, value) {
-                dynamicOptionsModel.setData(dynamicOptionsModel.index(option.index, 0),
-                                            option.values[index],
-                                            ExportOptionType.ValueRole)
+            onActivated: function (index, value) {
+                dynamicOptionsModel.setData(dynamicOptionsModel.index(option.index, 0), option.values[index], ExportOptionType.ValueRole)
             }
         }
     }
@@ -655,10 +661,7 @@ StyledDialogView {
             navigation.panel: audioSection.navigation
             navigation.order: sampleRateDropdown.navigation.order + 1 + option.index
 
-            onClicked: dynamicOptionsModel.setData(
-                           dynamicOptionsModel.index(option.index, 0),
-                           checked,
-                           ExportOptionType.ValueRole)
+            onClicked: dynamicOptionsModel.setData(dynamicOptionsModel.index(option.index, 0), checked, ExportOptionType.ValueRole)
         }
     }
 
@@ -670,7 +673,8 @@ StyledDialogView {
 
             sourceComponent: (option.max - option.min < 20) ? sliderComp : spinComp
 
-            onLoaded: if (item) item.option = option
+            onLoaded: if (item)
+                item.option = option
         }
     }
 
@@ -681,13 +685,11 @@ StyledDialogView {
         StyledSlider {
             property var option
 
-            from: option.min; to: option.max; stepSize: 1
-            value: Number(dynamicOptionsModel.data(dynamicOptionsModel.index(option.index,0),
-                                           ExportOptionType.ValueRole))
-            onValueChanged: dynamicOptionsModel.setData(
-                                dynamicOptionsModel.index(option.index,0),
-                                Math.round(option.value),
-                                ExportOptionType.ValueRole)
+            from: option.min
+            to: option.max
+            stepSize: 1
+            value: Number(dynamicOptionsModel.data(dynamicOptionsModel.index(option.index, 0), ExportOptionType.ValueRole))
+            onValueChanged: dynamicOptionsModel.setData(dynamicOptionsModel.index(option.index, 0), Math.round(option.value), ExportOptionType.ValueRole)
             Layout.minimumWidth: 180
         }
     }
@@ -707,11 +709,8 @@ StyledDialogView {
             navigation.panel: audioSection.navigation
             navigation.order: sampleRateDropdown.navigation.order + 1 + option.index
 
-            onValueEdited: function(newValue) {
-                dynamicOptionsModel.setData(
-                    dynamicOptionsModel.index(option.index,0),
-                    newValue,
-                    ExportOptionType.ValueRole)
+            onValueEdited: function (newValue) {
+                dynamicOptionsModel.setData(dynamicOptionsModel.index(option.index, 0), newValue, ExportOptionType.ValueRole)
             }
         }
     }

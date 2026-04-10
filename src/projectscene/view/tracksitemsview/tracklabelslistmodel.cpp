@@ -228,16 +228,33 @@ void TrackLabelsListModel::selectLabel(const LabelKey& key)
     Qt::KeyboardModifiers modifiers = keyboardModifiers();
 
     if (modifiers.testFlag(Qt::ShiftModifier)) {
-        selectionController()->addSelectedLabel(key.key);
-    } else {
         if (muse::contains(selectionController()->selectedLabels(), key.key)) {
+<<<<<<< HEAD
             return;
         }
 
         selectionController()->resetSelectedClips();
         selectionController()->setSelectedLabels(LabelKeyList({ key.key }), true);
+=======
+            selectionController()->removeLabelSelection(key.key);
+        } else {
+            selectionController()->addSelectedLabel(key.key);
+        }
+    } else {
+        if (!muse::contains(selectionController()->selectedLabels(), key.key)) {
+            if (selectionController()->timeSelectionIsNotEmpty()
+                && muse::contains(selectionController()->labelsIntersectingRangeSelection(), key.key)) {
+                selectionController()->addSelectedLabel(key.key);
+            } else {
+                selectionController()->resetDataSelection();
+                selectionController()->resetSelectedClips();
+                selectionController()->setSelectedLabels(LabelKeyList({ key.key }), true);
+            }
+        }
+>>>>>>> upstream/master
     }
 
+    setFocusedItem(key);
     m_needToSelectTracksData = false;
 }
 

@@ -3,16 +3,26 @@
 */
 #pragma once
 
-#include "modularity/ioc.h"
+#include "framework/uicomponents/qml/Muse/UiComponents/abstracttoolbarmodel.h"
+
+#include "framework/global/modularity/ioc.h"
+#include "framework/ui/iuiactionsregister.h"
+#include "framework/ui/iuiconfiguration.h"
+#include "framework/ui/iuistate.h"
+
 #include "context/iglobalcontext.h"
-#include "ui/iuiactionsregister.h"
-#include "ui/iuiconfiguration.h"
 #include "playback/iplaybackconfiguration.h"
 #include "playback/iplaybackcontroller.h"
 #include "record/irecordcontroller.h"
 #include "record/irecordconfiguration.h"
 
+<<<<<<< HEAD
 #include "uicomponents/qml/Muse/UiComponents/abstracttoolbarmodel.h"
+=======
+namespace au::project {
+class IAudacityProject;
+}
+>>>>>>> upstream/master
 
 namespace au::projectscene {
 class PlaybackToolBarModel : public muse::uicomponents::AbstractToolBarModel
@@ -21,6 +31,7 @@ class PlaybackToolBarModel : public muse::uicomponents::AbstractToolBarModel
 
     Q_PROPERTY(bool isEnabled READ isEnabled NOTIFY isEnabledChanged)
 
+<<<<<<< HEAD
     muse::Inject<muse::ui::IUiConfiguration> uiConfiguration;
     muse::Inject<muse::ui::IUiActionsRegister> uiActionsRegister;
     muse::Inject<context::IGlobalContext> context;
@@ -28,6 +39,17 @@ class PlaybackToolBarModel : public muse::uicomponents::AbstractToolBarModel
     muse::Inject<playback::IPlaybackController> playbackController;
     muse::Inject<record::IRecordController> recordController;
     muse::Inject<record::IRecordConfiguration> recordConfiguration;
+=======
+    muse::GlobalInject<muse::ui::IUiConfiguration> uiConfiguration;
+    muse::GlobalInject<playback::IPlaybackConfiguration> configuration;
+    muse::GlobalInject<record::IRecordConfiguration> recordConfiguration;
+
+    muse::ContextInject<muse::ui::IUiState> uiState { this };
+    muse::ContextInject<muse::ui::IUiActionsRegister> uiActionsRegister{ this };
+    muse::ContextInject<context::IGlobalContext> context{ this };
+    muse::ContextInject<playback::IPlaybackController> playbackController{ this };
+    muse::ContextInject<record::IRecordController> recordController{ this };
+>>>>>>> upstream/master
 
 public:
     explicit PlaybackToolBarModel(QObject* parent = nullptr);
@@ -63,6 +85,7 @@ private:
     void updateStopState();
     void updateRecordState();
     void updateLoopState();
+    void updateClipGainAutomationState();
     void updateSplitState();
 
     void setupConnections();

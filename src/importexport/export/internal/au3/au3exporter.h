@@ -5,6 +5,7 @@
 
 #include "modularity/ioc.h"
 #include "context/iglobalcontext.h"
+#include "au3cloud/iau3cloudconfiguration.h"
 
 #include "au3-import-export/Export.h"
 
@@ -16,6 +17,7 @@
 namespace au::importexport {
 using OptionsEditorUPtr = std::unique_ptr<ExportOptionsEditor>;
 
+<<<<<<< HEAD
 class Au3Exporter : public IExporter
 {
     muse::Inject<au::context::IGlobalContext> globalContext;
@@ -28,10 +30,29 @@ public:
 
     void init() override;
     muse::Ret exportData(std::string filename) override;
+=======
+class Au3Exporter : public IExporter, public muse::Contextable
+{
+    muse::GlobalInject<au::importexport::ExportConfiguration> exportConfiguration;
+    muse::GlobalInject<au::au3cloud::IAu3CloudConfiguration> cloudConfiguration;
+
+    muse::ContextInject<au::context::IGlobalContext> globalContext{ this };
+    muse::ContextInject<au::trackedit::ISelectionController> selectionController{ this };
+    muse::ContextInject<au::playback::IPlaybackController> playbackController{ this };
+
+public:
+    Au3Exporter(const muse::modularity::ContextPtr& ctx)
+        : muse::Contextable(ctx) {}
+
+    void init() override;
+    muse::Ret exportData(const muse::io::path_t& path, const Options& options = {}, muse::ProgressPtr progress = nullptr) override;
+>>>>>>> upstream/master
 
     std::vector<std::string> formatsList() const override;
     int formatIndex(const std::string& format) const override;
     std::vector<std::string> formatExtensions(const std::string& format) const override;
+    std::vector<std::string> cloudPreferredAudioFormats() const override;
+    ExportParameters cloudExportParameters(const std::string& format) const override;
     bool isCustomFFmpegExportFormat() const override;
     bool isOggExportFormat() const override;
     bool hasMetadata() const override;

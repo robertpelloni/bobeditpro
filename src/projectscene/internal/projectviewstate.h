@@ -10,6 +10,7 @@
 #include "playback/iplaybackconfiguration.h"
 #include "trackedit/iselectioncontroller.h"
 #include "trackedit/iprojecthistory.h"
+#include "spectrogram/ifrequencyselectioncontroller.h"
 #include "../iprojectsceneconfiguration.h"
 
 #include "au3wrap/iau3project.h"
@@ -17,6 +18,7 @@
 #include "../iprojectviewstate.h"
 
 namespace au::projectscene {
+<<<<<<< HEAD
 class ProjectViewState : public QObject, public IProjectViewState, public muse::async::Asyncable
 {
     Q_OBJECT
@@ -26,6 +28,19 @@ class ProjectViewState : public QObject, public IProjectViewState, public muse::
     muse::Inject<trackedit::ISelectionController> selectionController;
     muse::Inject<trackedit::IProjectHistory> projectHistory;
     muse::Inject<au::playback::IPlaybackConfiguration> playbackConfiguration;
+=======
+class ProjectViewState : public QObject, public IProjectViewState, public muse::Contextable, public muse::async::Asyncable
+{
+    Q_OBJECT
+
+    muse::GlobalInject<IProjectSceneConfiguration> configuration;
+    muse::GlobalInject<au::playback::IPlaybackConfiguration> playbackConfiguration;
+
+    muse::ContextInject<au::context::IGlobalContext> globalContext{ this };
+    muse::ContextInject<trackedit::ISelectionController> selectionController{ this };
+    muse::ContextInject<spectrogram::IFrequencySelectionController> frequencySelectionController{ this };
+    muse::ContextInject<trackedit::IProjectHistory> projectHistory{ this };
+>>>>>>> upstream/master
 
 public:
     ProjectViewState(std::shared_ptr<au::au3::IAu3Project> project);
@@ -56,8 +71,16 @@ public:
     Snap getSnap() const override;
     muse::ValCh<Snap> snap() const override;
 
+<<<<<<< HEAD
     void setSplitToolEnabled(const bool enabled) override;
     muse::ValCh<bool> splitToolEnabled() override;
+=======
+    void setClipGainAutomationEnabled(bool enabled) override;
+    muse::ValCh<bool> clipGainAutomationEnabled() const override;
+
+    void setSplitToolEnabled(bool enabled) override;
+    muse::ValCh<bool> splitToolEnabled() const override;
+>>>>>>> upstream/master
 
     muse::ValCh<std::pair<float, float> > verticalDisplayBounds(const trackedit::TrackId& trackId) const override;
     void zoomInVertically(const trackedit::TrackId& trackId) override;
@@ -70,6 +93,15 @@ public:
     muse::ValCh<bool> isHalfWave(const trackedit::TrackId& trackId) const override;
     void toggleHalfWave(const trackedit::TrackId& trackId) override;
 
+<<<<<<< HEAD
+=======
+    muse::ValCh<trackedit::TrackViewType> trackViewType(const trackedit::TrackId& trackId) const override;
+    void setTrackViewType(const trackedit::TrackId& trackId, trackedit::TrackViewType viewType) override;
+    void toggleGlobalSpectrogramView() override;
+    bool globalSpectrogramToggleIsOn() const override;
+    muse::async::Notification globalSpectrogramToggleIsOnChanged() const override;
+
+>>>>>>> upstream/master
     muse::ValCh<int> trackRulerType(const trackedit::TrackId& trackId) const override;
     void setTrackRulerType(const trackedit::TrackId& trackId, int rulerType) override;
 
@@ -128,6 +160,7 @@ private:
     mutable muse::ValCh<int> m_verticalRulerWidth;
 
     TrackData& makeTrackData(const trackedit::TrackId& trackId) const;
+    bool doSetTrackViewType(const trackedit::TrackId& trackId, trackedit::TrackViewType viewType);
 
     bool eventFilter(QObject* watched, QEvent* event) override;
 
@@ -137,8 +170,16 @@ private:
     mutable std::map<trackedit::TrackId, TrackData> m_tracks;
     muse::ValCh<Snap> m_snap;
 
+    muse::ValCh<bool> m_clipGainAutomationEnabled;
+
     muse::ValCh<bool> m_splitToolEnabled;
 
+<<<<<<< HEAD
+=======
+    bool m_globalSpectrogramToggleIsOn = false;
+    muse::async::Notification m_globalSpectrogramToggleIsOnChanged;
+
+>>>>>>> upstream/master
     muse::ValCh<double> m_mouseYPosition;
 
     //! Offset between mouse click position on item's header and item's start and end time

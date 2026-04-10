@@ -10,6 +10,7 @@
 #include "trackedit/itracksinteraction.h"
 
 namespace au::projectscene {
+<<<<<<< HEAD
 class DropController : public QObject
 {
     Q_OBJECT
@@ -17,6 +18,15 @@ class DropController : public QObject
     muse::Inject<au::context::IGlobalContext> globalContext;
     muse::Inject<importexport::IImporter> importer;
     muse::Inject<trackedit::ITracksInteraction> tracksInteraction;
+=======
+class DropController : public QObject, public muse::Contextable
+{
+    Q_OBJECT
+
+    muse::ContextInject<au::context::IGlobalContext> globalContext{ this };
+    muse::ContextInject<importexport::IImporter> importer{ this };
+    muse::ContextInject<trackedit::ITracksInteraction> tracksInteraction{ this };
+>>>>>>> upstream/master
 
 public:
     explicit DropController(QObject* parent = nullptr);

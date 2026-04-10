@@ -14,6 +14,7 @@
 #include "../ieffectinstancesregister.h"
 
 namespace au::effects {
+<<<<<<< HEAD
 class EffectPresetsScenario : public IEffectPresetsScenario
 {
     muse::Inject<muse::IInteractive> interactive;
@@ -23,9 +24,23 @@ class EffectPresetsScenario : public IEffectPresetsScenario
 
 public:
     EffectPresetsScenario() = default;
+=======
+class EffectPresetsScenario : public IEffectPresetsScenario, public muse::Contextable
+{
+    muse::GlobalInject<muse::IGlobalConfiguration> globalConfiguration;
 
-    void applyPreset(const EffectInstanceId& effectInstanceId, const PresetId& presetId) override;
-    void saveCurrentAsPreset(const EffectInstanceId& effectInstanceId) override;
+    muse::ContextInject<muse::IInteractive> interactive{ this };
+    muse::ContextInject<IEffectPresetsProvider> presetsProvider{ this };
+    muse::ContextInject<IEffectInstancesRegister> instancesRegister{ this };
+
+public:
+    EffectPresetsScenario(const muse::modularity::ContextPtr& ctx)
+        : muse::Contextable(ctx) {}
+>>>>>>> upstream/master
+
+    void loadPreset(const EffectInstanceId& effectInstanceId, const PresetId& presetId) override;
+    void savePresetAs(const EffectInstanceId& effectInstanceId) override;
+    void savePreset(const EffectInstanceId& effectInstanceId, const PresetId& presetId) override;
     void deletePreset(const EffectId& effectId, const PresetId& presetId) override;
     void importPreset(const EffectInstanceId& effectInstanceId) override;
     void exportPreset(const EffectInstanceId& effectInstanceId) override;

@@ -32,6 +32,10 @@
 #include "au3-network-manager/Request.h"
 
 #include "au3-string-utils/CodeConversions.h"
+<<<<<<< HEAD
+=======
+#include <rapidjson/document.h>
+>>>>>>> upstream/master
 
 namespace audacity::cloud::audiocom {
 namespace {

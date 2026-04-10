@@ -7,7 +7,7 @@
 #include "ieffectsprovider.h"
 #include "ieffectsconfiguration.h"
 #include "effectstypes.h"
-#include "realtimeeffectviewerdialogmodel.h"
+#include "effectsviewtypes.h"
 
 #include "framework/global/modularity/ioc.h"
 #include "framework/global/async/asyncable.h"
@@ -15,7 +15,7 @@
 #include <QObject>
 
 namespace au::effects {
-class DestructiveEffectViewerDialogModel : public QObject, public muse::Injectable, public muse::async::Asyncable
+class DestructiveEffectViewerDialogModel : public QObject, public muse::Contextable, public muse::async::Asyncable
 {
     Q_OBJECT
 
@@ -25,9 +25,16 @@ class DestructiveEffectViewerDialogModel : public QObject, public muse::Injectab
     Q_PROPERTY(EffectFamily effectFamily READ effectFamily NOTIFY effectFamilyChanged FINAL)
     Q_PROPERTY(ViewerComponentType viewerComponentType READ viewerComponentType NOTIFY viewerComponentTypeChanged FINAL)
 
+<<<<<<< HEAD
     muse::Inject<IEffectInstancesRegister> instancesRegister;
     muse::Inject<IEffectsProvider> effectsProvider;
     muse::Inject<IEffectsConfiguration> configuration;
+=======
+    muse::GlobalInject<IEffectsConfiguration> configuration;
+
+    muse::ContextInject<IEffectInstancesRegister> instancesRegister{ this };
+    muse::ContextInject<IEffectsProvider> effectsProvider{ this };
+>>>>>>> upstream/master
 
 public:
     explicit DestructiveEffectViewerDialogModel(QObject* parent = nullptr);
@@ -35,6 +42,8 @@ public:
 
     Q_INVOKABLE void load();
     Q_INVOKABLE void refreshUIMode();
+
+    Q_INVOKABLE void rollbackSettings();
 
     QString title() const;
     int instanceId() const;
@@ -51,8 +60,12 @@ signals:
     void viewerComponentTypeChanged();
 
 private:
+    void captureInitialSettings();
+
     QString m_title;
     int m_instanceId = -1;
     EffectId m_effectId;
+
+    std::shared_ptr<EffectSettings> m_initialSettings;
 };
 }

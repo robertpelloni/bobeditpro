@@ -39,15 +39,23 @@ PreferencesPage {
         spacing: root.sectionsSpacing
 
         AutomaticUpdateSection {
+            id: automaticUpdateSection
+
             isAppUpdatable: updateModel.isAppUpdatable()
             needCheckForNewAppVersion: updateModel.needCheckForNewAppVersion
-            museScorePrivacyPolicyUrl: updateModel.museScorePrivacyPolicyUrl()
+            privacyPolicyUrl: updateModel.privacyPolicyUrl()
 
             navigation.section: root.navigationSection
             navigation.order: root.navigationOrderStart + 1
 
             onNeedCheckForNewAppVersionChangeRequested: function(check) {
                 updateModel.needCheckForNewAppVersion = check
+            }
+
+            onFocusChanged: {
+                if (activeFocus) {
+                    root.ensureContentVisibleRequested(Qt.rect(x, y, width, height))
+                }
             }
         }
     }

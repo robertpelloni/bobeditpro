@@ -19,20 +19,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#ifndef AU_PROJECT_IRECENTFILESCONTROLLER_H
-#define AU_PROJECT_IRECENTFILESCONTROLLER_H
+#pragma once
 
-#include "modularity/imoduleinterface.h"
+#include "framework/global/modularity/imoduleinterface.h"
 
-#include "async/notification.h"
-#include "async/promise.h"
+#include "framework/global/async/notification.h"
 
 #include "types/projecttypes.h"
 
 class QPixmap;
 
 namespace au::project {
+<<<<<<< HEAD
 class IRecentFilesController : MODULE_EXPORT_INTERFACE
+=======
+class IRecentFilesController : MODULE_GLOBAL_INTERFACE
+>>>>>>> upstream/master
 {
     INTERFACE_ID(IRecentFilesProvider)
 
@@ -45,9 +47,5 @@ public:
     virtual void prependRecentFile(const RecentFile& file) = 0;
     virtual void moveRecentFile(const muse::io::path_t& before, const RecentFile& after) = 0;
     virtual void clearRecentFiles() = 0;
-
-    virtual muse::async::Promise<QPixmap> thumbnail(const muse::io::path_t& filePath) const = 0;
 };
 }
-
-#endif // AU_PROJECT_IRECENTFILESCONTROLLER_H

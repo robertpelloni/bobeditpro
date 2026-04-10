@@ -3,9 +3,10 @@
 */
 #include "effectsactionscontroller.h"
 #include "effects/effects_base/effectstypes.h"
+#include "effects/effects_base/internal/effectsutils.h"
 #include "effectsuiactions.h"
-#include "playback/iplayer.h"
 
+#include "spectrogram/spectrogramtypes.h"
 #include "wx/string.h"
 
 #include "log.h"
@@ -26,6 +27,22 @@ void EffectsActionsController::init()
     effectExecutionScenario()->lastProcessorIsNowAvailable().onNotify(this, [this] {
         m_canReceiveActionsChanged.send({ "repeat-last-effect" });
     });
+
+    frequencySelectionController()->frequencySelectionChanged().onReceive(this, [this](bool complete) {
+        if (complete) {
+            notifyAboutSpectralEffectsAvailability();
+        }
+    });
+}
+
+void EffectsActionsController::notifyAboutSpectralEffectsAvailability()
+{
+    ActionCodeList codes;
+    const auto spectralEffects = spectralEffectsRegister()->spectralEffects();
+    for (const auto& spectralEffect : spectralEffects) {
+        codes.push_back(spectralEffect.action);
+    }
+    m_canReceiveActionsChanged.send(codes);
 }
 
 void EffectsActionsController::registerActions()
@@ -43,7 +60,8 @@ void EffectsActionsController::registerActions()
 
     // presets
     dispatcher()->reg(this, ActionQuery("action://effects/presets/apply"), this, &EffectsActionsController::applyPreset);
-    dispatcher()->reg(this, ActionQuery("action://effects/presets/save"), this, &EffectsActionsController::saveAsPreset);
+    dispatcher()->reg(this, ActionQuery("action://effects/presets/save"), this, &EffectsActionsController::savePreset);
+    dispatcher()->reg(this, ActionQuery("action://effects/presets/save_as"), this, &EffectsActionsController::savePresetAs);
     dispatcher()->reg(this, ActionQuery("action://effects/presets/delete"), this, &EffectsActionsController::deletePreset);
     dispatcher()->reg(this, ActionQuery("action://effects/presets/import"), this, &EffectsActionsController::importPreset);
     dispatcher()->reg(this, ActionQuery("action://effects/presets/export"), this, &EffectsActionsController::exportPreset);
@@ -81,17 +99,28 @@ void EffectsActionsController::applyPreset(const muse::actions::ActionQuery& q)
 
     EffectInstanceId effectInstanceId = q.param("instanceId").toInt();
     PresetId presetId = q.param("presetId").toString();
-    presetsScenario()->applyPreset(effectInstanceId, presetId);
+    presetsScenario()->loadPreset(effectInstanceId, presetId);
 }
 
-void EffectsActionsController::saveAsPreset(const ActionQuery& q)
+void EffectsActionsController::savePresetAs(const ActionQuery& q)
 {
     IF_ASSERT_FAILED(q.contains("instanceId")) {
         return;
     }
 
     EffectInstanceId effectInstanceId = q.param("instanceId").toInt();
-    presetsScenario()->saveCurrentAsPreset(effectInstanceId);
+    presetsScenario()->savePresetAs(effectInstanceId);
+}
+
+void EffectsActionsController::savePreset(const ActionQuery& q)
+{
+    IF_ASSERT_FAILED(q.contains("instanceId") && q.contains("presetId")) {
+        return;
+    }
+
+    const EffectInstanceId effectInstanceId = q.param("instanceId").toInt();
+    const PresetId presetId = q.param("presetId").toString();
+    presetsScenario()->savePreset(effectInstanceId, presetId);
 }
 
 void EffectsActionsController::deletePreset(const ActionQuery& q)
@@ -142,6 +171,15 @@ bool EffectsActionsController::canReceiveAction(const muse::actions::ActionCode&
     if (code == "repeat-last-effect") {
         return effectExecutionScenario()->lastProcessorIsAvailable();
     } else {
+        const auto spectralEffects = spectralEffectsRegister()->spectralEffects();
+        const auto it = std::find_if(spectralEffects.begin(), spectralEffects.end(), [&code](const auto& spectralEffect) {
+            return spectralEffect.action == code;
+        });
+        if (it != spectralEffects.end()) {
+            const spectrogram::FrequencySelection selection = frequencySelectionController()->frequencySelection();
+            return frequencySelectionController()->showsSpectrogram(selection.trackId) && selection.isValid();
+        }
+
         return true;
     }
 }

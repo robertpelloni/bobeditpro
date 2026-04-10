@@ -13,7 +13,11 @@ using namespace muse;
 using namespace muse::io;
 
 MetadataModel::MetadataModel(QObject* parent)
+<<<<<<< HEAD
     : QAbstractListModel(parent)
+=======
+    : QAbstractListModel(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
+>>>>>>> upstream/master
 {
 }
 

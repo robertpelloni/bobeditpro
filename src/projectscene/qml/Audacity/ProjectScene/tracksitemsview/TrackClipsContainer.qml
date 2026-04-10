@@ -17,11 +17,17 @@ TrackItemsContainer {
     property bool rightTrimPressedButtons: false
     property real dbRange: -60.0
     property color trackColor
+<<<<<<< HEAD
+=======
+    required property int headerHeight
+    required property bool isAutomationEnabled
+>>>>>>> upstream/master
     required property bool isWaveformViewVisible
     required property bool isSpectrogramViewVisible
 
     signal movePreviewClip(int x, int width, string title)
     signal clearPreviewClip
+    signal trackMousePositionChanged(real x, real y)
 
     QtObject {
         id: prv
@@ -197,7 +203,7 @@ TrackItemsContainer {
                         width: Math.max(3, itemData.width)
                         x: itemData.x
 
-                        asynchronous: true
+                        asynchronous: false
 
                         sourceComponent: {
                             if ((itemData.x + itemData.width) < (0 - clipsModel.cacheBufferPx)) {
@@ -226,6 +232,7 @@ TrackItemsContainer {
                                 property int index: loader.index
 
                                 clipColor: itemData.color
+                                clipSelectedColor: itemData.selectedColor
                                 collapsed: root.trackViewState.isTrackCollapsed
                             }
                         }
@@ -244,6 +251,7 @@ TrackItemsContainer {
 
                                 title: itemData.title
                                 clipColor: itemData.color
+                                clipSelectedColor: itemData.selectedColor
                                 groupId: itemData.groupId
                                 clipKey: itemData.key
                                 clipTime: itemData.time
@@ -261,6 +269,7 @@ TrackItemsContainer {
                                 dbRange: root.dbRange
                                 isLinear: root.trackViewState.isLinear
                                 displayBounds: root.trackViewState.displayBounds
+                                isAutomationEnabled: root.isAutomationEnabled
                                 isWaveformViewVisible: root.isWaveformViewVisible
                                 isSpectrogramViewVisible: root.isSpectrogramViewVisible
                                 multiSampleEdit: clipsContainer.multiSampleEdit
@@ -533,6 +542,54 @@ TrackItemsContainer {
                 }
             }
 
+<<<<<<< HEAD
+=======
+            TrackSpectralSelectionContainer {
+                id: spectralSelectionContainer
+
+                visible: root.isSpectrogramViewVisible
+
+                y: root.headerHeight + (root.isWaveformViewVisible ? prv.viewHeight : 0)
+                height: prv.viewHeight
+                anchors.left: parent.left
+                anchors.right: parent.right
+                z: 1
+
+                clip: true
+
+                canvas: root.canvas
+                trackId: root.trackId
+                trackTitle: root.trackTitle
+                sampleRate: root.sampleRate
+                selectionInProgress: root.selectionInProgress
+                selectionStartPosition: root.context.selectionStartPosition
+                selectionEndPosition: root.context.selectionEndPosition
+                selectionStartFrequency: root.selectionStartFrequency
+                selectionEndFrequency: root.selectionEndFrequency
+                selectionStartTime: root.context.selectionStartTime
+                selectionEndTime: root.context.selectionEndTime
+                channelHeightRatio: channelSplitter.channelHeightRatio
+                isStereo: clipsModel.isStereo
+                selectionController: root.selectionController
+
+                onSelectionHorizontalResize: function (x1, x2, completed) {
+                    root.selectionResize(x1, x2, completed)
+                    if (completed) {
+                        root.seekToX(x1)
+                    }
+                }
+
+                onVerticalDragActiveChanged: {
+                    root.verticalSelectionEditInProgress = verticalDragActive
+                }
+
+                onMousePositionChanged: function (x, y) {
+                    let position = mapToItem(root, Qt.point(x, y))
+                    root.trackMousePositionChanged(position.x, position.y)
+                }
+            }
+
+>>>>>>> upstream/master
             //! clip
             ChannelSplitter {
                 id: channelSplitter

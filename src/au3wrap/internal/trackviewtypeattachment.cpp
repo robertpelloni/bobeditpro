@@ -3,6 +3,8 @@
  */
 #include "trackviewtypeattachment.h"
 
+#include "au3-wave-track/WaveTrack.h"
+
 namespace au::au3 {
 static const AttachedTrackObjects::RegisteredFactory keyTrackViewType{
     [](Au3Track& track) -> std::shared_ptr<TrackViewTypeAttachment> { return std::make_shared<TrackViewTypeAttachment>(track); }

@@ -57,6 +57,12 @@ PreferencesPage {
             onResetToDefaultRequested: {
                 preferencesModel.resetToDefault()
             }
+
+            onFocusChanged: {
+                if (activeFocus) {
+                    root.ensureContentVisibleRequested(Qt.rect(x, y, width, height))
+                }
+            }
         }
 
         ValueList {

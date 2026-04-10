@@ -20,6 +20,7 @@ enum class SelectionDirection {
     Down
 };
 
+<<<<<<< HEAD
 class TrackNavigationController : public ITrackNavigationController, public muse::actions::Actionable, public muse::async::Asyncable
 {
     muse::Inject<muse::actions::IActionsDispatcher> dispatcher;
@@ -27,6 +28,21 @@ class TrackNavigationController : public ITrackNavigationController, public muse
     muse::Inject<muse::ui::INavigationController> navigationController;
 
 public:
+=======
+class TrackNavigationController : public ITrackNavigationController, public muse::actions::Actionable, public muse::async::Asyncable,
+    public muse::Contextable
+{
+    muse::ContextInject<muse::actions::IActionsDispatcher> dispatcher{ this };
+    muse::ContextInject<muse::ui::INavigationController> navigationController{ this };
+    muse::ContextInject<au::context::IGlobalContext> globalContext{ this };
+    muse::ContextInject<au::trackedit::ISelectionController> selectionController{ this };
+    muse::ContextInject<au::trackedit::ITrackeditInteraction> trackeditInteraction{ this };
+
+public:
+    TrackNavigationController(const muse::modularity::ContextPtr& ctx)
+        : muse::Contextable(ctx) {}
+
+>>>>>>> upstream/master
     void init();
     void focusTrackByIndex(const muse::actions::ActionData& args) override;
     void focusPrevTrack() override;

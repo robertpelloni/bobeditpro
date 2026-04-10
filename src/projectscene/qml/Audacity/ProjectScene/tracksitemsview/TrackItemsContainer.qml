@@ -12,6 +12,7 @@ Item {
     property NavigationPanel navigationPanel: null
 
     property var trackId: null
+    property string trackTitle: ""
     property var context: null
     property var canvas: null
     property var container: null
@@ -28,6 +29,16 @@ Item {
     property bool selectionInProgress: false
     property bool hover: false
 
+<<<<<<< HEAD
+=======
+    property bool isLeadInRecordingTrack: false
+    property double leadInRecordingStartTime: 0
+
+    required property bool selectionInProgress
+    required property bool selectionEditInProgress
+    required property bool verticalSelectionEditInProgress
+
+>>>>>>> upstream/master
     property alias bottomSeparatorHeight: sep.height
 
     property alias contentItem: contentLoader.item
@@ -47,7 +58,11 @@ Item {
     signal updateMoveActive(bool completed)
 
     signal seekToX(var x)
+<<<<<<< HEAD
     signal insureVerticallyVisible(var top, var bottom)
+=======
+    signal insureVerticallyVisible
+>>>>>>> upstream/master
 
     signal handleTimeGuideline(real x, bool completed)
     signal triggerItemGuideline(real x, bool completed)
@@ -74,6 +89,40 @@ Item {
         anchors.fill: parent
         z: 1
         sourceComponent: root.contentComponent
+    }
+
+    // Lead-in recording start position indicator
+    Rectangle {
+        id: leadInRecordingLine
+
+        function updatePosition() {
+            if (root.context) {
+                x = root.context.timeToPosition(root.leadInRecordingStartTime)
+            }
+        }
+
+        anchors.top: root.top
+        anchors.bottom: root.bottom
+        anchors.bottomMargin: sep.thickness
+
+        width: 2
+        color: ui.theme.recordColor
+        opacity: 0.8
+        visible: root.isLeadInRecordingTrack
+        z: 2
+
+        onVisibleChanged: if (visible) updatePosition()
+
+        Connections {
+            target: root.context
+            function onFrameStartTimeChanged() { leadInRecordingLine.updatePosition() }
+            function onFrameEndTimeChanged() { leadInRecordingLine.updatePosition() }
+        }
+
+        Connections {
+            target: root
+            function onLeadInRecordingStartTimeChanged() { leadInRecordingLine.updatePosition() }
+        }
     }
 
     // Selection highlight

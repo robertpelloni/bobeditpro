@@ -13,12 +13,21 @@
 #include "shortcuts/ishortcutsregister.h"
 
 namespace au::projectscene {
+<<<<<<< HEAD
 class TapHoldShortcut : public QObject, muse::async::Asyncable
 {
     Q_OBJECT
 
     muse::Inject<muse::shortcuts::IShortcutsRegister> shortcutsRegister;
     muse::Inject<context::IUiContextResolver> uicontextResolver;
+=======
+class TapHoldShortcut : public QObject, public muse::Contextable, public muse::async::Asyncable
+{
+    Q_OBJECT
+
+    muse::ContextInject<muse::shortcuts::IShortcutsRegister> shortcutsRegister{ this };
+    muse::ContextInject<context::IUiContextResolver> uicontextResolver{ this };
+>>>>>>> upstream/master
 
 public:
     explicit TapHoldShortcut(const std::string& action, QObject* target = nullptr);

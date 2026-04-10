@@ -68,7 +68,7 @@ set( LIBRARIES
 #   au3-wx-wrappers # not yet used in AU4
 #   au3-shuttlegui # not yet used in AU4
 #   au3-wx-init # not yet used in AU4
-#   au3-time-track # not yet used in AU4
+   au3-time-track
    au3-snapping
 #   au3-vst # not yet used in AU4
    au3-playable-track
@@ -79,8 +79,12 @@ set( LIBRARIES
    au3-menus
 #   au3-note-track # not yet used in AU4
    au3-viewport
+<<<<<<< HEAD
 #   au3-music-information-retrieval # not yet used in AU4
 #   au3-crypto # not yet used in AU4
+=======
+   au3-crypto
+>>>>>>> upstream/master
    au3-fft
 #   au3-concurrency # not yet used in AU4
    au3-sqlite-helpers
@@ -90,6 +94,7 @@ set( LIBRARIES
    au3-builtin-effects
    au3-label-track
    au3-wave-track-fft
+   au3-musehub
 )
 
 # Conditional libraries based on AU4 build options
@@ -107,6 +112,7 @@ if (AU_MODULE_EFFECTS_AUDIO_UNIT)
    list( APPEND LIBRARIES au3-audio-unit)
 endif()
 
+<<<<<<< HEAD
 # AU3-specific conditional libraries (not used in AU4 yet)
 # These use ${_OPT} variables from AU3's build system
 if ( DEFINED ${_OPT}has_networking AND ${_OPT}has_networking )
@@ -119,6 +125,18 @@ endif()
 
 if ( DEFINED ${_OPT}has_audiocom_upload AND ${_OPT}has_audiocom_upload)
    list( APPEND LIBRARIES au3-cloud-audiocom)
+=======
+if (AU_MODULE_EFFECTS_NYQUIST)
+   list( APPEND LIBRARIES au3-nyquist-effects )
+endif()
+
+# au3-network-manager is a general networking library used by au3-musehub
+# and other modules, so it must be built unconditionally.
+list( APPEND LIBRARIES au3-network-manager)
+
+if (AU_BUILD_CLOUD_AUDIOCOM)
+   list( APPEND LIBRARIES au3-url-schemes au3-cloud-audiocom)
+>>>>>>> upstream/master
 endif()
 
 if( DEFINED ${_OPT}has_crashreports AND ${_OPT}has_crashreports )
@@ -127,10 +145,6 @@ if( DEFINED ${_OPT}has_crashreports AND ${_OPT}has_crashreports )
    elseif( ${_OPT}crashreport_backend STREQUAL "crashpad" )
       list( APPEND LIBRARIES au3-crashpad-configurer )
    endif()
-endif()
-
-if ( DEFINED ${_OPT}use_nyquist AND ${_OPT}use_nyquist )
-   list( APPEND LIBRARIES au3-nyquist-effects )
 endif()
 
 if ( DEFINED ${_OPT}use_ladspa AND ${_OPT}use_ladspa )

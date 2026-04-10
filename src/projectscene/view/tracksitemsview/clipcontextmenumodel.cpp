@@ -3,7 +3,9 @@
 */
 #include "clipcontextmenumodel.h"
 
-#include "translation.h"
+#include "spectrogram/spectrogramtypes.h"
+#include "trackedit/dom/track.h"
+#include "framework/global/translation.h"
 
 using namespace au::projectscene;
 using namespace muse::uicomponents;
@@ -43,6 +45,7 @@ void ClipContextMenuModel::load()
         makeSeparator(),
         makeItemWithArg("action://trackedit/cut"),
         makeItemWithArg("action://trackedit/copy"),
+        makeItemWithArg("action://delete"),
         makeItemWithArg("duplicate"),
         makeSeparator(),
         makeItemWithArg("split"),
@@ -54,6 +57,27 @@ void ClipContextMenuModel::load()
         makeItemWithArg("clip-render-pitch-speed"),
     };
 
+    const auto project = globalContext()->currentProject();
+    if (project && project->viewState()) {
+        muse::ValCh<trackedit::TrackViewType> valCh = project->viewState()->trackViewType(m_clipKey.trackId());
+
+        if (valCh.val == trackedit::TrackViewType::Spectrogram || valCh.val == trackedit::TrackViewType::WaveformAndSpectrogram) {
+            items.push_back(makeSeparator());
+            items.push_back(makeMenuItem(spectrogram::TRACK_SPECTROGRAM_SETTINGS_ACTION));
+        }
+
+        valCh.ch.onReceive(this, [this](auto) { load(); }, Mode::SetReplace);
+    }
+
+    trackedit::ITrackeditProjectPtr prj = globalContext()->currentTrackeditProject();
+    if (prj) {
+        prj->clipList(m_clipKey.trackId()).onItemChanged(this, [this](const trackedit::Clip& clip) {
+            if (clip.key == m_clipKey.key) {
+                load();
+            }
+        }, muse::async::Asyncable::Mode::SetReplace);
+    }
+
     setItems(items);
 
     updateColorCheckedState();
@@ -62,7 +86,22 @@ void ClipContextMenuModel::load()
 
 void ClipContextMenuModel::handleMenuItem(const QString& itemId)
 {
-    AbstractMenuModel::handleMenuItem(itemId);
+    if (itemId == spectrogram::TRACK_SPECTROGRAM_SETTINGS_ACTION) {
+        const auto project = globalContext()->currentProject();
+        IF_ASSERT_FAILED(project) {
+            return;
+        }
+        const auto trackId = m_clipKey.trackId();
+        const auto track = project->trackeditProject()->track(trackId);
+        IF_ASSERT_FAILED(track) {
+            return;
+        }
+        const muse::String trackTitle = track->title;
+        auto args = muse::actions::ActionData::make_arg2(trackId, trackTitle);
+        dispatcher()->dispatch(spectrogram::TRACK_SPECTROGRAM_SETTINGS_ACTION, std::move(args));
+    } else {
+        AbstractMenuModel::handleMenuItem(itemId);
+    }
 }
 
 ClipKey ClipContextMenuModel::clipKey() const
@@ -120,16 +159,16 @@ void ClipContextMenuModel::updateColorCheckedState()
         MenuItem& item = findItem(ActionCode(action));
         ActionQuery query(action);
 
-        if ((!clip.hasCustomColor && action == m_colorChangeActionCodeList.at(0))
-            || (clip.hasCustomColor && query.param("color").toString() == clip.color.toString())) {
-            auto state = item.state();
-            state.checked = true;
-            item.setState(state);
-        } else {
-            auto state = item.state();
-            state.checked = false;
-            item.setState(state);
+        bool checked = false;
+        if (clip.colorIndex == trackedit::CLIP_COLOR_INDEX_NONE && action == m_colorChangeActionCodeList.at(0)) {
+            checked = true;
+        } else if (query.contains("colorindex") && query.param("colorindex").toInt() == clip.colorIndex) {
+            checked = true;
         }
+
+        auto state = item.state();
+        state.checked = checked;
+        item.setState(state);
     }
 }
 
@@ -155,11 +194,11 @@ MenuItemList ClipContextMenuModel::makeClipColourItems()
     items << makeSeparator();
     m_colorChangeActionCodeList.push_back("action://trackedit/clip/change-color-auto");
 
-    const auto& colors = projectSceneConfiguration()->clipColors();
-    for (const auto& color : colors) {
-        items << makeMenuItem(makeClipColorChangeAction(color.second).toString(),
-                              muse::TranslatableString("clip", muse::String::fromStdString(color.first)));
-        m_colorChangeActionCodeList.push_back(makeClipColorChangeAction(color.second).toString());
+    const auto& colorInfos = projectSceneConfiguration()->clipColorInfos();
+    for (const auto& info : colorInfos) {
+        items << makeMenuItem(makeClipColorChangeAction(info.index).toString(),
+                              muse::TranslatableString("clip", muse::String::fromStdString(info.name)));
+        m_colorChangeActionCodeList.push_back(makeClipColorChangeAction(info.index).toString());
     }
 
     return items;

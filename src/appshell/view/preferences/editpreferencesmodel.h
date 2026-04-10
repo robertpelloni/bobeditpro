@@ -14,14 +14,26 @@
 #include "trackedit/itrackeditconfiguration.h"
 
 namespace au::appshell {
+<<<<<<< HEAD:src/appshell/view/preferences/editpreferencesmodel.h
 class EditPreferencesModel : public QObject, public muse::async::Asyncable
+=======
+class EditPreferencesModel : public QObject, public muse::async::Asyncable, public muse::Contextable
+>>>>>>> upstream/master:src/preferences/qml/Audacity/Preferences/editpreferencesmodel.h
 {
     Q_OBJECT
 
+<<<<<<< HEAD:src/appshell/view/preferences/editpreferencesmodel.h
     muse::Inject<au::trackedit::ITrackeditConfiguration> trackeditConfiguration;
     muse::Inject<au::projectscene::IProjectSceneConfiguration> projectsceneConfiguration;
     muse::Inject<muse::workspace::IWorkspaceManager> workspacesManager;
     muse::Inject<au::effects::IEffectsConfiguration> effectsConfiguration;
+=======
+    muse::GlobalInject<au::trackedit::ITrackeditConfiguration> trackeditConfiguration;
+    muse::GlobalInject<au::projectscene::IProjectSceneConfiguration> projectsceneConfiguration;
+    muse::GlobalInject<au::effects::IEffectsConfiguration> effectsConfiguration;
+
+    muse::ContextInject<muse::workspace::IWorkspaceManager> workspacesManager { this };
+>>>>>>> upstream/master:src/preferences/qml/Audacity/Preferences/editpreferencesmodel.h
 
     Q_PROPERTY(bool applyEffectToAllAudio READ applyEffectToAllAudio NOTIFY applyEffectToAllAudioChanged)
     Q_PROPERTY(
@@ -34,6 +46,9 @@ class EditPreferencesModel : public QObject, public muse::async::Asyncable
     Q_PROPERTY(bool pasteAsNewClip READ pasteAsNewClip NOTIFY pasteAsNewClipChanged)
     Q_PROPERTY(
         bool askBeforeConvertingToMonoOrStereo READ askBeforeConvertingToMonoOrStereo WRITE setAskBeforeConvertingToMonoOrStereo NOTIFY askBeforeConvertingToMonoOrStereoChanged)
+    Q_PROPERTY(int zoomPreset1 READ zoomPreset1 NOTIFY zoomPreset1Changed)
+    Q_PROPERTY(int zoomPreset2 READ zoomPreset2 NOTIFY zoomPreset2Changed)
+    Q_PROPERTY(QVariantList zoomPresetList READ zoomPresetList CONSTANT)
 
 public:
     explicit EditPreferencesModel(QObject* parent = nullptr);
@@ -68,6 +83,12 @@ public:
     bool askBeforeConvertingToMonoOrStereo() const;
     void setAskBeforeConvertingToMonoOrStereo(bool value);
 
+    int zoomPreset1() const;
+    Q_INVOKABLE void setZoomPreset1(int preset);
+    int zoomPreset2() const;
+    Q_INVOKABLE void setZoomPreset2(int preset);
+    QVariantList zoomPresetList() const;
+
     void asymmetricStereoHeightWorkspacesCleanUp();
 
 signals:
@@ -80,5 +101,7 @@ signals:
     void asymmetricWorkspacesChanged();
     void pasteAsNewClipChanged();
     void askBeforeConvertingToMonoOrStereoChanged();
+    void zoomPreset1Changed();
+    void zoomPreset2Changed();
 };
 }

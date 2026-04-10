@@ -15,6 +15,8 @@
 #include "trackedit/iprojecthistory.h"
 #include "trackedit/iselectioncontroller.h"
 #include "au3wrap/au3types.h"
+#include "spectrogram/iglobalspectrogramconfiguration.h"
+#include "spectrogram/ifrequencyselectioncontroller.h"
 
 #include <optional>
 
@@ -25,6 +27,7 @@ class EffectBase;
 class EffectInstance;
 class SimpleEffectSettingsAccess;
 namespace au::effects {
+<<<<<<< HEAD
 class EffectExecutionScenario : public IEffectExecutionScenario
 {
     muse::Inject<context::IGlobalContext> globalContext;
@@ -37,6 +40,25 @@ class EffectExecutionScenario : public IEffectExecutionScenario
 
 public:
     EffectExecutionScenario() = default;
+=======
+class EffectExecutionScenario : public IEffectExecutionScenario, public muse::Contextable
+{
+    muse::GlobalInject<IEffectsConfiguration> effectsConfiguration;
+    muse::GlobalInject<spectrogram::IGlobalSpectrogramConfiguration> spectrogramConfiguration;
+
+    muse::ContextInject<context::IGlobalContext> globalContext{ this };
+    muse::ContextInject<IEffectsProvider> effectsProvider{ this };
+    muse::ContextInject<IEffectInstancesRegister> effectInstancesRegister{ this };
+    muse::ContextInject<trackedit::ISelectionController> selectionController{ this };
+    muse::ContextInject<muse::IInteractive> interactive{ this };
+    muse::ContextInject<trackedit::IProjectHistory> projectHistory{ this };
+    muse::ContextInject<trackedit::ITrackNavigationController> trackNavigationController { this };
+    muse::ContextInject<spectrogram::IFrequencySelectionController> frequencySelectionController { this };
+
+public:
+    EffectExecutionScenario(const muse::modularity::ContextPtr& ctx)
+        : muse::Contextable(ctx) {}
+>>>>>>> upstream/master
 
     muse::Ret performEffect(const EffectId& effectId) override;
     bool lastProcessorIsAvailable() const override;

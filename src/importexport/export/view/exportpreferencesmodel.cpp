@@ -4,8 +4,11 @@
 
 #include "exportpreferencesmodel.h"
 
-#include "io/fileinfo.h"
-#include "translation.h"
+#include "framework/global/io/fileinfo.h"
+#include "framework/global/translation.h"
+#include "framework/global/defer.h"
+
+#include "trackedit/trackeditutils.h"
 
 using namespace au::importexport;
 
@@ -60,10 +63,12 @@ const std::vector<int> DEFAULT_SAMPLE_RATE_LIST {
 };
 
 ExportPreferencesModel::ExportPreferencesModel(QObject* parent)
+<<<<<<< HEAD
     : QObject(parent)
+=======
+    : QObject(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
+>>>>>>> upstream/master
 {
-    //! NOTE: init m_sampleRateMapping
-    exportSampleRateList();
 }
 
 ExportPreferencesModel::~ExportPreferencesModel()
@@ -126,6 +131,7 @@ void ExportPreferencesModel::init()
         emit exportSampleRateChanged();
     });
 
+    updateExportChannels();
     updateCurrentSampleRate();
 }
 
@@ -281,7 +287,16 @@ QStringList ExportPreferencesModel::formatsList() const
 
 ExportChannelsPref::ExportChannels ExportPreferencesModel::exportChannels() const
 {
+<<<<<<< HEAD
     return ExportChannelsPref::ExportChannels(exportConfiguration()->exportChannels());
+=======
+    if (type == exportChannelsType()) {
+        return;
+    }
+
+    exportConfiguration()->setExportChannelsType(static_cast<int>(type));
+    emit exportChannelsTypeChanged();
+>>>>>>> upstream/master
 }
 
 void ExportPreferencesModel::setExportChannels(ExportChannelsPref::ExportChannels exportChannels)
@@ -421,16 +436,36 @@ void ExportPreferencesModel::updateExportChannels()
 {
     int maxChannels = exporter()->maxChannels();
 
+<<<<<<< HEAD
     if (static_cast<int>(exportChannels()) > maxChannels) {
         setExportChannels(ExportChannelsPref::ExportChannels(maxChannels));
+=======
+    const auto project = globalContext()->currentTrackeditProject();
+    if (project) {
+        const bool hasStereo = au::trackedit::utils::hasStereoTrack(project->trackList());
+        ExportChannelsPref::ExportChannels recommended = hasStereo
+                                                         ? ExportChannelsPref::ExportChannels::STEREO
+                                                         : ExportChannelsPref::ExportChannels::MONO;
+
+        if (static_cast<int>(recommended) <= maxChannels) {
+            setExportChannelsType(recommended);
+            return;
+        }
+>>>>>>> upstream/master
     }
+
+    const auto fallback = maxChannels >= static_cast<int>(ExportChannelsPref::ExportChannels::STEREO)
+                          ? ExportChannelsPref::ExportChannels::STEREO
+                          : ExportChannelsPref::ExportChannels::MONO;
+
+    setExportChannelsType(fallback);
 }
 
 bool ExportPreferencesModel::verifyExportPossible()
 {
     muse::Ret directoryExists = fileSystem()->makePath(directoryPath());
     if (!directoryExists || directoryPath().isEmpty()) {
-        interactive()->error(muse::trc("export", "Export Audio"), muse::trc("export", "Unable to create destination folder"));
+        interactive()->error(muse::trc("export", "Export audio"), muse::trc("export", "Unable to create destination folder"));
         return false;
     }
 
@@ -456,7 +491,52 @@ QStringList ExportPreferencesModel::fileFilter()
 
 void ExportPreferencesModel::exportData()
 {
+<<<<<<< HEAD
     muse::Ret result = exporter()->exportData(filename().toStdString());
+=======
+    bool needToDisableMasterFx = needToDisableMasterFxBeforeExport();
+    if (needToDisableMasterFx) {
+        if (!warnAndDisableMasterFxBeforeExport()) {
+            return;
+        }
+    }
+
+    bool restoreMasterFx = needToDisableMasterFx;
+
+    const muse::Defer restoreMasterFxState([this, restoreMasterFx] {
+        if (restoreMasterFx) {
+            enableMasterFx();
+        }
+    });
+
+    muse::io::path_t directoryPath = exportConfiguration()->directoryPath();
+    muse::io::path_t filePath = directoryPath.appendingComponent(filename());
+
+    if (suffix(filePath).empty()) {
+        auto extensions = exporter()->formatExtensions(exportConfiguration()->currentFormat());
+        std::string defaultExtension;
+        if (!extensions.empty()) {
+            defaultExtension = extensions.front();
+        }
+
+        filePath = filePath.appendingSuffix(defaultExtension);
+    }
+
+    if (fileSystem()->exists(filePath)) {
+        const int overwriteBtn = int(muse::IInteractive::Button::CustomButton) + 1;
+        const auto question = muse::trc("export", "Do you want to overwrite?");
+        const auto btnText = muse::trc("export", "Overwrite");
+        muse::IInteractive::Result result = interactive()->questionSync("", question,
+                                                                        { muse::IInteractive::ButtonData(overwriteBtn, btnText),
+                                                                          interactive()->buttonData(muse::IInteractive::Button::Cancel)
+                                                                        });
+        if (result.button() != overwriteBtn) {
+            return;
+        }
+    }
+
+    muse::Ret result = exporter()->exportData(filePath);
+>>>>>>> upstream/master
     if (!result.success() && !result.text().empty()) {
         interactive()->error(muse::trc("export", "Export error"), result.text());
     }
@@ -480,4 +560,57 @@ bool ExportPreferencesModel::hasMetadata()
 int ExportPreferencesModel::optionsCount()
 {
     return exporter()->optionsCount();
+}
+
+bool ExportPreferencesModel::needToDisableMasterFxBeforeExport() const
+{
+    return masterFxEnabled() && customMappingEnabled();
+}
+
+void ExportPreferencesModel::enableMasterFx() const
+{
+    realtimeEffectService()->setTrackEffectsActive(effects::IRealtimeEffectService::masterTrackId, true);
+}
+
+bool ExportPreferencesModel::masterFxEnabled() const
+{
+    const auto stack = realtimeEffectService()->effectStack(effects::IRealtimeEffectService::masterTrackId);
+    if (!stack.has_value()
+        || stack->empty()
+        || !realtimeEffectService()->trackEffectsActive(effects::IRealtimeEffectService::masterTrackId)) {
+        return false;
+    }
+
+    return std::any_of(stack->begin(), stack->end(), [this](const auto& state) {
+        return realtimeEffectService()->isActive(state);
+    });
+}
+
+bool ExportPreferencesModel::customMappingEnabled() const
+{
+    return exportChannelsType() == ExportChannelsPref::ExportChannels::CUSTOM;
+}
+
+muse::Ret ExportPreferencesModel::warnAndDisableMasterFxBeforeExport() const
+{
+    auto continueBtn = interactive()->buttonData(muse::IInteractive::Button::Continue);
+    continueBtn.accent = true;
+    auto cancelBtn = interactive()->buttonData(muse::IInteractive::Button::Cancel);
+
+    const auto result = interactive()->questionSync(
+        muse::trc("export", "Export audio"),
+        muse::trc("export",
+                  "To export with custom channel mapping, master effects must be turned off temporarily.\n\n"
+                  "Master effects will be turned back on after export."),
+        { continueBtn, cancelBtn }, continueBtn.btn);
+
+    if (result.button() != continueBtn.btn) {
+        return muse::make_ret(muse::Ret::Code::Cancel);
+    }
+
+    if (masterFxEnabled()) {
+        realtimeEffectService()->setTrackEffectsActive(effects::IRealtimeEffectService::masterTrackId, false);
+    }
+
+    return muse::make_ok();
 }

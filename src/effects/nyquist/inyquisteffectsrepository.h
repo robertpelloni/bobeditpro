@@ -8,12 +8,13 @@
 #include "effects/effects_base/effectstypes.h"
 
 namespace au::effects {
-class INyquistEffectsRepository : MODULE_EXPORT_INTERFACE
+class INyquistEffectsRepository : MODULE_GLOBAL_INTERFACE
 {
     INTERFACE_ID(INyquistEffectsRepository)
 public:
     virtual ~INyquistEffectsRepository() = default;
 
     virtual EffectMetaList effectMetaList() const = 0;
+    virtual bool ensurePluginIsLoaded(const EffectId& effectId) const = 0;
 };
 }

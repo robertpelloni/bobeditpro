@@ -74,6 +74,7 @@
 #endif
 
 using namespace au::appshell;
+<<<<<<< HEAD
 using namespace au::appshell;
 using namespace mu;
 using namespace muse;
@@ -84,6 +85,10 @@ static void appshell_init_qrc()
 {
     Q_INIT_RESOURCE(appshell);
 }
+=======
+
+static const std::string mname("appshell");
+>>>>>>> upstream/master
 
 AppShellModule::AppShellModule()
 {
@@ -91,11 +96,12 @@ AppShellModule::AppShellModule()
 
 std::string AppShellModule::moduleName() const
 {
-    return "appshell";
+    return mname;
 }
 
 void AppShellModule::registerExports()
 {
+<<<<<<< HEAD
     m_applicationActionController = std::make_shared<ApplicationActionController>();
     m_applicationUiActions = std::make_shared<ApplicationUiActions>(m_applicationActionController);
     m_appShellConfiguration = std::make_shared<AppShellConfiguration>();
@@ -105,16 +111,22 @@ void AppShellModule::registerExports()
     ioc()->registerExport<IApplicationActionController>(moduleName(), m_applicationActionController);
     ioc()->registerExport<IStartupScenario>(moduleName(), new StartupScenario());
     ioc()->registerExport<ISessionsManager>(moduleName(), m_sessionsManager);
+=======
+    m_appShellConfiguration = std::make_shared<AppShellConfiguration>(muse::modularity::globalCtx());
+
+    globalIoc()->registerExport<IAppShellConfiguration>(mname, m_appShellConfiguration);
+>>>>>>> upstream/master
 
 #ifdef Q_OS_MAC
-    ioc()->registerExport<IAppMenuModelHook>(moduleName(), std::make_shared<MacOSAppMenuModelHook>());
+    globalIoc()->registerExport<IAppMenuModelHook>(mname, std::make_shared<MacOSAppMenuModelHook>());
 #else
-    ioc()->registerExport<IAppMenuModelHook>(moduleName(), std::make_shared<AppMenuModelHookStub>());
+    globalIoc()->registerExport<IAppMenuModelHook>(mname, std::make_shared<AppMenuModelHookStub>());
 #endif
 }
 
 void AppShellModule::resolveImports()
 {
+<<<<<<< HEAD
     auto ar = ioc()->resolve<ui::IUiActionsRegister>(moduleName());
     if (ar) {
         ar->reg(m_applicationUiActions);
@@ -196,18 +208,81 @@ void AppShellModule::onPreInit(const IApplication::RunMode& mode)
 }
 
 void AppShellModule::onInit(const IApplication::RunMode& mode)
+=======
+    auto ir = globalIoc()->resolve<muse::interactive::IInteractiveUriRegister>(mname);
+    if (ir) {
+        ir->registerPageUri(muse::Uri("audacity://home"));
+        ir->registerPageUri(muse::Uri("audacity://project"));
+        ir->registerPageUri(muse::Uri("audacity://publish"));
+        ir->registerPageUri(muse::Uri("audacity://devtools"));
+
+        ir->registerQmlUri(muse::Uri("audacity://about/audacity"), "Audacity.AppShell", "AboutDialog");
+        ir->registerQmlUri(muse::Uri("audacity://firstLaunchSetup"), "Audacity.AppShell", "FirstLaunchSetupDialog");
+        ir->registerQmlUri(muse::Uri("audacity://signin/audiocom"), "Audacity.AppShell", "SigninAudiocomDialog");
+        ir->registerQmlUri(muse::Uri("audacity://welcomedialog"), "Audacity.AppShell", "WelcomeDialog");
+    }
+}
+
+void AppShellModule::onInit(const muse::IApplication::RunMode& mode)
+>>>>>>> upstream/master
 {
     if (mode == IApplication::RunMode::AudioPluginRegistration) {
         return;
     }
 
     m_appShellConfiguration->init();
+}
+
+muse::modularity::IContextSetup* AppShellModule::newContext(const muse::modularity::ContextPtr& ctx) const
+{
+    return new AppShellContext(ctx);
+}
+
+// =====================================================
+// AppShellContext
+// =====================================================
+
+void AppShellContext::registerExports()
+{
+    m_applicationActionController = std::make_shared<ApplicationActionController>(iocContext());
+    m_applicationUiActions = std::make_shared<ApplicationUiActions>(iocContext(), m_applicationActionController);
+    m_sessionsManager = std::make_shared<SessionsManager>(iocContext());
+
+    ioc()->registerExport<IApplicationActionController>(mname, m_applicationActionController);
+    ioc()->registerExport<IStartupScenario>(mname, new StartupScenario(iocContext()));
+    ioc()->registerExport<ISessionsManager>(mname, m_sessionsManager);
+}
+
+void AppShellContext::onPreInit(const muse::IApplication::RunMode& mode)
+{
+    if (mode == muse::IApplication::RunMode::AudioPluginRegistration) {
+        return;
+    }
+
+    m_applicationActionController->preInit();
+}
+
+void AppShellContext::onInit(const muse::IApplication::RunMode& mode)
+{
+    if (mode == muse::IApplication::RunMode::AudioPluginRegistration) {
+        return;
+    }
+
     m_applicationActionController->init();
     m_applicationUiActions->init();
     m_sessionsManager->init();
+
+    auto ar = ioc()->resolve<muse::ui::IUiActionsRegister>(mname);
+    if (ar) {
+        ar->reg(m_applicationUiActions);
+    }
 }
 
+<<<<<<< HEAD
 void AppShellModule::onAllInited(const IApplication::RunMode& mode)
+=======
+void AppShellContext::onAllInited(const muse::IApplication::RunMode& mode)
+>>>>>>> upstream/master
 {
     if (mode == IApplication::RunMode::AudioPluginRegistration) {
         return;
@@ -219,7 +294,7 @@ void AppShellModule::onAllInited(const IApplication::RunMode& mode)
 #endif
 }
 
-void AppShellModule::onDeinit()
+void AppShellContext::onDeinit()
 {
     m_sessionsManager->deinit();
 }

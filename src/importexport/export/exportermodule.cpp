@@ -17,6 +17,8 @@
 using namespace au::importexport;
 using namespace muse;
 
+static const std::string mname("exporter");
+
 static void exporter_init_qrc()
 {
     Q_INIT_RESOURCE(exporter);
@@ -28,23 +30,29 @@ ExporterModule::ExporterModule()
 
 std::string ExporterModule::moduleName() const
 {
-    return "exporter";
+    return mname;
 }
 
 void ExporterModule::registerExports()
 {
+<<<<<<< HEAD
     m_exporter = std::make_shared<Au3Exporter>();
+=======
+>>>>>>> upstream/master
     m_configuration = std::make_shared<ExportConfiguration>();
     m_ffmpegOptionsAccessor = std::make_shared<Au3FFmpegOptionsAccessor>();
 
-    ioc()->registerExport<IExporter>(moduleName(), m_exporter);
-    ioc()->registerExport<IExportConfiguration>(moduleName(), m_configuration);
-    ioc()->registerExport<IFFmpegOptionsAccessor>(moduleName(), m_ffmpegOptionsAccessor);
+    globalIoc()->registerExport<IExportConfiguration>(mname, m_configuration);
+    globalIoc()->registerExport<IFFmpegOptionsAccessor>(mname, m_ffmpegOptionsAccessor);
 }
 
 void ExporterModule::resolveImports()
 {
+<<<<<<< HEAD
     auto ir = ioc()->resolve<muse::ui::IInteractiveUriRegister>(moduleName());
+=======
+    auto ir = globalIoc()->resolve<muse::interactive::IInteractiveUriRegister>(mname);
+>>>>>>> upstream/master
     if (ir) {
         ir->registerQmlUri(Uri("audacity://project/export"), "Export/ExportDialog.qml");
         ir->registerQmlUri(Uri("audacity://project/export/ffmpeg"), "Export/CustomFFmpegDialog.qml");
@@ -72,5 +80,29 @@ void ExporterModule::onInit(const muse::IApplication::RunMode&)
 {
     m_ffmpegOptionsAccessor->init();
     m_configuration->init();
+}
+
+muse::modularity::IContextSetup* ExporterModule::newContext(const muse::modularity::ContextPtr& ctx) const
+{
+    return new ExporterContext(ctx);
+}
+
+// =====================================================
+// ExporterContext
+// =====================================================
+
+void ExporterContext::registerExports()
+{
+    m_exporter = std::make_shared<Au3Exporter>(iocContext());
+
+    ioc()->registerExport<IExporter>(mname, m_exporter);
+}
+
+void ExporterContext::onInit(const muse::IApplication::RunMode&)
+{
     m_exporter->init();
+}
+
+void ExporterContext::onDeinit()
+{
 }

@@ -12,11 +12,22 @@
 #include "au3wrap/au3types.h"
 
 namespace au::trackedit {
+<<<<<<< HEAD
 class Au3ProjectHistory : public IProjectHistory
 {
     muse::Inject<context::IGlobalContext> globalContext;
 
 public:
+=======
+class Au3ProjectHistory : public IProjectHistory, public muse::Contextable
+{
+    muse::ContextInject<context::IGlobalContext> globalContext { this };
+
+public:
+    Au3ProjectHistory(const muse::modularity::ContextPtr& ctx)
+        : muse::Contextable(ctx) {}
+
+>>>>>>> upstream/master
     void init() override;
 
     bool undoAvailable() const override;
@@ -44,7 +55,7 @@ public:
     size_t currentStateIndex() const override;
     const muse::TranslatableString lastActionNameAtIdx(size_t idx) const override;
 
-    muse::async::Notification historyChanged() const override;
+    muse::async::Channel<HistoryEvent> historyChanged() const override;
 
 private:
     au3::Au3Project& projectRef() const;
@@ -52,9 +63,7 @@ private:
     void doUndo();
     void doRedo();
 
-    void notifyAboutHistoryChanged();
-
-    muse::async::Notification m_historyChanged;
+    muse::async::Channel<HistoryEvent> m_historyChanged;
 
     bool m_interactionOngoing = false;
 };

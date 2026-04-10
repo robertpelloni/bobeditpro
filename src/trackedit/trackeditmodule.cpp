@@ -30,6 +30,7 @@
 #include "internal/trackeditinteraction.h"
 #include "internal/trackeditconfiguration.h"
 #include "internal/trackeditoperationcontroller.h"
+#include "internal/clipboarddata.h"
 #include "internal/tracknavigationcontroller.h"
 #include "internal/trackspectrogramsettingsupdater.h"
 #include "internal/undomanager.h"
@@ -37,7 +38,6 @@
 #include "view/deletebehaviorpanelmodel.h"
 #include "view/pastebehaviorpanelmodel.h"
 #include "view/tracknavigationmodel.h"
-#include "view/trackspectrogramsettingsmodel.h"
 
 #include "internal/au3/au3trackeditproject.h"
 #include "internal/au3/au3selectioncontroller.h"
@@ -57,6 +57,8 @@ using namespace muse::modularity;
 using namespace muse::ui;
 using namespace muse::actions;
 
+static const std::string mname("trackedit");
+
 TrackeditModule::TrackeditModule()
     : m_trackeditController(std::make_shared<TrackeditActionsController>()),
     m_trackeditUiActions(std::make_shared<TrackeditUiActions>(m_trackeditController)),
@@ -74,11 +76,12 @@ static void trackedit_init_qrc()
 
 std::string TrackeditModule::moduleName() const
 {
-    return "trackedit";
+    return mname;
 }
 
 void TrackeditModule::registerExports()
 {
+<<<<<<< HEAD
     ioc()->registerExport<ITrackeditProjectCreator>(moduleName(), new Au3TrackeditProjectCreator());
     ioc()->registerExport<ITrackeditInteraction>(moduleName(),
                                                  new TrackeditInteraction(std::make_unique<TrackeditOperationController>(
@@ -92,6 +95,13 @@ void TrackeditModule::registerExports()
     ioc()->registerExport<ITracksInteraction>(moduleName(), new Au3TracksInteraction());
     ioc()->registerExport<IClipsInteraction>(moduleName(), new Au3ClipsInteraction());
     ioc()->registerExport<ILabelsInteraction>(moduleName(), new Au3LabelsInteraction());
+=======
+    m_configuration = std::make_shared<TrackeditConfiguration>();
+
+    globalIoc()->registerExport<ITrackeditConfiguration>(mname, m_configuration);
+    globalIoc()->registerExport<IClipboardData>(mname, std::make_shared<ClipboardData>());
+    globalIoc()->registerExport<ITrackeditProjectCreator>(mname, std::make_shared<Au3TrackeditProjectCreator>());
+>>>>>>> upstream/master
 }
 
 void TrackeditModule::registerUiTypes()
@@ -99,12 +109,15 @@ void TrackeditModule::registerUiTypes()
     qmlRegisterType<DeleteBehaviorPanelModel>("Audacity.TrackEdit", 1, 0, "DeleteBehaviorPanelModel");
     qmlRegisterType<PasteBehaviorPanelModel>("Audacity.TrackEdit", 1, 0, "PasteBehaviorPanelModel");
     qmlRegisterType<TrackNavigationModel>("Audacity.TrackEdit", 1, 0, "TrackNavigationModel");
-    qmlRegisterType<TrackSpectrogramSettingsModel>("Audacity.TrackEdit", 1, 0, "TrackSpectrogramSettingsModel");
 }
 
 void TrackeditModule::resolveImports()
 {
+<<<<<<< HEAD
     auto ir = ioc()->resolve<muse::ui::IInteractiveUriRegister>(moduleName());
+=======
+    auto ir = globalIoc()->resolve<muse::interactive::IInteractiveUriRegister>(mname);
+>>>>>>> upstream/master
     if (ir) {
         ir->registerQmlUri(muse::Uri("audacity://trackedit/custom_rate"), "Audacity/TrackEdit/CustomRateDialog.qml");
         ir->registerQmlUri(muse::Uri("audacity://trackedit/custom_time"), "Audacity/TrackEdit/CustomTimeDialog.qml");
@@ -112,8 +125,6 @@ void TrackeditModule::resolveImports()
         ir->registerQmlUri(muse::Uri(
                                "audacity://trackedit/delete_behavior_followup"),
                            "Audacity/TrackEdit/DeleteBehaviorOnboardingFollowupDialog.qml");
-        ir->registerQmlUri(muse::Uri(
-                               "audacity://trackedit/track_spectrogram_settings"), "Audacity/TrackEdit/TrackSpectrogramSettingsDialog.qml");
     }
 }
 
@@ -124,21 +135,55 @@ void TrackeditModule::registerResources()
 
 void TrackeditModule::onInit(const muse::IApplication::RunMode&)
 {
+    m_configuration->init();
+
+    TimeSignatureRestorer::reg();
+}
+
+IContextSetup* TrackeditModule::newContext(const muse::modularity::ContextPtr& ctx) const
+{
+    return new TrackeditContext(ctx);
+}
+
+// =====================================================
+// TrackeditContext
+// =====================================================
+
+void TrackeditContext::registerExports()
+{
+    m_trackeditController = std::make_shared<TrackeditActionsController>(iocContext());
+    m_trackeditUiActions = std::make_shared<TrackeditUiActions>(iocContext(), m_trackeditController);
+    m_selectionController = std::make_shared<Au3SelectionController>(iocContext());
+    m_trackNavigationController = std::make_shared<TrackNavigationController>(iocContext());
+    m_trackSpectrogramSettingsUpdater = std::make_shared<TrackSpectrogramSettingsUpdater>(iocContext());
+
+    ioc()->registerExport<ITrackeditInteraction>(mname,
+                                                 new TrackeditInteraction(iocContext(), std::make_unique<TrackeditOperationController>(
+                                                                              iocContext(), std::make_unique<UndoManager>(iocContext()))));
+    ioc()->registerExport<ISelectionController>(mname, m_selectionController);
+    ioc()->registerExport<IProjectHistory>(mname, new Au3ProjectHistory(iocContext()));
+    ioc()->registerExport<ITrackeditClipboard>(mname, new Au3TrackeditClipboard(iocContext()));
+    ioc()->registerExport<ITrackNavigationController>(mname, m_trackNavigationController);
+
+    ioc()->registerExport<ITracksInteraction>(mname, new Au3TracksInteraction(iocContext()));
+    ioc()->registerExport<IClipsInteraction>(mname, new Au3ClipsInteraction(iocContext()));
+    ioc()->registerExport<ILabelsInteraction>(mname, new Au3LabelsInteraction(iocContext()));
+}
+
+void TrackeditContext::onInit(const muse::IApplication::RunMode&)
+{
+    m_trackeditUiActions->init();
     m_trackeditController->init();
     m_selectionController->init();
-    m_configuration->init();
     m_trackNavigationController->init();
     m_trackSpectrogramSettingsUpdater->init();
 
-    TimeSignatureRestorer::reg();
-
-    m_trackeditUiActions->init();
-    auto ar = ioc()->resolve<muse::ui::IUiActionsRegister>(moduleName());
+    auto ar = ioc()->resolve<muse::ui::IUiActionsRegister>(mname);
     if (ar) {
         ar->reg(m_trackeditUiActions);
     }
 }
 
-void TrackeditModule::onDeinit()
+void TrackeditContext::onDeinit()
 {
 }

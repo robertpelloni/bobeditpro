@@ -7,7 +7,11 @@ using namespace au::projectscene;
 using namespace au::project;
 
 TracksViewStateModel::TracksViewStateModel(QObject* parent)
+<<<<<<< HEAD
     : QObject(parent)
+=======
+    : QObject(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
+>>>>>>> upstream/master
 {
 }
 

@@ -20,8 +20,13 @@ using namespace muse::async;
 using namespace au::playback;
 using namespace au::au3;
 
+<<<<<<< HEAD
 Au3AudioOutput::Au3AudioOutput()
     : m_outputMeter{au::au3::createAudioMeter()}
+=======
+Au3AudioOutput::Au3AudioOutput(const muse::modularity::ContextPtr& ctx)
+    : muse::Contextable(ctx), m_outputMeter{au::au3::createAudioMeter()}
+>>>>>>> upstream/master
 {
     globalContext()->currentProjectChanged().onNotify(this, [this](){
         auto currentProject = globalContext()->currentProject();
@@ -50,12 +55,9 @@ void Au3AudioOutput::notifyAboutSampleRateChanged()
     m_sampleRateChanged.send(sampleRate());
 }
 
-muse::async::Promise<float> Au3AudioOutput::playbackVolume() const
+float Au3AudioOutput::playbackVolume() const
 {
-    return muse::async::Promise<float>([this](auto resolve, auto /*reject*/) {
-        const float outputVolume = audioEngine()->getPlaybackVolume();
-        return resolve(muse::linear_to_db(outputVolume));
-    });
+    return muse::linear_to_db(audioEngine()->getPlaybackVolume());
 }
 
 void Au3AudioOutput::setPlaybackVolume(float volume)

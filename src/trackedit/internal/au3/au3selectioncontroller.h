@@ -10,11 +10,13 @@
 
 #include "au3wrap/au3types.h"
 #include "context/iglobalcontext.h"
+#include "spectrogram/ifrequencyselectioncontroller.h"
 
 #include "trackedittypes.h"
 #include "../../iselectioncontroller.h"
 
 namespace au::trackedit {
+<<<<<<< HEAD
 struct ClipAndTimeSelection;
 
 class Au3SelectionController : public ISelectionController, public muse::async::Asyncable
@@ -23,6 +25,17 @@ class Au3SelectionController : public ISelectionController, public muse::async::
 
 public:
     Au3SelectionController() = default;
+=======
+class Au3SelectionController : public ISelectionController, public muse::async::Asyncable, public muse::Contextable
+{
+    muse::ContextInject<au::context::IGlobalContext> globalContext { this };
+    muse::ContextInject<IProjectHistory> projectHistory { this };
+    muse::ContextInject<spectrogram::IFrequencySelectionController> frequencySelectionController { this };
+
+public:
+    Au3SelectionController(const muse::modularity::ContextPtr& ctx)
+        : muse::Contextable(ctx) {}
+>>>>>>> upstream/master
 
     void init();
 
@@ -105,7 +118,11 @@ public:
 private:
     void addSelectedTrack(const trackedit::TrackId& trackId);
     void updateSelectionController();
+<<<<<<< HEAD
     void restoreSelection(const ClipAndTimeSelection& selection);
+=======
+    void onHistoryEvent(const trackedit::HistoryEvent& event);
+>>>>>>> upstream/master
     ClipKeyList findClipsIntersectingRangeSelection() const;
 
     au3::Au3Project& projectRef() const;

@@ -18,7 +18,11 @@ const muse::actions::ActionQuery TOGGLE_TRACK_HALF_WAVE("action://projectscene/t
 }
 
 TrackRulerModel::TrackRulerModel(QObject* parent)
+<<<<<<< HEAD
     : QObject(parent)
+=======
+    : QObject(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
+>>>>>>> upstream/master
 {
     m_model = buildRulerModel();
 }
@@ -31,6 +35,13 @@ IProjectViewStatePtr TrackRulerModel::viewState() const
 
 void TrackRulerModel::init()
 {
+<<<<<<< HEAD
+=======
+    if (!m_model) {
+        m_model = buildRulerModel();
+    }
+
+>>>>>>> upstream/master
     m_model->setDbRange(au::playback::PlaybackMeterDbRange::toDouble(configuration()->playbackMeterDbRange()));
     configuration()->playbackMeterDbRangeChanged().onNotify(this, [this]() {
         m_model->setDbRange(au::playback::PlaybackMeterDbRange::toDouble(configuration()->playbackMeterDbRange()));
@@ -60,6 +71,12 @@ void TrackRulerModel::init()
         emit fullStepsChanged();
         emit smallStepsChanged();
     }, muse::async::Asyncable::Mode::SetReplace);
+<<<<<<< HEAD
+=======
+
+    emit fullStepsChanged();
+    emit smallStepsChanged();
+>>>>>>> upstream/master
 }
 
 std::vector<QVariantMap> TrackRulerModel::fullSteps() const
@@ -134,8 +151,13 @@ bool TrackRulerModel::isCollapsed() const
 
 void TrackRulerModel::setIsCollapsed(bool isCollapsed)
 {
-    if (m_isCollapsed != isCollapsed) {
-        m_isCollapsed = isCollapsed;
+    if (m_isCollapsed == isCollapsed) {
+        return;
+    }
+
+    m_isCollapsed = isCollapsed;
+
+    if (m_model) {
         m_model->setCollapsed(isCollapsed);
         emit fullStepsChanged();
         emit smallStepsChanged();
@@ -149,8 +171,13 @@ int TrackRulerModel::height() const
 
 void TrackRulerModel::setHeight(int height)
 {
-    if (m_height != height) {
-        m_height = height;
+    if (m_height == height) {
+        return;
+    }
+
+    m_height = height;
+
+    if (m_model) {
         m_model->setHeight(height);
         emit fullStepsChanged();
         emit smallStepsChanged();
@@ -173,8 +200,18 @@ double TrackRulerModel::channelHeightRatio() const
 
 void TrackRulerModel::setChannelHeightRatio(double channelHeightRatio)
 {
+<<<<<<< HEAD
     if (m_channelHeightRatio != channelHeightRatio) {
         m_channelHeightRatio = channelHeightRatio;
+=======
+    if (m_channelHeightRatio == channelHeightRatio) {
+        return;
+    }
+
+    m_channelHeightRatio = channelHeightRatio;
+
+    if (m_model) {
+>>>>>>> upstream/master
         m_model->setChannelHeightRatio(channelHeightRatio);
         emit fullStepsChanged();
         emit smallStepsChanged();

@@ -8,6 +8,8 @@ set( SOURCES
     IResponse.h
     IResponseFactory.h
 
+    NetworkManagerApi.h
+
     HeadersList.h
     HeadersList.cpp
 
@@ -50,5 +52,32 @@ PRIVATE
 
 set ( DEFINES INTERFACE "HAS_NETWORKING" PRIVATE "WIN32_LEAN_AND_MEAN" )
 
+<<<<<<< HEAD
+=======
+if(AU_USE_LIBCURL)
+    list(APPEND SOURCES
+        curl/CurlResponse.h
+        curl/CurlResponse.cpp
+        curl/CurlResponseFactory.h
+        curl/CurlResponseFactory.cpp
+        curl/CurlStringList.h
+        curl/CurlStringList.cpp
+        curl/CurlHandleManager.h
+        curl/CurlHandleManager.cpp
+    )
+    list(APPEND LIBRARIES PRIVATE CURL::libcurl)
+else()
+    set(CMAKE_AUTOMOC ON)
+
+    list(APPEND SOURCES
+        qt/Response.h
+        qt/Response.cpp
+        qt/ResponseFactory.h
+        qt/ResponseFactory.cpp
+    )
+    list(APPEND LIBRARIES PRIVATE Qt::Network)
+    list(APPEND DEFINES PRIVATE "USE_QT_NETWORKMANAGER")
+endif()
+>>>>>>> upstream/master
 
 audacity_library( ${TARGET} "${SOURCES}" "${LIBRARIES}" "${DEFINES}" "" )

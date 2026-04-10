@@ -57,6 +57,7 @@ class AppMenuModel : public muse::uicomponents::AbstractMenuModel, public effect
     Q_OBJECT
 
 public:
+<<<<<<< HEAD:src/appshell/view/appmenumodel.h
     muse::Inject<muse::ui::IMainWindow> mainWindow = { this };
     muse::Inject<muse::ui::IUiActionsRegister> uiActionsRegister = { this };
     muse::Inject<muse::ui::INavigationController> navigationController = { this };
@@ -75,6 +76,27 @@ public:
     muse::Inject<au::project::IRecentFilesController> recentFilesController = { this };
     // muse::Inject<extensions::IExtensionsProvider> extensionsProvider = { this };
     // muse::Inject<update::IUpdateConfiguration> updateConfiguration = { this };
+=======
+    muse::GlobalInject<muse::IGlobalConfiguration> globalConfiguration;
+    muse::GlobalInject<muse::ui::IUiConfiguration> uiConfiguration;
+    muse::GlobalInject<au::project::IRecentFilesController> recentFilesController;
+    muse::GlobalInject<effects::IEffectsConfiguration> effectsConfiguration;
+    muse::GlobalInject<IAppShellConfiguration> configuration;
+    muse::GlobalInject<IAppMenuModelHook> appMenuModelHook;
+
+    muse::ContextInject<muse::actions::IActionsDispatcher> actionsDispatcher = { this };
+    muse::ContextInject<muse::ui::IMainWindow> mainWindow { this };
+    muse::ContextInject<muse::ui::INavigationController> navigationController = { this };
+    muse::ContextInject<muse::ui::IUiActionsRegister> uiActionsRegister = { this };
+    muse::ContextInject<effects::IEffectsMenuProvider> effectsMenuProvider = { this };
+    muse::ContextInject<effects::IEffectsProvider> effectsProvider = { this };
+    muse::ContextInject<trackedit::IProjectHistory> projectHistory = { this };
+
+    //! TODO AU4
+    // muse::ContextInject<workspace::IWorkspaceManager> workspacesManager = { this };
+    // muse::ContextInject<extensions::IExtensionsProvider> extensionsProvider = { this };
+    // muse::GlobalInject<update::IUpdateConfiguration> updateConfiguration = { this };
+>>>>>>> upstream/master:src/appshell/qml/Audacity/AppShell/appmenumodel.h
 
 public:
     explicit AppMenuModel(QObject* parent = nullptr);
@@ -113,6 +135,7 @@ private:
 
     muse::uicomponents::MenuItemList makeExportItems();
     muse::uicomponents::MenuItemList makeClipItems();
+    muse::uicomponents::MenuItemList makeLabelItems();
     muse::uicomponents::MenuItemList makeAudioActionsItems();
     muse::uicomponents::MenuItemList makeRegionSelectionItems();
     muse::uicomponents::MenuItemList makeAudioClipsSelectionItems();
@@ -130,6 +153,8 @@ private:
     muse::uicomponents::MenuItemList makeShowItems();
     muse::uicomponents::MenuItemList makeEffectsItems();
     muse::uicomponents::MenuItemList makeGeneratorItems();
+    muse::uicomponents::MenuItemList makeToolItems();
+    muse::uicomponents::MenuItemList makeAnalyzeItems();
 
     void setItemIsChecked(const QString& itemId, bool checked);
 

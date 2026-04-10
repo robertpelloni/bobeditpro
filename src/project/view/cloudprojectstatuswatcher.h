@@ -30,11 +30,15 @@
 #include "iprojectfilescontroller.h"
 
 namespace au::project {
-class CloudScoreStatusWatcher : public QObject, muse::async::Asyncable
+class CloudScoreStatusWatcher : public QObject, public muse::async::Asyncable, public muse::Contextable
 {
     Q_OBJECT
 
+<<<<<<< HEAD
     muse::Inject<IProjectFilesController> projectFilesController;
+=======
+    muse::ContextInject<IProjectFilesController> projectFilesController { this };
+>>>>>>> upstream/master
 
     Q_PROPERTY(bool isDownloadedAndUpToDate READ isDownloadedAndUpToDate CONSTANT)
 

@@ -19,7 +19,7 @@ std::string AudioModule::moduleName() const
 void AudioModule::registerExports()
 {
     // for muse
-    ioc()->registerExport<muse::audio::IAudioThreadSecurer>(moduleName(), m_audioThreadSecurer);
+    globalIoc()->registerExport<muse::audio::IAudioThreadSecurer>(moduleName(), m_audioThreadSecurer);
 }
 
 void AudioModule::onInit(const muse::IApplication::RunMode&)

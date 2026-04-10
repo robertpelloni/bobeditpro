@@ -21,6 +21,14 @@
  */
 #include "projectpropertiesmodel.h"
 
+<<<<<<< HEAD
+=======
+#include <QByteArray>
+#include <QBuffer>
+#include <QImage>
+
+#include "modularity/ioc.h"
+>>>>>>> upstream/master
 #include "translation.h"
 #include "log.h"
 
@@ -29,7 +37,11 @@ using namespace muse::modularity;
 using namespace au::project;
 
 ProjectPropertiesModel::ProjectPropertiesModel(QObject* parent)
+<<<<<<< HEAD
     : QAbstractListModel(parent)
+=======
+    : QAbstractListModel(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
+>>>>>>> upstream/master
 {
 }
 
@@ -39,8 +51,8 @@ void ProjectPropertiesModel::init()
         init();
     }, muse::async::Asyncable::Mode::SetReplace);
 
-    thumbnailCreator()->captureThumbnailRequested().onReceive(this, [this](const muse::io::path_t& response) {
-        captureThumbnail(response.toQString());
+    thumbnailCreator()->captureThumbnailRequested().onNotify(this, [this]() {
+        emit captureThumbnail();
     }, muse::async::Asyncable::Mode::SetReplace);
 
     m_project = globalContext()->currentProject();
@@ -48,9 +60,22 @@ void ProjectPropertiesModel::init()
     load();
 }
 
-void ProjectPropertiesModel::onThumbnailCreated(bool success)
+void ProjectPropertiesModel::onThumbnailCreated(const QVariant& image)
 {
-    thumbnailCreator()->onThumbnailCreated(success);
+    const auto qimage = qvariant_cast<QImage>(image);
+    if (qimage.isNull()) {
+        LOGE() << "onThumbnailCreated: received null image";
+        thumbnailCreator()->onThumbnailCreated({});
+        return;
+    }
+
+    QByteArray bytes;
+    QBuffer buffer(&bytes);
+    buffer.open(QIODevice::WriteOnly);
+    qimage.save(&buffer, "PNG");
+    buffer.close();
+
+    thumbnailCreator()->onThumbnailCreated(std::vector<uint8_t>(bytes.begin(), bytes.end()));
 }
 
 void ProjectPropertiesModel::load()
@@ -196,7 +221,7 @@ void ProjectPropertiesModel::saveProperties()
 
 void ProjectPropertiesModel::openFileLocation()
 {
-    Ret ret = interactive()->revealInFileBrowser(m_projectMetaInfo.filePath.toQString());
+    Ret ret = platformInteractive()->revealInFileBrowser(m_projectMetaInfo.filePath.toQString());
 
     if (!ret) {
         LOGE() << "Could not open folder: " << m_projectMetaInfo.filePath.toQString();

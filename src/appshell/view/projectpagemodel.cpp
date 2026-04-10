@@ -4,6 +4,7 @@
 #include "projectpagemodel.h"
 
 #include "framework/global/log.h"
+#include "framework/global/async/async.h"
 
 #include "internal/applicationuiactions.h"
 #include "projectscene/internal/projectsceneuiactions.h"
@@ -14,19 +15,12 @@ using namespace muse::actions;
 static const ActionQuery PLAYBACK_LEVEL_QUERY("action://playback/level");
 
 ProjectPageModel::ProjectPageModel(QObject* parent)
+<<<<<<< HEAD:src/appshell/view/projectpagemodel.cpp
     : QObject(parent)
+=======
+    : QObject(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
+>>>>>>> upstream/master:src/appshell/qml/Audacity/AppShell/projectpagemodel.cpp
 {
-}
-
-bool ProjectPageModel::isNavigatorVisible() const
-{
-    return configuration()->isNotationNavigatorVisible();
-}
-
-bool ProjectPageModel::isBraillePanelVisible() const
-{
-    return false;
-    //return brailleConfiguration()->braillePanelEnabled();
 }
 
 void ProjectPageModel::init()
@@ -39,7 +33,7 @@ void ProjectPageModel::init()
             dispatcher()->reg(this, actionCode, [=]() { toggleDock(dockName); });
         }
 
-        uiConfiguration()->toolConfigChanged(playbackToolBarName()).onNotify(this, [this]() {
+        uiState()->toolConfigChanged(playbackToolBarName()).onNotify(this, [this]() {
             updatePlaybackMeterVisibility();
         });
 
@@ -47,27 +41,16 @@ void ProjectPageModel::init()
             updatePlaybackMeterVisibility();
         });
 
-        // globalContext()->currentNotationChanged().onNotify(this, [this]() {
-        //     onNotationChanged();
-        // });
-
-        // brailleConfiguration()->braillePanelEnabledChanged().onNotify(this, [this]() {
-        //     emit isBraillePanelVisibleChanged();
-        // });
-
         m_inited = true;
     }
 
-    // update
-    onNotationChanged();
     updatePlaybackMeterVisibility();
-    updateDrumsetPanelVisibility();
 }
 
 void ProjectPageModel::updatePlaybackMeterVisibility()
 {
-    const auto toolConfig = uiConfiguration()->toolConfig(playbackToolBarName(),
-                                                          au::projectscene::ProjectSceneUiActions::defaultPlaybackToolBarConfig());
+    const auto toolConfig = uiState()->toolConfig(playbackToolBarName(),
+                                                  au::projectscene::ProjectSceneUiActions::defaultPlaybackToolBarConfig());
     const auto it = std::find_if(toolConfig.items.begin(), toolConfig.items.end(),
                                  [](const muse::ui::ToolConfig::Item& item) {
         return item.action == PLAYBACK_LEVEL_QUERY.toString();
@@ -77,7 +60,9 @@ void ProjectPageModel::updatePlaybackMeterVisibility()
         const bool meterPanelVisible = it->show
                                        && (playbackConfiguration()->playbackMeterPosition()
                                            == playback::PlaybackMeterPosition::MeterPosition::SideBar);
-        dispatcher()->dispatch("dock-set-open", ActionData::make_arg2<QString, bool>(playbackMeterPanelName(), meterPanelVisible));
+        muse::async::Async::call(this, [this, meterPanelVisible]() {
+            dispatcher()->dispatch("dock-set-open", ActionData::make_arg2<QString, bool>(playbackMeterPanelName(), meterPanelVisible));
+        });
     }
 }
 
@@ -94,11 +79,6 @@ QString ProjectPageModel::playbackToolBarName() const
 QString ProjectPageModel::undoRedoToolBarName() const
 {
     return UNDO_REDO_TOOLBAR_NAME;
-}
-
-QString ProjectPageModel::noteInputBarName() const
-{
-    return NOTE_INPUT_BAR_NAME;
 }
 
 QString ProjectPageModel::workspacesToolBarName() const
@@ -121,101 +101,12 @@ QString ProjectPageModel::playbackMeterPanelName() const
     return PLAYBACK_METER_PANEL_NAME;
 }
 
-QString ProjectPageModel::instrumentsPanelName() const
-{
-    return INSTRUMENTS_PANEL_NAME;
-}
-
-QString ProjectPageModel::inspectorPanelName() const
-{
-    return INSPECTOR_PANEL_NAME;
-}
-
-QString ProjectPageModel::selectionFiltersPanelName() const
-{
-    return SELECTION_FILTERS_PANEL_NAME;
-}
-
-QString ProjectPageModel::mixerPanelName() const
-{
-    return MIXER_PANEL_NAME;
-}
-
-QString ProjectPageModel::pianoKeyboardPanelName() const
-{
-    return PIANO_KEYBOARD_PANEL_NAME;
-}
-
-QString ProjectPageModel::timelinePanelName() const
-{
-    return TIMELINE_PANEL_NAME;
-}
-
-QString ProjectPageModel::drumsetPanelName() const
-{
-    return DRUMSET_PANEL_NAME;
-}
-
 QString ProjectPageModel::statusBarName() const
 {
     return PROJECT_STATUSBAR_NAME;
 }
 
-void ProjectPageModel::onNotationChanged()
-{
-    // INotationPtr notation = globalContext()->currentNotation();
-    // if (!notation) {
-    //     return;
-    // }
-
-    // INotationNoteInputPtr noteInput = notation->interaction()->noteInput();
-    // noteInput->stateChanged().onNotify(this, [this]() {
-    //     updateDrumsetPanelVisibility();
-    // });
-}
-
 void ProjectPageModel::toggleDock(const QString& name)
 {
-    if (name == NOTATION_NAVIGATOR_PANEL_NAME) {
-        configuration()->setIsNotationNavigatorVisible(!isNavigatorVisible());
-        emit isNavigatorVisibleChanged();
-        return;
-    }
-
-    // if (name == NOTATION_BRAILLE_PANEL_NAME) {
-    //     brailleConfiguration()->setBraillePanelEnabled(!isBraillePanelVisible());
-    //     emit isBraillePanelVisibleChanged();
-    //     return;
-    // }
-
     dispatcher()->dispatch("dock-toggle", ActionData::make_arg1<QString>(name));
-}
-
-void ProjectPageModel::updateDrumsetPanelVisibility()
-{
-    TRACEFUNC;
-
-    // const dock::IDockWindow* window = dockWindowProvider()->window();
-    // if (!window) {
-    //     return;
-    // }
-
-    // auto setDrumsetPanelOpen = [this, window](bool open) {
-    //     if (open == window->isDockOpen(DRUMSET_PANEL_NAME)) {
-    //         return;
-    //     }
-
-    //     dispatcher()->dispatch("dock-set-open", ActionData::make_arg2<QString, bool>(DRUMSET_PANEL_NAME, open));
-    // };
-
-    // const INotationPtr notation = globalContext()->currentNotation();
-    // if (!notation) {
-    //     setDrumsetPanelOpen(false);
-    //     return;
-    // }
-
-    // const INotationNoteInputPtr noteInput = notation->interaction()->noteInput();
-    // bool isNeedOpen = noteInput->isNoteInputMode() && noteInput->state().drumset != nullptr;
-
-    // setDrumsetPanelOpen(isNeedOpen);
 }

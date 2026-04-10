@@ -32,22 +32,25 @@ import "internal/ProjectsPage"
 Item {
     id: root
 
-    property AbstractProjectsModel model
+    property AbstractItemModel model
     property list<ColumnItem> columns
     property alias showNewProjectItem: newProjectItem.visible
     property string searchText
 
     property color backgroundColor: ui.theme.backgroundSecondaryColor
     property real sideMargin: 46
+    property string placeholder: ""
+
+    property bool isCloudList: false
 
     property alias view: view
 
     property alias navigation: navPanel
 
-    signal createNewProjectRequested()
+    signal createNewProjectRequested
     signal openProjectRequested(var projectPath, var displayName)
 
-    component ColumnItem : QtObject {
+    component ColumnItem: QtObject {
         property string header
 
         property var width: function (parentWidth) {
@@ -101,7 +104,7 @@ Item {
             navigation.row: 0
             navigation.column: 0
 
-            project: {
+            item: {
                 "name": qsTrc("project", "New project")
             }
 
@@ -138,6 +141,9 @@ Item {
 
                 // Column headers
                 RowLayout {
+                    id: headerLayout
+
+                    Layout.fillWidth: true
                     Layout.preferredHeight: 44
                     Layout.leftMargin: view.itemInset
                     Layout.rightMargin: view.itemInset
@@ -159,7 +165,9 @@ Item {
                         //
                         // - Qt.font(Object.assign(ui.theme.bodyBoldFont, { capitalization: Font.AllUppercase }))
                         //   (complains that ui.theme.bodyBoldFont is const and cannot be modified)
-                        font: Qt.font(Object.assign({}, ui.theme.bodyBoldFont, { capitalization: Font.AllUppercase }))
+                        font: Qt.font(Object.assign({}, ui.theme.bodyBoldFont, {
+                            capitalization: Font.AllUppercase
+                        }))
                         horizontalAlignment: Text.AlignLeft
                     }
 
@@ -171,7 +179,9 @@ Item {
 
                             text: modelData.header
 
-                            font: Qt.font(Object.assign({}, ui.theme.bodyBoldFont, { capitalization: Font.AllUppercase }))
+                            font: Qt.font(Object.assign({}, ui.theme.bodyBoldFont, {
+                                capitalization: Font.AllUppercase
+                            }))
                             horizontalAlignment: Text.AlignLeft
                         }
                     }
@@ -190,6 +200,8 @@ Item {
                     readonly property real itemInset: 12
                     readonly property real rowHeight: 64
                     readonly property real columnSpacing: 44
+
+                    readonly property int cellHeight: rowHeight + spacing
 
                     ScrollBar.vertical: StyledScrollBar {
                         parent: root
@@ -213,12 +225,16 @@ Item {
                         implicitHeight: view.rowHeight
                         columnSpacing: view.columnSpacing
 
+                        isCloudItem: root.isCloudList
+
+                        placeholder: root.placeholder
+
                         navigation.panel: navPanel
                         navigation.row: index + 1
                         navigation.column: 0
 
                         onClicked: {
-                            root.openProjectRequested(project.path, project.name)
+                            root.openProjectRequested(item.path, item.name)
                         }
                     }
                 }

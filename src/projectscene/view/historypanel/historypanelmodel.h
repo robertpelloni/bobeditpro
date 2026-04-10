@@ -14,16 +14,16 @@
 #include "trackedit/iprojecthistory.h"
 
 namespace au::projectscene {
-class HistoryPanelModel : public QAbstractListModel, public QQmlParserStatus, public muse::Injectable, public muse::async::Asyncable
+class HistoryPanelModel : public QAbstractListModel, public QQmlParserStatus, public muse::Contextable, public muse::async::Asyncable
 {
     Q_OBJECT
     Q_INTERFACES(QQmlParserStatus)
 
     Q_PROPERTY(int currentIndex READ currentIndex NOTIFY currentIndexChanged)
 
-    muse::Inject<context::IGlobalContext> context = { this };
-    muse::Inject<trackedit::ITrackeditInteraction> trackeditInteraction = { this };
-    muse::Inject<trackedit::IProjectHistory> projectHistory = { this };
+    muse::ContextInject<context::IGlobalContext> context = { this };
+    muse::ContextInject<trackedit::ITrackeditInteraction> trackeditInteraction = { this };
+    muse::ContextInject<trackedit::IProjectHistory> projectHistory = { this };
 
 public:
     explicit HistoryPanelModel(QObject* parent = nullptr);
@@ -46,7 +46,7 @@ private:
     bool isProjectLoaded() const;
     void onCurrentProjectChanged();
 
-    void onUndoRedo();
+    void onHistoryEvent();
 
     void updateCurrentIndex();
 

@@ -23,7 +23,12 @@
 using namespace au::trackedit;
 using namespace au::au3;
 
+<<<<<<< HEAD
 Au3LabelsInteraction::Au3LabelsInteraction()
+=======
+Au3LabelsInteraction::Au3LabelsInteraction(const muse::modularity::ContextPtr& ctx)
+    : muse::Contextable(ctx)
+>>>>>>> upstream/master
 {
     m_progress.setMaxNumIncrements(200);
 }

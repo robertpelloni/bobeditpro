@@ -20,6 +20,7 @@
 #include "trackedit/iselectioncontroller.h"
 
 namespace au::record {
+<<<<<<< HEAD
 class Au3AudioInput : public IAudioInput, public muse::async::Asyncable
 {
     muse::Inject<au::audio::IAudioEngine> audioEngine;
@@ -30,11 +31,25 @@ class Au3AudioInput : public IAudioInput, public muse::async::Asyncable
     muse::Inject<record::IRecordController> controller;
     muse::Inject<record::IRecordMeterController> meterController;
     muse::Inject<trackedit::ISelectionController> selectionController;
+=======
+class Au3AudioInput : public IAudioInput, public muse::async::Asyncable, public muse::Contextable
+{
+    muse::GlobalInject<record::IRecordConfiguration> configuration;
+    muse::GlobalInject<au::audio::IAudioEngine> audioEngine;
+    muse::GlobalInject<record::IRecordMeterController> meterController;
+
+    muse::ContextInject<au::context::IGlobalContext> globalContext{ this };
+    muse::ContextInject<audio::IAudioDevicesProvider> audioDevicesProvider{ this };
+    muse::ContextInject<playback::IPlaybackController> playbackController{ this };
+    muse::ContextInject<record::IRecordController> controller{ this };
+    muse::ContextInject<trackedit::ISelectionController> selectionController{ this };
+    muse::ContextInject<trackedit::ITrackNavigationController> trackNavigationController{ this };
+>>>>>>> upstream/master
 
 public:
     Au3AudioInput();
 
-    muse::async::Promise<float> recordVolume() const override;
+    float recordVolume() const override;
     void setRecordVolume(float volume) override;
     muse::async::Channel<float> recordVolumeChanged() const override;
 

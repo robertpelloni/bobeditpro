@@ -17,6 +17,7 @@
 #include "projectscene/view/trackruler/itrackruler.h"
 
 namespace au::projectscene {
+<<<<<<< HEAD
 class TrackRulerModel : public QObject, public muse::async::Asyncable
 {
     Q_OBJECT
@@ -24,6 +25,16 @@ class TrackRulerModel : public QObject, public muse::async::Asyncable
     muse::Inject<muse::actions::IActionsDispatcher> dispatcher;
     muse::Inject<au::playback::IPlaybackConfiguration> configuration;
     muse::Inject<au::context::IGlobalContext> globalContext;
+=======
+class TrackRulerModel : public QObject, public muse::async::Asyncable, public muse::Contextable
+{
+    Q_OBJECT
+
+    muse::GlobalInject<au::playback::IPlaybackConfiguration> configuration;
+
+    muse::ContextInject<muse::actions::IActionsDispatcher> dispatcher{ this };
+    muse::ContextInject<au::context::IGlobalContext> globalContext{ this };
+>>>>>>> upstream/master
 
     Q_PROPERTY(std::vector<QVariantMap> fullSteps READ fullSteps NOTIFY fullStepsChanged)
     Q_PROPERTY(std::vector<QVariantMap> smallSteps READ smallSteps NOTIFY smallStepsChanged)
@@ -108,6 +119,10 @@ signals:
     void trackIdChanged();
 
     void isHalfWaveChanged();
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/master
 private:
     IProjectViewStatePtr viewState() const;
 

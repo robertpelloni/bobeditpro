@@ -8,10 +8,21 @@
 #include "../ieffectinstancesregister.h"
 
 namespace au::effects {
+<<<<<<< HEAD
 class EffectInstancesRegister : public IEffectInstancesRegister
 {
 public:
     EffectInstancesRegister() = default;
+=======
+class EffectInstancesRegister : public IEffectInstancesRegister, public muse::Contextable
+{
+    muse::GlobalInject<IParameterExtractorRegistry> parameterExtractorRegistry;
+    muse::ContextInject<IEffectsProvider> effectsProvider{ this };
+
+public:
+    EffectInstancesRegister(const muse::modularity::ContextPtr& ctx)
+        : muse::Contextable(ctx) {}
+>>>>>>> upstream/master
 
     EffectInstanceId regInstance(const EffectId& effectId, const std::shared_ptr<EffectInstance>& i, EffectSettingsAccessPtr) override;
     void unregInstance(const std::shared_ptr<EffectInstance>& i) override;

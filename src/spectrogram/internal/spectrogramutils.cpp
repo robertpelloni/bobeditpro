@@ -2,6 +2,12 @@
  * Audacity: A Digital Audio Editor
  */
 #include "spectrogramutils.h"
+<<<<<<< HEAD
+=======
+#include "internal/numberscale.h"
+#include "ispectrogramconfiguration.h"
+#include "spectrogramtypes.h"
+>>>>>>> upstream/master
 
 #include <cmath>
 
@@ -80,3 +86,129 @@ void au::spectrogram::fillWhere(
         where[x] = floor(w0 + double(x) * samplesPerPixel);
     }
 }
+<<<<<<< HEAD
+=======
+
+int au::spectrogram::fftLength(ISpectrogramConfiguration& config)
+{
+    return (1 << config.winSizeLog2()) * ((config.algorithm() != SpectrogramAlgorithm::Pitch) ? config.zeroPaddingFactor() : 1);
+}
+
+std::pair<float, float> au::spectrogram::spectrogramBounds(ISpectrogramConfiguration& config, double sampleRate)
+{
+    const auto type = config.scale();
+
+    auto min = 0.f;
+    auto max = 0.f;
+
+    auto bottom = 0.f;
+    if (type == SpectrogramScale::Period) {
+        // special case
+        const auto half = fftLength(config) / 2;
+        // EAC returns no data for below this frequency:
+        const float bin2 = sampleRate / half;
+        bottom = bin2;
+    } else if (type != SpectrogramScale::Linear) {
+        // logarithmic, etc.
+        bottom = 1.0f;
+    }
+
+    const float top = sampleRate / 2;
+    if (config.maxFreq() < 0) {
+        max = top;
+    } else {
+        max = std::clamp<double>(config.maxFreq(), bottom, top);
+    }
+
+    auto spectrumMin = config.minFreq();
+    if (spectrumMin < 0) {
+        min = std::max(bottom, top / 1000.0f);
+    } else {
+        min = std::clamp<double>(spectrumMin, bottom, top);
+    }
+
+    return std::make_pair(min, max);
+}
+
+namespace {
+using namespace au::spectrogram;
+
+/**
+ * @brief Sorted by decreasing value.
+ */
+std::vector<double> getTicksValues(double maxFreq, double minFreq, double step, SpectrogramScale scale)
+{
+    std::vector<double> ticks;
+    auto tick = std::floor(maxFreq / step) * step;
+    while (tick >= minFreq) {
+        if (scale == SpectrogramScale::Logarithmic && tick <= 0) {
+            break;
+        }
+        ticks.push_back(tick);
+        tick -= step;
+    }
+    return ticks;
+}
+
+std::vector<SpectrogramRulerTick> toTicks(const std::vector<double>& values, const NumberScale& numberScale, double reservedHeight,
+                                          double rulerHeight)
+{
+    std::vector<SpectrogramRulerTick> ticks;
+    ticks.reserve(values.size());
+    std::transform(values.begin(), values.end(), std::back_inserter(ticks), [&numberScale, rulerHeight](double value) {
+        return SpectrogramRulerTick { value, 1. * numberScale.valueToPosition(value) * rulerHeight };
+    });
+
+    auto top = -reservedHeight / 2;
+    auto it = ticks.begin();
+    while (it != ticks.end()) {
+        const auto tickTop = it->pos - reservedHeight / 2;
+        const auto tickBottom = it->pos + reservedHeight / 2;
+        if (tickTop < top || tickBottom > rulerHeight + reservedHeight / 2) {
+            it = ticks.erase(it);
+        } else {
+            top = tickBottom;
+            ++it;
+        }
+    }
+
+    return ticks;
+}
+
+std::vector<SpectrogramRulerTick> getTicks(ISpectrogramConfiguration& config, const NumberScale& numberScale, double reservedHeight,
+                                           double rulerHeight, double step)
+{
+    const std::vector<double> values = getTicksValues(config.maxFreq(), config.minFreq(), step, config.scale());
+    return toTicks(values, numberScale, reservedHeight, rulerHeight);
+}
+}
+
+au::spectrogram::SpectrogramRulerTicks au::spectrogram::spectrogramRulerTicks(ISpectrogramConfiguration& config, double labelHeight,
+                                                                              double rulerHeight)
+{
+    const auto range = config.maxFreq() - config.minFreq();
+    if (range <= 0) {
+        return {};
+    }
+
+    const auto minFreq = config.scale() == SpectrogramScale::Logarithmic ? std::max(config.minFreq(), 1.) : config.minFreq();
+    const auto numberScale = NumberScale{ config.scale(), config.maxFreq(), minFreq };
+
+    const auto majorStep = std::pow(10., std::floor(std::log10(range)));
+    const std::vector<SpectrogramRulerTick> majorTicks = getTicks(config, numberScale, labelHeight, rulerHeight, majorStep);
+    const auto minorStep = majorStep / 10;
+    constexpr auto minorTickReservedHeight = 4.;
+    std::vector<SpectrogramRulerTick> minorTicks = getTicks(config, numberScale, minorTickReservedHeight, rulerHeight, minorStep);
+
+    // Remove minor ticks that overlap with major ticks.
+    minorTicks.erase(std::remove_if(minorTicks.begin(), minorTicks.end(),
+                                    [&majorTicks](const SpectrogramRulerTick& minorTick) {
+        return std::any_of(majorTicks.begin(), majorTicks.end(), [&minorTick](const SpectrogramRulerTick& majorTick) {
+            return std::abs(majorTick.pos - minorTick.pos) < minorTickReservedHeight;
+        });
+    }),
+                     minorTicks.end());
+
+    return { majorTicks, minorTicks };
+}
+>>>>>>> upstream/master

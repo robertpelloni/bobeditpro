@@ -5,9 +5,9 @@
 
 #include "modularity/ioc.h"
 #include "ieffectinstancesregister.h"
-#include "ieffectsprovider.h"
 #include "ieffectsconfiguration.h"
 #include "effectstypes.h"
+#include "effectsviewtypes.h"
 #include "effects/effects_base/irealtimeeffectservice.h"
 #include "context/iglobalcontext.h"
 #include "actions/actionable.h"
@@ -18,24 +18,7 @@
 #include <QObject>
 
 namespace au::effects {
-class ViewerComponentTypes
-{
-    Q_GADGET
-public:
-    enum class Type {
-        AudioUnit,
-        Lv2,
-        Vst,
-        Builtin,
-        Generated,
-        Unknown
-    };
-    Q_ENUM(Type)
-};
-
-using ViewerComponentType = ViewerComponentTypes::Type;
-
-class RealtimeEffectViewerDialogModel : public QObject, public muse::Injectable, public muse::async::Asyncable,
+class RealtimeEffectViewerDialogModel : public QObject, public muse::Contextable, public muse::async::Asyncable,
     public muse::actions::Actionable
 {
     Q_OBJECT
@@ -52,12 +35,21 @@ class RealtimeEffectViewerDialogModel : public QObject, public muse::Injectable,
     Q_PROPERTY(bool useVendorUI READ useVendorUI NOTIFY useVendorUIChanged FINAL);
     Q_PROPERTY(ViewerComponentType viewerComponentType READ viewerComponentType NOTIFY viewerComponentTypeChanged FINAL);
 
+<<<<<<< HEAD
     muse::Inject<IEffectInstancesRegister> instancesRegister;
     muse::Inject<IEffectsProvider> effectsProvider;
     muse::Inject<IEffectsConfiguration> configuration;
     muse::Inject<effects::IRealtimeEffectService> realtimeEffectService;
     muse::Inject<context::IGlobalContext> globalContext;
     muse::Inject<muse::ui::INavigationController> navigationController;
+=======
+    muse::GlobalInject<IEffectsConfiguration> configuration;
+
+    muse::ContextInject<IEffectInstancesRegister> instancesRegister{ this };
+    muse::ContextInject<effects::IRealtimeEffectService> realtimeEffectService{ this };
+    muse::ContextInject<context::IGlobalContext> globalContext{ this };
+    muse::ContextInject<muse::ui::INavigationController> navigationController{ this };
+>>>>>>> upstream/master
 
 public:
     Q_INVOKABLE void load();

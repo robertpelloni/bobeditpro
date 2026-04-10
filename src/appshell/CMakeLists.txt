@@ -150,11 +150,30 @@ if (OS_IS_WIN)
     set(MODULE_LINK ${MODULE_LINK} dwmapi)
 endif(OS_IS_WIN)
 
+<<<<<<< HEAD
 if (NOT OS_IS_MAC)
     set(MODULE_SRC ${MODULE_SRC}
         ${CMAKE_CURRENT_LIST_DIR}/view/navigableappmenumodel.cpp
         ${CMAKE_CURRENT_LIST_DIR}/view/navigableappmenumodel.h
     )
+=======
+qt_add_resources(appshell appshell_resources
+    PREFIX
+        /
+    FILES
+        resources/Classic.svg
+        resources/Colorful.svg
+        resources/LoadingScreen.svg
+        resources/GoogleLogo.png
+        resources/FacebookLogo.png
+        resources/win_opengl_buglist.json
+        resources/welcomedialog/MuseHubPromo.jpg
+        resources/welcomedialog/Audacity40Video.png
+        resources/welcomedialog/AudioDotCom_Dark.png
+        resources/welcomedialog/AudioDotCom_Light.png
+        resources/welcomedialog/Audacity_Merch_Store.png
+)
+>>>>>>> upstream/master
 
     # we use QKeyMapper to fix https://github.com/musescore/MuseScore/issues/10181
     find_package(Qt6 REQUIRED COMPONENTS GuiPrivate)

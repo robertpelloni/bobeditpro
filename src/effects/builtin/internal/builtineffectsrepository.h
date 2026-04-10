@@ -3,18 +3,12 @@
 */
 #pragma once
 
-#include <map>
-
-#include "modularity/ioc.h"
-
-#include "../ieffectsviewregister.h"
 #include "../ibuiltineffectsrepository.h"
-
-#include "au3-components/ComponentInterfaceSymbol.h"
 
 namespace au::effects {
 class BuiltinEffectsRepository : public IBuiltinEffectsRepository
 {
+<<<<<<< HEAD
     muse::Inject<IEffectsViewRegister> effectsViewRegister;
 
 public:
@@ -23,15 +17,15 @@ public:
     void preInit();
     void init();
 
+=======
+public:
+>>>>>>> upstream/master
     muse::async::Notification effectMetaListUpdated() const override;
     EffectMetaList effectMetaList() const override;
-
-    EffectMeta effectMeta(const ComponentInterfaceSymbol& symbol) const;
+    void registerMeta(const EffectMeta& meta) override;
 
 private:
-    void updateEffectMetaList();
-
     muse::async::Notification m_effectMetaListUpdated;
-    std::map<ComponentInterfaceSymbol, EffectMeta> m_metas;
+    EffectMetaList m_metas;
 };
 }

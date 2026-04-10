@@ -7,11 +7,28 @@
 using namespace au::playback;
 
 PlaybackStateModel::PlaybackStateModel(QObject* parent)
+<<<<<<< HEAD
     : QObject(parent)
+=======
+    : QObject(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
+{
+}
+
+void PlaybackStateModel::init()
+>>>>>>> upstream/master
 {
     playbackController()->isPlayingChanged().onNotify(this, [this]() {
         emit isPlayingChanged();
     });
+
+    playbackController()->lastPlaybackSeekTimeChanged().onNotify(this, [this]() {
+        emit lastPlaybackSeekTimeChanged();
+    });
+}
+
+void PlaybackStateModel::setLastPlaybackSeekTime(double time)
+{
+    playbackController()->setLastPlaybackSeekTime(std::max(0.0, time));
 }
 
 bool PlaybackStateModel::isPlaying() const
@@ -27,4 +44,9 @@ bool PlaybackStateModel::isPaused() const
 bool PlaybackStateModel::isStopped() const
 {
     return playbackController()->isStopped();
+}
+
+double PlaybackStateModel::lastPlaybackSeekTime() const
+{
+    return playbackController()->lastPlaybackSeekTime();
 }

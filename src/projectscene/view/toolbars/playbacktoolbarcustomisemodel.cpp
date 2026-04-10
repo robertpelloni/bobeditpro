@@ -24,7 +24,11 @@ static const ActionQuery PLAYBACK_PLAY_QUERY("action://playback/play");
 static const ActionQuery RECORD_START_QUERY("action://record/start");
 
 PlaybackToolBarCustomiseModel::PlaybackToolBarCustomiseModel(QObject* parent)
+<<<<<<< HEAD
     : SelectableItemListModel(parent)
+=======
+    : SelectableItemListModel(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
+>>>>>>> upstream/master
 {
 }
 
@@ -34,8 +38,8 @@ void PlaybackToolBarCustomiseModel::load()
 
     QList<Item*> items;
 
-    ToolConfig toolConfig = uiConfiguration()->toolConfig(TOOLBAR_NAME,
-                                                          projectscene::ProjectSceneUiActions::defaultPlaybackToolBarConfig());
+    ToolConfig toolConfig = uiState()->toolConfig(TOOLBAR_NAME,
+                                                  projectscene::ProjectSceneUiActions::defaultPlaybackToolBarConfig());
 
     auto isSeparator = [](const UiAction& a) { return a.code.empty(); };
 
@@ -262,5 +266,5 @@ void PlaybackToolBarCustomiseModel::saveActions()
         config.items.append(citem);
     }
 
-    uiConfiguration()->setToolConfig(TOOLBAR_NAME, config);
+    uiState()->setToolConfig(TOOLBAR_NAME, config);
 }

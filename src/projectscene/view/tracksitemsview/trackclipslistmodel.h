@@ -22,10 +22,18 @@ class TrackClipsListModel : public TrackItemsListModel
         bool asymmetricStereoHeightsPossible READ asymmetricStereoHeightsPossible NOTIFY asymmetricStereoHeightsPossibleChanged)
     Q_PROPERTY(bool isContrastFocusBorderEnabled READ isContrastFocusBorderEnabled NOTIFY isContrastFocusBorderEnabledChanged FINAL)
 
+<<<<<<< HEAD
     muse::Inject<projectscene::IProjectSceneConfiguration> projectSceneConfiguration;
     muse::Inject<muse::workspace::IWorkspaceManager> workspacesManager;
     muse::Inject<trackedit::IProjectHistory> projectHistory;
     muse::Inject<muse::ui::IUiConfiguration> uiConfiguration;
+=======
+    muse::GlobalInject<projectscene::IProjectSceneConfiguration> projectSceneConfiguration;
+    muse::GlobalInject<muse::ui::IUiConfiguration> uiConfiguration;
+
+    muse::ContextInject<context::IGlobalContext> globalContext { this };
+    muse::ContextInject<muse::workspace::IWorkspaceManager> workspacesManager{ this };
+>>>>>>> upstream/master
 
 public:
     explicit TrackClipsListModel(QObject* parent = nullptr);
@@ -73,6 +81,7 @@ private:
     void update();
     void updateItemMetrics(ViewTrackItem* item) override;
     trackedit::TrackItemKeyList getSelectedItemKeys() const override;
+    trackedit::ClipKeyList clipsForInteraction(const ClipKey& key) const;
 
     TrackClipItem* clipItemByKey(const trackedit::ClipKey& k) const;
 

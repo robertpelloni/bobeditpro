@@ -79,6 +79,13 @@ const UiActionList PlaybackUiActions::m_mainActions = {
              TranslatableString("action", "Open audio setup context menu"),
              IconCode::Code::CONFIGURE
              ),
+    UiAction("get-effects",
+             au::context::UiCtxProjectOpened,
+             au::context::CTX_PROJECT_FOCUSED,
+             TranslatableString("action", "Get effects"),
+             TranslatableString("action", "Open Get effects dialog"),
+             IconCode::Code::PLUGIN
+             ),
     UiAction("audio-settings",
              au::context::UiCtxProjectOpened,
              au::context::CTX_PROJECT_FOCUSED,
@@ -207,15 +214,20 @@ const UiActionList PlaybackUiActions::m_settingsActions = {
     UiAction("pan",
              au::context::UiCtxAny,
              au::context::CTX_ANY,
-             TranslatableString("action", "Pan score automatically"),
-             TranslatableString("action", "Pan score automatically during playback"),
+             TranslatableString("action", "Pan automatically"),
+             TranslatableString("action", "Pan automatically during playback"),
              IconCode::Code::PAN_SCORE,
              Checkable::Yes
              ),
 };
 
+<<<<<<< HEAD
 PlaybackUiActions::PlaybackUiActions(std::shared_ptr<PlaybackController> controller)
     : m_controller(controller)
+=======
+PlaybackUiActions::PlaybackUiActions(const muse::modularity::ContextPtr& ctx, std::shared_ptr<PlaybackController> controller)
+    : muse::Contextable(ctx), m_controller(controller)
+>>>>>>> upstream/master
 {
 }
 

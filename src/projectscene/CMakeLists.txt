@@ -65,6 +65,8 @@ set(MODULE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/view/trackspanel/realtimeeffectlistmodel.h
     ${CMAKE_CURRENT_LIST_DIR}/view/trackspanel/realtimeeffectlistitemmodel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/view/trackspanel/realtimeeffectlistitemmodel.h
+    ${CMAKE_CURRENT_LIST_DIR}/view/trackspanel/realtimeeffectrowactionscontroller.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/view/trackspanel/realtimeeffectrowactionscontroller.h
     ${CMAKE_CURRENT_LIST_DIR}/view/trackspanel/realtimeeffectmenumodelbase.cpp
     ${CMAKE_CURRENT_LIST_DIR}/view/trackspanel/realtimeeffectmenumodelbase.h
     ${CMAKE_CURRENT_LIST_DIR}/view/trackspanel/realtimeeffectsectionmodel.cpp
@@ -96,6 +98,9 @@ set(MODULE_SRC
 
     ${CMAKE_CURRENT_LIST_DIR}/view/toolbars/audiosetupcontextmenumodel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/view/toolbars/audiosetupcontextmenumodel.h
+
+    ${CMAKE_CURRENT_LIST_DIR}/view/toolbars/geteffectsmodel.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/view/toolbars/geteffectsmodel.h
 
     ${CMAKE_CURRENT_LIST_DIR}/view/tracksitemsview/au3/isamplespainter.h
     ${CMAKE_CURRENT_LIST_DIR}/view/tracksitemsview/au3/samplespainter.h

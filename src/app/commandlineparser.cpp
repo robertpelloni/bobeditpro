@@ -24,6 +24,7 @@
 #include <QDir>
 
 #include "global/io/dir.h"
+#include "project/types/projecttypes.h"
 
 #include "log.h"
 
@@ -91,6 +92,7 @@ void CommandLineParser::init()
     m_parser.addOption(QCommandLineOption({ "f", "force" },
                                           "Use with '-o <file>', ignore warnings reg. score being corrupted or from wrong version"));
 
+<<<<<<< HEAD
     m_parser.addOption(QCommandLineOption("score-media",
                                           "Export all media (excepting mp3) for a given score in a single JSON file and print it to stdout"));
     m_parser.addOption(QCommandLineOption("highlight-config", "Set highlight to svg, generated from a given score", "highlight-config"));
@@ -102,6 +104,10 @@ void CommandLineParser::init()
                                           "Transpose the given score and export the data to a single JSON file, print it to stdout",
                                           "options"));
     m_parser.addOption(QCommandLineOption("source-update", "Update the source in the given score"));
+=======
+    m_parser.addOption(QCommandLineOption("session-type", "Startup with given session type", "type"));
+    m_parser.addOption(internalCommandLineOption("import-media-file", "Import media file on startup", "path"));
+>>>>>>> upstream/master
 
     m_parser.addOption(QCommandLineOption({ "S", "style" }, "Load style file", "style"));
 
@@ -160,27 +166,9 @@ void CommandLineParser::parse(int argc, char** argv)
     QStringList args = prepareArguments(argc, argv);
     m_parser.parse(args);
 
-    auto floatValue = [this](const QString& name) -> std::optional<float> {
-        bool ok = true;
-        float val = m_parser.value(name).toFloat(&ok);
-        if (ok) {
-            return val;
-        }
-        return std::nullopt;
-    };
-
     auto doubleValue = [this](const QString& name) -> std::optional<double> {
         bool ok = true;
         double val = m_parser.value(name).toDouble(&ok);
-        if (ok) {
-            return val;
-        }
-        return std::nullopt;
-    };
-
-    auto intValue = [this](const QString& name) -> std::optional<int> {
-        bool ok = true;
-        int val = m_parser.value(name).toInt(&ok);
         if (ok) {
             return val;
         }
@@ -248,6 +236,20 @@ void CommandLineParser::parse(int argc, char** argv)
         m_options.startup.type = m_parser.value("session-type").toStdString();
     }
 
+<<<<<<< HEAD
+=======
+    if (m_parser.isSet("import-media-file")) {
+        for (const QString& file : m_parser.values("import-media-file")) {
+            m_options.startup.mediaFiles.emplace_back(fromUserInputPath(file));
+        }
+    }
+
+    if (m_parser.isSet("F") || m_parser.isSet("R")) {
+        m_options.app.revertToFactorySettings = true;
+    }
+
+    // Audio plugin registration
+>>>>>>> upstream/master
     if (m_parser.isSet("register-audio-plugin")) {
         m_runMode = IApplication::RunMode::AudioPluginRegistration;
         m_audioPluginRegistration.pluginPath = fromUserInputPath(m_parser.value("register-audio-plugin"));
@@ -471,12 +473,28 @@ void CommandLineParser::parse(int argc, char** argv)
 
     // Startup
     if (m_runMode == IApplication::RunMode::GuiApp) {
+<<<<<<< HEAD
         if (!scorefiles.isEmpty()) {
             m_options.startup.scoreUrl = QUrl::fromUserInput(scorefiles[0], QDir::currentPath(), QUrl::AssumeLocalFile);
         }
 
         if (m_parser.isSet("score-display-name-override")) {
             m_options.startup.scoreDisplayNameOverride = m_parser.value("score-display-name-override");
+=======
+        for (const QString& file : projectfiles) {
+            const muse::io::path_t filePath(file);
+            if (project::isAudacityFile(filePath)) {
+                if (!m_options.startup.projectUrl.has_value()) {
+                    m_options.startup.projectUrl = QUrl::fromUserInput(file, QDir::currentPath(), QUrl::AssumeLocalFile);
+                }
+                m_options.startup.mediaFiles.clear();
+                continue;
+            }
+
+            if (!m_options.startup.projectUrl.has_value()) {
+                m_options.startup.mediaFiles.emplace_back(filePath);
+            }
+>>>>>>> upstream/master
         }
     }
 }

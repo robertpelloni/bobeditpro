@@ -24,8 +24,20 @@ public:
     void onInit(const muse::IApplication::RunMode& mode) override;
     void onDeinit() override;
 
+    muse::modularity::IContextSetup* newContext(const muse::modularity::ContextPtr& ctx) const override;
+
 private:
     const std::shared_ptr<AudioUnitPluginsMetaReader> m_metaReader;
-    std::shared_ptr<AudioUnitEffectsRepository> m_effectsRepository;
+};
+
+class AudioUnitEffectsContext : public muse::modularity::IContextSetup
+{
+public:
+    AudioUnitEffectsContext(const muse::modularity::ContextPtr& ctx)
+        : muse::modularity::IContextSetup(ctx) {}
+
+    void registerExports() override;
+    void resolveImports() override;
+    void onDeinit() override;
 };
 }

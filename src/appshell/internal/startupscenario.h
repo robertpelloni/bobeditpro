@@ -38,6 +38,7 @@
 // #include "multiinstances/imultiinstancesprovider.h"
 
 namespace au::appshell {
+<<<<<<< HEAD
 class StartupScenario : public au::appshell::IStartupScenario, public muse::async::Asyncable
 {
     muse::Inject<muse::IInteractive> interactive;
@@ -46,17 +47,35 @@ class StartupScenario : public au::appshell::IStartupScenario, public muse::asyn
     muse::Inject<ISessionsManager> sessionsManager;
     muse::Inject<muse::audioplugins::IRegisterAudioPluginsScenario> registerAudioPluginsScenario;
     // muse::Inject<au::project::IProjectAutoSaver> projectAutoSaver; // we don't use at the moment 01/09/2025 the project auto saver as we already have the autosave table
+=======
+class StartupScenario : public au::appshell::IStartupScenario, public muse::async::Asyncable, public muse::Contextable
+{
+    muse::GlobalInject<IAppShellConfiguration> configuration;
+    muse::GlobalInject<muse::mi::IMultiWindowsProvider> multiwindowsProvider;
+
+    muse::ContextInject<muse::IInteractive> interactive { this };
+    muse::ContextInject<muse::actions::IActionsDispatcher> dispatcher { this };
+    muse::ContextInject<muse::audioplugins::IRegisterAudioPluginsScenario> registerAudioPluginsScenario { this };
+    muse::ContextInject<ISessionsManager> sessionsManager { this };
+>>>>>>> upstream/master
 
 //! TODO AU4
     // INJECT(mi::IMultiInstancesProvider, multiInstancesProvider)
 public:
+<<<<<<< HEAD
+=======
+    StartupScenario(const muse::modularity::ContextPtr& ctx)
+        : muse::Contextable(ctx) {}
+>>>>>>> upstream/master
 
     void setStartupType(const std::optional<std::string>& type) override;
 
     bool isStartWithNewFileAsSecondaryInstance() const override;
 
-    const au::project::ProjectFile& startupScoreFile() const override;
-    void setStartupScoreFile(const std::optional<au::project::ProjectFile>& file) override;
+    const au::project::ProjectFile& startupProjectFile() const override;
+    void setStartupProjectFile(const std::optional<au::project::ProjectFile>& file) override;
+    const muse::io::paths_t& startupMediaFiles() const override;
+    void setStartupMediaFiles(const muse::io::paths_t& files) override;
 
     void runOnSplashScreen() override;
     void runAfterSplashScreen() override;
@@ -64,16 +83,18 @@ public:
 
 private:
     void onStartupPageOpened(StartupModeType modeType);
+    void showStartupDialogsIfNeed(StartupModeType modeType);
 
     StartupModeType resolveStartupModeType() const;
     muse::Uri startupPageUri(StartupModeType modeType) const;
 
-    void openScore(const au::project::ProjectFile& file);
+    void openProject(const au::project::ProjectFile& file);
 
     void restoreLastSession();
 
     std::string m_startupTypeStr;
-    au::project::ProjectFile m_startupScoreFile;
+    au::project::ProjectFile m_startupProjectFile;
+    muse::io::paths_t m_startupMediaFiles;
     bool m_startupCompleted = false;
 };
 }

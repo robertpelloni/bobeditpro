@@ -241,7 +241,7 @@ WaveClip::WaveClip(size_t width,
                                                SampleFormats { narrowestSampleFormat, format });
     }
 
-    mEnvelope = std::make_unique<Envelope>(true, 1e-7, 2.0, 1.0);
+    mEnvelope = std::make_unique<Envelope>(true, 1e-7, 4.0, 1.0);
     assert(CheckInvariants());
 }
 
@@ -291,7 +291,7 @@ WaveClip::WaveClip(
 
     mIsPlaceholder = orig.GetIsPlaceholder();
 
-    mColor = orig.mColor;
+    mColorIndex = orig.mColorIndex;
 
     assert(NChannels() == (token.emptyCopy ? 0 : orig.NChannels()));
     assert(token.emptyCopy || CheckInvariants());
@@ -356,7 +356,7 @@ WaveClip::WaveClip(
             WaveClip::NewSharedFrom(*cutline, factory, true, backup));
     }
 
-    mColor = orig.mColor;
+    mColorIndex = orig.mColorIndex;
 
     assert(NChannels() == orig.NChannels());
     assert(CheckInvariants());
@@ -1096,7 +1096,12 @@ static constexpr auto ClipStretchToMatchTempo_attr = "clipStretchToMatchTempo";
 static constexpr auto ClipTempo_attr = "clipTempo";
 static constexpr auto Name_attr = "name";
 static constexpr auto GroupId_attr = "groupId";
+<<<<<<< HEAD
 static constexpr auto Color_attr = "color";
+=======
+static constexpr auto ColorIndex_attr = "colorindex";
+static constexpr auto Selected_attr = "isSelected";
+>>>>>>> upstream/master
 
 bool WaveClip::HandleXMLTag(const std::string_view& tag, const AttributesList& attrs)
 {
@@ -1166,9 +1171,10 @@ bool WaveClip::HandleXMLTag(const std::string_view& tag, const AttributesList& a
                     return false;
                 }
                 mGroupId = longValue;
-            } else if (attr == Color_attr) {
-                if (value.IsStringView()) {
-                    SetColor(value.ToWString());
+            } else if (attr == ColorIndex_attr) {
+                long colorIndexValue;
+                if (value.TryGet(colorIndexValue)) {
+                    SetColorIndex(static_cast<int>(colorIndexValue));
                 }
             } else if (Attachments::FindIf(
                            [&](WaveClipListener& listener){
@@ -1248,7 +1254,12 @@ void WaveClip::WriteXML(size_t ii, XMLWriter& xmlFile) const
     xmlFile.WriteAttr(ClipStretchToMatchTempo_attr, mStretchToMatchProjectTempo);
     xmlFile.WriteAttr(Name_attr, mName);
     xmlFile.WriteAttr(GroupId_attr, static_cast<long>(mGroupId));
+<<<<<<< HEAD
     xmlFile.WriteAttr(Color_attr, mColor);
+=======
+    xmlFile.WriteAttr(ColorIndex_attr, mColorIndex);
+    xmlFile.WriteAttr(Selected_attr, mSelected);
+>>>>>>> upstream/master
 
     if (mClipTempo) {
         xmlFile.WriteAttr(ClipTempo_attr, *mClipTempo, 8);
@@ -1917,14 +1928,14 @@ void WaveClip::SetGroupId(int64_t id)
     mGroupId = id;
 }
 
-void WaveClip::SetColor(const wxString& color)
+void WaveClip::SetColorIndex(int colorIndex)
 {
-    mColor = color;
+    mColorIndex = colorIndex;
 }
 
-const wxString& WaveClip::GetColor() const
+int WaveClip::GetColorIndex() const
 {
-    return mColor;
+    return mColorIndex;
 }
 
 sampleCount WaveClip::TimeToSamples(double time) const
@@ -2017,9 +2028,15 @@ sampleCount WaveClip::GetVisibleSampleCount() const
            - TimeToSamples(mTrimRight) - TimeToSamples(mTrimLeft);
 }
 
-void WaveClip::SetTrimLeft(double trim)
+bool WaveClip::SetTrimLeft(double trim)
 {
-    mTrimLeft = std::max(.0, trim);
+    const auto newTrim = std::max(.0, trim);
+    if (mTrimLeft == newTrim) {
+        return false;
+    }
+
+    mTrimLeft = newTrim;
+    return true;
 }
 
 double WaveClip::GetTrimLeft() const noexcept
@@ -2027,9 +2044,15 @@ double WaveClip::GetTrimLeft() const noexcept
     return mTrimLeft;
 }
 
-void WaveClip::SetTrimRight(double trim)
+bool WaveClip::SetTrimRight(double trim)
 {
-    mTrimRight = std::max(.0, trim);
+    const auto newTrim = std::max(.0, trim);
+    if (mTrimRight == newTrim) {
+        return false;
+    }
+
+    mTrimRight = newTrim;
+    return true;
 }
 
 double WaveClip::GetTrimRight() const noexcept
@@ -2037,14 +2060,14 @@ double WaveClip::GetTrimRight() const noexcept
     return mTrimRight;
 }
 
-void WaveClip::TrimLeft(double deltaTime)
+bool WaveClip::TrimLeft(double deltaTime)
 {
-    SetTrimLeft(mTrimLeft + deltaTime);
+    return SetTrimLeft(mTrimLeft + deltaTime);
 }
 
-void WaveClip::TrimRight(double deltaTime)
+bool WaveClip::TrimRight(double deltaTime)
 {
-    SetTrimRight(mTrimRight + deltaTime);
+    return SetTrimRight(mTrimRight + deltaTime);
 }
 
 void WaveClip::TrimQuarternotesFromRight(double quarters)

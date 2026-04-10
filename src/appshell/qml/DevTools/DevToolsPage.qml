@@ -39,12 +39,39 @@ DockPage {
 
     function setCurrentCentral(name) {
         switch (name) {
+<<<<<<< HEAD:src/appshell/qml/DevTools/DevToolsPage.qml
         case "settings": root.central = settingsComp; break
         case "gallery": root.central = galleryComp; break
         case "interactive": root.central = interactiveComp; break
         case "crashhandler": root.central = crashhandlerComp; break
         case "extensions": root.central = extensionsComp; break
         case "navigation": root.central = keynavComp; break
+=======
+        case "settings":
+            root.central = settingsComp
+            break
+        case "gallery":
+            root.central = galleryComp
+            break
+        case "interactive":
+            root.central = interactiveComp
+            break
+        case "toastnotification":
+            root.central = toastNotificationComp
+            break
+        case "crashhandler":
+            root.central = crashhandlerComp
+            break
+        case "extensions":
+            root.central = extensionsComp
+            break
+        case "navigation":
+            root.central = keynavComp
+            break
+        case "cloud":
+            root.central = cloudComp
+            break
+>>>>>>> upstream/master:src/appshell/qml/Audacity/AppShell/DevTools/DevToolsPage.qml
         }
     }
 
@@ -69,15 +96,50 @@ DockPage {
                     anchors.fill: parent
 
                     model: [
+<<<<<<< HEAD:src/appshell/qml/DevTools/DevToolsPage.qml
                         { "name": "settings", "title": "Settings" },
                         { "name": "gallery", "title": "UI Gallery" },
                         { "name": "interactive", "title": "Interactive" },
                         { "name": "crashhandler", "title": "Crash handler" },
                         { "name": "extensions", "title": "Extensions" },
                         { "name": "navigation", "title": "KeyNav" }
+=======
+                        {
+                            "name": "settings",
+                            "title": "Settings"
+                        },
+                        {
+                            "name": "gallery",
+                            "title": "UI Gallery"
+                        },
+                        {
+                            "name": "interactive",
+                            "title": "Interactive"
+                        },
+                        {
+                            "name": "toastnotification",
+                            "title": "Toast Notification"
+                        },
+                        {
+                            "name": "crashhandler",
+                            "title": "Crash handler"
+                        },
+                        {
+                            "name": "extensions",
+                            "title": "Extensions"
+                        },
+                        {
+                            "name": "navigation",
+                            "title": "KeyNav"
+                        },
+                        {
+                            "name": "cloud",
+                            "title": "Cloud Tests"
+                        }
+>>>>>>> upstream/master:src/appshell/qml/Audacity/AppShell/DevTools/DevToolsPage.qml
                     ]
 
-                    onSelected: function(name) {
+                    onSelected: function (name) {
                         root.setCurrentCentral(name)
                     }
                 }
@@ -124,4 +186,15 @@ DockPage {
 
         KeyNavExample {}
     }
+<<<<<<< HEAD:src/appshell/qml/DevTools/DevToolsPage.qml
+=======
+
+    Component {
+        id: cloudComp
+
+        Loader {
+            source: "Cloud/CloudTests.qml"
+        }
+    }
+>>>>>>> upstream/master:src/appshell/qml/Audacity/AppShell/DevTools/DevToolsPage.qml
 }

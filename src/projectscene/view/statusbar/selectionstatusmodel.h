@@ -15,7 +15,11 @@
 #include "playback/iplayback.h"
 
 namespace au::projectscene {
+<<<<<<< HEAD
 class SelectionStatusModel : public QObject, public muse::async::Asyncable
+=======
+class SelectionStatusModel : public QObject, public muse::async::Asyncable, public muse::Contextable
+>>>>>>> upstream/master
 {
     Q_OBJECT
 
@@ -23,6 +27,7 @@ class SelectionStatusModel : public QObject, public muse::async::Asyncable
     Q_PROPERTY(double endTime READ endTime WRITE setEndTime NOTIFY endTimeChanged FINAL)
 
     Q_PROPERTY(int currentFormat READ currentFormat WRITE setCurrentFormat NOTIFY currentFormatChanged FINAL)
+    Q_PROPERTY(int durationFormat READ durationFormat WRITE setDurationFormat NOTIFY durationFormatChanged FINAL)
 
     Q_PROPERTY(double sampleRate READ sampleRate NOTIFY sampleRateChanged FINAL)
     Q_PROPERTY(double tempo READ tempo NOTIFY timeSignatureChanged FINAL)
@@ -31,10 +36,18 @@ class SelectionStatusModel : public QObject, public muse::async::Asyncable
 
     Q_PROPERTY(bool isEnabled READ isEnabled NOTIFY isEnabledChanged)
 
+<<<<<<< HEAD
     muse::Inject<context::IGlobalContext> globalContext;
     muse::Inject<trackedit::ISelectionController> selectionController;
     muse::Inject<playback::IPlayback> playback;
     muse::Inject<IProjectSceneConfiguration> configuration;
+=======
+    muse::GlobalInject<IProjectSceneConfiguration> configuration;
+
+    muse::ContextInject<context::IGlobalContext> globalContext { this };
+    muse::ContextInject<trackedit::ISelectionController> selectionController { this };
+    muse::ContextInject<playback::IPlayback> playback { this };
+>>>>>>> upstream/master
 
 public:
     Q_INVOKABLE void init();
@@ -48,6 +61,9 @@ public:
     int currentFormat() const;
     void setCurrentFormat(int format);
 
+    int durationFormat() const;
+    void setDurationFormat(int format);
+
     double sampleRate() const;
     double tempo() const;
     int upperTimeSignature() const;
@@ -60,6 +76,7 @@ signals:
     void endTimeChanged();
 
     void currentFormatChanged();
+    void durationFormatChanged();
     void sampleRateChanged();
 
     void timeSignatureChanged();
@@ -72,5 +89,6 @@ private:
     double m_endTime = 0.0;
 
     int m_currentFormat = 0;
+    int m_durationFormat = 0;
 };
 }

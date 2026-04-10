@@ -4,15 +4,10 @@
 #include "builtineffectsmodule.h"
 
 #include "internal/builtineffectsrepository.h"
-#include "internal/builtinviewlauncher.h"
 
-#include "common/builtineffectmodel.h"
-#include "common/valuewarper/valuewarper.h"
-
+#include "view/builtineffectmodel.h"
 #include "view/builtineffectviewloader.h"
-#include "view/effectsviewregister.h"
-
-#include "effects/effects_base/ieffectviewlaunchregister.h"
+#include "view/builtineffectsviewregister.h"
 
 using namespace au::effects;
 
@@ -28,18 +23,26 @@ std::string BuiltinEffectsModule::moduleName() const
 
 void BuiltinEffectsModule::registerExports()
 {
+<<<<<<< HEAD
     m_builtinEffectsRepository = std::make_shared<BuiltinEffectsRepository>();
 
     ioc()->registerExport<IBuiltinEffectsRepository>(moduleName(), m_builtinEffectsRepository);
     ioc()->registerExport<IEffectsViewRegister>(moduleName(), new EffectsViewRegister());
+=======
+    globalIoc()->registerExport<IBuiltinEffectsViewRegister>(moduleName(), new BuiltinEffectsViewRegister());
+    globalIoc()->registerExport<IBuiltinEffectsRepository>(moduleName(), new BuiltinEffectsRepository());
+>>>>>>> upstream/master
 }
 
 void BuiltinEffectsModule::resolveImports()
 {
+<<<<<<< HEAD
     auto lr = ioc()->resolve<IEffectViewLaunchRegister>(moduleName());
     if (lr) {
         lr->regLauncher("Audacity" /*builtin*/, std::make_shared<BuiltinViewLauncher>());
     }
+=======
+>>>>>>> upstream/master
 }
 
 void BuiltinEffectsModule::registerResources()
@@ -51,15 +54,12 @@ void BuiltinEffectsModule::registerUiTypes()
 {
     qmlRegisterUncreatableType<BuiltinEffectModel>("Audacity.BuiltinEffects", 1, 0, "BuiltinEffectModel", "Not creatable abstract type");
     qmlRegisterType<BuiltinEffectViewLoader>("Audacity.BuiltinEffects", 1, 0, "BuiltinEffectViewLoader");
-    qmlRegisterType<ValueWarper>("Audacity.BuiltinEffects", 1, 0, "ValueWarper");
-}
-
-void BuiltinEffectsModule::onPreInit(const muse::IApplication::RunMode&)
-{
-    m_builtinEffectsRepository->preInit();
 }
 
 void BuiltinEffectsModule::onInit(const muse::IApplication::RunMode&)
 {
-    m_builtinEffectsRepository->init();
+}
+
+void BuiltinEffectsModule::onDelayedInit()
+{
 }

@@ -34,6 +34,7 @@
 #endif
 
 namespace au::context {
+<<<<<<< HEAD
 class UiContextResolver : public muse::ui::IUiContextResolver, public muse::async::Asyncable
 {
     INJECT(muse::IInteractive, interactive)
@@ -42,6 +43,17 @@ class UiContextResolver : public muse::ui::IUiContextResolver, public muse::asyn
 
 #ifdef AU_BUILD_PLAYBACK_MODULE
     INJECT(playback::IPlaybackController, playbackController)
+=======
+class UiContextResolver : public muse::ui::IUiContextResolver, public muse::async::Asyncable, public muse::Contextable
+{
+    muse::ContextInject<muse::IInteractive> interactive { this };
+    muse::ContextInject<IGlobalContext> globalContext { this };
+    muse::ContextInject<muse::ui::INavigationController> navigationController { this };
+    muse::ContextInject<trackedit::ITrackNavigationController> trackNavigationController { this };
+
+#ifdef AU_BUILD_PLAYBACK_MODULE
+    muse::ContextInject<playback::IPlaybackController> playbackController { this };
+>>>>>>> upstream/master
 #endif
 public:
     UiContextResolver() = default;

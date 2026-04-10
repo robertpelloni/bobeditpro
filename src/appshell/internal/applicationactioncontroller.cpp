@@ -21,6 +21,8 @@
  */
 #include "applicationactioncontroller.h"
 
+#include <algorithm>
+
 #include <QApplication>
 #include <QCloseEvent>
 #include <QFileOpenEvent>
@@ -53,7 +55,7 @@ void ApplicationActionController::init()
 
     dispatcher()->reg(this, "fullscreen", this, &ApplicationActionController::toggleFullScreen);
 
-    dispatcher()->reg(this, "about-musescore", this, &ApplicationActionController::openAboutDialog);
+    dispatcher()->reg(this, "about-audacity", this, &ApplicationActionController::openAboutDialog);
     dispatcher()->reg(this, "about-qt", this, &ApplicationActionController::openAboutQtDialog);
     dispatcher()->reg(this, "online-handbook", this, &ApplicationActionController::openOnlineHandbookPage);
     dispatcher()->reg(this, "ask-help", this, &ApplicationActionController::openAskForHelpPage);
@@ -157,9 +159,21 @@ bool ApplicationActionController::canReceiveAction(const ActionCode& code) const
 
 bool ApplicationActionController::eventFilter(QObject* watched, QEvent* event)
 {
-    //! TODO AU4
-    if ((event->type() == QEvent::Close && watched == mainWindow()->qWindow())
-        || event->type() == QEvent::Quit) {
+    if (event->type() == QEvent::Close && watched == mainWindow()->qWindow()) {
+        if (multiwindowsProvider()->windowCount() > 1) {
+            if (!projectFilesController()->closeOpenedProject()) {
+                event->ignore();
+                return true;
+            }
+            watched->deleteLater();
+            return false;
+        }
+        const bool accepted = quit();
+        event->setAccepted(accepted);
+        return true;
+    }
+
+    if (event->type() == QEvent::Quit) {
         const bool accepted = quit();
         event->setAccepted(accepted);
         return true;
@@ -173,7 +187,7 @@ bool ApplicationActionController::eventFilter(QObject* watched, QEvent* event)
             if (startupScenario()->startupCompleted()) {
                 dispatcher()->dispatch("file-open", ActionData::make_arg1<QUrl>(url));
             } else {
-                startupScenario()->setStartupScoreFile(project::ProjectFile { url });
+                startupScenario()->setStartupProjectFile(project::ProjectFile { url });
             }
 
             return true;
@@ -194,9 +208,29 @@ bool ApplicationActionController::quit()
         m_quiting = false;
     };
 
-    constexpr auto quit = true;
-    if (!projectFilesController()->closeOpenedProject(quit)) {
-        return false;
+    auto allContexts = application()->contexts();
+
+    // Close the current window first, then others
+    auto thisCtx = iocContext();
+    std::stable_partition(allContexts.begin(), allContexts.end(),
+                          [&thisCtx](const auto& ctx) { return ctx == thisCtx; });
+
+    for (const auto& ctx : allContexts) {
+        auto pfc = muse::modularity::ioc(ctx)->resolve<project::IProjectFilesController>("appshell");
+        if (pfc && !pfc->closeOpenedProject()) {
+            return false;
+        }
+
+        auto window = muse::modularity::ioc(ctx)->resolve<muse::ui::IMainWindow>("appshell");
+
+        IF_ASSERT_FAILED(window) {
+            continue;
+        }
+
+        if (auto w = window->qWindow()) {
+            w->hide();
+            w->deleteLater();
+        }
     }
 
     QCoreApplication::exit();
@@ -223,7 +257,7 @@ void ApplicationActionController::toggleFullScreen()
 
 void ApplicationActionController::openAboutDialog()
 {
-    // interactive()->open("audacity://about/audacity");
+    interactive()->open("audacity://about/audacity");
 }
 
 void ApplicationActionController::openAboutQtDialog()
@@ -234,13 +268,13 @@ void ApplicationActionController::openAboutQtDialog()
 void ApplicationActionController::openOnlineHandbookPage()
 {
     std::string handbookUrl = configuration()->handbookUrl();
-    interactive()->openUrl(handbookUrl);
+    platformInteractive()->openUrl(handbookUrl);
 }
 
 void ApplicationActionController::openAskForHelpPage()
 {
     std::string askForHelpUrl = configuration()->askForHelpUrl();
-    interactive()->openUrl(askForHelpUrl);
+    platformInteractive()->openUrl(askForHelpUrl);
 }
 
 void ApplicationActionController::openPreferencesDialog()
@@ -291,8 +325,8 @@ void ApplicationActionController::revertToFactorySettings()
     std::string title = muse::trc("appshell", "Are you sure you want to revert to factory settings?");
     std::string question = muse::trc("appshell",
                                      "This action will reset all your app preferences and delete all custom palettes and custom shortcuts. "
-                                     "The list of recent scores will also be cleared.\n\n"
-                                     "This action will not delete any of your scores.");
+                                     "The list of recent projects will also be cleared.\n\n"
+                                     "This action will not delete any of your projects.");
 
     int revertBtn = int(muse::IInteractive::Button::Apply);
     muse::IInteractive::Result result = interactive()->warningSync(title, question,

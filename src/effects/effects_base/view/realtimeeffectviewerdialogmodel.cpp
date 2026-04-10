@@ -11,7 +11,11 @@
 
 namespace au::effects {
 RealtimeEffectViewerDialogModel::RealtimeEffectViewerDialogModel(QObject* parent)
+<<<<<<< HEAD
     : QObject(parent)
+=======
+    : QObject(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
+>>>>>>> upstream/master
 {
 }
 
@@ -94,6 +98,8 @@ EffectFamily RealtimeEffectViewerDialogModel::prop_effectFamily() const
         return EffectFamily::AudioUnit;
     } else if (family == "Audacity") {
         return EffectFamily::Builtin;
+    } else if (family == "Nyquist") {
+        return EffectFamily::Nyquist;
     } else {
         assert(false);
         return EffectFamily::Unknown;
@@ -132,7 +138,6 @@ void RealtimeEffectViewerDialogModel::prop_setEffectState(const QString& effectS
 
     m_effectState = reinterpret_cast<RealtimeEffectState*>(effectState.toULongLong())->shared_from_this();
     const auto effectId = m_effectState->GetID().ToStdString();
-    const auto type = effectsProvider()->effectSymbol(effectId);
     const auto instance = std::dynamic_pointer_cast<effects::EffectInstance>(m_effectState->GetInstance());
     instancesRegister()->regInstance(muse::String::fromStdString(effectId), instance, m_effectState->GetAccess());
 

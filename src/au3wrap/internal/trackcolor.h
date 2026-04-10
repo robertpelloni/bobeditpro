@@ -1,17 +1,16 @@
 #pragma once
 
-#include "modularity/ioc.h"
-
-#include "projectscene/iprojectsceneconfiguration.h"
-
-#include "draw/types/color.h"
 #include "au3-track/Track.h"
+#include "trackedit/trackedittypes.h"
 
 namespace au::au3 {
 class TrackColor : public TrackAttachment
 {
+<<<<<<< HEAD
     muse::Inject<projectscene::IProjectSceneConfiguration> projectSceneConfiguration;
 
+=======
+>>>>>>> upstream/master
 public:
     static TrackColor& Get(const Track* track);
     static TrackColor& Get(Track* track);
@@ -24,13 +23,13 @@ public:
     void WriteXMLAttributes(XMLWriter& writer) const override;
     bool HandleXMLAttribute(const std::string_view& attr, const XMLAttributeValueView& valueView) override;
 
-    muse::draw::Color GetColor() const;
-    void SetColor(const muse::draw::Color& color);
+    trackedit::ClipColorIndex GetColorIndex() const;
+    void SetColorIndex(trackedit::ClipColorIndex colorIndex);
 
     void assignColor();
 
 private:
     std::weak_ptr<Track> mTrack;
-    muse::draw::Color mColor;
+    trackedit::ClipColorIndex mColorIndex = 0;
 };
 }

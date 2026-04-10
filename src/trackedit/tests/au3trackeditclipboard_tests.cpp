@@ -12,6 +12,7 @@
 
 #include "trackedit/internal/au3/au3trackeditclipboard.h"
 #include "trackedit/internal/au3/au3trackdata.h"
+#include "trackedit/internal/clipboarddata.h"
 
 using ::testing::Return;
 using ::testing::Truly;
@@ -27,7 +28,14 @@ class Au3TrackEditClipboardTests : public ::testing::Test
 public:
     void SetUp() override
     {
+<<<<<<< HEAD
         m_au3TrackEditClipboard = std::make_unique<Au3TrackeditClipboard>();
+=======
+        m_clipboardData = std::make_shared<ClipboardData>();
+        muse::modularity::globalIoc()->registerExport<IClipboardData>("test", m_clipboardData);
+
+        m_au3TrackEditClipboard = std::make_unique<Au3TrackeditClipboard>(muse::modularity::globalCtx());
+>>>>>>> upstream/master
 
         m_globalContext = std::make_shared<au::context::GlobalContextMock>();
 
@@ -53,7 +61,7 @@ public:
 
     void initTestProject()
     {
-        m_au3ProjectAccessor = std::make_shared<au3::Au3ProjectAccessor>();
+        m_au3ProjectAccessor = std::make_shared<au3::Au3ProjectAccessor>(muse::modularity::globalCtx());
         const muse::io::path_t TEST_PROJECT_PATH = muse::String::fromUtf8(trackedit_tests_DATA_ROOT) + "/data/testClipboard.aup3";
         constexpr auto discardAutosave = false;
         muse::Ret ret = m_au3ProjectAccessor->load(TEST_PROJECT_PATH, discardAutosave);
@@ -118,6 +126,7 @@ public:
     const int m_numberOfTracks = 2; // The number of tracks in testClipboard.aup3
 
     std::unique_ptr<Au3TrackeditClipboard> m_au3TrackEditClipboard;
+    std::shared_ptr<ClipboardData> m_clipboardData;
 
     std::shared_ptr<au::context::GlobalContextMock> m_globalContext;
     std::shared_ptr<project::AudacityProjectMock> m_currentProject;

@@ -27,9 +27,15 @@
 #include "modularity/ioc.h"
 #include "iglobalconfiguration.h"
 #include "io/ifilesystem.h"
+<<<<<<< HEAD
 // #include "multiinstances/imultiinstancesprovider.h"
 #include "ui/iuiconfiguration.h"
+=======
+>>>>>>> upstream/master
 #include "projectscene/iprojectsceneconfiguration.h"
+#include "iapplication.h"
+
+// #include "ui/iuiconfiguration.h"
 // #include "project/iprojectconfiguration.h"
 // #include "playback/iplaybackconfiguration.h"
 // #include "languages/ilanguagesconfiguration.h"
@@ -37,8 +43,9 @@
 #include "iappshellconfiguration.h"
 
 namespace au::appshell {
-class AppShellConfiguration : public IAppShellConfiguration, public muse::async::Asyncable
+class AppShellConfiguration : public IAppShellConfiguration, public muse::Contextable, public muse::async::Asyncable
 {
+<<<<<<< HEAD
     muse::Inject<muse::IGlobalConfiguration> globalConfiguration;
     muse::Inject<muse::io::IFileSystem> fileSystem;
     muse::Inject<projectscene::IProjectSceneConfiguration> projectSceneConfiguration;
@@ -48,35 +55,48 @@ class AppShellConfiguration : public IAppShellConfiguration, public muse::async:
     // INJECT(notation::INotationConfiguration, notationConfiguration)
     // INJECT(playback::IPlaybackConfiguration, playbackConfiguration)
     // INJECT(languages::ILanguagesConfiguration, languagesConfiguration)
+=======
+    muse::GlobalInject<muse::IGlobalConfiguration> globalConfiguration;
+    muse::GlobalInject<muse::io::IFileSystem> fileSystem;
+    muse::GlobalInject<projectscene::IProjectSceneConfiguration> projectSceneConfiguration;
+    muse::GlobalInject<muse::IApplication> application;
+>>>>>>> upstream/master
 
 public:
+    AppShellConfiguration(const muse::modularity::ContextPtr& iocCtx)
+        : muse::Contextable(iocCtx) {}
+
     void init();
 
     bool hasCompletedFirstLaunchSetup() const override;
     void setHasCompletedFirstLaunchSetup(bool has) override;
 
+    bool welcomeDialogShowOnStartup() const override;
+    void setWelcomeDialogShowOnStartup(bool show) override;
+    muse::async::Notification welcomeDialogShowOnStartupChanged() const override;
+
+    std::string welcomeDialogLastShownVersion() const override;
+    void setWelcomeDialogLastShownVersion(const std::string& version) override;
+
+    int welcomeDialogLastShownIndex() const override;
+    void setWelcomeDialogLastShownIndex(int index) override;
+
     StartupModeType startupModeType() const override;
     void setStartupModeType(StartupModeType type) override;
 
-    muse::io::path_t startupScorePath() const override;
-    void setStartupScorePath(const muse::io::path_t& scorePath) override;
+    muse::io::path_t startupProjectPath() const override;
+    void setStartupProjectPath(const muse::io::path_t& scorePath) override;
 
     muse::io::path_t userDataPath() const override;
 
     std::string handbookUrl() const override;
     std::string askForHelpUrl() const override;
-    std::string museScoreUrl() const override;
-    std::string museScoreForumUrl() const override;
-    std::string museScoreContributionUrl() const override;
-    std::string musicXMLLicenseUrl() const override;
-    std::string musicXMLLicenseDeedUrl() const override;
+    std::string appUrl() const override;
+    std::string forumUrl() const override;
+    std::string contributionUrl() const override;
 
-    std::string museScoreVersion() const override;
-    std::string museScoreRevision() const override;
-
-    bool isNotationNavigatorVisible() const override;
-    void setIsNotationNavigatorVisible(bool visible) const override;
-    muse::async::Notification isNotationNavigatorVisibleChanged() const override;
+    std::string audacityVersion() const override;
+    std::string appRevision() const override;
 
     bool needShowSplashScreen() const override;
     void setNeedShowSplashScreen(bool show) override;
@@ -99,10 +119,6 @@ public:
     muse::async::Notification isEffectsPanelVisibleChanged() const override;
 
 private:
-    std::string utmParameters(const std::string& utmMedium) const;
-
-    std::string currentLanguageCode() const;
-
     muse::io::path_t sessionDataPath() const;
     muse::io::path_t sessionFilePath() const;
 
@@ -113,6 +129,8 @@ private:
 
     QString m_preferencesDialogCurrentPageId;
     muse::async::Notification m_settingsApplied;
+
+    muse::async::Notification m_welcomeDialogShowOnStartupChanged;
 };
 }
 

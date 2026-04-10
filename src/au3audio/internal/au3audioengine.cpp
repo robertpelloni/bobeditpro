@@ -60,14 +60,35 @@ bool Au3AudioEngine::isBusy() const
     return AudioIO::Get()->IsBusy();
 }
 
+bool Au3AudioEngine::isCapturing() const
+{
+    return AudioIO::Get()->IsCapturing();
+}
+
 int Au3AudioEngine::startStream(const TransportSequences& sequences, const double startTime, const double endTime,
                                 const double mixerEndTime,
-                                AudacityProject& project, const bool isDefaultPlayTrackPolicy, const double audioStreamSampleRate)
+                                AudacityProject& project, const bool isDefaultPlayTrackPolicy, const double audioStreamSampleRate,
+                                const double leadInTime,
+                                std::vector<std::vector<float> >* crossfadeData)
 {
     AudioIOStartStreamOptions options = ProjectAudioIO::GetDefaultOptions(project, isDefaultPlayTrackPolicy);
     options.inputMonitoring = recordConfiguration()->isInputMonitoringOn();
     options.rate = audioStreamSampleRate;
+<<<<<<< HEAD
     return AudioIO::Get()->StartStream(sequences, startTime, endTime, mixerEndTime, options);
+=======
+    options.leadInTime = leadInTime;
+    if (crossfadeData) {
+        options.pCrossfadeData = crossfadeData;
+    }
+    auto& audioIO = *AudioIO::Get();
+    const int token = audioIO.StartStream(sequences, startTime, endTime, mixerEndTime, options);
+    if (token > 0) {
+        LOGI() << "PortAudio latency report (ms): outputLatency=" << audioIO.GetHardwarePlaybackLatencyMs() <<
+            ", inputLatency=" << audioIO.GetHardwareCaptureLatencyMs();
+    }
+    return token;
+>>>>>>> upstream/master
 }
 
 void Au3AudioEngine::stopStream()

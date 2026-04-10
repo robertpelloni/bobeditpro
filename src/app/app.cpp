@@ -50,6 +50,10 @@ using namespace au::appshell;
 static GlobalModule globalModule;
 
 App::App()
+<<<<<<< HEAD
+=======
+    : muse::Contextable(muse::modularity::globalCtx())
+>>>>>>> upstream/master
 {
 }
 
@@ -327,14 +331,14 @@ void App::applyCommandLineOptions(const CommandLineParser::Options& options)
 
     startupScenario()->setStartupType(options.startup.type);
 
-    if (options.startup.scoreUrl.has_value()) {
-        project::ProjectFile file { options.startup.scoreUrl.value() };
+    if (options.startup.projectUrl.has_value()) {
+        project::ProjectFile file { options.startup.projectUrl.value() };
 
         if (options.startup.scoreDisplayNameOverride.has_value()) {
             file.displayNameOverride = options.startup.scoreDisplayNameOverride.value();
         }
 
-        startupScenario()->setStartupScoreFile(file);
+        startupScenario()->setStartupProjectFile(file);
     }
 
     if (options.app.loggerLevel) {

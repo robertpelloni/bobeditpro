@@ -8,12 +8,26 @@
 #include "global/iinteractive.h"
 
 namespace au::effects {
+<<<<<<< HEAD
 class AbstractViewLauncher : public IEffectViewLauncher
 {
 protected:
     muse::Inject<muse::IInteractive> interactive;
     muse::Inject<IEffectInstancesRegister> instancesRegister;
 
+=======
+class AbstractViewLauncher : public IEffectViewLauncher, public muse::Contextable
+{
+protected:
+    muse::ContextInject<muse::IInteractive> interactive{ this };
+    muse::ContextInject<IEffectInstancesRegister> instancesRegister{ this };
+
+public:
+    AbstractViewLauncher(const muse::modularity::ContextPtr& ctx)
+        : muse::Contextable(ctx) {}
+
+protected:
+>>>>>>> upstream/master
     muse::Ret doShowEffect(int instanceId, EffectFamily) const;
     void doShowRealtimeEffect(const RealtimeEffectStatePtr& state) const;
 

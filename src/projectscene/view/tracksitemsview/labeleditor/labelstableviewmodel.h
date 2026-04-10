@@ -5,8 +5,15 @@
 
 #include <qqmlintegration.h>
 
+<<<<<<< HEAD
 #include "modularity/ioc.h"
 #include "iinteractive.h"
+=======
+#include "framework/global/modularity/ioc.h"
+#include "framework/interactive/iinteractive.h"
+#include "framework/interactive/iplatforminteractive.h"
+
+>>>>>>> upstream/master
 #include "context/iglobalcontext.h"
 #include "trackedit/itrackeditinteraction.h"
 #include "trackedit/ilabelsinteraction.h"
@@ -33,11 +40,12 @@ enum class Type {
 Q_ENUM_NS(Type)
 }
 
-class LabelsTableViewModel : public muse::uicomponents::AbstractTableViewModel, public muse::Injectable
+class LabelsTableViewModel : public muse::uicomponents::AbstractTableViewModel, public muse::Contextable
 {
     Q_OBJECT
     QML_ELEMENT;
 
+<<<<<<< HEAD
     muse::Inject<muse::IInteractive> interactive = { this };
     muse::Inject<context::IGlobalContext> globalContext = { this };
     muse::Inject<trackedit::ITrackeditInteraction> trackeditInteraction = { this };
@@ -46,6 +54,18 @@ class LabelsTableViewModel : public muse::uicomponents::AbstractTableViewModel, 
     muse::Inject<importexport::ILabelsImporter> labelsImporter = { this };
     muse::Inject<importexport::ILabelsConfiguration> labelsImportExportConfiguration = { this };
     muse::Inject<IProjectSceneConfiguration> configuration = { this };
+=======
+    muse::GlobalInject<importexport::ILabelsConfiguration> labelsImportExportConfiguration;
+    muse::GlobalInject<IProjectSceneConfiguration> configuration;
+    muse::GlobalInject<muse::IPlatformInteractive> platformInteractive;
+
+    muse::ContextInject<muse::IInteractive> interactive = { this };
+    muse::ContextInject<context::IGlobalContext> globalContext = { this };
+    muse::ContextInject<trackedit::ITrackeditInteraction> trackeditInteraction = { this };
+    muse::ContextInject<trackedit::ILabelsInteraction> labelsInteraction = { this };
+    muse::ContextInject<importexport::ILabelsExporter> labelExporter = { this };
+    muse::ContextInject<importexport::ILabelsImporter> labelsImporter = { this };
+>>>>>>> upstream/master
 
 public:
     explicit LabelsTableViewModel(QObject* parent = nullptr);

@@ -45,8 +45,13 @@ static constexpr QRectF websiteRect(76, 240, 0, 0);
 static const QColor versionNumberColor("#EB4859");
 static constexpr qreal versionNumberSpacing = 5.0;
 
+<<<<<<< HEAD:src/appshell/view/internal/splashscreen/loadingscreenview.cpp
 LoadingScreenView::LoadingScreenView(QWidget* parent)
     : QWidget(parent),
+=======
+LoadingScreenView::LoadingScreenView(const muse::modularity::ContextPtr& ctx, QWidget* parent)
+    : QWidget(parent), muse::Contextable(ctx),
+>>>>>>> upstream/master:src/appshell/internal/splashscreen/loadingscreenview.cpp
     m_backgroundRenderer(new QSvgRenderer(imagePath, this))
 {
     setAttribute(Qt::WA_TranslucentBackground);

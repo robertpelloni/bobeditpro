@@ -10,6 +10,7 @@
 
 namespace au::effects {
 class Lv2PluginMetaReader;
+class Lv2EffectsRepository;
 
 class Lv2EffectsModule : public muse::modularity::IModuleSetup
 {
@@ -24,7 +25,20 @@ public:
     void onInit(const muse::IApplication::RunMode& mode) override;
     void onDeinit() override;
 
+    muse::modularity::IContextSetup* newContext(const muse::modularity::ContextPtr& ctx) const override;
+
 private:
     const std::shared_ptr<Lv2PluginMetaReader> m_metaReader;
+};
+
+class Lv2EffectsContext : public muse::modularity::IContextSetup
+{
+public:
+    Lv2EffectsContext(const muse::modularity::ContextPtr& ctx)
+        : muse::modularity::IContextSetup(ctx) {}
+
+    void registerExports() override;
+    void resolveImports() override;
+    void onDeinit() override;
 };
 }

@@ -118,6 +118,21 @@ jobs:
         source /c/build_tools/environment.sh
         cmake -DCRASH_REPORT_URL=$C_URL -P ${CI_DIR}/windows/ci_build.cmake
 
+<<<<<<< HEAD
+=======
+    - name: Show ccache stats
+      run: |
+        ccache -sv
+
+    - name: Upload build for self-test
+      if: env.DO_BUILD == 'true'
+      uses: actions/upload-artifact@v6
+      with:
+        name: selftest-build-windows
+        path: ./build.install/
+        retention-days: 1
+
+>>>>>>> upstream/master
     - name: Package
       env:
         SIGN_KEY:    ${{ secrets.WINDOWS_CODE_SIGNING_ACCESS_KEY_ID }}
@@ -148,3 +163,51 @@ jobs:
       with:
         name: ${{ env.UPLOAD_ARTIFACT_NAME }}
         path: ./build.artifacts/
+<<<<<<< HEAD
+=======
+
+    - name: Prepare ccache files for saving
+      id: prepare-save-ccache
+      if: always()
+      shell: bash
+      run: |
+        ccache --recompress 10
+        echo "CCACHE_TIMESTAMP=$(date -u +"%F-%T")" | tee -a $GITHUB_OUTPUT
+    - name: Save ccache files
+      if: always()
+      uses: actions/cache/save@v5
+      with:
+        key: ${{ steps.restore-ccache.outputs.cache-primary-key }}${{ steps.prepare-save-ccache.outputs.CCACHE_TIMESTAMP }}
+        path: ${{ github.workspace }}/.ccache
+
+  plugin-registration-self-test:
+    needs: au4_build_windows
+    runs-on: windows-2022
+    steps:
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '6.10.1'
+        host: 'windows'
+        target: 'desktop'
+        arch: 'win64_msvc2022_64'
+        modules: 'qt5compat qtnetworkauth qtshadertools qtwebsockets qtgraphs qtquick3d'
+        cache: true
+
+    - name: Download build artifact
+      uses: actions/download-artifact@v6
+      with:
+        name: selftest-build-windows
+        path: ./build.install
+
+    - name: Run plugin registration app self-test
+      shell: bash
+      run: |
+        ./build.install/bin/Audacity4.exe --plugin-registration-self-test
+
+    - name: Delete self-test artifact
+      if: always()
+      uses: geekyeggo/delete-artifact@176a747ab7e287e3ff4787bf8a148716375ca118 # v6.0.0
+      with:
+        name: selftest-build-windows
+>>>>>>> upstream/master

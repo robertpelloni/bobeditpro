@@ -10,6 +10,7 @@
 #include "trackedit/iprojecthistory.h"
 #include "iinteractive.h"
 #include "trackedit/itracksinteraction.h"
+#include "automation/iclipgaininteraction.h"
 
 #include "au3wrap/au3types.h"
 
@@ -21,6 +22,7 @@ namespace au::trackedit {
 class Au3TrackData;
 using Au3TrackDataPtr = std::shared_ptr<Au3TrackData>;
 
+<<<<<<< HEAD
 class Au3ClipsInteraction : public IClipsInteraction
 {
     muse::Inject<au::context::IGlobalContext> globalContext;
@@ -29,6 +31,18 @@ class Au3ClipsInteraction : public IClipsInteraction
     muse::Inject<au::trackedit::IProjectHistory> projectHistory;
     muse::Inject<muse::IInteractive> interactive;
     muse::Inject<ITracksInteraction> tracksInteraction;
+=======
+class Au3ClipsInteraction : public IClipsInteraction, public muse::Contextable
+{
+    muse::GlobalInject<au::trackedit::ITrackeditConfiguration> configuration;
+
+    muse::ContextInject<au::context::IGlobalContext> globalContext{ this };
+    muse::ContextInject<au::trackedit::ISelectionController> selectionController{ this };
+    muse::ContextInject<au::trackedit::IProjectHistory> projectHistory{ this };
+    muse::ContextInject<muse::IInteractive> interactive{ this };
+    muse::ContextInject<ITracksInteraction> tracksInteraction{ this };
+    muse::ContextInject<automation::IClipGainInteraction> clipGainInteraction{ this };
+>>>>>>> upstream/master
 
 public:
     Au3ClipsInteraction();
@@ -45,7 +59,7 @@ public:
     bool resetClipPitch(const ClipKey& clipKey) override;
     bool changeClipSpeed(const ClipKey& clipKey, double speed) override;
     bool resetClipSpeed(const ClipKey& clipKey) override;
-    bool changeClipColor(const ClipKey& clipKey, const std::string& color) override;
+    bool changeClipColor(const ClipKey& clipKey, ClipColorIndex colorIndex) override;
     bool changeClipOptimizeForVoice(const ClipKey& clipKey, bool optimize) override;
     bool renderClipPitchAndSpeed(const ClipKey& clipKey) override;
 

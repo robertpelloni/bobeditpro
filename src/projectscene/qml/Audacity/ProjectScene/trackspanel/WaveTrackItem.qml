@@ -75,6 +75,7 @@ TrackItem {
                 text: qsTrc("projectscene", "Effects")
 
                 onClicked: {
+                    root.selectionRequested(true)
                     root.openEffectsRequested()
                 }
             }

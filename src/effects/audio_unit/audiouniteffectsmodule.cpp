@@ -17,6 +17,8 @@
 #include "view/audiounitview.h"
 #include "view/audiounitviewmodel.h"
 
+static const std::string mname("effects_audiounit");
+
 static void AudioUnitInitQrc()
 {
     Q_INIT_RESOURCE(audiounit);
@@ -30,32 +32,39 @@ au::effects::AudioUnitEffectsModule::AudioUnitEffectsModule()
 
 std::string au::effects::AudioUnitEffectsModule::moduleName() const
 {
-    return "effects_audiounit";
+    return mname;
 }
 
 void au::effects::AudioUnitEffectsModule::registerExports()
 {
+<<<<<<< HEAD
     m_effectsRepository = std::make_shared<AudioUnitEffectsRepository>();
 
     ioc()->registerExport<IAudioUnitEffectsRepository>(moduleName(), m_effectsRepository);
+=======
+    globalIoc()->registerExport<IAudioUnitEffectsRepository>(mname, std::make_shared<AudioUnitEffectsRepository>());
+>>>>>>> upstream/master
 }
 
 void au::effects::AudioUnitEffectsModule::resolveImports()
 {
-    auto scannerRegister = ioc()->resolve<muse::audioplugins::IAudioPluginsScannerRegister>(moduleName());
+    auto scannerRegister = globalIoc()->resolve<muse::audioplugins::IAudioPluginsScannerRegister>(mname);
     if (scannerRegister) {
         scannerRegister->registerScanner(std::make_shared<AudioUnitPluginsScanner>());
     }
 
-    auto metaReaderRegister = ioc()->resolve<muse::audioplugins::IAudioPluginMetaReaderRegister>(moduleName());
+    auto metaReaderRegister = globalIoc()->resolve<muse::audioplugins::IAudioPluginMetaReaderRegister>(mname);
     if (metaReaderRegister) {
         metaReaderRegister->registerReader(m_metaReader);
     }
+<<<<<<< HEAD
 
     auto launchRegister = ioc()->resolve<IEffectViewLaunchRegister>(moduleName());
     if (launchRegister) {
         launchRegister->regLauncher("AudioUnit", std::make_shared<AudioUnitViewLauncher>());
     }
+=======
+>>>>>>> upstream/master
 }
 
 void au::effects::AudioUnitEffectsModule::registerUiTypes()
@@ -72,4 +81,29 @@ void au::effects::AudioUnitEffectsModule::onInit(const muse::IApplication::RunMo
 void au::effects::AudioUnitEffectsModule::onDeinit()
 {
     m_metaReader->deinit();
+}
+
+muse::modularity::IContextSetup* au::effects::AudioUnitEffectsModule::newContext(const muse::modularity::ContextPtr& ctx) const
+{
+    return new AudioUnitEffectsContext(ctx);
+}
+
+// =====================================================
+// AudioUnitEffectsContext
+// =====================================================
+
+void au::effects::AudioUnitEffectsContext::registerExports()
+{
+}
+
+void au::effects::AudioUnitEffectsContext::resolveImports()
+{
+    auto launchRegister = ioc()->resolve<IEffectViewLaunchRegister>(mname);
+    if (launchRegister) {
+        launchRegister->regLauncher("AudioUnit", std::make_shared<AudioUnitViewLauncher>(iocContext()));
+    }
+}
+
+void au::effects::AudioUnitEffectsContext::onDeinit()
+{
 }

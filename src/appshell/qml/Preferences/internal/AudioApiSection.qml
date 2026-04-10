@@ -42,6 +42,7 @@ BaseSection {
         id: playbackState
     }
 
+<<<<<<< HEAD:src/appshell/qml/Preferences/internal/AudioApiSection.qml
     // /*
     //  * TODO: https://github.com/musescore/MuseScore/issues/9807
     ComboBoxWithTitle {
@@ -49,30 +50,100 @@ BaseSection {
 
         title: qsTrc("appshell/preferences", "Host")
         columnWidth: root.columnWidth
-
-        enabled: !playbackState.isPlaying
-
-        currentIndex: apiModel.currentAudioApiIndex
-        model: root.audioApiList
-
-        navigation.name: "AudioApiBox"
-        navigation.panel: root.navigation
-        navigation.row: 1
-
-        onValueEdited: function(newIndex, newValue) {
-            root.currentAudioApiIndexChangeRequested(newIndex)
-        }
+=======
+    Component.onCompleted: {
+        playbackState.init()
     }
-    // */
 
-    CommonAudioApiConfiguration {
-        columnWidth: Math.max(apiModel.longestDeviceNameLength, root.columnWidth)
+    Row {
+        width: parent.width
+        spacing: root.spacing
 
-        enabled: !playbackState.isPlaying
+        Column {
+            width: root.columnWidth
+            spacing: root.spacing
+>>>>>>> upstream/master:src/preferences/qml/Audacity/Preferences/internal/AudioApiSection.qml
 
-        navigation: root.navigation
-        navigationOrderStart: 2
+            ComboBoxWithTitle {
+                title: qsTrc("preferences", "Host")
+                columnWidth: root.columnWidth
 
-        apiModel: root.apiModel
+                enabled: !playbackState.isPlaying
+
+                currentIndex: apiModel.currentAudioApiIndex
+                model: root.audioApiList
+
+                navigation.name: "AudioApiBox"
+                navigation.panel: root.navigation
+                navigation.row: 1
+                navigation.column: 0
+
+                onValueEdited: function(newIndex, newValue) {
+                    root.currentAudioApiIndexChangeRequested(newIndex)
+                }
+            }
+
+            ComboBoxWithTitle {
+                title: qsTrc("preferences", "Recording device")
+                columnWidth: root.columnWidth
+
+                enabled: !playbackState.isPlaying
+
+                currentIndex: indexOfValue(apiModel.currentInputDeviceId)
+                model: apiModel.inputDeviceList
+
+                navigation.name: "RecordingDeviceBox"
+                navigation.panel: root.navigation
+                navigation.row: 2
+                navigation.column: 0
+
+                onValueEdited: function(newIndex, newValue) {
+                    apiModel.inputDeviceSelected(newValue)
+                }
+            }
+        }
+
+        Column {
+            width: root.columnWidth
+            spacing: root.spacing
+
+            ComboBoxWithTitle {
+                title: qsTrc("preferences", "Playback device")
+                columnWidth: root.columnWidth
+
+                enabled: !playbackState.isPlaying
+
+                currentIndex: indexOfValue(apiModel.currentOutputDeviceId)
+                model: apiModel.outputDeviceList
+
+                navigation.name: "PlaybackDeviceBox"
+                navigation.panel: root.navigation
+                navigation.row: 1
+                navigation.column: 1
+
+                onValueEdited: function(newIndex, newValue) {
+                    apiModel.outputDeviceSelected(newValue)
+                }
+            }
+
+            ComboBoxWithTitle {
+                title: qsTrc("preferences", "Recording channels")
+                columnWidth: root.columnWidth
+
+                enabled: !playbackState.isPlaying
+
+                currentIndex: indexOfValue(apiModel.currentInputChannelsSelected)
+                model: apiModel.inputChannelsList
+
+                navigation.name: "RecordingChannelsBox"
+                navigation.panel: root.navigation
+                navigation.row: 2
+                navigation.column: 1
+
+                onValueEdited: function(newIndex, newValue) {
+                    apiModel.inputChannelsSelected(newIndex)
+                }
+            }
+        }
     }
 }

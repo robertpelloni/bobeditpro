@@ -44,10 +44,15 @@ using namespace au::trackedit;
 using namespace au::au3;
 
 namespace {
-const std::string mixingDownToMonoLabel = muse::trc("trackedit", "Mixing down to mono...");
+const std::string mixingDownToMonoLabel = muse::trc("trackedit", "Mixing down to mono…");
 }
 
+<<<<<<< HEAD
 Au3TracksInteraction::Au3TracksInteraction()
+=======
+Au3TracksInteraction::Au3TracksInteraction(const muse::modularity::ContextPtr& ctx)
+    : muse::Contextable(ctx)
+>>>>>>> upstream/master
 {
     m_progress.setMaxNumIncrements(200);
 }
@@ -112,7 +117,7 @@ bool Au3TracksInteraction::changeTrackTitle(const TrackId trackId, const muse::S
     return true;
 }
 
-bool Au3TracksInteraction::changeTracksColor(const TrackIdList& tracksIds, const std::string& color)
+bool Au3TracksInteraction::changeTracksColor(const TrackIdList& tracksIds, ClipColorIndex colorIndex)
 {
     for (const TrackId& trackId : tracksIds) {
         Au3Track* track = DomAccessor::findTrack(projectRef(), ::TrackId(trackId));
@@ -121,15 +126,15 @@ bool Au3TracksInteraction::changeTracksColor(const TrackIdList& tracksIds, const
         }
 
         auto& trackColor = TrackColor::Get(track);
-        trackColor.SetColor(muse::draw::Color::fromString(color));
+        trackColor.SetColorIndex(colorIndex);
 
         trackedit::ITrackeditProjectPtr prj = globalContext()->currentTrackeditProject();
         prj->notifyAboutTrackChanged(DomConverter::track(track));
 
         if (Au3WaveTrack* waveTrack = dynamic_cast<Au3WaveTrack*>(track)) {
             for (auto& clips: DomAccessor::waveClipsAsList(waveTrack)) {
-                //Set it back to auto
-                clips->SetColor("");
+                //Set it back to auto (inherit from track)
+                clips->SetColorIndex(CLIP_COLOR_INDEX_NONE);
                 prj->notifyAboutClipChanged(DomConverter::clip(waveTrack, clips.get()));
             }
         } else if (Au3LabelTrack* labelTrack = dynamic_cast<Au3LabelTrack*>(track)) {
@@ -306,10 +311,22 @@ muse::Ret Au3TracksInteraction::pasteClips(const std::vector<Au3TrackDataPtr>& c
 
         const auto trackToPaste = std::static_pointer_cast<Au3WaveTrack>(copiedData.at(i)->track());
 
-        if (dstWaveTrack->IsEmpty() && trackToPaste->NChannels() != dstWaveTrack->NChannels()) {
-            auto& trackList = au3::Au3TrackList::Get(projectRef());
-            dstWaveTrack = utils::toggleStereo(trackList, *dstWaveTrack);
-            prj->trackChanged().send(DomConverter::track(dstWaveTrack));
+        if (dstWaveTrack->IsEmpty()) {
+            bool trackChanged = false;
+            // For empty tracks, adopt the sample rate from the imported audio
+            if (dstWaveTrack->GetRate() != trackToPaste->GetRate()) {
+                dstWaveTrack->SetRate(trackToPaste->GetRate());
+                trackChanged = true;
+            }
+            // Handle channel mismatch
+            if (trackToPaste->NChannels() != dstWaveTrack->NChannels()) {
+                auto& trackList = au3::Au3TrackList::Get(projectRef());
+                dstWaveTrack = utils::toggleStereo(trackList, *dstWaveTrack);
+                trackChanged = true;
+            }
+            if (trackChanged) {
+                prj->trackChanged().send(DomConverter::track(dstWaveTrack));
+            }
         } else if (trackToPaste->NChannels() == 1 && dstWaveTrack->NChannels() == 2) {
             trackToPaste->MonoToStereo();
         } else if (trackToPaste->NChannels() == 2 && dstWaveTrack->NChannels() == 1) {
@@ -520,6 +537,10 @@ bool Au3TracksInteraction::splitTracksAt(const TrackIdList& tracksIds, std::vect
 {
     selectionController()->resetSelectedClips();
 
+    trackedit::ITrackeditProjectPtr prj = globalContext()->currentTrackeditProject();
+    std::vector<trackedit::Track> changedTracks;
+    ClipKeyList splitClipKeys;
+
     for (const auto& trackId : tracksIds) {
         Au3WaveTrack* waveTrack = DomAccessor::findWaveTrack(projectRef(), Au3TrackId(trackId));
         IF_ASSERT_FAILED(waveTrack) {
@@ -536,21 +557,25 @@ bool Au3TracksInteraction::splitTracksAt(const TrackIdList& tracksIds, std::vect
         }
 
         if (didAnySplitOccur) {
-            // Select the leftmost clip
             secs_t time = pivots.front();
             const auto sampleLength = 1. / waveTrack->GetRate();
             time -= sampleLength;
 
             auto clip = waveTrack->GetClipAtTime(time);
-
             if (clip) {
-                ClipKey clipKey = DomConverter::clip(waveTrack, clip.get()).key;
-                selectionController()->setSelectedClips({ clipKey }, true);
+                splitClipKeys.push_back(DomConverter::clip(waveTrack, clip.get()).key);
             }
 
-            trackedit::ITrackeditProjectPtr prj = globalContext()->currentTrackeditProject();
-            prj->notifyAboutTrackChanged(DomConverter::track(waveTrack));
+            changedTracks.push_back(DomConverter::track(waveTrack));
         }
+    }
+
+    for (const auto& track : changedTracks) {
+        prj->notifyAboutTrackClipListChanged(track);
+    }
+
+    if (!splitClipKeys.empty()) {
+        selectionController()->setSelectedClips(splitClipKeys, true);
     }
 
     return true;

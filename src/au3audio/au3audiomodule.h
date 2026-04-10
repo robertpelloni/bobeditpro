@@ -17,15 +17,27 @@ public:
 
     std::string moduleName() const override;
     void registerExports() override;
-    void resolveImports() override;
-    void registerResources() override;
-    void registerUiTypes() override;
     void onInit(const muse::IApplication::RunMode& mode) override;
     void onDeinit() override;
+
+    muse::modularity::IContextSetup* newContext(const muse::modularity::ContextPtr& ctx) const override;
 
 private:
 
     std::shared_ptr<Au3AudioEngine> m_audioEngine;
+};
+
+class Au3AudioContext : public muse::modularity::IContextSetup
+{
+public:
+    Au3AudioContext(const muse::modularity::ContextPtr& ctx)
+        : muse::modularity::IContextSetup(ctx) {}
+
+    void registerExports() override;
+    void onInit(const muse::IApplication::RunMode& mode) override;
+    void onDeinit() override;
+
+private:
     std::shared_ptr<Au3AudioDevicesProvider> m_audioDevicesProvider;
 };
 }

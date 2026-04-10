@@ -22,17 +22,19 @@
 
 #include "view/toolbars/audiosetupcontextmenumodel.h"
 #include "view/toolbars/projecttoolbarmodel.h"
+#include "view/toolbars/geteffectsmodel.h"
 #include "view/toolbars/undoredotoolbarmodel.h"
 #include "view/toolbars/workspacestoolbarmodel.h"
 
-#include "view/trackspanel/paneltrackslistmodel.h"
 #include "view/trackspanel/addeffectmenumodel.h"
-#include "view/trackspanel/realtimeeffectlistmodel.h"
+#include "view/trackspanel/addnewtrackpopupmodel.h"
+#include "view/trackspanel/paneltrackslistmodel.h"
 #include "view/trackspanel/realtimeeffectlistitemmenumodel.h"
+#include "view/trackspanel/realtimeeffectlistmodel.h"
+#include "view/trackspanel/realtimeeffectrowactionscontroller.h"
 #include "view/trackspanel/realtimeeffectsectionmodel.h"
 #include "view/trackspanel/trackcontextmenumodel.h"
 #include "view/trackspanel/trackitem.h"
-#include "view/trackspanel/addnewtrackpopupmodel.h"
 
 #include "view/tracksitemsview/viewtrackslistmodel.h"
 #include "view/tracksitemsview/trackclipslistmodel.h"
@@ -83,6 +85,8 @@ using namespace au::projectscene;
 using namespace muse::modularity;
 using namespace muse::ui;
 
+static const std::string mname("projectscene");
+
 static void projectscene_init_qrc()
 {
     Q_INIT_RESOURCE(projectscene);
@@ -90,7 +94,7 @@ static void projectscene_init_qrc()
 
 std::string ProjectSceneModule::moduleName() const
 {
-    return "projectscene";
+    return mname;
 }
 
 void ProjectSceneModule::registerResources()
@@ -100,6 +104,7 @@ void ProjectSceneModule::registerResources()
 
 void ProjectSceneModule::registerExports()
 {
+<<<<<<< HEAD
     m_projectSceneActionsController = std::make_shared<ProjectSceneActionsController>();
     m_uiActions = std::make_shared<ProjectSceneUiActions>(m_projectSceneActionsController);
     m_configuration = std::make_shared<ProjectSceneConfiguration>();
@@ -113,11 +118,17 @@ void ProjectSceneModule::registerExports()
     ioc()->registerExport<IConnectingDotsPainter>(moduleName(), new ConnectingDotsPainter());
     ioc()->registerExport<IMinMaxRMSPainter>(moduleName(), new MinMaxRMSPainter());
     ioc()->registerExport<ISamplesPainter>(moduleName(), new SamplesPainter());
+=======
+    m_configuration = std::make_shared<ProjectSceneConfiguration>();
+
+    globalIoc()->registerExport<IProjectSceneConfiguration>(mname, m_configuration);
+    globalIoc()->registerExport<IProjectViewStateCreator>(mname, std::make_shared<ProjectViewStateCreator>());
+>>>>>>> upstream/master
 }
 
 void ProjectSceneModule::resolveImports()
 {
-    auto ir = ioc()->resolve<IInteractiveUriRegister>(moduleName());
+    auto ir = globalIoc()->resolve<IInteractiveUriRegister>(mname);
     if (ir) {
         ir->registerQmlUri(muse::Uri("audacity://projectscene/editpitchandspeed"),
                            "Audacity/ProjectScene/tracksitemsview/pitchandspeed/PitchAndSpeedChangeDialog.qml");
@@ -127,6 +138,8 @@ void ProjectSceneModule::resolveImports()
                            "Audacity/ProjectScene/tracksitemsview/labeleditor/LabelEditorDialog.qml");
         ir->registerQmlUri(muse::Uri("audacity://projectscene/addnewlabeltrack"),
                            "Audacity/ProjectScene/tracksitemsview/labeleditor/AddNewLabelTrackDialog.qml");
+        ir->registerQmlUri(muse::Uri("audacity://projectscene/geteffects"),
+                           "Audacity/ProjectScene/toolbars/GetEffectsDialog.qml");
     }
 }
 
@@ -150,6 +163,7 @@ void ProjectSceneModule::registerUiTypes()
     qmlRegisterType<UndoRedoToolBarModel>("Audacity.ProjectScene", 1, 0, "UndoRedoToolBarModel");
     qmlRegisterType<WorkspacesToolBarModel>("Audacity.ProjectScene", 1, 0, "WorkspacesToolBarModel");
     qmlRegisterType<AudioSetupContextMenuModel>("Audacity.ProjectScene", 1, 0, "AudioSetupContextMenuModel");
+    qmlRegisterType<GetEffectsModel>("Audacity.ProjectScene", 1, 0, "GetEffectsModel");
 
     qmlRegisterType<PlaybackToolBarModel>("Audacity.ProjectScene", 1, 0, "PlaybackToolBarModel");
     qmlRegisterType<PlaybackToolBarCustomiseModel>("Audacity.ProjectScene", 1, 0, "PlaybackToolBarCustomiseModel");
@@ -161,6 +175,7 @@ void ProjectSceneModule::registerUiTypes()
     qmlRegisterType<AddEffectMenuModel>("Audacity.ProjectScene", 1, 0, "AddEffectMenuModel");
     qmlRegisterType<RealtimeEffectListModel>("Audacity.ProjectScene", 1, 0, "RealtimeEffectListModel");
     qmlRegisterType<RealtimeEffectListItemMenuModel>("Audacity.ProjectScene", 1, 0, "RealtimeEffectListItemMenuModel");
+    qmlRegisterType<RealtimeEffectRowActionsController>("Audacity.ProjectScene", 1, 0, "RealtimeEffectRowActionsController");
     qmlRegisterType<RealtimeEffectSectionModel>("Audacity.ProjectScene", 1, 0, "RealtimeEffectSectionModel");
     qmlRegisterType<TrackContextMenuModel>("Audacity.ProjectScene", 1, 0, "TrackContextMenuModel");
     qmlRegisterType<AddNewTrackPopupModel>("Audacity.ProjectScene", 1, 0, "AddNewTrackPopupModel");
@@ -212,19 +227,50 @@ void ProjectSceneModule::registerUiTypes()
     qmlRegisterType<TrackRulerModel>("Audacity.ProjectScene", 1, 0, "TrackRulerModel");
 }
 
-void ProjectSceneModule::onInit(const muse::IApplication::RunMode& mode)
+void ProjectSceneModule::onInit(const muse::IApplication::RunMode&)
+{
+    m_configuration->init();
+}
+
+IContextSetup* ProjectSceneModule::newContext(const muse::modularity::ContextPtr& ctx) const
+{
+    return new ProjectSceneContext(ctx);
+}
+
+// =====================================================
+// ProjectSceneContext
+// =====================================================
+
+void ProjectSceneContext::registerExports()
+{
+    m_projectSceneActionsController = std::make_shared<ProjectSceneActionsController>(iocContext());
+    m_uiActions = std::make_shared<ProjectSceneUiActions>(iocContext(), m_projectSceneActionsController);
+    m_realtimeEffectPanelTrackSelection = std::make_shared<RealtimeEffectPanelTrackSelection>(iocContext());
+
+    ioc()->registerExport<IProjectSceneActionsController>(mname, m_projectSceneActionsController);
+    ioc()->registerExport<IRealtimeEffectPanelTrackSelection>(mname, m_realtimeEffectPanelTrackSelection);
+    ioc()->registerExport<IWavePainter>(mname, std::make_shared<WavePainterProxy>(iocContext()));
+    ioc()->registerExport<IConnectingDotsPainter>(mname, std::make_shared<ConnectingDotsPainter>(iocContext()));
+    ioc()->registerExport<IMinMaxRMSPainter>(mname, std::make_shared<MinMaxRMSPainter>(iocContext()));
+    ioc()->registerExport<ISamplesPainter>(mname, std::make_shared<SamplesPainter>(iocContext()));
+}
+
+void ProjectSceneContext::onInit(const muse::IApplication::RunMode& mode)
 {
     if (mode != muse::IApplication::RunMode::GuiApp) {
         return;
     }
 
-    m_configuration->init();
+    m_uiActions->init();
     m_projectSceneActionsController->init();
     m_realtimeEffectPanelTrackSelection->init();
 
-    m_uiActions->init();
-    auto ar = ioc()->resolve<muse::ui::IUiActionsRegister>(moduleName());
+    auto ar = ioc()->resolve<muse::ui::IUiActionsRegister>(mname);
     if (ar) {
         ar->reg(m_uiActions);
     }
+}
+
+void ProjectSceneContext::onDeinit()
+{
 }

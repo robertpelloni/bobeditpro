@@ -8,6 +8,8 @@ import Muse.GraphicalEffects
 import Audacity.ProjectScene
 import Audacity.Playback
 import Audacity.Spectrogram
+import Audacity.UiComponents
+import Audacity.Automation
 
 Rectangle {
     id: root
@@ -16,6 +18,7 @@ Rectangle {
     property alias clipKey: waveView.clipKey
     property alias clipTime: waveView.clipTime
     property alias title: titleLabel.text
+    required property bool isAutomationEnabled
     required property bool isWaveformViewVisible
     required property bool isSpectrogramViewVisible
     property int pitch: 0
@@ -23,7 +26,13 @@ Rectangle {
     property bool showChannelSplitter: false
     property alias channelHeightRatio: waveChannelSplitter.channelHeightRatio
     property var canvas: null
+<<<<<<< HEAD
     property color clipColor: "#677CE4"
+=======
+    required property int headerHeight
+    property color clipColor: ui.theme.extra["clip_color_1"]
+    property color clipSelectedColor: ui.theme.extra["clip_selected_color_1"]
+>>>>>>> upstream/master
     property color normalHeaderColor: root.currentClipStyle == ClipStyle.COLORFUL ? root.clipColor : root.classicHeaderColor
     property color selectedHeaderColor: root.currentClipStyle == ClipStyle.COLORFUL ? ui.blendColors("#ffffff", root.clipColor, 0.3) : classicHeaderColor
     property color normalHeaderHoveredColor: root.currentClipStyle == ClipStyle.COLORFUL ? ui.blendColors("#ffffff", root.clipColor, 0.8) : classicHeaderHoveredColor
@@ -93,8 +102,13 @@ Rectangle {
     property alias navigation: navCtrl
 
     radius: 4
+<<<<<<< HEAD
     color: clipSelected ? "white" : clipColor
     border.color: "#000000"
+=======
+    color: clipSelected ? clipSelectedColor : clipColor
+    border.color: ui.theme.extra["black_color"]
+>>>>>>> upstream/master
     opacity: root.moveActive && (clipSelected || clipIntersectsSelection) ? 0.5 : isAudible ? 1.0 : 0.3
 
     onMoveActiveChanged: {
@@ -109,6 +123,7 @@ Rectangle {
     property bool isBrush: waveView.isStemPlot && root.altPressed
     property bool isIsolationMode: false
     property bool containsMouse: false
+    property bool automationMouseHoverLetThrough: false
     property alias isNearSample: waveView.isNearSample
     property alias currentChannel: waveView.currentChannel
     property bool leftTrimContainsMouse: false
@@ -121,6 +136,12 @@ Rectangle {
 
     PlaybackStateModel {
         id: playbackState
+    }
+
+    ClipGainModel {
+        id: clipGainModel
+
+        clipKey: root.clipKey
     }
 
     // for navigating between clips
@@ -185,6 +206,23 @@ Rectangle {
 
         readonly property int doubleClickInterval: 400
         readonly property int doubleClickMaxDistance: 5
+
+        property bool singleMenuLoaded: false
+        property bool multiMenuLoaded: false
+
+        function ensureSingleMenuLoaded() {
+            if (!singleMenuLoaded) {
+                singleClipContextMenuModel.load()
+                singleMenuLoaded = true
+            }
+        }
+
+        function ensureMultiMenuLoaded() {
+            if (!multiMenuLoaded) {
+                multiClipContextMenuModel.load()
+                multiMenuLoaded = true
+            }
+        }
     }
 
     // panel for navigating within the clip's items
@@ -220,6 +258,18 @@ Rectangle {
         Qt.callLater(root.titleEditAccepted, newTitle)
     }
 
+<<<<<<< HEAD
+=======
+    function openContextMenu() {
+        if (root.multiClipsSelected || root.groupId != -1) {
+            prv.ensureMultiMenuLoaded()
+        } else {
+            prv.ensureSingleMenuLoaded()
+        }
+        menuBtn.toggleMenu(menuBtn)
+    }
+
+>>>>>>> upstream/master
     function mousePositionChanged(x, y) {
         clipItemMousePositionChanged(x, y)
         waveView.onWaveViewPositionChanged(x, y - header.height)
@@ -247,7 +297,7 @@ Rectangle {
             return
         }
 
-        root.containsMouse = containsMouse
+        root.containsMouse = containsMouse || root.automationMouseHoverLetThrough
         if (!root.containsMouse && !root.multiSampleEdit) {
             waveView.isNearSample = false
         }
@@ -287,8 +337,13 @@ Rectangle {
     }
 
     Component.onCompleted: {
+<<<<<<< HEAD
         singleClipContextMenuModel.load()
         multiClipContextMenuModel.load()
+=======
+        playbackState.init()
+        clipGainModel.init()
+>>>>>>> upstream/master
     }
 
     Component.onDestruction: {
@@ -324,8 +379,10 @@ Rectangle {
 
         onClicked: function (e) {
             if (root.multiClipsSelected) {
+                prv.ensureMultiMenuLoaded()
                 multiClipContextMenuLoader.show(Qt.point(e.x, e.y), multiClipContextMenuModel.items)
             } else {
+                prv.ensureSingleMenuLoaded()
                 singleClipContextMenuLoader.show(Qt.point(e.x, e.y), singleClipContextMenuModel.items)
                 root.requestSelected()
             }
@@ -344,6 +401,19 @@ Rectangle {
             }
 
             root.setContainsMouse(containsMouse)
+        }
+    }
+
+    // NOTE: hover events from polyline are not visible in MouseArea
+    // so we need to handle them manually
+    HoverHandler {
+        id: passiveHoverHandler
+
+        enabled: root.isAutomationEnabled
+
+        onHoveredChanged: {
+            automationMouseHoverLetThrough = hovered
+            root.setContainsMouse(hoverArea.containsMouse)
         }
     }
 
@@ -537,7 +607,12 @@ Rectangle {
                         root.editTitle()
                     } else {
                         //! NOTE Handle singleClick logic
+<<<<<<< HEAD
                         if (!root.multiClipsSelected && !isWithinRange(e.x, headerSelectionRectangle.x, headerSelectionRectangle.width)) {
+=======
+                        if ((!root.multiClipsSelected || (e.modifiers & Qt.ShiftModifier))
+                                && !(root.isDataSelected && isWithinRange(e.x, headerSelectionRectangle.x, headerSelectionRectangle.width))) {
+>>>>>>> upstream/master
                             root.requestSelected()
                         }
 
@@ -729,8 +804,14 @@ Rectangle {
                         Qt.callLater(menuModel.handleMenuItem, itemId)
                     }
 
-                    onClicked: {
-                        if (!root.multiClipsSelected) {
+                    onClicked: function(mouse) {
+                        if (root.multiClipsSelected || root.groupId != -1) {
+                            prv.ensureMultiMenuLoaded()
+                        } else {
+                            prv.ensureSingleMenuLoaded()
+                        }
+
+                        if (!root.multiClipsSelected || (mouse.modifiers & Qt.ShiftModifier)) {
                             if (!root.clipSelected) {
                                 root.requestSelectionReset()
                             }
@@ -761,6 +842,7 @@ Rectangle {
                 channelHeightRatio: showChannelSplitter ? root.channelHeightRatio : 1
 
                 clipColor: root.clipColor
+                clipSelectedColor: root.clipSelectedColor
                 clipSelected: root.clipSelected
                 isIsolationMode: root.isIsolationMode
                 multiSampleEdit: root.multiSampleEdit
@@ -819,6 +901,104 @@ Rectangle {
                         waveView.onWaveViewPositionChanged(hoverArea.mouseX, hoverArea.mouseY - header.height)
                     }
                 }
+
+                Polyline {
+                    id: automation
+
+                    anchors.fill: waveView
+                    anchors.bottomMargin: 1
+
+                    visible: root.isAutomationEnabled
+
+                    lineColor: ui.theme.extra["audio_envelope_line"]
+                    lineWidth: 2
+
+                    pointRadius: 4.0
+                    pointOutlineColor: ui.theme.extra["audio_envelope_point"]
+                    pointCentreColor: ui.theme.extra["audio_envelope_point"]
+                    pointOutlineWidth: 2.0
+
+                    ghostPointRadius: 3.0
+                    ghostPointOutlineColor: ui.theme.extra["audio_envelope_point"]
+
+
+                    points: clipGainModel.points
+                    defaultValue: clipGainModel.defaultValue
+
+                    xRangeFrom: waveView.itemStartTime
+                    xRangeTo: waveView.itemEndTime
+
+                    yRangeFrom: clipGainModel.minValue
+                    yRangeTo: clipGainModel.maxValue
+                    ySplitNormalized: clipGainModel.ySplitNormalized
+                    ySplitValue: clipGainModel.ySplitValue
+                    yAxisInverse: false
+
+                    Component.onCompleted: {
+                        automation.init()
+                    }
+
+                    onPointMoved: function(index, x, y, completed) {
+                        clipGainModel.setPoint(index, x, y, completed)
+                        tooltip.gain = gainToDb(y)
+                        tooltip.show(true)
+                    }
+
+                    onPointAdded: function(x, y, completed) {
+                        clipGainModel.addPoint(x, y, completed)
+                    }
+
+                    onPointRemoved: function(index, completed) {
+                        clipGainModel.removePoint(index, completed)
+                    }
+
+                    onDragCancelled: {
+                        clipGainModel.cancelDrag()
+                        tooltip.hide(true)
+                    }
+
+                    onInteractionFinished: function() {
+                        if (!automation.hasActivePoint) {
+                            tooltip.hide(true)
+                        }
+                    }
+
+                    onActivePointChanged: {
+                        if (automation.hasActivePoint) {
+                            fake.x = automation.activePointX
+                            fake.y = automation.activePointY - (automation.pointRadius + 2)
+                            tooltip.gain = gainToDb(automation.activePointValue)
+                            tooltip.show(true)
+                        } else {
+                            tooltip.hide(true)
+                        }
+                    }
+
+                    Item {
+                        // NOTE: fakeItem for tooltip to follow
+                        id: fake
+
+                        height: 1
+                        width: 1
+
+                        x: automation.activePointX
+                        y: automation.activePointY - (automation.pointRadius + 2)
+
+                        enabled: false // so it doesn't steal mouse events
+
+                        GainTooltip {
+                            id: tooltip
+                        }
+                    }
+
+                    function gainToDb(g) {
+                        if (g < 0.001)  // -60 dB
+                            return "-∞"
+
+                        let db = 20 * Math.log10(g)
+                        return db.toFixed(1)
+                    }
+                }
             }
 
             SpectrogramView {
@@ -837,6 +1017,12 @@ Rectangle {
                 frameEndTime: root.context.frameEndTime
                 selectionStartTime: root.context.selectionStartTime
                 selectionEndTime: root.context.selectionEndTime
+<<<<<<< HEAD
+=======
+                selectionStartFrequency: root.selectionStartFrequency
+                selectionEndFrequency: root.selectionEndFrequency
+                clipSelected: root.clipSelected
+>>>>>>> upstream/master
 
                 ChannelSplitter {
                     id: spectrogramChannelSplitter

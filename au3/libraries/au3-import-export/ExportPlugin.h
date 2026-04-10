@@ -10,6 +10,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
 // #include <rapidjson/fwd.h>
 
@@ -151,15 +152,19 @@ public:
     virtual std::vector<std::string> GetMimeTypes(int formatIndex) const;
 
     /**
-     * @brief Attempt to parse configuration JSON object and produce
+     * @brief Attempt to parse configuration JSON string and produce
      * a suitable set of parameters. Configuration is format dependent.
      *
      * @param formatIndex Internal format index
-     * @param config Configuration JSON object
+     * @param config Configuration as a JSON string
      * @param parameters Where to put parameters
      * @return Whether the parsing was successful
      **/
+<<<<<<< HEAD
     // virtual bool ParseConfig(int formatIndex, const rapidjson::Value& config, ExportProcessor::Parameters& parameters) const;
+=======
+    virtual bool ParseConfig(int formatIndex, const std::string& config, ExportProcessor::Parameters& parameters) const;
+>>>>>>> upstream/master
 
     virtual bool CheckFileName(wxFileName& filename, int format = 0) const;
 

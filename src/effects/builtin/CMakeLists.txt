@@ -5,37 +5,25 @@ declare_module(effects_builtin)
 
 set(MODULE_QRC effects_builtin.qrc)
 
+set(MODULE_QML_IMPORT ${CMAKE_CURRENT_LIST_DIR}/qml)
+
 set(MODULE_SRC
-    # common
+    # public
     ${CMAKE_CURRENT_LIST_DIR}/builtineffectsmodule.cpp
     ${CMAKE_CURRENT_LIST_DIR}/builtineffectsmodule.h
     ${CMAKE_CURRENT_LIST_DIR}/ibuiltineffectsrepository.h
-    ${CMAKE_CURRENT_LIST_DIR}/ieffectsviewregister.h
+    ${CMAKE_CURRENT_LIST_DIR}/ibuiltineffectsviewregister.h
 
+    # internal
     ${CMAKE_CURRENT_LIST_DIR}/internal/builtineffectsrepository.cpp
     ${CMAKE_CURRENT_LIST_DIR}/internal/builtineffectsrepository.h
-    ${CMAKE_CURRENT_LIST_DIR}/internal/builtinviewlauncher.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/internal/builtinviewlauncher.h
 
-    ${CMAKE_CURRENT_LIST_DIR}/common/params.h
-    ${CMAKE_CURRENT_LIST_DIR}/common/builtineffectmodel.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/common/builtineffectmodel.h
-    ${CMAKE_CURRENT_LIST_DIR}/common/builtineffectsettingmodel.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/common/builtineffectsettingmodel.h
-    ${CMAKE_CURRENT_LIST_DIR}/common/generatoreffect.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/common/generatoreffect.h
-    ${CMAKE_CURRENT_LIST_DIR}/common/generatoreffectmodel.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/common/generatoreffectmodel.h
-    ${CMAKE_CURRENT_LIST_DIR}/common/measureunits.h
-
-    ${CMAKE_CURRENT_LIST_DIR}/common/valuewarper/valuewarper.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/common/valuewarper/valuewarper.h
-    ${CMAKE_CURRENT_LIST_DIR}/common/valuewarper/valuewarpertypes.h
-    ${CMAKE_CURRENT_LIST_DIR}/common/valuewarper/warpingtransformer.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/common/valuewarper/warpingtransformer.h
-
+    # view
+    ${CMAKE_CURRENT_LIST_DIR}/view/builtineffectmodel.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/view/builtineffectmodel.h
     ${CMAKE_CURRENT_LIST_DIR}/view/builtineffectviewloader.cpp
     ${CMAKE_CURRENT_LIST_DIR}/view/builtineffectviewloader.h
+<<<<<<< HEAD
     ${CMAKE_CURRENT_LIST_DIR}/view/effectsviewregister.cpp
     ${CMAKE_CURRENT_LIST_DIR}/view/effectsviewregister.h
 
@@ -162,20 +150,19 @@ set(MODULE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/changepitch/changepitcheffect.h
     ${CMAKE_CURRENT_LIST_DIR}/changepitch/changepitchviewmodel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/changepitch/changepitchviewmodel.h
+=======
+    ${CMAKE_CURRENT_LIST_DIR}/view/builtineffectsviewregister.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/view/builtineffectsviewregister.h
+>>>>>>> upstream/master
     )
 
 # AU3
-set(MODULE_DEF ${MODULE_DEF}
-    -DBUILTIN_EFFECTS_API=
-    # Note: USE_SOUNDTOUCH and USE_SBSMS are now set as PUBLIC compile definitions
-    # by the soundtouch and libsbsms targets, so they propagate automatically when linked
-    # Note: NOTE_TRACK_API is only needed if USE_MIDI is defined
-    # Currently MIDI support is not enabled in AU4
-    # -DNOTE_TRACK_API=
-)
+include(${CMAKE_CURRENT_LIST_DIR}/../../au3wrap/au3wrapDefs.cmake)
+
+set(MODULE_INCLUDE ${AU3_INCLUDE})
+set(MODULE_DEF ${AU3_DEF})
 
 set(MODULE_LINK au3wrap)
-set(MODULE_LINK_PUBLIC au3-effects au3-builtin-effects)
 
 set(MODULE_USE_UNITY OFF)
 

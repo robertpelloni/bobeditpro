@@ -9,7 +9,6 @@
 
 #include "au3-track/Track.h"
 #include "au3-time-frequency-selection/ViewInfo.h"
-#include "au3-track-selection/TrackFocus.h"
 
 #include "au3wrap/internal/domconverter.h"
 #include "au3wrap/au3types.h"
@@ -62,13 +61,40 @@ void Au3SelectionController::init()
                 const auto it = tracks.begin();
                 setFocusedTrack(TrackId((*it)->GetId()));
             }
+<<<<<<< HEAD
+=======
+
+            setSelectedLabels(savedSelectedLabels, true);
+            setSelectedClips(savedSelectedClips, true);
+
+            if (savedSelectedClips.empty()) {
+                setSelectedTracks(savedSelectedTracks, true);
+            }
+
+            setClipsIntersectingRangeSelection(findClipsIntersectingRangeSelection());
+            setLabelsIntersectingRangeSelection(findLabelsIntersectingRangeSelection());
+
+            projectHistory()->historyChanged().onReceive(this, [this](auto event) {
+                onHistoryEvent(event);
+            }, Asyncable::Mode::SetReplace);
+>>>>>>> upstream/master
         } else {
             m_tracksSubc.Reset();
         }
     });
+
+    frequencySelectionController()->frequencySelectionChanged().onReceive(this, [this](bool complete) {
+        if (complete) {
+            projectHistory()->modifyState();
+        }
+    });
 }
 
+<<<<<<< HEAD
 void Au3SelectionController::restoreSelection(const ClipAndTimeSelection& selection)
+=======
+void Au3SelectionController::onHistoryEvent(const trackedit::HistoryEvent& event)
+>>>>>>> upstream/master
 {
     MYLOG() << "restoreSelection";
 
@@ -76,6 +102,16 @@ void Au3SelectionController::restoreSelection(const ClipAndTimeSelection& select
     m_selectedStartTime.set(selection.dataSelectedStartTime, true);
     m_selectedEndTime.set(selection.dataSelectedEndTime, true);
     updateSelectionController();
+<<<<<<< HEAD
+=======
+
+    if (event == HistoryEvent::RestoredState) {
+        frequencySelectionController()->restoreFrequencySelection();
+    }
+
+    setClipsIntersectingRangeSelection(findClipsIntersectingRangeSelection());
+    setLabelsIntersectingRangeSelection(findLabelsIntersectingRangeSelection());
+>>>>>>> upstream/master
 }
 
 ClipKeyList Au3SelectionController::findClipsIntersectingRangeSelection() const
@@ -299,7 +335,7 @@ double Au3SelectionController::leftMostSelectedClipStartTime() const
         }
 
         std::shared_ptr<Au3WaveClip> clip = DomAccessor::findWaveClip(waveTrack, selectedClip.itemId);
-        IF_ASSERT_FAILED(clip) {
+        if (!clip) {
             continue;
         }
 
@@ -705,7 +741,7 @@ bool Au3SelectionController::selectionContainsGroup() const
         }
 
         std::shared_ptr<WaveClip> clip = au3::DomAccessor::findWaveClip(waveTrack, clipKey.itemId);
-        IF_ASSERT_FAILED(clip) {
+        if (!clip) {
             return false;
         }
 
@@ -733,7 +769,7 @@ bool Au3SelectionController::isSelectionGrouped() const
         }
 
         std::shared_ptr<WaveClip> clip = au3::DomAccessor::findWaveClip(waveTrack, clipKey.itemId);
-        IF_ASSERT_FAILED(clip) {
+        if (!clip) {
             return false;
         }
 

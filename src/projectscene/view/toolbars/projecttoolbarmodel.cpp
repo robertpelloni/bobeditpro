@@ -18,9 +18,14 @@ void ProjectToolBarModel::load()
     AbstractToolBarModel::load();
 
     muse::actions::ActionCodeList itemsCodes = {
-        "toggle-mixer",
         "audio-setup",
     };
+
+    if (au3CloudService()->enabled()) {
+        itemsCodes.push_back("file-share-audio");
+    }
+
+    itemsCodes.push_back("get-effects");
 
     ToolBarItemList items;
     for (const ActionCode& code : itemsCodes) {
@@ -37,6 +42,7 @@ void ProjectToolBarModel::load()
     });
 
     dispatcher()->reg(this, "audio-setup", [this]() { emit openAudioSetupContextMenu(); });
+    dispatcher()->reg(this, "get-effects", [this]() { emit openGetEffectsDialog(); });
 
     m_loaded = true;
 }

@@ -522,7 +522,7 @@ public:
     size_t GetNumPlaybackChannels() const { return mNumPlaybackChannels; }
     size_t GetNumCaptureChannels() const { return mNumCaptureChannels; }
 
-    // Meaning really capturing, not just pre-rolling
+    // Meaning really capturing, not just lead-in time playing
     bool IsCapturing() const;
 
     /** \brief Ensure selected device names are valid

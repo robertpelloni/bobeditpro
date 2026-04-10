@@ -7,6 +7,7 @@
 #include "framework/global/async/channel.h"
 
 #include "trackedit/trackedittypes.h"
+#include "spectrogram/spectrogramtypes.h"
 
 #include <optional>
 

@@ -5,13 +5,24 @@
 
 #include "modularity/ioc.h"
 #include "global/iglobalconfiguration.h"
+<<<<<<< HEAD
+=======
+#include "io/ifilesystem.h"
+#include "au3cloud/iau3cloudconfiguration.h"
+>>>>>>> upstream/master
 
 #include "../iprojectconfiguration.h"
 
 namespace au::project {
 class ProjectConfiguration final : public IProjectConfiguration
 {
+<<<<<<< HEAD
     muse::Inject<muse::IGlobalConfiguration> globalConfiguration;
+=======
+    muse::GlobalInject<muse::IGlobalConfiguration> globalConfiguration;
+    muse::GlobalInject<muse::io::IFileSystem> fileSystem;
+    muse::GlobalInject<au3cloud::IAu3CloudConfiguration> cloudConfiguration;
+>>>>>>> upstream/master
 
 public:
     ProjectConfiguration() = default;
@@ -25,6 +36,10 @@ public:
     void setUserProjectsPath(const muse::io::path_t& path) override;
     muse::async::Channel<muse::io::path_t> userProjectsPathChanged() const override;
     muse::io::path_t defaultUserProjectsPath() const override;
+
+    muse::io::path_t cloudProjectsPath() const override;
+    void setCloudProjectsPath(const muse::io::path_t& path) override;
+    bool isCloudProject(const muse::io::path_t& projectPath) const override;
 
     muse::io::path_t lastOpenedProjectsPath() const override;
     void setLastOpenedProjectsPath(const muse::io::path_t& path) override;

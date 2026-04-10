@@ -40,7 +40,7 @@ BaseSection {
     }
 
     Row {
-        spacing: 8
+        spacing: root.spacing
 
         ComboBoxWithTitle {
             title: qsTrc("appshell/preferences", "Default sample rate")
@@ -61,11 +61,36 @@ BaseSection {
             }
         }
 
+        ComboBoxWithTitle {
+            title: qsTrc("preferences", "Default sample format")
+            columnWidth: root.columnWidth
+
+            enabled: !playbackState.isPlaying
+
+            currentIndex: indexOfValue(apiModel.defaultSampleFormat)
+            model: apiModel.defaultSampleFormatList
+
+            navigation.name: "DefaultSampleFormatBox"
+            navigation.panel: root.navigation
+            navigation.row: 1
+            navigation.column: 1
+
+            onValueEdited: function(newIndex, newValue) {
+                apiModel.defaultSampleFormatSelected(newValue)
+            }
+        }
+    }
+
+    Row {
+        visible: apiModel.otherSampleRate
+        spacing: root.spacing
+
         IncrementalPropertyControlWithTitle {
+            title: qsTrc("preferences", "Custom sample rate")
+            columnWidth: root.columnWidth
             currentValue: apiModel.defaultSampleRateValue
 
             enabled: !playbackState.isPlaying
-            visible: apiModel.otherSampleRate
 
             minValue: 1
             maxValue: 999999
@@ -74,8 +99,8 @@ BaseSection {
 
             navigation.name: "SampleRateControl"
             navigation.panel: root.navigation
-            navigation.row: 1
-            navigation.column: 1
+            navigation.row: 2
+            navigation.column: 0
 
             onValueEdited: function(newValue) {
                 apiModel.defaultSampleRateValueSelected(newValue)
@@ -83,6 +108,7 @@ BaseSection {
         }
     }
 
+<<<<<<< HEAD:src/appshell/qml/Preferences/internal/SampleRateSection.qml
     ComboBoxWithTitle {
         title: qsTrc("appshell/preferences", "Default sample format")
         columnWidth: root.columnWidth
@@ -101,9 +127,12 @@ BaseSection {
         }
     }
 
+=======
+>>>>>>> upstream/master:src/preferences/qml/Audacity/Preferences/internal/SampleRateSection.qml
     StyledTextLabel {
-        text: "Default sample rates and formats apply to newly created tracks only. Recording into existing tracks will use the track’s sample rate and format instead."
-
+        text: qsTrc("preferences",
+                "Default sample rates and formats apply to newly created tracks only. " +
+                "Recording into existing tracks will use the track\'s sample rate and format instead.")
         width: root.width
 
         horizontalAlignment: Text.AlignLeft

@@ -20,6 +20,7 @@ static const ActionQuery RECORD_STOP_QUERY("action://record/stop");
 static const ActionQuery RECORD_LEVEL_QUERY("action://record/level");
 static const ActionQuery RECORD_TOGGLE_MIC_METERING("action://record/toggle-mic-metering");
 static const ActionQuery RECORD_TOGGLE_INPUT_MONITORING("action://record/toggle-input-monitoring");
+static const ActionQuery RECORD_LEAD_IN_RECORDING_QUERY("action://record/lead-in-recording");
 
 const UiActionList RecordUiActions::m_mainActions = {
     UiAction(RECORD_START_QUERY.toString(),
@@ -64,10 +65,22 @@ const UiActionList RecordUiActions::m_mainActions = {
              TranslatableString("action", "Enable input monitoring"),
              Checkable::Yes
              ),
+    UiAction(RECORD_LEAD_IN_RECORDING_QUERY.toString(),
+             au::context::UiCtxProjectOpened,
+             au::context::CTX_PROJECT_FOCUSED,
+             TranslatableString("action", "Lead-in Recording"),
+             TranslatableString("action", "Start lead-in recording"),
+             IconCode::Code::RECORD_FILL
+             ),
 };
 
+<<<<<<< HEAD
 RecordUiActions::RecordUiActions(std::shared_ptr<RecordController> controller)
     : m_controller(controller)
+=======
+RecordUiActions::RecordUiActions(const muse::modularity::ContextPtr& ctx, std::shared_ptr<RecordController> controller)
+    : muse::Contextable(ctx), m_controller(controller)
+>>>>>>> upstream/master
 {
 }
 

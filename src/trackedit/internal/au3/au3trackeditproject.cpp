@@ -27,7 +27,12 @@ struct Au3TrackeditProject::Au3Impl
     Observer::Subscription projectTimeSignatureSubscription;
 };
 
+<<<<<<< HEAD
 Au3TrackeditProject::Au3TrackeditProject(const std::shared_ptr<IAu3Project>& au3project)
+=======
+Au3TrackeditProject::Au3TrackeditProject(const muse::modularity::ContextPtr& ctx, const std::shared_ptr<IAu3Project>& au3project)
+    : muse::Contextable(ctx)
+>>>>>>> upstream/master
 {
     m_impl = std::make_shared<Au3Impl>();
     m_impl->prj = reinterpret_cast<Au3Project*>(au3project->au3ProjectPtr());
@@ -56,8 +61,8 @@ std::vector<int64_t> Au3TrackeditProject::groupsIdsList() const
 
     for (const auto& trackId : trackIdList()) {
         Au3WaveTrack* waveTrack = DomAccessor::findWaveTrack(*m_impl->prj, Au3TrackId(trackId));
-        IF_ASSERT_FAILED(waveTrack) {
-            return {};
+        if (!waveTrack) {
+            continue;
         }
 
         for (const auto& key : clipList(trackId)) {
@@ -320,6 +325,11 @@ au::trackedit::Label Au3TrackeditProject::label(const LabelKey& key) const
     return DomConverter::label(labelTrack, au3Label);
 }
 
+void Au3TrackeditProject::notifyAboutTrackClipListChanged(const Track& track)
+{
+    m_trackClipListChanged.send(track);
+}
+
 void Au3TrackeditProject::notifyAboutClipChanged(const Clip& clip)
 {
     async::ChangedNotifier<Clip>& notifier = m_clipsChanged[clip.key.trackId];
@@ -411,6 +421,11 @@ muse::async::Channel<au::trackedit::Track> Au3TrackeditProject::trackChanged() c
     return m_trackChanged;
 }
 
+muse::async::Channel<au::trackedit::Track> Au3TrackeditProject::trackClipListChanged() const
+{
+    return m_trackClipListChanged;
+}
+
 muse::async::Channel<au::trackedit::Track> Au3TrackeditProject::trackRemoved() const
 {
     return m_trackRemoved;
@@ -463,7 +478,11 @@ TracksAndItems Au3TrackeditProject::buildTracksAndItems() const
 
 ITrackeditProjectPtr Au3TrackeditProjectCreator::create(const std::shared_ptr<IAu3Project>& au3project) const
 {
+<<<<<<< HEAD
     return std::make_shared<Au3TrackeditProject>(au3project);
+=======
+    return std::make_shared<Au3TrackeditProject>(au3project->iocContext(), au3project);
+>>>>>>> upstream/master
 }
 
 TimeSignatureRestorer::TimeSignatureRestorer(AudacityProject& project)

@@ -14,7 +14,11 @@
 #include <map>
 
 namespace au::projectscene {
+<<<<<<< HEAD
 class RealtimeEffectListModel : public QAbstractListModel, public muse::async::Asyncable
+=======
+class RealtimeEffectListModel : public QAbstractListModel, public muse::async::Asyncable, public muse::Contextable
+>>>>>>> upstream/master
 {
     Q_OBJECT
 
@@ -22,9 +26,15 @@ class RealtimeEffectListModel : public QAbstractListModel, public muse::async::A
     Q_PROPERTY(bool isMasterTrack READ prop_isMasterTrack WRITE prop_setIsMasterTrack NOTIFY isMasterTrackChanged)
     Q_PROPERTY(bool trackEffectsActive READ prop_trackEffectsActive WRITE prop_setTrackEffectsActive NOTIFY trackEffectsActiveChanged)
 
+<<<<<<< HEAD
     muse::Inject<effects::IRealtimeEffectService> realtimeEffectService;
     muse::Inject<context::IGlobalContext> globalContext;
     muse::Inject<IRealtimeEffectPanelTrackSelection> trackSelection;
+=======
+    muse::ContextInject<effects::IRealtimeEffectService> realtimeEffectService{ this };
+    muse::ContextInject<context::IGlobalContext> globalContext{ this };
+    muse::ContextInject<IRealtimeEffectPanelTrackSelection> trackSelection{ this };
+>>>>>>> upstream/master
 
 public:
     explicit RealtimeEffectListModel(QObject* parent = nullptr);

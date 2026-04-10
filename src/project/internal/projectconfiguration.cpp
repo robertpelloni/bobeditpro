@@ -1,7 +1,8 @@
-#include "global/settings.h"
-#include "translation.h"
-
 #include <QDir>
+
+#include "framework/global/settings.h"
+#include "framework/global/translation.h"
+#include "framework/global/io/dir.h"
 
 #include "au3-files/FileNames.h"
 
@@ -37,6 +38,7 @@ void ProjectConfiguration::init()
 
     muse::settings()->setDefaultValue(SHOULD_ASK_SAVE_LOCATION_TYPE, muse::Val(true));
     muse::settings()->setDefaultValue(LAST_USED_SAVE_LOCATION_TYPE, muse::Val(SaveLocationType::Undefined));
+    muse::settings()->setDefaultValue(LAST_SAVED_PROJECTS_PATH, muse::Val(globalConfiguration()->userDataPath() + "/Projects"));
 
     muse::settings()->setDefaultValue(AUTOSAVE_INTERVAL_KEY, muse::Val(5));
     muse::settings()->valueChanged(AUTOSAVE_INTERVAL_KEY).onReceive(nullptr, [this](const muse::Val& val) {
@@ -44,6 +46,15 @@ void ProjectConfiguration::init()
     });
 
     initTempDir();
+<<<<<<< HEAD
+=======
+    if (!userProjectsPath().empty()) {
+        fileSystem()->makePath(userProjectsPath());
+    }
+    if (!cloudProjectsPath().empty()) {
+        fileSystem()->makePath(cloudProjectsPath());
+    }
+>>>>>>> upstream/master
 }
 
 muse::io::path_t ProjectConfiguration::recentFilesJsonPath() const
@@ -77,6 +88,21 @@ muse::async::Channel<muse::io::path_t> ProjectConfiguration::userProjectsPathCha
 muse::io::path_t ProjectConfiguration::defaultUserProjectsPath() const
 {
     return muse::settings()->defaultValue(USER_PROJECTS_PATH).toPath();
+}
+
+muse::io::path_t ProjectConfiguration::cloudProjectsPath() const
+{
+    return cloudConfiguration()->cloudProjectsPath();
+}
+
+void ProjectConfiguration::setCloudProjectsPath(const muse::io::path_t& path)
+{
+    cloudConfiguration()->setCloudProjectsPath(path);
+}
+
+bool ProjectConfiguration::isCloudProject(const muse::io::path_t& projectPath) const
+{
+    return muse::io::dirpath(projectPath) == cloudProjectsPath();
 }
 
 muse::io::path_t ProjectConfiguration::lastOpenedProjectsPath() const
@@ -117,8 +143,6 @@ muse::io::path_t ProjectConfiguration::defaultSavingFilePath(IAudacityProjectPtr
             if (muse::io::isAbsolute(projectPath)) {
                 folderPath = muse::io::dirpath(projectPath);
             }
-
-            filename = muse::io::filename(projectPath, false);
         } else {
             //! TODO AU4
             // projectPath = engraving::containerPath(projectPath);

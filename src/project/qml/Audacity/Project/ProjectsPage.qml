@@ -64,7 +64,7 @@ FocusScope {
 
         anchors.fill: parent
 
-        color: ui.theme.backgroundSecondaryColor
+        color: ui.theme.backgroundTertiaryColor
     }
 
     RowLayout {
@@ -143,7 +143,7 @@ FocusScope {
                 accessible.name: qsTrc("project", "Projects tab bar")
                 enabled: tabBar.enabled && tabBar.visible
 
-                onNavigationEvent: function(event) {
+                onNavigationEvent: function (event) {
                     if (event.type === NavigationEvent.AboutActive) {
                         event.setData("controlName", tabBar.currentItem.navigation.name)
                     }
@@ -159,13 +159,21 @@ FocusScope {
             }
 
             StyledTabButton {
-                text: qsTrc("project", "My online projects")
+                text: qsTrc("project", "Cloud projects")
+                visible: projectsPageModel.cloudEnabled
 
-                visible: false
-
-                navigation.name: "MyOnlineProjects"
+                navigation.name: "CloudProjects"
                 navigation.panel: navTabPanel
                 navigation.column: 2
+            }
+
+            StyledTabButton {
+                text: qsTrc("project", "Cloud audio files")
+                visible: projectsPageModel.cloudEnabled
+
+                navigation.name: "CloudAudioFiles"
+                navigation.panel: navTabPanel
+                navigation.column: 3
             }
         }
 
@@ -182,7 +190,7 @@ FocusScope {
         FlatButton {
             id: refreshButton
 
-            visible: tabBar.currentIndex === 1
+            visible: tabBar.currentIndex === 1 || tabBar.currentIndex === 2
 
             navigation.panel: viewButtonsNavPanel
             navigation.order: 1
@@ -200,8 +208,16 @@ FocusScope {
             implicitHeight: ui.theme.defaultButtonSize
 
             model: [
-                { "icon": IconCode.GRID, "title": qsTrc("project", "Grid view"), "value": ProjectsPageModel.Grid },
-                { "icon": IconCode.LIST, "title": qsTrc("project", "List view"), "value": ProjectsPageModel.List }
+                {
+                    "icon": IconCode.GRID,
+                    "title": qsTrc("project", "Grid view"),
+                    "value": ProjectsPageModel.Grid
+                },
+                {
+                    "icon": IconCode.LIST,
+                    "title": qsTrc("project", "List view"),
+                    "value": ProjectsPageModel.List
+                }
             ]
 
             delegate: FlatRadioButton {
@@ -240,7 +256,7 @@ FocusScope {
                 return null
             }
 
-            return [newAndRecentComp, onlineProjectsComp][tabBar.currentIndex]
+            return [newAndRecentComp, cloudProjectsComp, cloudAudioFilesComp][tabBar.currentIndex]
         }
     }
 
@@ -263,48 +279,85 @@ FocusScope {
                 projectsPageModel.createNewProject()
             }
 
-            onOpenProjectRequested: function(projectPath, displayName) {
+            onOpenProjectRequested: function (projectPath, displayName) {
                 Qt.callLater(projectsPageModel.openProject, projectPath, displayName)
+            }
+
+            onOpenCloudProjectRequested: function (projectId, projectPath, displayName) {
+                Qt.callLater(projectsPageModel.openCloudProject, projectId, projectPath, displayName)
             }
         }
     }
 
     Component {
-        id: onlineProjectsComp
+        id: cloudProjectsComp
 
-        Text {
-            text: "onlineProjectsComp"
+        Loader {
+            anchors.fill: parent
+            source: "internal/ProjectsPage/CloudProjectsView.qml"
+
+            onLoaded: {
+                item.viewType = Qt.binding(function () {
+                    return projectsPageModel.viewType
+                })
+                item.searchText = Qt.binding(function () {
+                    return searchField.searchText
+                })
+                item.backgroundColor = Qt.binding(function () {
+                    return background.color
+                })
+                item.sideMargin = Qt.binding(function () {
+                    return prv.sideMargin
+                })
+                item.navigationSection = navSec
+                item.navigationOrder = 5
+                item.openCloudProjectRequested.connect(function (projectId, projectPath, displayName) {
+                    Qt.callLater(projectsPageModel.openCloudProject, projectId, projectPath, displayName)
+                })
+            }
+
+            Connections {
+                target: refreshButton
+                function onClicked() {
+                    if (item)
+                        item.refresh()
+                }
+            }
         }
+    }
 
-        // CloudProjectsView {
-        //     id: cloudProjectsView
-        //     anchors.fill: parent
+    Component {
+        id: cloudAudioFilesComp
 
-        //     viewType: projectsPageModel.viewType
-        //     searchText: searchField.searchText
+        Loader {
+            anchors.fill: parent
+            source: "internal/ProjectsPage/CloudAudioFilesView.qml"
 
-        //     backgroundColor: background.color
-        //     sideMargin: prv.sideMargin
+            onLoaded: {
+                item.viewType = Qt.binding(function () {
+                    return projectsPageModel.viewType
+                })
+                item.searchText = Qt.binding(function () {
+                    return searchField.searchText
+                })
+                item.backgroundColor = Qt.binding(function () {
+                    return background.color
+                })
+                item.sideMargin = Qt.binding(function () {
+                    return prv.sideMargin
+                })
+                item.navigationSection = navSec
+                item.navigationOrder = 6
+            }
 
-        //     navigationSection: navSec
-        //     navigationOrder: 4
-
-        //     onCreateNewProjectRequested: {
-        //         projectsPageModel.createNewProject()
-        //     }
-
-        //     onOpenProjectRequested: function(projectPath, displayName) {
-        //         Qt.callLater(projectsPageModel.openProject, projectPath, displayName)
-        //     }
-
-        //     Connections {
-        //         target: refreshButton
-
-        //         function onClicked() {
-        //             cloudProjectsView.refresh()
-        //         }
-        //     }
-        // }
+            Connections {
+                target: refreshButton
+                function onClicked() {
+                    if (item)
+                        item.refresh()
+                }
+            }
+        }
     }
 
     Rectangle {
@@ -348,7 +401,7 @@ FocusScope {
         }
 
         Row {
-            anchors.right : parent.right
+            anchors.right: parent.right
             anchors.rightMargin: prv.sideMargin
             anchors.verticalCenter: parent.verticalCenter
 

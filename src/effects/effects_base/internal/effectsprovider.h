@@ -27,6 +27,7 @@ class ProgressDialog;
 }
 
 namespace au::effects {
+<<<<<<< HEAD
 class EffectsProvider : public IEffectsProvider, public muse::async::Asyncable
 {
     muse::Inject<au::context::IGlobalContext> globalContext;
@@ -42,6 +43,27 @@ class EffectsProvider : public IEffectsProvider, public muse::async::Asyncable
     muse::Inject<muse::audioplugins::IKnownAudioPluginsRegister> knownPluginsRegister;
 
 public:
+=======
+class EffectsProvider : public IEffectsProvider, public muse::async::Asyncable, public muse::Contextable
+{
+    muse::GlobalInject<IEffectsConfiguration> configuration;
+    muse::GlobalInject<muse::audioplugins::IKnownAudioPluginsRegister> knownPluginsRegister;
+    muse::GlobalInject<IAudioUnitEffectsRepository> audioUnitEffectsRepository;
+    muse::GlobalInject<IBuiltinEffectsRepository> builtinEffectsRepository;
+    muse::GlobalInject<ILv2EffectsRepository> lv2EffectsRepository;
+    muse::GlobalInject<INyquistEffectsRepository> nyquistEffectsRepository;
+    muse::GlobalInject<IVstEffectsRepository> vstEffectsRepository;
+
+    muse::ContextInject<au::context::IGlobalContext> globalContext{ this };
+    muse::ContextInject<muse::IInteractive> interactive{ this };
+    muse::ContextInject<playback::IPlayback> playback{ this };
+    muse::ContextInject<IEffectViewLaunchRegister> viewLaunchRegister{ this };
+
+public:
+    EffectsProvider(const muse::modularity::ContextPtr& ctx)
+        : muse::Contextable(ctx) {}
+
+>>>>>>> upstream/master
     void init();
 
     void reloadEffects();

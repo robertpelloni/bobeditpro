@@ -23,11 +23,14 @@
 #define AU_APPSHELL_PUBLISHTOOLBARMODEL_H
 
 #include "uicomponents/qml/Muse/UiComponents/abstractmenumodel.h"
+#include "au3cloud/iau3audiocomservice.h"
 
 namespace au::appshell {
 class PublishToolBarModel : public muse::uicomponents::AbstractMenuModel
 {
     Q_OBJECT
+
+    muse::ContextInject<au::au3cloud::IAu3AudioComService> au3CloudService { this };
 
 public:
     PublishToolBarModel(QObject* parent = nullptr);

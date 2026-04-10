@@ -6,7 +6,7 @@
 #include <QPainter>
 #include <QElapsedTimer>
 
-#include "draw/types/color.h"
+#include "global/types/color.h"
 #include "global/log.h"
 
 #include "au3/wavepainterutils.h"
@@ -40,7 +40,11 @@ static const float SAMPLE_STALK_CLIP_SELECTED_ALPHA = 0.6;
 static const float SAMPLE_STALK_DATA_SELECTED_ALPHA = 0.7;
 
 WaveView::WaveView(QQuickItem* parent)
+<<<<<<< HEAD
     : QQuickPaintedItem(parent)
+=======
+    : QQuickPaintedItem(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
+>>>>>>> upstream/master
 {
     //! NOTE: Push history state after edit is completed to avoid multiple unecessary calls.
     connect(this, &WaveView::isIsolationModeChanged, [this]() {
@@ -97,7 +101,7 @@ IWavePainter::Params WaveView::getWavePainterParams() const
 
     projectscene::ClipStyles::Style clipStyle = configuration()->clipStyle();
     if (clipStyle == projectscene::ClipStyles::Style::COLORFUL) {
-        applyColorfulStyle(params, m_clipColor, m_clipSelected);
+        applyColorfulStyle(params, m_clipColor, m_clipSelectedColor, m_clipSelected);
     } else {
         applyClassicStyle(params, m_clipSelected);
     }
@@ -107,17 +111,23 @@ IWavePainter::Params WaveView::getWavePainterParams() const
 
 void WaveView::applyColorfulStyle(IWavePainter::Params& params,
                                   const QColor& clipColor,
+                                  const QColor& clipSelectedColor,
                                   bool selected) const
 {
-    float bgAlpha = selected ? 0.8 : 0.9;
     float normalBgAlpha = 0.8;
-    params.style.blankBrush = muse::blendQColors(BACKGROUND_COLOR, clipColor, bgAlpha);
-    params.style.normalBackground = muse::blendQColors(BACKGROUND_COLOR, clipColor, normalBgAlpha);
-    params.style.selectedBackground = transformColor(params.style.normalBackground);
-
-    const QColor envelopeBgColor = muse::blendQColors(clipColor, QColor(255, 255, 255), 0.64);
-    params.style.envelopeBackground = envelopeBgColor;
-    params.style.selectedEnvelopeBackground = transformColor(envelopeBgColor);
+    if (selected) {
+        params.style.blankBrush = clipSelectedColor;
+        params.style.normalBackground = clipSelectedColor;
+        params.style.selectedBackground = clipSelectedColor;
+        params.style.envelopeBackground = clipSelectedColor;
+        params.style.selectedEnvelopeBackground = clipSelectedColor;
+    } else {
+        params.style.blankBrush = muse::blendQColors(BACKGROUND_COLOR, clipColor, 0.9);
+        params.style.normalBackground = muse::blendQColors(BACKGROUND_COLOR, clipColor, normalBgAlpha);
+        params.style.selectedBackground = clipSelectedColor;
+        params.style.envelopeBackground = muse::blendQColors(BACKGROUND_COLOR, clipColor, normalBgAlpha);
+        params.style.selectedEnvelopeBackground = clipSelectedColor;
+    }
 
     params.style.samplePen = muse::blendQColors(params.style.blankBrush, SAMPLES_BASE_COLOR, 0.8);
     params.style.selectedSamplePen = muse::blendQColors(params.style.blankBrush,
@@ -147,9 +157,9 @@ void WaveView::applyClassicStyle(IWavePainter::Params& params, bool selected) co
     params.style.normalBackground = params.style.blankBrush;
     params.style.selectedBackground = selected ? transformColor(CLASSIC_BACKGROUND_SELECTED_COLOR) : CLASSIC_BACKGROUND_SELECTED_COLOR;
 
-    const QColor envelopeBgColor = muse::blendQColors(CLASSIC_BACKGROUND_COLOR, QColor(255, 255, 255), 0.64);
-    params.style.envelopeBackground = envelopeBgColor;
-    params.style.selectedEnvelopeBackground = transformColor(envelopeBgColor);
+    params.style.envelopeBackground = params.style.blankBrush;
+    params.style.selectedEnvelopeBackground
+        = selected ? transformColor(CLASSIC_BACKGROUND_SELECTED_COLOR) : CLASSIC_BACKGROUND_SELECTED_COLOR;
 
     QColor baseSampleColor = selected ? CLASSIC_SAMPLES_BASE_SELECTED_COLOR : CLASSIC_SAMPLES_BASE_COLOR;
     params.style.samplePen = baseSampleColor;
@@ -206,6 +216,8 @@ void WaveView::setTimelineContext(TimelineContext* newContext)
         connect(m_context, &TimelineContext::selectionStartTimeChanged, this, &WaveView::updateView);
         connect(m_context, &TimelineContext::selectionEndTimeChanged, this, &WaveView::updateView);
         connect(m_context, &TimelineContext::zoomChanged, this, &WaveView::onWaveZoomChanged);
+
+        onWaveZoomChanged();
     }
 
     emit timelineContextChanged();
@@ -228,6 +240,22 @@ void WaveView::setClipColor(const QColor& newClipColor)
     }
     m_clipColor = newClipColor;
     emit clipColorChanged();
+
+    update();
+}
+
+QColor WaveView::clipSelectedColor() const
+{
+    return m_clipSelectedColor;
+}
+
+void WaveView::setClipSelectedColor(const QColor& newClipSelectedColor)
+{
+    if (m_clipSelectedColor == newClipSelectedColor) {
+        return;
+    }
+    m_clipSelectedColor = newClipSelectedColor;
+    emit clipSelectedColorChanged();
 
     update();
 }

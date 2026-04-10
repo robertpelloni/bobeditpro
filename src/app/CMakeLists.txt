@@ -107,6 +107,7 @@ set(LINK_LIB
     iex_labels
 )
 
+<<<<<<< HEAD
 if (AU_MODULE_EFFECTS_VST)
     list(APPEND LINK_LIB muse::vst)
     add_definitions(-DAU_MODULE_EFFECTS_VST)
@@ -119,6 +120,56 @@ endif()
 if (AU_MODULE_EFFECTS_AUDIO_UNIT)
     add_definitions(-DAU_MODULE_EFFECTS_AUDIO_UNIT)
 endif()
+=======
+add_to_link_if_exists(muse::accessibility)
+add_to_link_if_exists(muse::actions)
+add_to_link_if_exists(muse::audioplugins)
+add_to_link_if_exists(muse::autobot)
+add_to_link_if_exists(muse::cloud_qml)
+add_to_link_if_exists(muse::cloud)
+add_to_link_if_exists(muse::diagnostics)
+add_to_link_if_exists(muse::dockwindow)
+add_to_link_if_exists(muse::extensions)
+add_to_link_if_exists(muse::graphicaleffects_qml)
+add_to_link_if_exists(muse::interactive)
+add_to_link_if_exists(muse::languages)
+add_to_link_if_exists(muse::learn)
+add_to_link_if_exists(muse::legacytreeview_qml)
+add_to_link_if_exists(muse::multiwindows)
+add_to_link_if_exists(muse::muse::vst)
+add_to_link_if_exists(muse::network)
+add_to_link_if_exists(muse::shortcuts)
+add_to_link_if_exists(muse::tours)
+add_to_link_if_exists(muse::ui_dialogs_qml)
+add_to_link_if_exists(muse::ui)
+add_to_link_if_exists(muse::uicomponents)
+add_to_link_if_exists(muse::workspace)
+
+add_to_link_if_exists(appshell)
+add_to_link_if_exists(au3audio)
+add_to_link_if_exists(au3wrap)
+add_to_link_if_exists(au3cloud)
+add_to_link_if_exists(audio)
+add_to_link_if_exists(context)
+add_to_link_if_exists(effects_audio_unit)
+add_to_link_if_exists(effects_base)
+add_to_link_if_exists(effects_builtin)
+add_to_link_if_exists(effects_builtin_collection)
+add_to_link_if_exists(effects_lv2)
+add_to_link_if_exists(effects_nyquist)
+add_to_link_if_exists(effects_vst)
+add_to_link_if_exists(exporter)
+add_to_link_if_exists(iex_labels)
+add_to_link_if_exists(importer)
+add_to_link_if_exists(playback)
+add_to_link_if_exists(preferences)
+add_to_link_if_exists(project)
+add_to_link_if_exists(projectscene)
+add_to_link_if_exists(record)
+add_to_link_if_exists(spectrogram)
+add_to_link_if_exists(toast)
+add_to_link_if_exists(automation)
+>>>>>>> upstream/master
 
 if (MUSE_MODULE_AUTOBOT)
     list(APPEND LINK_LIB muse::autobot)
@@ -210,6 +261,14 @@ endif(CC_IS_MSVC)
 target_link_libraries(audacity PRIVATE ${LINK_LIB}  ${COVERAGE_LINK_FLAGS})
 
 ###########################################
+# Dependencies
+###########################################
+
+if (AU_MODULE_EFFECTS_NYQUIST)
+    add_dependencies(audacity nyquist-runtime nyquist-plug-ins)
+endif()
+
+###########################################
 # INSTALL
 ###########################################
 
@@ -282,17 +341,14 @@ if (OS_IS_WIN)
               USE_SOURCE_PERMISSIONS
           )
 
+    set_target_properties(${EXECUTABLE_NAME} PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_INSTALL_PREFIX}/bin"
+    )
+
     if (MSVC)
         set_target_properties(${EXECUTABLE_NAME} PROPERTIES
-            VS_DEBUGGER_COMMAND "${CMAKE_INSTALL_PREFIX}/bin/${EXECUTABLE_NAME}"
+            VS_DEBUGGER_COMMAND "${CMAKE_INSTALL_PREFIX}/bin/${APP_OUTPUT_NAME}.exe"
             VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_INSTALL_PREFIX}/bin"
-        )
-
-        # Unlike VSCode, Visual Studio doesn't have pre-launch tasks we could use to run the `INSTALL` target.
-        # Instead, we copy the executable to the install directory after the build.
-        add_custom_command(TARGET ${EXECUTABLE_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_INSTALL_PREFIX}/bin
-            COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${EXECUTABLE_NAME}> ${CMAKE_INSTALL_PREFIX}/bin
         )
     endif()
 

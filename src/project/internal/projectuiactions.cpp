@@ -28,6 +28,18 @@ const UiActionList ProjectUiActions::m_actions = {
              TranslatableString("action", "&Open…"),
              TranslatableString("action", "Open…")
              ),
+    UiAction("cloud-file-open",
+             au::context::UiCtxAny,
+             au::context::CTX_ANY,
+             TranslatableString("action", "&Open cloud project…"),
+             TranslatableString("action", "Open cloud project…")
+             ),
+    UiAction("cloud-audio-open",
+             au::context::UiCtxAny,
+             au::context::CTX_ANY,
+             TranslatableString("action", "Open"),
+             TranslatableString("action", "Open cloud audio")
+             ),
     UiAction("clear-recent",
              au::context::UiCtxAny,
              au::context::CTX_ANY,
@@ -273,50 +285,7 @@ const UiActionList ProjectUiActions::m_actions = {
              TranslatableString("action", "Move cursor to closest zero crossing")
              ),
 
-    // view menu
-    UiAction("zoom-in",
-             au::context::UiCtxAny,
-             au::context::CTX_ANY,
-             TranslatableString("action", "Zoom in"),
-             TranslatableString("action", "Zoom in")
-             ),
-    UiAction("zoom-out",
-             au::context::UiCtxAny,
-             au::context::CTX_ANY,
-             TranslatableString("action", "Zoom out"),
-             TranslatableString("action", "Zoom out")
-             ),
-    UiAction("zoom-to-selection",
-             au::context::UiCtxAny,
-             au::context::CTX_ANY,
-             TranslatableString("action", "Zoom to selection"),
-             TranslatableString("action", "Zoom to selection"),
-             IconCode::Code::FIT_SELECTION
-             ),
-    UiAction("zoom-toggle",
-             au::context::UiCtxUnknown,
-             au::context::CTX_ANY,
-             TranslatableString("action", "Zoom toggle"),
-             TranslatableString("action", "Zoom toggle")
-             ),
-    UiAction("zoom-reset",
-             au::context::UiCtxUnknown,
-             au::context::CTX_ANY,
-             TranslatableString("action", "Zoom reset"),
-             TranslatableString("action", "Zoom reset")
-             ),
-    UiAction("fit-project-to-window",
-             au::context::UiCtxAny,
-             au::context::CTX_ANY,
-             TranslatableString("action", "Fit project to window"),
-             TranslatableString("action", "Fit project to window")
-             ),
-    UiAction("fit-view-to-project",
-             au::context::UiCtxUnknown,
-             au::context::CTX_ANY,
-             TranslatableString("action", "Fit view to project"),
-             TranslatableString("action", "Fit view to project")
-             ),
+    // view menu (zoom actions are in projectsceneuiactions.cpp)
     UiAction("collapse-all-tracks",
              au::context::UiCtxUnknown,
              au::context::CTX_ANY,
@@ -381,12 +350,6 @@ const UiActionList ProjectUiActions::m_actions = {
              au::context::CTX_ANY,
              TranslatableString("action", "Set up timed recording"),
              TranslatableString("action", "Set up timed recording")
-             ),
-    UiAction("punch-and-roll-record",
-             au::context::UiCtxUnknown,
-             au::context::CTX_ANY,
-             TranslatableString("action", "Punch and roll record"),
-             TranslatableString("action", "Punch and roll record")
              ),
     UiAction("toggle-sound-activated-recording",
              au::context::UiCtxUnknown,
@@ -477,8 +440,8 @@ const UiActionList ProjectUiActions::m_actions = {
     UiAction("keep-tracks-synchronised",
              au::context::UiCtxAny,
              au::context::CTX_ANY,
-             TranslatableString("action", "Keep tracks synchronised"),
-             TranslatableString("action", "Keep tracks synchronised")
+             TranslatableString("action", "Keep tracks synchronized"),
+             TranslatableString("action", "Keep tracks synchronized")
              ),
 
     // generate menu
@@ -726,13 +689,6 @@ const UiActionList ProjectUiActions::m_actions = {
              TranslatableString("action", "Updates"),
              TranslatableString("action", "Updates")
              ),
-    UiAction("about-audacity",
-             au::context::UiCtxUnknown,
-             au::context::CTX_ANY,
-             TranslatableString("action", "About Audacity"),
-             TranslatableString("action", "About Audacity")
-             ),
-
     UiAction("file-save-to-cloud",
              au::context::UiCtxAny,
              au::context::CTX_ANY,
@@ -741,10 +697,10 @@ const UiActionList ProjectUiActions::m_actions = {
              IconCode::Code::CLOUD_FILE
              ),
     UiAction("file-share-audio",
-             au::context::UiCtxAny,
-             au::context::CTX_ANY,
-             TranslatableString("action", "Share on Audio.com…"),
-             TranslatableString("action", "Share on Audio.com…"),
+             au::context::UiCtxProjectOpened,
+             au::context::CTX_PROJECT_FOCUSED,
+             TranslatableString("action", "Share audio"),
+             TranslatableString("action", "Share audio"),
              IconCode::Code::SHARE_AUDIO
              ),
 
@@ -757,7 +713,11 @@ const UiActionList ProjectUiActions::m_actions = {
 };
 
 ProjectUiActions::ProjectUiActions(const std::shared_ptr<ProjectActionsController>& controller)
+<<<<<<< HEAD
     : m_controller(controller)
+=======
+    : muse::Contextable(controller->iocContext()), m_controller(controller)
+>>>>>>> upstream/master
 {
 }
 

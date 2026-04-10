@@ -60,8 +60,12 @@ ProjectsView {
                 root.createNewProjectRequested()
             }
 
-            onOpenProjectRequested: function(projectPath, displayName) {
+            onOpenProjectRequested: function (projectPath, displayName) {
                 root.openProjectRequested(projectPath, displayName)
+            }
+
+            onOpenCloudProjectRequested: function (projectId, projectPath, displayName) {
+                root.openCloudProjectRequested(projectId, projectPath, displayName)
             }
         }
     }
@@ -91,7 +95,7 @@ ProjectsView {
                 root.createNewProjectRequested()
             }
 
-            onOpenProjectRequested: function(projectPath, displayName) {
+            onOpenProjectRequested: function (projectPath, displayName) {
                 root.openProjectRequested(projectPath, displayName)
             }
 
@@ -104,13 +108,13 @@ ProjectsView {
                     header: qsTrc("project", "Modified")
 
                     width: function (parentWidth) {
-                        let parentWidthExclusingSpacing = parentWidth - list.columns.length * list.view.columnSpacing;
+                        let parentWidthExclusingSpacing = parentWidth - list.columns.length * list.view.columnSpacing
                         return 0.25 * parentWidthExclusingSpacing
                     }
 
                     delegate: StyledTextLabel {
                         id: modifiedLabel
-                        text: project.timeSinceModified ?? ""
+                        text: item.timeSinceModified ?? ""
 
                         font.capitalization: Font.AllUppercase
                         horizontalAlignment: Text.AlignLeft
@@ -137,19 +141,18 @@ ProjectsView {
                         }
                     }
                 },
-
                 ProjectsListView.ColumnItem {
                     id: sizeColumn
                     header: qsTrc("global", "Size", "file size")
 
                     width: function (parentWidth) {
-                        let parentWidthExclusingSpacing = parentWidth - list.columns.length * list.view.columnSpacing;
+                        let parentWidthExclusingSpacing = parentWidth - list.columns.length * list.view.columnSpacing
                         return 0.15 * parentWidthExclusingSpacing
                     }
 
                     delegate: StyledTextLabel {
                         id: sizeLabel
-                        text: Boolean(project.fileSize) ? project.fileSize : "-"
+                        text: Boolean(item.fileSize) ? item.fileSize : "-"
 
                         font: ui.theme.largeBodyFont
                         horizontalAlignment: Text.AlignLeft
@@ -161,7 +164,7 @@ ProjectsView {
                                 row: navigationRow
                                 column: navigationColumnStart
                                 enabled: sizeLabel.visible && sizeLabel.enabled && !sizeLabel.isEmpty
-                                accessible.name: sizeColumn.header + ": " + (Boolean(project.fileSize) ? project.fileSize : qsTrc("global", "Unknown"))
+                                accessible.name: sizeColumn.header + ": " + (Boolean(item.fileSize) ? item.fileSize : qsTrc("global", "Unknown"))
                                 accessible.role: MUAccessible.StaticText
 
                                 onActiveChanged: {

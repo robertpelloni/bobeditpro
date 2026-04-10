@@ -9,7 +9,7 @@
 #include "effects/effects_base/effectstypes.h"
 
 namespace au::effects {
-class IBuiltinEffectsRepository : MODULE_EXPORT_INTERFACE
+class IBuiltinEffectsRepository : MODULE_GLOBAL_INTERFACE
 {
     INTERFACE_ID(IBuiltinEffectsRepository)
 public:
@@ -17,5 +17,6 @@ public:
 
     virtual muse::async::Notification effectMetaListUpdated() const = 0;
     virtual EffectMetaList effectMetaList() const = 0;
+    virtual void registerMeta(const EffectMeta& meta) = 0;
 };
 }

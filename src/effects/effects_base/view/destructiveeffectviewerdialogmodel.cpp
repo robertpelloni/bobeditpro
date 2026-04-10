@@ -2,11 +2,17 @@
  * Audacity: A Digital Audio Editor
  */
 #include "destructiveeffectviewerdialogmodel.h"
-#include "log.h"
+
+// TODO: au3 EffectInterface shouldn't be a dependency in Qt models
+#include "au3-components/EffectInterface.h"
 
 namespace au::effects {
 DestructiveEffectViewerDialogModel::DestructiveEffectViewerDialogModel(QObject* parent)
+<<<<<<< HEAD
     : QObject(parent)
+=======
+    : QObject(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
+>>>>>>> upstream/master
 {
 }
 
@@ -39,9 +45,27 @@ void DestructiveEffectViewerDialogModel::setInstanceId(int newInstanceId)
     m_effectId = instancesRegister()->effectIdByInstanceId(m_instanceId);
     const auto id = m_effectId.toStdString();
     m_title = QString::fromStdString(effectsProvider()->effectName(id));
+    captureInitialSettings();
     emit titleChanged();
     emit effectFamilyChanged();
     emit viewerComponentTypeChanged();
+}
+
+void DestructiveEffectViewerDialogModel::rollbackSettings()
+{
+    if (!m_initialSettings) {
+        return;
+    }
+
+    const EffectSettingsAccessPtr access = instancesRegister()->settingsAccessById(m_instanceId);
+    if (!access) {
+        return;
+    }
+
+    EffectSettings settings = *m_initialSettings;
+    access->Set(std::move(settings));
+    access->Flush();
+    instancesRegister()->notifyAboutSettingsChanged(m_instanceId);
 }
 
 bool DestructiveEffectViewerDialogModel::useVendorUI() const
@@ -82,6 +106,10 @@ ViewerComponentType DestructiveEffectViewerDialogModel::viewerComponentType() co
         return ViewerComponentType::Builtin;
     }
 
+    if (family == EffectFamily::Nyquist) {
+        return ViewerComponentType::Generated;
+    }
+
     // For external plugins (VST3, LV2), check if we should use generated UI
     const bool shouldUseVendorUI = useVendorUI();
     if (!shouldUseVendorUI) {
@@ -97,5 +125,16 @@ ViewerComponentType DestructiveEffectViewerDialogModel::viewerComponentType() co
     default:
         return ViewerComponentType::Unknown;
     }
+}
+
+void DestructiveEffectViewerDialogModel::captureInitialSettings()
+{
+    const EffectSettings* settings = instancesRegister()->settingsById(m_instanceId);
+    if (!settings) {
+        m_initialSettings.reset();
+        return;
+    }
+
+    m_initialSettings = std::make_shared<EffectSettings>(*settings);
 }
 } // namespace au::effects

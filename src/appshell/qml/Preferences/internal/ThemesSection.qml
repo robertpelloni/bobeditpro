@@ -31,7 +31,11 @@ import "../../shared"
 BaseSection {
     id: root
 
+<<<<<<< HEAD:src/appshell/qml/Preferences/internal/ThemesSection.qml
     title: highContrastEnabled ? qsTrc("appshell/preferences", "High contrast themes") : qsTrc("appshell/preferences", "Themes")
+=======
+    title: highContrastEnabled ? qsTrc("preferences", "High-contrast theme") : qsTrc("preferences", "Theme")
+>>>>>>> upstream/master:src/preferences/qml/Audacity/Preferences/internal/ThemesSection.qml
     navigation.direction: NavigationPanel.Both
 
     property bool highContrastEnabled: false

@@ -22,7 +22,11 @@ constexpr float LINEAR_METER_MIN_VOLUME = -60.0f;
 }
 
 MeterModel::MeterModel(QObject* parent)
+<<<<<<< HEAD
     : QObject(parent)
+=======
+    : QObject(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
+>>>>>>> upstream/master
 {
 }
 

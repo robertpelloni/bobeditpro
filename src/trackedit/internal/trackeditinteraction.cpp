@@ -1,8 +1,13 @@
 #include "trackeditinteraction.h"
 
 namespace au::trackedit {
+<<<<<<< HEAD
 TrackeditInteraction::TrackeditInteraction(std::unique_ptr<ITrackeditInteraction> interaction)
     : m_interaction(std::move(interaction))
+=======
+TrackeditInteraction::TrackeditInteraction(const muse::modularity::ContextPtr& ctx, std::unique_ptr<ITrackeditInteraction> interaction)
+    : muse::Contextable(ctx), m_interaction(std::move(interaction))
+>>>>>>> upstream/master
 {
 }
 
@@ -66,14 +71,14 @@ bool TrackeditInteraction::resetClipSpeed(const ClipKey& clipKey)
     return withPlaybackStop(&ITrackeditInteraction::resetClipSpeed, clipKey);
 }
 
-bool TrackeditInteraction::changeClipColor(const ClipKey& clipKey, const std::string& color)
+bool TrackeditInteraction::changeClipColor(const ClipKey& clipKey, ClipColorIndex colorIndex)
 {
-    return m_interaction->changeClipColor(clipKey, color);
+    return m_interaction->changeClipColor(clipKey, colorIndex);
 }
 
-bool TrackeditInteraction::changeTracksColor(const TrackIdList& tracksIds, const std::string& color)
+bool TrackeditInteraction::changeTracksColor(const TrackIdList& tracksIds, ClipColorIndex colorIndex)
 {
-    return m_interaction->changeTracksColor(tracksIds, color);
+    return m_interaction->changeTracksColor(tracksIds, colorIndex);
 }
 
 bool TrackeditInteraction::changeAudioTrackViewType(const trackedit::TrackId& trackId, trackedit::TrackViewType viewType)

@@ -24,7 +24,12 @@
 using namespace au::playback;
 using namespace au::au3;
 
+<<<<<<< HEAD
 Au3Player::Au3Player()
+=======
+Au3Player::Au3Player(const muse::modularity::ContextPtr& ctx)
+    : muse::Contextable(ctx)
+>>>>>>> upstream/master
 {
     m_playbackStatus.ch.onReceive(this, [this](PlaybackStatus st) {
         if (st == PlaybackStatus::Running) {
@@ -93,7 +98,11 @@ void Au3Player::play()
     SelectedRegion selectedRegion(playRegion.GetStart(), playRegion.GetEnd());
 
     if (!canStopAudioStream()) {
-        return /*-1*/;
+        if (audioEngine()->isCapturing()) {
+            LOGW() << "Cannot start playback: another project is recording";
+            return;
+        }
+        audioEngine()->stopStream();
     }
 
     auto& pStartTime = options.pStartTime;
@@ -108,7 +117,8 @@ void Au3Player::play()
     }
 
     if (audioEngine()->isBusy()) {
-        return /*-1*/;
+        LOGW() << "Audio engine still busy after stopping other stream";
+        return;
     }
 
     const bool cutpreview = false;//mode == PlayMode::cutPreviewPlay;
@@ -234,6 +244,18 @@ void Au3Player::seek(const muse::secs_t newPosition, bool applyIfPlaying)
     }
 
     m_playbackPosition.set(pos);
+
+    // Start position tracking if this project's audio stream is active during recording
+    // (e.g., lead-in recording). The timer reads GetStreamTime() and
+    // updatePlaybackState() will stop it when the stream ends.
+    int token = ProjectAudioIO::Get(projectRef()).GetAudioIOToken();
+    bool isStreamActive = AudioIO::Get()->IsStreamActive(token);
+    if (isStreamActive && m_playbackStatus.val == PlaybackStatus::Stopped
+        && !m_timer.isActive()) {
+        m_currentTarget.reset();
+        m_consumedSamplesSoFar = 0;
+        m_timer.start();
+    }
 }
 
 void Au3Player::rewind()
@@ -465,13 +487,19 @@ void Au3Player::updatePlaybackState()
         m_playbackPosition.set(time);
     }
 
-    if (isActive) {
-        m_reachedEnd.val = false;
-    } else {
-        if (playbackStatus() == PlaybackStatus::Running && !m_reachedEnd.val) {
-            m_reachedEnd.val = true;
-            m_reachedEnd.notification.notify();
+    if (!isActive) {
+        if (playbackStatus() == PlaybackStatus::Running
+            || playbackStatus() == PlaybackStatus::Paused) {
+            m_playbackStatus.set(PlaybackStatus::Stopped);
+        } else if (m_timer.isActive()) {
+            // Stream ended while not in playback mode (e.g., recording finished)
+            m_timer.stop();
         }
+    } else if (m_playbackStatus.val == PlaybackStatus::Stopped
+               && m_timer.isActive() && AudioIO::Get()->IsCapturing()) {
+        // Recording has started after lead-in pre-roll — stop the playback timer
+        // to avoid conflicting with the recording system's playhead updates
+        m_timer.stop();
     }
 }
 

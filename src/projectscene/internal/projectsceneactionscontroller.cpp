@@ -20,6 +20,12 @@ static const ActionCode CLIP_PITCH_AND_SPEED_CODE("clip-pitch-speed");
 static const ActionCode TOGGLE_PLAYBACK_ON_RULER_CLICK_ENABLED_CODE("toggle-playback-on-ruler-click-enabled");
 static const ActionQuery TOGGLE_TRACK_HALF_WAVE("action://projectscene/track-view-half-wave");
 static const ActionCode LABEL_OPEN_EDITOR_CODE("toggle-label-editor");
+<<<<<<< HEAD
+=======
+static const ActionCode CLIP_GAIN_CODE("clip-gain");
+
+static const muse::Uri EDIT_PITCH_AND_SPEED_URI("audacity://projectscene/editpitchandspeed");
+>>>>>>> upstream/master
 
 void ProjectSceneActionsController::init()
 {
@@ -35,6 +41,10 @@ void ProjectSceneActionsController::init()
                       &ProjectSceneActionsController::togglePlaybackOnRulerClickEnabled);
     dispatcher()->reg(this, TOGGLE_TRACK_HALF_WAVE, this, &ProjectSceneActionsController::toggleTrackHalfWave);
     dispatcher()->reg(this, LABEL_OPEN_EDITOR_CODE, this, &ProjectSceneActionsController::openLabelEditor);
+<<<<<<< HEAD
+=======
+    dispatcher()->reg(this, CLIP_GAIN_CODE, this, &ProjectSceneActionsController::toggleAutomation);
+>>>>>>> upstream/master
 }
 
 void ProjectSceneActionsController::notifyActionCheckedChanged(const ActionCode& actionCode)
@@ -126,9 +136,27 @@ void ProjectSceneActionsController::togglePlaybackOnRulerClickEnabled()
     notifyActionCheckedChanged(TOGGLE_PLAYBACK_ON_RULER_CLICK_ENABLED_CODE);
 }
 
+void ProjectSceneActionsController::toggleAutomation()
+{
+    project::IAudacityProjectPtr prj = globalContext()->currentProject();
+    const auto viewState = prj->viewState();
+
+    if (viewState == nullptr) {
+        return;
+    }
+
+    const bool automationState = viewState->clipGainAutomationEnabled().val;
+    const bool enablingAutomation = !automationState;
+    if (enablingAutomation && viewState->globalSpectrogramToggleIsOn()) {
+        viewState->toggleGlobalSpectrogramView();
+    }
+
+    viewState->setClipGainAutomationEnabled(enablingAutomation);
+}
+
 void ProjectSceneActionsController::toggleTrackHalfWave(const muse::actions::ActionQuery& q)
 {
-    IF_ASSERT_FAILED(q.params().size() == 1) {
+    IF_ASSERT_FAILED(q.params().size() >= 1) {
         return;
     }
     const int trackId = q.param("trackId").toInt();
@@ -165,4 +193,12 @@ Channel<ActionCode> ProjectSceneActionsController::actionCheckedChanged() const
 bool ProjectSceneActionsController::canReceiveAction(const ActionCode&) const
 {
     return globalContext()->currentProject() != nullptr;
+<<<<<<< HEAD
+=======
+}
+
+Channel<ActionCode> ProjectSceneActionsController::actionEnabledChanged() const
+{
+    return m_actionEnabledChanged;
+>>>>>>> upstream/master
 }

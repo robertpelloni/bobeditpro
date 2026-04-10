@@ -4,7 +4,12 @@ Rectangle {
 
     id: root
 
+<<<<<<< HEAD
     property color clipColor: "#677CE4"
+=======
+    required property color clipColor
+    property color clipSelectedColor: clipColor
+>>>>>>> upstream/master
     property bool collapsed: false
 
     //radius: 4

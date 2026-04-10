@@ -4,7 +4,11 @@
 #include "audiouniteffectsrepository.h"
 
 au::effects::AudioUnitEffectsRepository::AudioUnitEffectsRepository()
+<<<<<<< HEAD
     : m_helper(m_module, muse::audio::AudioResourceType::AudioUnit)
+=======
+    : m_helper{m_module, muse::audio::AudioResourceType::AudioUnit}
+>>>>>>> upstream/master
 {
 }
 

@@ -16,15 +16,24 @@
 
 class WaveClipItem;
 namespace au::projectscene {
+<<<<<<< HEAD
 class WaveView : public QQuickPaintedItem, public muse::async::Asyncable
+=======
+class WaveView : public QQuickPaintedItem, public muse::async::Asyncable, public muse::Contextable
+>>>>>>> upstream/master
 {
     Q_OBJECT
     Q_PROPERTY(TimelineContext * context READ timelineContext WRITE setTimelineContext NOTIFY timelineContextChanged FINAL)
     Q_PROPERTY(ClipKey clipKey READ clipKey WRITE setClipKey NOTIFY clipKeyChanged FINAL)
     Q_PROPERTY(QColor clipColor READ clipColor WRITE setClipColor NOTIFY clipColorChanged FINAL)
+    Q_PROPERTY(QColor clipSelectedColor READ clipSelectedColor WRITE setClipSelectedColor NOTIFY clipSelectedColorChanged FINAL)
     Q_PROPERTY(bool clipSelected READ clipSelected WRITE setClipSelected NOTIFY clipSelectedChanged FINAL)
     Q_PROPERTY(double channelHeightRatio READ channelHeightRatio WRITE setChannelHeightRatio NOTIFY channelHeightRatioChanged FINAL)
 
+    Q_PROPERTY(double startTime READ startTime NOTIFY clipTimeChanged)
+    Q_PROPERTY(double endTime READ endTime NOTIFY clipTimeChanged)
+    Q_PROPERTY(double itemStartTime READ itemStartTime NOTIFY clipTimeChanged)
+    Q_PROPERTY(double itemEndTime READ itemEndTime NOTIFY clipTimeChanged)
     Q_PROPERTY(ClipTime clipTime READ clipTime WRITE setClipTime NOTIFY clipTimeChanged FINAL)
 
     Q_PROPERTY(bool isNearSample READ isNearSample WRITE setIsNearSample NOTIFY isNearSampleChanged FINAL)
@@ -37,10 +46,18 @@ class WaveView : public QQuickPaintedItem, public muse::async::Asyncable
     Q_PROPERTY(double dbRange READ dbRange WRITE setDbRange FINAL)
     Q_PROPERTY(QVariant displayBounds READ displayBounds WRITE setDisplayBounds FINAL)
 
+<<<<<<< HEAD
     muse::Inject<au::context::IGlobalContext> globalContext;
     muse::Inject<au::projectscene::IWavePainter> wavePainter;
     muse::Inject<IProjectSceneConfiguration> configuration;
     muse::Inject<au::trackedit::IProjectHistory> projectHistory;
+=======
+    muse::GlobalInject<IProjectSceneConfiguration> configuration;
+
+    muse::ContextInject<au::context::IGlobalContext> globalContext{ this };
+    muse::ContextInject<au::projectscene::IWavePainter> wavePainter{ this };
+    muse::ContextInject<au::trackedit::IProjectHistory> projectHistory{ this };
+>>>>>>> upstream/master
 
 public:
     WaveView(QQuickItem* parent = nullptr);
@@ -52,8 +69,14 @@ public:
     void setClipKey(const ClipKey& newClipKey);
     QColor clipColor() const;
     void setClipColor(const QColor& newClipColor);
+    QColor clipSelectedColor() const;
+    void setClipSelectedColor(const QColor& newClipSelectedColor);
     bool clipSelected() const;
     void setClipSelected(bool newClipSelected);
+    double startTime() const { return m_clipTime.startTime; }
+    double endTime()   const { return m_clipTime.endTime; }
+    double itemStartTime() const { return m_clipTime.itemStartTime; }
+    double itemEndTime()   const { return m_clipTime.itemEndTime; }
     ClipTime clipTime() const;
     void setClipTime(const ClipTime& newClipTime);
     double channelHeightRatio() const;
@@ -89,6 +112,7 @@ signals:
     void timelineContextChanged();
     void clipKeyChanged();
     void clipColorChanged();
+    void clipSelectedColorChanged();
     void clipTimeChanged();
     void clipSelectedChanged();
     void channelHeightRatioChanged();
@@ -103,7 +127,7 @@ private:
     void updateView();
     void onWaveZoomChanged();
     IWavePainter::Params getWavePainterParams() const;
-    void applyColorfulStyle(IWavePainter::Params& params, const QColor& clipColor, bool selected) const;
+    void applyColorfulStyle(IWavePainter::Params& params, const QColor& clipColor, const QColor& clipSelectedColor, bool selected) const;
     void applyClassicStyle(IWavePainter::Params& params, bool selected) const;
     void pushProjectHistorySampleEdit();
 
@@ -112,6 +136,7 @@ private:
     TimelineContext* m_context = nullptr;
     ClipKey m_clipKey;
     QColor m_clipColor;
+    QColor m_clipSelectedColor;
     double m_clipLeft = 0;
     double m_channelHeightRatio = 0.5;
     bool m_clipSelected = false;

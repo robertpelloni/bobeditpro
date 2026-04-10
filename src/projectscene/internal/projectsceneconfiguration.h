@@ -3,23 +3,26 @@
 */
 #pragma once
 
-#include "modularity/ioc.h"
-
-#include "ui/iuiconfiguration.h"
-#include "workspace/iworkspacemanager.h"
-
+#include "framework/global/modularity/ioc.h"
+#include "framework/ui/iuiconfiguration.h"
 #include "../iprojectsceneconfiguration.h"
 
 namespace au::projectscene {
 class ProjectSceneConfiguration : public IProjectSceneConfiguration
 {
 public:
+<<<<<<< HEAD
     muse::Inject<muse::ui::IUiConfiguration> uiConfiguration;
     muse::Inject<muse::workspace::IWorkspaceManager> workspaceManager;
 
 public:
     ProjectSceneConfiguration() = default;
 
+=======
+    muse::GlobalInject<muse::ui::IUiConfiguration> uiConfiguration;
+
+public:
+>>>>>>> upstream/master
     void init();
 
     bool isVerticalRulersVisible() const override;
@@ -34,7 +37,7 @@ public:
     void setClippingInWaveformVisible(bool visible) override;
     muse::async::Channel<bool> isClippingInWaveformVisibleChanged() const override;
 
-    double zoom() const override;
+    double zoom(const muse::modularity::ContextPtr& ctx) const override;
 
     int mouseZoomPrecision() const override;
     void setMouseZoomPrecision(int precision) override;
@@ -47,7 +50,9 @@ public:
     void setIsEffectsPanelVisible(bool visible) override;
     muse::async::Notification isEffectsPanelVisibleChanged() const override;
 
-    const std::vector<std::pair<std::string, std::string> >& clipColors() const override;
+    const std::vector<ClipColorInfo>& clipColorInfos() const override;
+    muse::Color clipColor(trackedit::ClipColorIndex index) const override;
+    muse::Color clipSelectedColor(trackedit::ClipColorIndex index) const override;
 
     ClipStyles::Style clipStyle() const override;
     void setClipStyle(ClipStyles::Style style) override;
@@ -65,6 +70,10 @@ public:
     void setSelectionTimecodeFormat(int format) override;
     muse::async::Notification selectionTimecodeFormatChanged() const override;
 
+    int durationTimecodeFormat() const override;
+    void setDurationTimecodeFormat(int format) override;
+    muse::async::Notification durationTimecodeFormatChanged() const override;
+
     bool playbackOnRulerClickEnabled() const override;
     void setPlaybackOnRulerClickEnabled(bool enabled) override;
     muse::async::Notification playbackOnRulerClickEnabledChanged() const override;
@@ -72,17 +81,24 @@ public:
     int labelEditorColumnFormat(const std::string& columnName) const override;
     void setLabelEditorColumnFormat(const std::string& columnName, int format) const override;
 
+    ZoomPresets::Preset zoomPreset1() const override;
+    void setZoomPreset1(ZoomPresets::Preset preset) override;
+    ZoomPresets::Preset zoomPreset2() const override;
+    void setZoomPreset2(ZoomPresets::Preset preset) override;
+
 private:
     muse::ByteArray labelEditorColumnFormatJson() const;
 
     muse::async::Channel<bool> m_isVerticalRulersVisibleChanged;
     muse::async::Channel<bool> m_isRMSInWaveformVisibleChanged;
     muse::async::Channel<bool> m_isClippingInWaveformVisibleChanged;
-    muse::async::Channel<ClipStyles::Style> m_clipStyleChanged;
+    muse::async::Notification m_timelineRulerModeChanged;
     muse::async::Notification m_effectsPanelVisible;
+    muse::async::Channel<ClipStyles::Style> m_clipStyleChanged;
     muse::async::Notification m_asymmetricStereoHeightsChanged;
     muse::async::Notification m_asymmetricStereoHeightsWorkspacesChanged;
     muse::async::Notification m_selectionTimecodeFormatChanged;
+    muse::async::Notification m_durationTimecodeFormatChanged;
     muse::async::Notification m_playbackOnRulerClickEnabledChanged;
 };
 }

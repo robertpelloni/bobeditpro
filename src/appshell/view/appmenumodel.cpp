@@ -143,7 +143,7 @@ void AppMenuModel::setupConnections()
         onEffectsChanged();
     });
 
-    projectHistory()->historyChanged().onNotify(this, [this]() {
+    projectHistory()->historyChanged().onReceive(this, [this](auto) {
         updateUndoRedoItems();
     });
 
@@ -231,9 +231,6 @@ MenuItem* AppMenuModel::makeEditMenu()
         makeMenuItem("action://paste"),
         makeMenuItem("action://delete"),
         makeSeparator(),
-        makeMenuItem("group-clips"),
-        makeMenuItem("ungroup-clips"),
-        makeSeparator(),
         makeMenuItem("duplicate"),
         // TODO: we should only show those trackedit actions when in the trackedit context,
         // this need some framework update to support contextual shortcuts and dynamic actions based on context
@@ -243,14 +240,9 @@ MenuItem* AppMenuModel::makeEditMenu()
         makeMenuItem("delete-per-track-ripple"),
         makeSeparator(),
         makeMenu(TranslatableString("appshell/menu/clip", "Clip"), makeClipItems(), "menu-clip"),
+        makeMenu(TranslatableString("appshell/menu/label", "Label"), makeLabelItems(), "menu-label"),
         makeMenuItem("silence-audio"),
         makeSeparator(),
-        makeMenuItem("label-add"),
-        makeMenuItem("paste-new-label"),
-        makeMenu(TranslatableString("appshell/menu/audio-actions", "Audio actions across labels"),
-                 makeAudioActionsItems(), "menu-audio-actions", false),
-        makeSeparator(),
-        makeMenuItem("manage-labels"),
         makeMenuItem("manage-metadata"),
         makeSeparator(),
         makeMenuItem("preference-dialog", MenuItemRole::PreferencesRole)
@@ -298,12 +290,11 @@ MenuItem* AppMenuModel::makeViewMenu()
 
     MenuItemList viewItems {
         makeMenu(TranslatableString("appshell/menu/zoom", "Zoom"), makeZoomItems(), "menu-zoom"),
-        makeMenu(TranslatableString("appshell/menu/skip", "Skip to "), makeSkipToItems(), "menu-skip", false),
-        makeSeparator(),
-        makeMenuItem("toggle-mixer")
+        makeMenu(TranslatableString("appshell/menu/skip", "Skip to"), makeSkipToItems(), "menu-skip", false),
     };
 
     if (effectsItem) {
+        viewItems << makeSeparator();
         viewItems << effectsItem;
     }
 
@@ -335,7 +326,7 @@ MenuItem* AppMenuModel::makeRecordMenu()
         makeMenuItem("record-on-current-track"),
         makeMenuItem("record-on-new-track"),
         makeMenuItem("set-up-timed-recording"),
-        makeMenuItem("punch-and-roll-record"),
+        makeMenuItem("action://record/lead-in-recording"),
         makeSeparator(),
         makeMenuItem("toggle-sound-activated-recording"),
         makeMenuItem("set-sound-activation-level"),
@@ -375,36 +366,12 @@ MenuItem* AppMenuModel::makeEffectMenu()
 
 MenuItem* AppMenuModel::makeAnalyzeMenu()
 {
-    MenuItemList analyzeItems {
-        makeMenuItem("analyze-plugin-manager"),
-        makeSeparator(),
-        makeMenuItem("contrast-analyzer"),
-        makeMenuItem("plot-spectrum"),
-        makeMenuItem("analyzer-omitted"),
-    };
-
-    return makeMenu(TranslatableString("appshell/menu/analyze", "&Analyze"), analyzeItems, "menu-analyze");
+    return makeMenu(TranslatableString("appshell/menu/analyze", "&Analyze"), makeAnalyzeItems(), "menu-analyze");
 }
 
 MenuItem* AppMenuModel::makeToolsMenu()
 {
-    MenuItemList toolsItems {
-        makeMenuItem("tools-plugin-manager"),
-        makeSeparator(),
-        makeMenuItem("manage-macros"),
-        makeMenu(TranslatableString("appshell/menu/macros", "&Macros"), makeMacrosItems(), "menu-macros", false),
-        makeSeparator(),
-        makeMenuItem("nyquist-plugin-installer"),
-        makeMenuItem("nyquist-prompt"),
-        makeSeparator(),
-        makeMenuItem("sample-data-export"),
-        makeMenuItem("sample-data-import"),
-        makeMenuItem("raw-data-import"),
-        makeSeparator(),
-        makeMenuItem("reset-configuration")
-    };
-
-    return makeMenu(TranslatableString("appshell/menu/tools", "&Tools"), toolsItems, "menu-tools");
+    return makeMenu(TranslatableString("appshell/menu/tools", "&Tools"), makeToolItems(), "menu-tools");
 }
 
 MenuItem* AppMenuModel::makeExtraMenu()
@@ -591,6 +558,20 @@ MenuItemList AppMenuModel::makeClipItems()
     return items;
 }
 
+MenuItemList AppMenuModel::makeLabelItems()
+{
+    MenuItemList items {
+        makeMenuItem("label-add"),
+        makeMenuItem("paste-new-label"),
+        makeMenu(TranslatableString("appshell/menu/audio-actions", "Audio actions across labels"),
+                 makeAudioActionsItems(), "menu-audio-actions", false),
+        makeSeparator(),
+        makeMenuItem("manage-labels"),
+    };
+
+    return items;
+}
+
 MenuItemList AppMenuModel::makeAudioActionsItems()
 {
     MenuItemList items {
@@ -663,12 +644,11 @@ MenuItemList AppMenuModel::makeZoomItems()
     MenuItemList items {
         makeMenuItem("zoom-in"),
         makeMenuItem("zoom-out"),
+        makeMenuItem("zoom-default"),
         makeMenuItem("zoom-to-selection"),
         makeMenuItem("zoom-toggle"),
-        makeMenuItem("zoom-reset"),
         makeSeparator(),
         makeMenuItem("zoom-to-fit-project"),
-        makeMenuItem("fit-view-to-project"),
         makeMenuItem("collapse-all-tracks"),
         makeMenuItem("expand-all-tracks")
     };
@@ -883,10 +863,63 @@ MenuItemList AppMenuModel::makeGeneratorItems()
     return items;
 }
 
+MenuItemList AppMenuModel::makeToolItems()
+{
+    MenuItemList items {
+        makeMenuItem("tools-plugin-manager"),
+        makeSeparator(),
+        makeMenuItem("manage-macros"),
+        makeMenu(TranslatableString("appshell/menu/macros", "&Macros"), makeMacrosItems(), "menu-macros", false),
+        makeSeparator(),
+    };
+
+    const muse::uicomponents::MenuItemList toolMenus = effectsMenuProvider()->destructiveEffectMenu(*this,
+                                                                                                    effects::EffectFilter::ToolsOnly);
+
+    items << toolMenus;
+
+    if (!toolMenus.empty()) {
+        items << makeSeparator();
+    }
+
+    items << makeMenuItem("raw-data-import")
+          << makeSeparator()
+          << makeMenuItem("reset-configuration");
+
+    return items;
+}
+
+MenuItemList AppMenuModel::makeAnalyzeItems()
+{
+    MenuItemList items {
+        makeMenuItem("analyze-plugin-manager"),
+        makeSeparator(),
+        makeMenuItem("contrast-analyzer"),
+        makeMenuItem("plot-spectrum"),
+        makeMenuItem("analyzer-omitted"),
+        makeSeparator(),
+    };
+
+    const muse::uicomponents::MenuItemList analyzeMenus = effectsMenuProvider()->destructiveEffectMenu(*this,
+                                                                                                       effects::EffectFilter::AnalyzersOnly);
+
+    items << analyzeMenus;
+
+    if (!analyzeMenus.empty()) {
+        items << makeSeparator();
+    }
+
+    return items;
+}
+
 void AppMenuModel::onEffectsChanged()
 {
     MenuItem& effectsItem = findMenu("menu-effect");
     effectsItem.setSubitems(makeEffectsItems());
     MenuItem& generateItem = findMenu("menu-generate");
     generateItem.setSubitems(makeGeneratorItems());
+    MenuItem& analyzeItem = findMenu("menu-analyze");
+    analyzeItem.setSubitems(makeAnalyzeItems());
+    MenuItem& toolsItem = findMenu("menu-tools");
+    toolsItem.setSubitems(makeToolItems());
 }

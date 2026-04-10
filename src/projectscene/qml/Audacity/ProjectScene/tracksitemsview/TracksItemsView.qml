@@ -7,6 +7,11 @@ import Muse.UiComponents
 import Audacity.ProjectScene
 import Audacity.Project
 import Audacity.Playback
+<<<<<<< HEAD
+=======
+import Audacity.Spectrogram
+import Audacity.Record
+>>>>>>> upstream/master
 
 Rectangle {
     id: root
@@ -70,6 +75,10 @@ Rectangle {
         id: playRegionModel
     }
 
+    LeadInRecordingIndicatorModel {
+        id: leadInIndicator
+    }
+
     ViewTracksListModel {
         id: tracksModel
 
@@ -85,13 +94,12 @@ Rectangle {
     ProjectPropertiesModel {
         id: project
 
-        onCaptureThumbnail: function captureThumbnail(thumbnailUrl) {
+        onCaptureThumbnail: function captureThumbnail() {
             // hide playCursor for the time grabbing image
             playCursor.visible = false
             content.grabToImage(function (result) {
                 playCursor.visible = true
-                var success = result.saveToFile(thumbnailUrl)
-                project.onThumbnailCreated(success)
+                project.onThumbnailCreated(result.image)
             })
         }
     }
@@ -160,7 +168,14 @@ Rectangle {
         //! NOTE Models depend on geometry, so let's create a page first and then initialize the models
         Qt.callLater(root.init)
 
+<<<<<<< HEAD
         selectionController.load()
+=======
+        playbackState.init()
+        playRegionModel.init()
+        leadInIndicator.init()
+        selectionViewController.load()
+>>>>>>> upstream/master
         selectionContextMenuModel.load()
         canvasContextMenuModel.load()
 
@@ -289,10 +304,34 @@ Rectangle {
 
             height: 40
 
+            Timer {
+                id: playCursorReleaseTimer
+                interval: 100
+                repeat: false
+                onTriggered: {
+                    head.dragActive = false
+                    timeline.displayedPlayCursorX = playCursorController.positionX
+                }
+            }
+
+            property double displayedPlayCursorX: playCursorController.positionX
+
             function updateCursorPosition(x, y) {
                 lineCursor.x = x
                 timeline.context.updateMousePositionTime(x)
                 tracksViewState.setMouseY(Math.max(0, Math.min(y, mainMouseArea.height)))
+            }
+
+            Connections {
+                target: playCursorController
+
+                function onPositionXChanged() {
+                    if (head.dragActive) {
+                        return
+                    }
+
+                    timeline.displayedPlayCursorX = playCursorController.positionX
+                }
             }
 
             Rectangle {
@@ -324,16 +363,27 @@ Rectangle {
                 anchors.top: parent.top
                 anchors.topMargin: 24
 
-                x: playCursorController.positionX - (width / 2)
+                property bool dragActive: false
+                property double dragPositionX: timeline.displayedPlayCursorX
+
+                x: timeline.displayedPlayCursorX - (width / 2)
 
                 MouseArea {
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: pressed || timelineMouseArea.pressed ? Qt.ClosedHandCursor : Qt.OpenHandCursor
 
+                    onPressed: function (e) {
+                        head.dragActive = true
+                        head.dragPositionX = mapToItem(timeline, e.x, e.y).x
+                        timeline.displayedPlayCursorX = head.dragPositionX
+                    }
+
                     onPositionChanged: function (e) {
                         var ix = mapToItem(timeline, e.x, e.y).x
                         if (pressed) {
+                            head.dragPositionX = ix
+                            timeline.displayedPlayCursorX = ix
                             playCursorController.seekToX(ix)
                         }
                         timeline.updateCursorPosition(ix, 0)
@@ -346,6 +396,13 @@ Rectangle {
                             playCursorController.seekToX(ix, playbackState.isPlaying || timeline.context.playbackOnRulerClickEnabled)
                             playCursorController.setPlaybackRegion(ix, ix)
                         }
+                        playCursorReleaseTimer.restart()
+                    }
+
+                    onCanceled: {
+                        playCursorReleaseTimer.stop()
+                        head.dragActive = false
+                        timeline.displayedPlayCursorX = playCursorController.positionX
                     }
                 }
             }
@@ -464,6 +521,9 @@ Rectangle {
                         lastItemClickKey = root.hoveredItemKey
                     } else {
                         if (!((e.modifiers & (Qt.ControlModifier | Qt.ShiftModifier)) || root.isSplitMode)) {
+                            if (playbackState.isPlaying) {
+                                playbackState.setLastPlaybackSeekTime(timeline.context.positionToTime(e.x))
+                            }
                             playCursorController.seekToX(e.x)
                         }
 
@@ -710,7 +770,11 @@ Rectangle {
                             canvas: content
 
                             trackId: itemData.trackId
+                            trackTitle: itemData.trackTitle
                             trackColor: itemData.color
+
+                            isLeadInRecordingTrack: leadInIndicator.visible && leadInIndicator.trackIds.indexOf(itemData.trackId) !== -1
+                            leadInRecordingStartTime: leadInIndicator.startTime
 
                             isDataSelected: itemData.isDataSelected
                             isTrackSelected: itemData.isTrackSelected
@@ -718,6 +782,7 @@ Rectangle {
                             isMultiSelectionActive: itemData.isMultiSelectionActive
                             isTrackAudible: itemData.isTrackAudible
                             dbRange: itemData.dbRange
+                            isAutomationEnabled: itemData.isAutomationEnabled
                             isWaveformViewVisible: itemData.isWaveformViewVisible
                             isSpectrogramViewVisible: itemData.isSpectrogramViewVisible
 
@@ -735,6 +800,13 @@ Rectangle {
                             }
 
                             navigationPanel: navPanels && navPanels[index] ? navPanels[index] : null
+
+                            onTrackMousePositionChanged: function (xWithinTrack, yWithinTrack) {
+                                let xGlobalPosition = xWithinTrack
+                                let yGlobalPosition = y + yWithinTrack - tracksItemsView.contentY
+
+                                timeline.updateCursorPosition(xGlobalPosition, yGlobalPosition)
+                            }
 
                             onTrackItemMousePositionChanged: function (xWithinTrack, yWithinTrack, itemKey) {
                                 let xGlobalPosition = xWithinTrack
@@ -775,7 +847,8 @@ Rectangle {
                             }
 
                             onRequestSelectionContextMenu: function (x, y) {
-                                selectionContextMenuLoader.show(Qt.point(x + canvasIndent.width, y + timelineHeader.height), selectionContextMenuModel.items)
+                                let mapped = trackClipsContainer.mapToItem(tracksItemsView, x, y)
+                                selectionContextMenuLoader.show(Qt.point(mapped.x + canvasIndent.width, mapped.y + timelineHeader.height), selectionContextMenuModel.items)
                             }
 
                             onSelectionDraged: function (x1, x2, completed) {
@@ -916,6 +989,7 @@ Rectangle {
                             canvas: content
 
                             trackId: itemData.trackId
+                            trackTitle: itemData.trackTitle
                             isDataSelected: itemData.isDataSelected
                             isTrackSelected: itemData.isTrackSelected
                             isTrackFocused: itemData.isTrackFocused
@@ -977,7 +1051,8 @@ Rectangle {
                             }
 
                             onRequestSelectionContextMenu: function (x, y) {
-                                selectionContextMenuLoader.show(Qt.point(x + canvasIndent.width, y + timelineHeader.height), selectionContextMenuModel.items)
+                                let mapped = trackItemLoader.item.mapToItem(tracksItemsView, x, y)
+                                selectionContextMenuLoader.show(Qt.point(mapped.x + canvasIndent.width, mapped.y + timelineHeader.height), selectionContextMenuModel.items)
                             }
 
                             onItemSelectedRequested: {
@@ -1035,13 +1110,20 @@ Rectangle {
             width: timeline.context.selectionEndPosition - x
         }
 
+        PlaybackSeekLine {
+            anchors.top: tracksItemsViewArea.top
+            anchors.bottom: parent.bottom
+
+            x: timeline.context.lastPlaybackSeekPosition
+        }
+
         PlayCursorLine {
             id: playCursor
 
             anchors.top: tracksItemsViewArea.top
             anchors.bottom: parent.bottom
 
-            x: playCursorController.positionX
+            x: timeline.displayedPlayCursorX
         }
 
         Rectangle {

@@ -5,8 +5,6 @@
 
 #include "audio/iaudiodevicesprovider.h"
 
-#include "framework/global/modularity/ioc.h"
-
 #include <QObject>
 
 namespace au::spectrogram {
@@ -38,19 +36,20 @@ class AbstractSpectrogramSettingsModel : public QObject
     Q_PROPERTY(int windowSize READ windowSize WRITE setWindowSize NOTIFY windowSizeChanged)
     Q_PROPERTY(int zeroPaddingFactor READ zeroPaddingFactor WRITE setZeroPaddingFactor NOTIFY zeroPaddingFactorChanged)
 
+<<<<<<< HEAD
     muse::Inject<audio::IAudioDevicesProvider> audioDevicesProvider;
 
+=======
+>>>>>>> upstream/master
 public:
     explicit AbstractSpectrogramSettingsModel(QObject* parent = nullptr);
     virtual ~AbstractSpectrogramSettingsModel() = default;
 
     virtual int minFreq() const = 0;
     void setMinFreq(int value);
-    int frequencyHardMinimum() const { return 0; }
 
     virtual int maxFreq() const = 0;
     void setMaxFreq(int value);
-    int frequencyHardMaximum() const;
 
     virtual int colorGainDb() const = 0;
     virtual void setColorGainDb(int value) = 0;

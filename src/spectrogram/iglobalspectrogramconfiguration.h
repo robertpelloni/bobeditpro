@@ -10,7 +10,11 @@
 #include "framework/global/async/notification.h"
 
 namespace au::spectrogram {
+<<<<<<< HEAD
 class IGlobalSpectrogramConfiguration : MODULE_EXPORT_INTERFACE, public ISpectrogramConfiguration
+=======
+class IGlobalSpectrogramConfiguration : MODULE_GLOBAL_INTERFACE, public ISpectrogramConfiguration
+>>>>>>> upstream/master
 {
     INTERFACE_ID(IGlobalSpectrogramConfiguration)
 
@@ -21,8 +25,8 @@ public:
     virtual void setSpectralSelectionEnabled(bool value) = 0;
     virtual muse::async::Channel<bool> spectralSelectionEnabledChanged() const = 0;
 
-    virtual muse::async::Channel<int> minFreqChanged() const = 0;
-    virtual muse::async::Channel<int> maxFreqChanged() const = 0;
+    virtual muse::async::Channel<double> minFreqChanged() const = 0;
+    virtual muse::async::Channel<double> maxFreqChanged() const = 0;
     virtual muse::async::Channel<SpectrogramColorScheme> colorSchemeChanged() const = 0;
     virtual muse::async::Channel<int> colorGainDbChanged() const = 0;
     virtual muse::async::Channel<int> colorRangeDbChanged() const = 0;

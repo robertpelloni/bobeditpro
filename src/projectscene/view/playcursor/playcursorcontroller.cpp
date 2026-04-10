@@ -31,7 +31,11 @@ static const ActionQuery PLAYBACK_SEEK_QUERY("action://playback/seek");
 static const ActionQuery PLAYBACK_CHANGE_PLAY_REGION_QUERY("action://playback/play-region-change");
 
 PlayCursorController::PlayCursorController(QObject* parent)
+<<<<<<< HEAD
     : QObject(parent)
+=======
+    : QObject(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
+>>>>>>> upstream/master
 {
 }
 
@@ -108,7 +112,7 @@ void PlayCursorController::updatePositionX(muse::secs_t secs)
 void PlayCursorController::onFrameTimeChanged()
 {
     double newPosition;
-    if (globalContext()->isRecording()) {
+    if (globalContext()->isRecording() && !recordController()->isLeadInRecording()) {
         newPosition = m_context->timeToPosition(globalContext()->recordPosition());
     } else {
         newPosition = m_context->timeToPosition(playbackState()->playbackPosition());

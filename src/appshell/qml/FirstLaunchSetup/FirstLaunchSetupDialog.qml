@@ -43,6 +43,32 @@ StyledDialogView {
 
     readonly property Page currentPage: pageLoader.item as Page
 
+<<<<<<< HEAD:src/appshell/qml/FirstLaunchSetup/FirstLaunchSetupDialog.qml
+=======
+    function endSetup() {
+        model.finish()
+        root.accept()
+    }
+
+    function advanceToNextPage() {
+        if (root.currentPage) {
+            root.currentPage.nextButtonClicked()
+        }
+
+        if (model.canFinish) {
+            endSetup()
+            return
+        }
+
+        if (Boolean(buttons.lastPressedButton)) {
+            buttons.lastPressedButton.navigation.accessible.ignored = true
+        }
+
+        pageLoader.item.resetFocus()
+        model.currentPageIndex++
+    }
+
+>>>>>>> upstream/master:src/appshell/qml/Audacity/AppShell/FirstLaunchSetup/FirstLaunchSetupDialog.qml
     FirstLaunchSetupModel {
         id: model
     }
@@ -83,6 +109,15 @@ StyledDialogView {
                 item.navigationSection = root.navigationSection
                 item.activeButtonTitle = buttons.activeButton.text
 
+<<<<<<< HEAD:src/appshell/qml/FirstLaunchSetup/FirstLaunchSetupDialog.qml
+=======
+                if (item.navNextPageRequested) {
+                    item.navNextPageRequested.connect(function () {
+                        advanceToNextPage()
+                    })
+                }
+
+>>>>>>> upstream/master:src/appshell/qml/Audacity/AppShell/FirstLaunchSetup/FirstLaunchSetupDialog.qml
                 navigationActiveTimer.start()
             }
 

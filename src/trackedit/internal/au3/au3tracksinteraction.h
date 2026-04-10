@@ -20,6 +20,7 @@ namespace au::trackedit {
 class Au3TrackData;
 using Au3TrackDataPtr = std::shared_ptr<Au3TrackData>;
 
+<<<<<<< HEAD
 class Au3TracksInteraction : public ITracksInteraction
 {
     muse::Inject<muse::IInteractive> interactive;
@@ -29,6 +30,19 @@ class Au3TracksInteraction : public ITracksInteraction
     muse::Inject<au::trackedit::IProjectHistory> projectHistory;
     muse::Inject<au::trackedit::IClipsInteraction> clipsInteraction;
     muse::Inject<au::playback::IPlaybackConfiguration> playbackConfiguration;
+=======
+class Au3TracksInteraction : public ITracksInteraction, public muse::Contextable
+{
+    muse::GlobalInject<au::trackedit::ITrackeditConfiguration> configuration;
+    muse::GlobalInject<au::playback::IPlaybackConfiguration> playbackConfiguration;
+
+    muse::ContextInject<muse::IInteractive> interactive{ this };
+    muse::ContextInject<au::context::IGlobalContext> globalContext{ this };
+    muse::ContextInject<au::trackedit::ISelectionController> selectionController{ this };
+    muse::ContextInject<au::trackedit::IProjectHistory> projectHistory{ this };
+    muse::ContextInject<au::trackedit::IClipsInteraction> clipsInteraction{ this };
+    muse::ContextInject<au::trackedit::ITrackNavigationController> trackNavigationController{ this };
+>>>>>>> upstream/master
 
 public:
     Au3TracksInteraction();
@@ -36,8 +50,12 @@ public:
     bool trimTracksData(const std::vector<trackedit::TrackId>& tracksIds, secs_t begin, secs_t end) override;
     bool silenceTracksData(const std::vector<trackedit::TrackId>& tracksIds, secs_t begin, secs_t end) override;
     bool changeTrackTitle(const trackedit::TrackId trackId, const muse::String& title) override;
+<<<<<<< HEAD
     bool changeTracksColor(const TrackIdList& tracksIds, const std::string& color) override;
     bool changeAudioTrackViewType(const trackedit::TrackId& trackId, trackedit::TrackViewType viewType) override;
+=======
+    bool changeTracksColor(const TrackIdList& tracksIds, ClipColorIndex colorIndex) override;
+>>>>>>> upstream/master
 
     muse::Ret paste(const std::vector<ITrackDataPtr>& data, secs_t begin, bool moveClips, bool moveAllTracks, bool isMultiSelectionCopy,
                     bool& projectWasModified) override;

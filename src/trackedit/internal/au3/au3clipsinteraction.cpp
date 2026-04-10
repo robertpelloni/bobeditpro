@@ -6,12 +6,18 @@
 
 #include <algorithm>
 
+<<<<<<< HEAD
 #include "au3-track/Track.h"
+=======
+#include <QCoreApplication>
+
+>>>>>>> upstream/master
 #include "au3-stretching-sequence/TempoChange.h"
-#include "au3-wave-track/WaveClip.h"
-#include "au3-wave-track/WaveTrackUtilities.h"
-#include "au3-wave-track/WaveTrack.h"
+#include "au3-track/Track.h"
 #include "au3-wave-track/TimeStretching.h"
+#include "au3-wave-track/WaveClip.h"
+#include "au3-wave-track/WaveTrack.h"
+#include "au3-wave-track/WaveTrackUtilities.h"
 
 #include "global/types/ret.h"
 #include "global/types/number.h"
@@ -36,10 +42,15 @@ using namespace au::trackedit;
 using namespace au::au3;
 
 namespace {
-static const std::string mixingDownToMonoLabel = muse::trc("trackedit", "Mixing down to mono...");
+static const std::string mixingDownToMonoLabel = muse::trc("trackedit", "Mixing down to mono…");
 }
 
+<<<<<<< HEAD
 Au3ClipsInteraction::Au3ClipsInteraction()
+=======
+Au3ClipsInteraction::Au3ClipsInteraction(const muse::modularity::ContextPtr& ctx)
+    : muse::Contextable(ctx)
+>>>>>>> upstream/master
 {
     m_progress.setMaxNumIncrements(200);
 }
@@ -63,12 +74,12 @@ muse::async::Channel<au::trackedit::ClipKey, secs_t, bool> Au3ClipsInteraction::
 muse::secs_t Au3ClipsInteraction::clipStartTime(const trackedit::ClipKey& clipKey) const
 {
     Au3WaveTrack* waveTrack = DomAccessor::findWaveTrack(projectRef(), Au3TrackId(clipKey.trackId));
-    IF_ASSERT_FAILED(waveTrack) {
+    if (!waveTrack) {
         return -1.0;
     }
 
     std::shared_ptr<Au3WaveClip> clip = DomAccessor::findWaveClip(waveTrack, clipKey.itemId);
-    IF_ASSERT_FAILED(clip) {
+    if (!clip) {
         return -1.0;
     }
 
@@ -78,12 +89,12 @@ muse::secs_t Au3ClipsInteraction::clipStartTime(const trackedit::ClipKey& clipKe
 muse::secs_t Au3ClipsInteraction::clipEndTime(const ClipKey& clipKey) const
 {
     Au3WaveTrack* waveTrack = DomAccessor::findWaveTrack(projectRef(), Au3TrackId(clipKey.trackId));
-    IF_ASSERT_FAILED(waveTrack) {
+    if (!waveTrack) {
         return -1.0;
     }
 
     std::shared_ptr<Au3WaveClip> clip = DomAccessor::findWaveClip(waveTrack, clipKey.itemId);
-    IF_ASSERT_FAILED(clip) {
+    if (!clip) {
         return -1.0;
     }
 
@@ -215,7 +226,7 @@ bool Au3ClipsInteraction::resetClipSpeed(const ClipKey& clipKey)
     return doChangeClipSpeed(clipKey, 1);
 }
 
-bool Au3ClipsInteraction::changeClipColor(const ClipKey& clipKey, const std::string& newColor)
+bool Au3ClipsInteraction::changeClipColor(const ClipKey& clipKey, ClipColorIndex colorIndex)
 {
     WaveTrack* waveTrack = DomAccessor::findWaveTrack(projectRef(), ::TrackId(clipKey.trackId));
     IF_ASSERT_FAILED(waveTrack) {
@@ -227,7 +238,7 @@ bool Au3ClipsInteraction::changeClipColor(const ClipKey& clipKey, const std::str
         return false;
     }
 
-    clip->SetColor(newColor);
+    clip->SetColorIndex(colorIndex);
 
     trackedit::ITrackeditProjectPtr prj = globalContext()->currentTrackeditProject();
     prj->notifyAboutClipChanged(DomConverter::clip(waveTrack, clip.get()));
@@ -258,7 +269,7 @@ bool Au3ClipsInteraction::changeClipOptimizeForVoice(const ClipKey& clipKey, boo
 
 bool Au3ClipsInteraction::renderClipPitchAndSpeed(const ClipKey& clipKey)
 {
-    interactive()->showProgress(muse::trc("trackedit", "Rendering pitch and speed..."), m_progress);
+    interactive()->showProgress(muse::trc("trackedit", "Rendering pitch and speed…"), m_progress);
     m_progress.start();
 
     muse::ProgressResult result;
@@ -381,6 +392,7 @@ bool Au3ClipsInteraction::removeClips(const ClipKeyList& clipKeyList, bool moveC
         waveTrack->Clear(clip->Start(), clip->End(), moveClips);
 
         trackedit::ITrackeditProjectPtr prj = globalContext()->currentTrackeditProject();
+        prj->notifyAboutClipRemoved(DomConverter::clip(waveTrack, clip.get()));
         prj->notifyAboutTrackChanged(DomConverter::track(waveTrack));
     }
 
@@ -395,8 +407,6 @@ bool Au3ClipsInteraction::moveClips(secs_t timePositionOffset, int trackPosition
     }
     m_busy = true;
     const muse::Defer defer([&] { m_busy = false; });
-
-    trackPositionOffset = std::clamp(trackPositionOffset, -1, 1);
 
     const trackedit::ITrackeditProjectPtr prj = globalContext()->currentTrackeditProject();
 
@@ -923,9 +933,7 @@ NeedsDownmixing Au3ClipsInteraction::moveSelectedClipsUpOrDown(int offset)
     // Also, it feels better to do all the magic on some floating track list and, if all goes well, replace the original
     // with the modified copy, then sending the appropriate signals.
 
-    // The algorithm is easier if we only allow moving up or down one track at a time.
-    // From a UX perspective, this doesn't change a thing, since dragging a clip results in a myriad of `moveClips` calls.
-    IF_ASSERT_FAILED(offset == -1 || offset == 1) {
+    IF_ASSERT_FAILED(offset != 0) {
         return NeedsDownmixing::No;
     }
 
@@ -934,6 +942,7 @@ NeedsDownmixing Au3ClipsInteraction::moveSelectedClipsUpOrDown(int offset)
     const auto copy = orig.Duplicate();
     const auto prj = globalContext()->currentTrackeditProject();
 
+<<<<<<< HEAD
     ClipKeyList selectedClips = selectionController()->timeSelectionIsNotEmpty()
                                 ? selectionController()->clipsIntersectingRangeSelection()
                                 : selectionController()->selectedClips();
@@ -941,13 +950,22 @@ NeedsDownmixing Au3ClipsInteraction::moveSelectedClipsUpOrDown(int offset)
     const auto dragDirection = offset == -1 ? utils::VerticalDrag::Up : utils::VerticalDrag::Down;
     // Make sure clips aren't dragged past the topmost track:
     if (dragDirection == utils::VerticalDrag::Up && std::any_of(selectedClips.begin(), selectedClips.end(), [&](const ClipKey& clip) {
+=======
+    // Make sure clips aren't dragged past the topmost track:
+    if (offset < 0 && std::any_of(clipKeyList.begin(), clipKeyList.end(), [&](const ClipKey& clip) {
+>>>>>>> upstream/master
         return utils::getTrackIndex(orig, clip.trackId) == 0;
     })) {
         return NeedsDownmixing::No;
     }
 
+<<<<<<< HEAD
     const NeedsDownmixing needsDownmixing = utils::moveClipsVertically(dragDirection, orig,
                                                                        *copy, selectedClips);
+=======
+    const NeedsDownmixing needsDownmixing = utils::moveClipsVertically(offset, orig,
+                                                                       *copy, clipKeyList);
+>>>>>>> upstream/master
 
     // Clean-up after ourselves, preserving original track formats:
     // Tracks that were empty at the start of the interaction, are empty now and differ in format must be restored.
@@ -982,7 +1000,7 @@ NeedsDownmixing Au3ClipsInteraction::moveSelectedClipsUpOrDown(int offset)
 
         if (!origWaveTrack) {
             // This must be a new track created 'cos the user dragged clips down.
-            assert(offset == 1);
+            assert(offset > 0);
             origWaveTrack = utils::appendWaveTrack(mutOrig, newWaveTrack->NChannels());
             prj->notifyAboutTrackAdded(DomConverter::track(origWaveTrack));
         }
@@ -1045,9 +1063,15 @@ NeedsDownmixing Au3ClipsInteraction::moveSelectedClipsUpOrDown(int offset)
     if (offset < 0) {
         // The user dragged up. It's possible that the bottom-most tracks were created during this interaction,
         // in which case we make it nice to the user and remove them automatically.
-        // `m_tracksWhenDragStarted` tells use what the tracks looks like at the start of the interaction. We check all extra tracks.
+        // Only remove empty temp tracks that are below the dragged clips
+        const auto& origTracks = ::TrackList::Get(projectRef());
+        size_t highestClipIndex = 0;
+        for (const auto& clipKey : clipKeyList) {
+            highestClipIndex = std::max(highestClipIndex, utils::getTrackIndex(origTracks, clipKey.trackId));
+        }
+        const size_t removeFrom = std::max(m_tracksWhenDragStarted->size, highestClipIndex + 1);
         constexpr auto emptyOnly = true;
-        tracksInteraction()->removeDragAddedTracks(m_tracksWhenDragStarted->size, emptyOnly);
+        tracksInteraction()->removeDragAddedTracks(removeFrom, emptyOnly);
     }
 
     return needsDownmixing;
@@ -1257,6 +1281,7 @@ secs_t Au3ClipsInteraction::clampRightStretchDelta(const ClipKeyList& clipKeys,
 
 bool Au3ClipsInteraction::trimClipsLeft(const ClipKeyList& clipKeys, secs_t deltaSec, bool completed)
 {
+    bool ok = false;
     for (const auto& selectedClip : clipKeys) {
         Au3WaveTrack* waveTrack = DomAccessor::findWaveTrack(projectRef(), Au3TrackId(selectedClip.trackId));
         IF_ASSERT_FAILED(waveTrack) {
@@ -1275,17 +1300,19 @@ bool Au3ClipsInteraction::trimClipsLeft(const ClipKeyList& clipKeys, secs_t delt
             }
         }
 
-        clip->TrimLeft(deltaSec);
+        ok = clip->TrimLeft(deltaSec);
 
         trackedit::ITrackeditProjectPtr prj = globalContext()->currentTrackeditProject();
         prj->notifyAboutClipChanged(DomConverter::clip(waveTrack, clip.get()));
+        clipGainInteraction()->clipGainChanged().send(selectedClip, completed);
     }
 
-    return true;
+    return ok;
 }
 
 bool Au3ClipsInteraction::trimClipsRight(const ClipKeyList& clipKeys, secs_t deltaSec, bool completed)
 {
+    bool ok = false;
     for (const auto& selectedClip : clipKeys) {
         Au3WaveTrack* waveTrack = DomAccessor::findWaveTrack(projectRef(), Au3TrackId(selectedClip.trackId));
         IF_ASSERT_FAILED(waveTrack) {
@@ -1304,13 +1331,14 @@ bool Au3ClipsInteraction::trimClipsRight(const ClipKeyList& clipKeys, secs_t del
             }
         }
 
-        clip->TrimRight(deltaSec);
+        ok = clip->TrimRight(deltaSec);
 
         trackedit::ITrackeditProjectPtr prj = globalContext()->currentTrackeditProject();
         prj->notifyAboutClipChanged(DomConverter::clip(waveTrack, clip.get()));
+        clipGainInteraction()->clipGainChanged().send(selectedClip, completed);
     }
 
-    return true;
+    return ok;
 }
 
 bool Au3ClipsInteraction::stretchClipsLeft(const ClipKeyList& clipKeys, secs_t deltaSec, bool completed)
@@ -1338,6 +1366,7 @@ bool Au3ClipsInteraction::stretchClipsLeft(const ClipKeyList& clipKeys, secs_t d
 
         trackedit::ITrackeditProjectPtr prj = globalContext()->currentTrackeditProject();
         prj->notifyAboutClipChanged(DomConverter::clip(waveTrack, clip.get()));
+        clipGainInteraction()->clipGainChanged().send(selectedClip, completed);
     }
 
     return true;
@@ -1368,6 +1397,7 @@ bool Au3ClipsInteraction::stretchClipsRight(const ClipKeyList& clipKeys, secs_t 
 
         trackedit::ITrackeditProjectPtr prj = globalContext()->currentTrackeditProject();
         prj->notifyAboutClipChanged(DomConverter::clip(waveTrack, clip.get()));
+        clipGainInteraction()->clipGainChanged().send(selectedClip, completed);
     }
 
     return true;

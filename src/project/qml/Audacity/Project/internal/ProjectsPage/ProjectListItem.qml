@@ -30,18 +30,22 @@ import Audacity.Project 1.0
 ListItemBlank {
     id: root
 
-    required property var project
+    required property var item
     property alias columns: columnsRepeater.model
 
-    property alias thumbnailComponent: thumbnailLoader.sourceComponent
+    property Component thumbnailComponent: defaultThumbnailComponent
 
     property real itemInset: 12
     property real columnSpacing: 44
     property alias showBottomBorder: bottomBorder.visible
 
+    property string placeholder: ""
+
+    property bool isCloudItem: false
+
     implicitHeight: 64
 
-    navigation.accessible.name: root.project.name ?? ""
+    navigation.accessible.name: root.item.name ?? ""
     navigation.onActiveChanged: {
         if (navigation.active) {
             root.scrollIntoView()
@@ -49,6 +53,16 @@ ListItemBlank {
     }
 
     focusBorder.anchors.bottomMargin: bottomBorder.visible ? bottomBorder.height : 0
+
+    Component {
+        id: defaultThumbnailComponent
+
+        ProjectThumbnail {
+            path: root.item.path ?? ""
+            suffix: root.item.suffix ?? ""
+            placeholder: root.placeholder
+        }
+    }
 
     RowLayout {
         anchors.fill: parent
@@ -58,75 +72,78 @@ ListItemBlank {
         spacing: root.columnSpacing
 
         RowLayout {
+            id: nameLayout
+
+            Layout.fillWidth: true
+
             spacing: 24
 
             Loader {
-                id: thumbnailLoader
-
-                Layout.preferredWidth: 71
-                Layout.preferredHeight: 40
-
-                sourceComponent: ProjectThumbnail {
-                    path: root.project.path ?? ""
-                    suffix: root.project.suffix ?? ""
-                    thumbnailUrl: Qt.resolvedUrl("file:" + root.project.thumbnailUrl) ?? ""
-                }
-
-                layer.enabled: true
-                layer.effect: RoundedCornersEffect {
-                    radius: 2
-                }
-            }
-
-            StyledTextLabel {
-                Layout.fillWidth: true
-
-                text: root.project.name ?? ""
-                font: ui.theme.largeBodyFont
-                horizontalAlignment: Text.AlignLeft
-            }
-
-            Loader {
-                active: root.project.isCloud ?? false
+                active: !(root.isCloudItem ?? false)
+                visible: active
+                Layout.fillWidth: active
 
                 sourceComponent: RowLayout {
-                    visible: root.project.isCloud
-
                     spacing: 24
 
-                    // CloudProjectStatusWatcher {
-                    //     id: cloudProjectStatusWatcher
-                    // }
+                    Loader {
+                        Layout.preferredWidth: 71
+                        Layout.preferredHeight: 40
 
-                    Component.onCompleted: {
-                        cloudProjectStatusWatcher.load(root.project.projectId)
-                    }
+                        sourceComponent: root.thumbnailComponent
 
-                    ProgressBar {
-                        Layout.preferredWidth: 118
-                        Layout.preferredHeight: 16
-
-                        visible: cloudProjectStatusWatcher.isProgress
-
-                        from: 0
-                        to: cloudProjectStatusWatcher.progressTotal
-                        value: cloudProjectStatusWatcher.progressCurrent
-
-                        navigation.panel: root.navigation.panel
-                        navigation.row: root.navigation.row
-                        navigation.column: 2
-                        navigation.onActiveChanged: {
-                            if (navigation.active) {
-                                root.scrollIntoView()
-                            }
+                        layer.enabled: true
+                        layer.effect: RoundedCornersEffect {
+                            radius: 2
                         }
                     }
 
+                    StyledTextLabel {
+                        Layout.fillWidth: true
+
+                        text: root.item.name ?? ""
+                        font: ui.theme.largeBodyFont
+                        horizontalAlignment: Text.AlignLeft
+                    }
+                }
+            }
+
+            Loader {
+                active: root.isCloudItem ?? false
+                visible: active
+                Layout.fillWidth: active
+
+                sourceComponent: RowLayout {
+                    visible: root.item.isCloud
+                    spacing: 24
+
+                    StyledTextLabel {
+                        id: cloudProjectName
+
+                        Layout.preferredWidth: 200
+
+                        text: root.item.name ?? ""
+                        font: ui.theme.largeBodyFont
+                        horizontalAlignment: Text.AlignLeft
+                    }
+
+                    Image {
+                        id: previewImage
+
+                        Layout.fillWidth: true
+
+                        source: "qrc:/resources/Waveform.svg"
+                        horizontalAlignment: Image.AlignLeft
+                        verticalAlignment: Image.AlignVCenter
+                    }
+
                     CloudProjectIndicatorButton {
+                        id: cloudIndicator
+
                         Layout.alignment: Qt.AlignTrailing | Qt.AlignVCenter
 
-                        isProgress: cloudProjectStatusWatcher.isProgress
-                        isDownloadedAndUpToDate: cloudProjectStatusWatcher.isDownloadedAndUpToDate
+                        isProgress: false //cloudProjectStatusWatcher.isProgress
+                        isDownloadedAndUpToDate: true //cloudProjectStatusWatcher.isDownloadedAndUpToDate
 
                         navigation.panel: root.navigation.panel
                         navigation.row: root.navigation.row
@@ -134,14 +151,6 @@ ListItemBlank {
                         navigation.onActiveChanged: {
                             if (navigation.active) {
                                 root.scrollIntoView()
-                            }
-                        }
-
-                        onClicked: {
-                            if (isProgress) {
-                                cloudProjectStatusWatcher.cancel()
-                            } else {
-                                root.clicked(null)
                             }
                         }
                     }
@@ -157,7 +166,7 @@ ListItemBlank {
 
                 // These properties are here to give the delegate access to them
                 readonly property ProjectListItem listItem: root
-                readonly property var project: root.project
+                readonly property var item: root.item
                 readonly property NavigationPanel navigationPanel: root.navigation.panel
                 readonly property int navigationRow: root.navigation.row
                 readonly property int navigationColumnStart: 100 * (model.index + 1)

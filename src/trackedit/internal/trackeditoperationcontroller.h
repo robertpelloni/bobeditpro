@@ -16,14 +16,26 @@
 #include "itrackeditclipboard.h"
 
 namespace au::trackedit {
-class TrackeditOperationController : public ITrackeditInteraction, public muse::Injectable, public muse::async::Asyncable
+class TrackeditOperationController : public ITrackeditInteraction, public muse::Contextable, public muse::async::Asyncable
 {
+<<<<<<< HEAD
     muse::Inject<ITracksInteraction> tracksInteraction;
     muse::Inject<IClipsInteraction> clipsInteraction;
     muse::Inject<ILabelsInteraction> labelsInteraction;
     muse::Inject<ITrackeditClipboard> clipboard;
     muse::Inject<IProjectHistory> projectHistory;
     muse::Inject<au::context::IGlobalContext> globalContext;
+=======
+    muse::ContextInject<ITracksInteraction> tracksInteraction { this };
+    muse::ContextInject<IClipsInteraction> clipsInteraction { this };
+    muse::ContextInject<ILabelsInteraction> labelsInteraction { this };
+    muse::ContextInject<ITrackeditClipboard> clipboard { this };
+    muse::ContextInject<IProjectHistory> projectHistory { this };
+    muse::ContextInject<au::context::IGlobalContext> globalContext { this };
+    muse::ContextInject<importexport::IImporter> importer { this };
+    muse::ContextInject<au::trackedit::ISelectionController> selectionController{ this };
+    muse::ContextInject<muse::actions::IActionsDispatcher> dispatcher{ this };
+>>>>>>> upstream/master
 
 public:
     TrackeditOperationController(std::unique_ptr<IUndoManager> undoManager);
@@ -44,9 +56,14 @@ public:
     bool resetClipPitch(const ClipKey& clipKey) override;
     bool changeClipSpeed(const ClipKey& clipKey, double speed) override;
     bool resetClipSpeed(const ClipKey& clipKey) override;
+<<<<<<< HEAD
     bool changeClipColor(const ClipKey& clipKey, const std::string& color) override;
     bool changeTracksColor(const TrackIdList& tracksIds, const std::string& color) override;
     bool changeAudioTrackViewType(const trackedit::TrackId& trackId, trackedit::TrackViewType viewType) override;
+=======
+    bool changeClipColor(const ClipKey& clipKey, ClipColorIndex colorIndex) override;
+    bool changeTracksColor(const TrackIdList& tracksIds, ClipColorIndex colorIndex) override;
+>>>>>>> upstream/master
     bool changeClipOptimizeForVoice(const ClipKey& clipKey, bool optimize) override;
     bool renderClipPitchAndSpeed(const ClipKey& clipKey) override;
     void clearClipboard() override;
@@ -150,6 +167,8 @@ private:
     void pushProjectHistoryDuplicateState();
     void pushProjectHistorySplitDeleteState();
     void pushProjectHistoryDeleteState(secs_t start, secs_t duration);
+    std::optional<secs_t> shortestLabelDuration(const LabelKeyList& labelKeys) const;
+    secs_t clampBoundaryDeltaToSelectedItems(secs_t deltaSec, secs_t minClipDuration, const LabelKeyList& labelKeys) const;
 
     const std::unique_ptr<IUndoManager> m_undoManager;
     muse::async::Notification m_cancelDragEditRequested;

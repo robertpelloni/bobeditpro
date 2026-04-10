@@ -20,7 +20,7 @@ void EffectPresetsScenario::showError(const muse::Ret& ret, const std::string& t
     interactive()->error(ret.text(), text);
 }
 
-void EffectPresetsScenario::applyPreset(const EffectInstanceId& effectInstanceId, const PresetId& presetId)
+void EffectPresetsScenario::loadPreset(const EffectInstanceId& effectInstanceId, const PresetId& presetId)
 {
     Ret ret = presetsProvider()->applyPreset(effectInstanceId, presetId);
     if (!ret) {
@@ -28,7 +28,7 @@ void EffectPresetsScenario::applyPreset(const EffectInstanceId& effectInstanceId
     }
 }
 
-void EffectPresetsScenario::saveCurrentAsPreset(const EffectInstanceId& effectInstanceId)
+void EffectPresetsScenario::savePresetAs(const EffectInstanceId& effectInstanceId)
 {
     RetVal<Val> rv = interactive()->openSync("audacity://effects/presets/input_name");
     std::string name = rv.val.toString();
@@ -45,8 +45,8 @@ void EffectPresetsScenario::saveCurrentAsPreset(const EffectInstanceId& effectIn
     bool alreadyExists = presetsProvider()->hasUserPresetWithName(effectId, name);
     if (alreadyExists) {
         IInteractive::Result res = interactive()->questionSync(
-            muse::trc("effects", "Save Preset"),
-            muse::mtrc("effects", "Preset \"%1\" already exists, replace?")
+            muse::trc("effects", "Save preset"),
+            muse::mtrc("effects", "Preset “%1” already exists, replace?")
             .arg(String::fromStdString(name)).toStdString(),
             { IInteractive::Button::Cancel, IInteractive::Button::Yes });
 
@@ -62,11 +62,32 @@ void EffectPresetsScenario::saveCurrentAsPreset(const EffectInstanceId& effectIn
     }
 }
 
+void EffectPresetsScenario::savePreset(const EffectInstanceId& effectInstanceId, const PresetId& presetId)
+{
+    IF_ASSERT_FAILED(!presetId.empty()) {
+        return;
+    }
+
+    const EffectId effectId = instancesRegister()->effectIdByInstanceId(effectInstanceId);
+    IF_ASSERT_FAILED(!effectId.empty()) {
+        return;
+    }
+
+    IF_ASSERT_FAILED(presetsProvider()->hasUserPresetWithName(effectId, presetId.ToStdString())) {
+        return;
+    }
+
+    Ret ret = presetsProvider()->saveCurrentAsPreset(effectInstanceId, presetId.ToStdString());
+    if (!ret) {
+        showError(ret);
+    }
+}
+
 void EffectPresetsScenario::deletePreset(const EffectId& effectId, const PresetId& presetId)
 {
     IInteractive::Result res = interactive()->questionSync(
-        muse::trc("effects", "Delete Preset"),
-        muse::mtrc("effects", "Are you sure you want to delete \"%1\"?")
+        muse::trc("effects", "Delete preset"),
+        muse::mtrc("effects", "Are you sure you want to delete “%1”?")
         .arg(au3::wxToString(presetId)).toStdString(),
         { IInteractive::Button::No, IInteractive::Button::Yes });
 
@@ -93,7 +114,7 @@ void EffectPresetsScenario::importPreset(const EffectInstanceId& effectInstanceI
         m_lastImportPath = globalConfiguration()->homePath();
     }
 
-    const std::string interactiveTitle = muse::trc("effects", "Import Effect Parameters");
+    const std::string interactiveTitle = muse::trc("effects", "Import effect parameters");
     io::path_t path = interactive()->selectOpeningFileSync(interactiveTitle,
                                                            m_lastImportPath,
                                                            presetFilesFilter());
@@ -124,7 +145,7 @@ void EffectPresetsScenario::exportPreset(const EffectInstanceId& effectInstanceI
         m_lastExportPath = globalConfiguration()->homePath();
     }
 
-    io::path_t path = interactive()->selectSavingFileSync(muse::trc("effects", "Export Effect Parameters"),
+    io::path_t path = interactive()->selectSavingFileSync(muse::trc("effects", "Export effect parameters"),
                                                           m_lastExportPath,
                                                           presetFilesFilter());
 

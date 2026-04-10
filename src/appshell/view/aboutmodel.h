@@ -35,13 +35,24 @@
 class QUrl;
 
 namespace au::appshell {
+<<<<<<< HEAD:src/appshell/view/aboutmodel.h
 class AboutModel : public QObject
+=======
+class AboutModel : public QObject, public muse::Contextable
+>>>>>>> upstream/master:src/appshell/qml/Audacity/AppShell/aboutmodel.h
 {
     Q_OBJECT
 
+<<<<<<< HEAD:src/appshell/view/aboutmodel.h
     muse::Inject<IAppShellConfiguration> configuration;
     muse::Inject<muse::IGlobalConfiguration> globalConfiguration;
     muse::Inject<muse::IApplication> application;
+=======
+    muse::GlobalInject<IAppShellConfiguration> configuration;
+    muse::GlobalInject<muse::IGlobalConfiguration> globalConfiguration;
+
+    muse::GlobalInject<muse::IApplication> application;
+>>>>>>> upstream/master:src/appshell/qml/Audacity/AppShell/aboutmodel.h
 
 //! TODO AU4
 //     muse::Inject<update::IUpdateConfiguration> updateConfiguration;
@@ -49,15 +60,12 @@ class AboutModel : public QObject
 public:
     explicit AboutModel(QObject* parent = nullptr);
 
-    Q_INVOKABLE QString museScoreVersion() const;
-    Q_INVOKABLE QString museScoreRevision() const;
-    Q_INVOKABLE QVariantMap museScoreUrl() const;
-    Q_INVOKABLE QVariantMap museScoreForumUrl() const;
-    Q_INVOKABLE QVariantMap museScoreContributionUrl() const;
-    Q_INVOKABLE QVariantMap museScorePrivacyPolicyUrl() const;
-
-    Q_INVOKABLE QVariantMap musicXMLLicenseUrl() const;
-    Q_INVOKABLE QVariantMap musicXMLLicenseDeedUrl() const;
+    Q_INVOKABLE QString appVersion() const;
+    Q_INVOKABLE QString appRevision() const;
+    Q_INVOKABLE QVariantMap appUrl() const;
+    Q_INVOKABLE QVariantMap forumUrl() const;
+    Q_INVOKABLE QVariantMap contributionUrl() const;
+    Q_INVOKABLE QVariantMap privacyPolicyUrl() const;
 
     Q_INVOKABLE void copyRevisionToClipboard() const;
 

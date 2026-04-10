@@ -110,7 +110,6 @@ static const ActionQuery TRACK_CHANGE_RATE_QUERY("action://trackedit/track/chang
 static const ActionQuery SET_TRACK_VIEW_WAVEFORM("action://trackedit/track-view-waveform");
 static const ActionQuery SET_TRACK_VIEW_SPECTROGRAM("action://trackedit/track-view-spectrogram");
 static const ActionQuery SET_TRACK_VIEW_MULTI("action://trackedit/track-view-multi");
-static const ActionQuery TRACK_OPEN_SPECTROGRAM_SETTINGS("action://trackedit/track-spectrogram-settings");
 
 static const ActionCode LABEL_ADD_CODE("label-add");
 
@@ -281,7 +280,6 @@ void TrackeditActionsController::init()
     dispatcher()->reg(this, SET_TRACK_VIEW_WAVEFORM, this, &TrackeditActionsController::changeTrackViewToWaveform);
     dispatcher()->reg(this, SET_TRACK_VIEW_SPECTROGRAM, this, &TrackeditActionsController::changeTrackViewToSpectrogram);
     dispatcher()->reg(this, SET_TRACK_VIEW_MULTI, this, &TrackeditActionsController::changeTrackViewToWaveformAndSpectrogram);
-    dispatcher()->reg(this, TRACK_OPEN_SPECTROGRAM_SETTINGS, this, &TrackeditActionsController::openTrackSpectrogramSettings);
 
     dispatcher()->reg(this, LABEL_ADD_CODE, this, &TrackeditActionsController::addLabel);
 
@@ -294,7 +292,20 @@ void TrackeditActionsController::init()
     dispatcher()->reg(this, LABEL_COPY_CODE, this, &TrackeditActionsController::labelCopy);
     dispatcher()->reg(this, LABEL_COPY_MULTI_CODE, this, &TrackeditActionsController::labelCopyMulti);
 
+<<<<<<< HEAD
     projectHistory()->historyChanged().onNotify(this, [this]() {
+=======
+    dispatcher()->reg(this, TRACK_VIEW_ITEM_MOVE_LEFT_CODE, this, &TrackeditActionsController::moveFocusedItemLeft);
+    dispatcher()->reg(this, TRACK_VIEW_ITEM_MOVE_RIGHT_CODE, this, &TrackeditActionsController::moveFocusedItemRight);
+    dispatcher()->reg(this, TRACK_VIEW_ITEM_MOVE_UP_CODE, this, &TrackeditActionsController::moveFocusedItemUp);
+    dispatcher()->reg(this, TRACK_VIEW_ITEM_MOVE_DOWN_CODE, this, &TrackeditActionsController::moveFocusedItemDown);
+    dispatcher()->reg(this, TRACK_VIEW_ITEM_EXTEND_LEFT_CODE, this, &TrackeditActionsController::extendFocusedItemBoundaryLeft);
+    dispatcher()->reg(this, TRACK_VIEW_ITEM_EXTEND_RIGHT_CODE, this, &TrackeditActionsController::extendFocusedItemBoundaryRight);
+    dispatcher()->reg(this, TRACK_VIEW_ITEM_REDUCE_LEFT_CODE, this, &TrackeditActionsController::reduceFocusedItemBoundaryLeft);
+    dispatcher()->reg(this, TRACK_VIEW_ITEM_REDUCE_RIGHT_CODE, this, &TrackeditActionsController::reduceFocusedItemBoundaryRight);
+
+    projectHistory()->historyChanged().onReceive(this, [this](auto) {
+>>>>>>> upstream/master
         notifyActionEnabledChanged(TRACKEDIT_UNDO);
         notifyActionEnabledChanged(TRACKEDIT_REDO);
     });
@@ -402,6 +413,8 @@ void TrackeditActionsController::doGlobalCut()
 
         dispatcher()->dispatch(RANGE_SELECTION_SPLIT_CUT,
                                ActionData::make_arg3<TrackIdList, secs_t, secs_t>(selectedTracks, selectedStartTime, selectedEndTime));
+
+        frequencySelectionController()->resetFrequencySelection();
         return;
     }
 
@@ -537,6 +550,15 @@ void TrackeditActionsController::doGlobalDelete()
         }
     }
 
+    const auto frequencySelection = frequencySelectionController()->frequencySelection();
+    if (frequencySelectionController()->showsSpectrogram(frequencySelection.trackId) && frequencySelection.isValid()) {
+        using namespace spectrogram;
+        if (const std::optional<SpectralEffect> effect = spectralEffectsRegister()->spectralEffect(SpectralEffectId::DeleteSelection)) {
+            dispatcher()->dispatch(effect->action);
+            return;
+        }
+    }
+
     if (selectionController()->timeSelectionIsNotEmpty()) {
         auto selectedTracks = selectionController()->selectedTracks();
         secs_t selectedStartTime = selectionController()->dataSelectedStartTime();
@@ -544,6 +566,8 @@ void TrackeditActionsController::doGlobalDelete()
 
         dispatcher()->dispatch(RANGE_SELECTION_SPLIT_DELETE,
                                ActionData::make_arg3<TrackIdList, secs_t, secs_t>(selectedTracks, selectedStartTime, selectedEndTime));
+
+        frequencySelectionController()->resetFrequencySelection();
         return;
     }
 
@@ -1679,19 +1703,27 @@ void TrackeditActionsController::moveCursorToClosestZeroCrossing()
 
 void TrackeditActionsController::setClipColor(const muse::actions::ActionQuery& q)
 {
+<<<<<<< HEAD
     if (!selectionController()->hasSelectedClips()) {
+=======
+    auto selectedClips = clipsForInteraction();
+    if (selectedClips.empty()) {
+>>>>>>> upstream/master
         return;
     }
 
-    std::string newColor;
-    if (q.contains("color")) {
-        newColor = q.param("color").toString();
-    } else {
-        newColor = "";
+    trackedit::ClipColorIndex colorIndex = trackedit::CLIP_COLOR_INDEX_NONE;
+    if (q.contains("colorindex")) {
+        colorIndex = q.param("colorindex").toInt();
     }
 
+<<<<<<< HEAD
     auto clipKey = selectionController()->selectedClips().front();
     trackeditInteraction()->changeClipColor(clipKey, newColor);
+=======
+    auto clipKey = selectedClips.front();
+    trackeditInteraction()->changeClipColor(clipKey, colorIndex);
+>>>>>>> upstream/master
     notifyActionCheckedChanged(q.toString());
 }
 
@@ -1702,14 +1734,12 @@ void TrackeditActionsController::setTrackColor(const muse::actions::ActionQuery&
         return;
     }
 
-    std::string color;
-    if (q.contains("color")) {
-        color = q.param("color").toString();
-    } else {
-        color = "";
+    trackedit::ClipColorIndex colorIndex = trackedit::CLIP_COLOR_INDEX_NONE;
+    if (q.contains("colorindex")) {
+        colorIndex = q.param("colorindex").toInt();
     }
 
-    trackeditInteraction()->changeTracksColor(tracks, color);
+    trackeditInteraction()->changeTracksColor(tracks, colorIndex);
     notifyActionCheckedChanged(q.toString());
 }
 
@@ -1782,6 +1812,29 @@ void TrackeditActionsController::setTrackRate(const muse::actions::ActionQuery& 
     }
 }
 
+<<<<<<< HEAD
+=======
+void TrackeditActionsController::toggleGlobalSpectrogramView()
+{
+    const auto project = globalContext()->currentProject();
+    IF_ASSERT_FAILED(project) {
+        return;
+    }
+
+    const auto viewState = project->viewState();
+    IF_ASSERT_FAILED(viewState) {
+        return;
+    }
+
+    const bool enablingGlobalSpectrogram = !viewState->globalSpectrogramToggleIsOn();
+    if (enablingGlobalSpectrogram && viewState->clipGainAutomationEnabled().val) {
+        viewState->setClipGainAutomationEnabled(false);
+    }
+
+    viewState->toggleGlobalSpectrogramView();
+}
+
+>>>>>>> upstream/master
 void TrackeditActionsController::changeTrackViewToWaveform(const muse::actions::ActionQuery& q)
 {
     changeTrackView(q, TrackViewType::Waveform);
@@ -1799,7 +1852,7 @@ void TrackeditActionsController::changeTrackViewToWaveformAndSpectrogram(const m
 
 void TrackeditActionsController::changeTrackView(const muse::actions::ActionQuery& q, TrackViewType trackView)
 {
-    IF_ASSERT_FAILED(q.params().size() == 1) {
+    IF_ASSERT_FAILED(q.params().size() >= 1) {
         return;
     }
     const auto trackId = q.param("trackId").toInt();
@@ -1819,13 +1872,6 @@ void TrackeditActionsController::changeTrackView(const muse::actions::ActionQuer
     default:
         assert(false);
     }
-}
-
-void TrackeditActionsController::openTrackSpectrogramSettings(const muse::actions::ActionQuery& q)
-{
-    muse::UriQuery spectrogramSettingsUri("audacity://trackedit/track_spectrogram_settings");
-    spectrogramSettingsUri.addParam("trackId", muse::Val(q.param("trackId").toInt()));
-    interactive()->open(spectrogramSettingsUri);
 }
 
 void TrackeditActionsController::addLabel()

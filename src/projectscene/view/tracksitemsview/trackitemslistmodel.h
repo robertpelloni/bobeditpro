@@ -25,7 +25,12 @@
 #include "viewtrackitem.h"
 
 namespace au::projectscene {
+<<<<<<< HEAD
 class TrackItemsListModel : public QAbstractListModel, public muse::async::Asyncable, public muse::actions::Actionable
+=======
+class TrackItemsListModel : public QAbstractListModel, public muse::async::Asyncable, public muse::actions::Actionable,
+    public muse::Contextable
+>>>>>>> upstream/master
 {
     Q_OBJECT
 
@@ -34,12 +39,22 @@ class TrackItemsListModel : public QAbstractListModel, public muse::async::Async
     Q_PROPERTY(int cacheBufferPx READ cacheBufferPx CONSTANT)
 
 protected:
+<<<<<<< HEAD
     muse::Inject<muse::actions::IActionsDispatcher> dispatcher;
     muse::Inject<context::IGlobalContext> globalContext;
     muse::Inject<muse::IInteractive> interactive;
     muse::Inject<trackedit::ITrackeditInteraction> trackeditInteraction;
     muse::Inject<trackedit::ISelectionController> selectionController;
     muse::Inject<trackedit::IProjectHistory> projectHistory;
+=======
+    muse::ContextInject<muse::actions::IActionsDispatcher> dispatcher{ this };
+    muse::ContextInject<context::IGlobalContext> globalContext{ this };
+    muse::ContextInject<muse::IInteractive> interactive{ this };
+    muse::ContextInject<trackedit::ITrackeditInteraction> trackeditInteraction{ this };
+    muse::ContextInject<trackedit::ISelectionController> selectionController{ this };
+    muse::ContextInject<trackedit::IProjectHistory> projectHistory{ this };
+    muse::ContextInject<trackedit::ITrackNavigationController> trackNavigationController{ this };
+>>>>>>> upstream/master
 
 public:
     explicit TrackItemsListModel(QObject* parent = nullptr);
@@ -118,6 +133,9 @@ protected:
     bool isAllowedToMoveToTracks(const std::vector<trackedit::TrackType>& allowedTrackTypes, const trackedit::TrackId& movedTrackId) const;
 
     Qt::KeyboardModifiers keyboardModifiers() const;
+
+    friend class TrackClipsSelectionTests;
+    friend class TrackLabelsSelectionTests;
 
     TimelineContext* m_context = nullptr;
     trackedit::TrackId m_trackId = -1;

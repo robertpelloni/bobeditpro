@@ -12,7 +12,11 @@ using namespace au::projectscene;
 using namespace au::effects;
 
 RealtimeEffectListModel::RealtimeEffectListModel(QObject* parent)
+<<<<<<< HEAD
     : QAbstractListModel(parent)
+=======
+    : QAbstractListModel(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
+>>>>>>> upstream/master
 {
 }
 

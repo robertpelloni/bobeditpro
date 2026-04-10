@@ -5,10 +5,10 @@
 
 #include <memory>
 
-#include "global/types/ret.h"
-#include "global/async/notification.h"
-#include "global/io/ifilesystem.h"
-#include "global/modularity/ioc.h"
+#include "framework/global/types/ret.h"
+#include "framework/global/async/notification.h"
+#include "framework/global/io/ifilesystem.h"
+#include "framework/global/modularity/ioc.h"
 
 #include "au3wrap/iau3project.h"
 #include "au3-track/Track.h"
@@ -23,11 +23,12 @@ class Au3ProjectAccessor : public IAu3Project
 {
 public:
 
-    Au3ProjectAccessor();
+    Au3ProjectAccessor(const muse::modularity::ContextPtr& ctx);
 
     [[nodiscard]] muse::Ret open() override;
     [[nodiscard]] muse::Ret load(const muse::io::path_t& filePath, bool ignoreAutosave) override;
     bool save(const muse::io::path_t& fileName) override;
+    void saveThumbnail(std::vector<uint8_t> pngData) override;
     void close() override;
 
     std::string title() const override;
@@ -65,7 +66,13 @@ class Au3ProjectCreator : public IAu3ProjectCreator
 
 public:
 
-    std::shared_ptr<IAu3Project> create() const override;
+    std::shared_ptr<IAu3Project> create(const muse::modularity::ContextPtr& ctx) const override;
     [[nodiscard]] muse::Ret removeUnsavedData(const muse::io::path_t& projectPath) const override;
+};
+
+class Au3ProjectReader : public IAu3ProjectReader
+{
+public:
+    std::optional<std::vector<uint8_t> > readProjectThumbnail(const muse::io::path_t& projectPath) const override;
 };
 }

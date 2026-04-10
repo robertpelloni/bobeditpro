@@ -4,24 +4,28 @@
 #pragma once
 
 #include "effects/effects_base/effectstypes.h"
-#include "audioplugins/iknownaudiopluginsregister.h"
-#include "modularity/ioc.h"
-#include "global/io/path.h"
+#include "framework/audioplugins/iknownaudiopluginsregister.h"
+#include "framework/global/modularity/ioc.h"
+#include "framework/global/io/path.h"
 
 class PluginProvider;
 
 namespace au::effects {
-class EffectsRepositoryHelper final : public muse::Injectable
+class EffectsRepositoryHelper final
 {
 public:
+<<<<<<< HEAD
     muse::Inject<muse::audioplugins::IKnownAudioPluginsRegister> knownPlugins;
+=======
+    muse::GlobalInject<muse::audioplugins::IKnownAudioPluginsRegister> knownPlugins;
+>>>>>>> upstream/master
 
 public:
     using GetTitleFunc = std::function<muse::String (const muse::io::path_t&)>;
 
     EffectsRepositoryHelper(PluginProvider&, muse::audio::AudioResourceType, GetTitleFunc getTitle = nullptr);
 
-    virtual ~EffectsRepositoryHelper() = default;
+    ~EffectsRepositoryHelper() = default;
 
     EffectMetaList effectMetaList() const;
     bool ensurePluginIsLoaded(const EffectId& effectId) const;

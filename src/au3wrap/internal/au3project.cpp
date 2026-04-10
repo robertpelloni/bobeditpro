@@ -3,7 +3,9 @@
 */
 #include "au3project.h"
 
-#include "global/defer.h"
+#include "framework/global/defer.h"
+#include "framework/global/translation.h"
+#include "framework/global/log.h"
 
 #include "au3-project-history/ProjectHistory.h"
 #include "au3-project-history/UndoManager.h"
@@ -11,14 +13,14 @@
 #include "au3-file-formats/AcidizerTags.h"
 #include "au3-import-export/Import.h"
 #include "au3-import-export/ImportPlugin.h"
-#include "au3-import-export/ImportProgressListener.h"
 #include "au3-numeric-formats/ProjectTimeSignature.h"
 #include "au3-project-file-io/ProjectFileIO.h"
 #include "au3-project/Project.h"
-#include "au3-tags/Tags.h"
 #include "au3-wave-track/WaveClip.h"
 #include "au3-wave-track/WaveTrack.h"
+#include "au3-wave-track/WaveTrackUtilities.h"
 #include "au3-stretching-sequence/TempoChange.h"
+#include "projectthumbnail.h"
 
 //! HACK
 //! Static variable is not initialized
@@ -26,17 +28,13 @@
 //! so, to fix it, included this file here
 #include "au3-project-file-io/SqliteSampleBlock.cpp"
 
-#include "translation.h"
-#include "wxtypes_convert.h"
-#include "../au3types.h"
-#include "domconverter.h"
-#include "trackcolor.h"
+#include "project/projecterrors.h"
 
-#include "log.h"
+#include "wxtypes_convert.h"
+#include "trackcolor.h"
+#include "../au3types.h"
 
 #include <random>
-
-#include "project/projecterrors.h"
 
 using namespace au::au3;
 
@@ -50,16 +48,27 @@ size_t randomIndex()
 }
 }
 
-std::shared_ptr<IAu3Project> Au3ProjectCreator::create() const
+std::shared_ptr<IAu3Project> Au3ProjectCreator::create(const muse::modularity::ContextPtr& ctx) const
 {
     TrackColor::Init(randomIndex());
-    return std::make_shared<Au3ProjectAccessor>();
+    return std::make_shared<Au3ProjectAccessor>(ctx);
+}
+
+std::optional<std::vector<uint8_t> > Au3ProjectReader::readProjectThumbnail(const muse::io::path_t& projectPath) const
+{
+    const std::string sstr = projectPath.toStdString();
+    const FilePath fileName = wxString::FromUTF8(sstr.c_str(), sstr.size());
+    if (fileName.empty()) {
+        return std::nullopt;
+    }
+
+    return ProjectFileIO::ReadThumbnail(fileName);
 }
 
 muse::Ret Au3ProjectCreator::removeUnsavedData(const muse::io::path_t& projectPath) const
 {
     // Helper method to remove autosave data from a project file without keeping it open
-    const auto tempProject = create();
+    const auto tempProject = create(muse::modularity::globalCtx());
     if (!tempProject) {
         return muse::make_ret(static_cast<muse::Ret::Code>(au::project::Err::NoProjectError));
     }
@@ -84,8 +93,8 @@ struct au::au3::Au3ProjectData
     Au3Project& projectRef() { return *project.get(); }
 };
 
-Au3ProjectAccessor::Au3ProjectAccessor()
-    : m_data(std::make_shared<Au3ProjectData>())
+Au3ProjectAccessor::Au3ProjectAccessor(const muse::modularity::ContextPtr& ctx)
+    : IAu3Project(ctx), m_data(std::make_shared<Au3ProjectData>())
 {
     m_data->project = Au3Project::Create();
     mTrackListSubstription = Au3TrackList::Get(m_data->projectRef()).Subscribe([this](const TrackListEvent& event)
@@ -166,6 +175,11 @@ muse::Ret Au3ProjectAccessor::load(const muse::io::path_t& filePath, bool ignore
     updateSavedState();
 
     return ret;
+}
+
+void Au3ProjectAccessor::saveThumbnail(std::vector<uint8_t> pngData)
+{
+    ProjectThumbnail::Get(m_data->projectRef()).SetData(std::move(pngData));
 }
 
 bool Au3ProjectAccessor::save(const muse::io::path_t& filePath)

@@ -22,7 +22,7 @@ Audacity4Project::Audacity4Project()
 
 Ret Audacity4Project::createNew()
 {
-    m_au3Project = au3ProjectCreator()->create();
+    m_au3Project = au3ProjectCreator()->create(iocContext());
     if (!m_au3Project->open()) {
         return muse::make_ret(static_cast<Ret::Code>(au::project::Err::NoProjectError));
     }
@@ -30,6 +30,7 @@ Ret Audacity4Project::createNew()
     m_trackeditProject = trackeditProjectCreator()->create(m_au3Project);
     m_isNewlyCreated = true;
     m_viewState = viewStateCreator()->createViewState(m_au3Project);
+    setupProjectNotifications();
 
     return muse::make_ret(Ret::Code::Ok);
 }
@@ -139,7 +140,7 @@ muse::Ret Audacity4Project::doLoad(const io::path_t& path, const bool forceMode,
         return make_ret(Err::ProjectFileNotFound, path);
     }
 
-    m_au3Project = au3ProjectCreator()->create();
+    m_au3Project = au3ProjectCreator()->create(iocContext());
     ret = m_au3Project->load(path);
     if (!ret) {
         LOGE() << "Failed load:" << path;
@@ -151,12 +152,7 @@ muse::Ret Audacity4Project::doLoad(const io::path_t& path, const bool forceMode,
     m_trackeditProject = trackeditProjectCreator()->create(m_au3Project);
 
     m_viewState = viewStateCreator()->createViewState(m_au3Project);
-
-    // Set up notification for save status changes
-    m_au3Project->projectChanged().onNotify(this, [this]() {
-        // Mark project as needing save and autosave
-        setNeedSave(true);
-    });
+    setupProjectNotifications();
 
     // For restored never-saved projects, ensure proper initialization
     // by calling reload() to trigger tracksChanged notifications.
@@ -171,6 +167,14 @@ muse::Ret Audacity4Project::doLoad(const io::path_t& path, const bool forceMode,
     }
 
     return ret;
+}
+
+void Audacity4Project::setupProjectNotifications()
+{
+    m_au3Project->projectChanged().onNotify(this, [this]() {
+        m_displayNameChanged.notify();
+        setNeedSave(true);
+    }, muse::async::Asyncable::Mode::SetReplace);
 }
 
 Ret Audacity4Project::doImport(const muse::io::path_t& path, const bool forceMode) const
@@ -265,6 +269,11 @@ bool Audacity4Project::isNewlyCreated() const
 bool Audacity4Project::isImported() const
 {
     return m_isImported;
+}
+
+bool Audacity4Project::isCloudProject() const
+{
+    return configuration()->isCloudProject(m_path);
 }
 
 String Audacity4Project::title() const
@@ -379,17 +388,18 @@ Ret Audacity4Project::doSave(const muse::io::path_t& savePath, bool generateBack
         return make_ret(io::Err::FSNotExist);
     }
 
+    if (createThumbnail) {
+        std::optional<std::vector<uint8_t> > pngData = thumbnailCreator()->createThumbnail();
+        if (!pngData.has_value()) {
+            LOGE() << "Failed to create thumbnail for: " << savePath;
+        } else {
+            m_au3Project->saveThumbnail(std::move(pngData).value());
+        }
+    }
+
     auto ret = m_au3Project->save(savePath);
     if (!ret) {
         return make_ret(Ret::Code::UnknownError);
-    }
-
-    if (createThumbnail) {
-        Ret ret = thumbnailCreator()->createThumbnail(savePath);
-        if (!ret) {
-            LOGE() << "Failed create thumbnail: " << ret.toString();
-            return ret;
-        }
     }
 
     return muse::make_ok();

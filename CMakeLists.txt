@@ -86,7 +86,12 @@ set(MUSE_MODULE_LANGUAGES ON)
 set(MUSE_MODULE_LEARN ON)
 set(MUSE_MODULE_MIDI OFF)
 set(MUSE_MODULE_MPE OFF)
+<<<<<<< HEAD
 set(MUSE_MODULE_MULTIINSTANCES OFF)
+=======
+set(MUSE_MODULE_MULTIWINDOWS ON)
+set(MUSE_MODULE_MULTIWINDOWS_SINGLEPROC_MODE ON)
+>>>>>>> upstream/master
 set(MUSE_MODULE_MUSESAMPLER OFF)
 set(MUSE_MODULE_NETWORK ON)
 set(MUSE_MODULE_SHORTCUTS ON)
@@ -97,6 +102,14 @@ set(MUSE_MODULE_WORKSPACE ON)
 
 # Modules (alphabetical order please)
 option(AU_BUILD_APPSHELL_MODULE "Build appshell module" ON)
+<<<<<<< HEAD
+=======
+option(AU_BUILD_AUTOMATION_TESTS "Build automation tests" ON)
+option(AU_BUILD_CLOUD_AUDIOCOM "Build cloud audiocom module" ON)
+if (AU_BUILD_CLOUD_AUDIOCOM)
+    add_compile_definitions(AU_BUILD_CLOUD_AUDIOCOM)
+endif()
+>>>>>>> upstream/master
 option(AU_BUILD_CONTEXT_TESTS "Build context tests" ON)
 option(AU_BUILD_EFFECTS_BUILTIN_TESTS "Build builtin-effect tests" ON)
 option(AU_BUILD_EFFECTS_MODULE "Build effects module" ON)
@@ -112,24 +125,42 @@ option(AU_BUILD_UICOMPONENTS_TESTS "Build uicomponents tests" ON)
 option(AU_BUILD_TRACKEDIT_TESTS "Build trackedit tests" ON)
 
 option(AU_MODULE_EFFECTS_VST "Build audacity vst module" ON)
+if (AU_MODULE_EFFECTS_VST)
+    add_compile_definitions(AU_MODULE_EFFECTS_VST)
+endif()
+
 set(AU_MODULE_VST_VST3_SDK_PATH "" CACHE PATH "[optional] Path to VST3_SDK. SDK version >= ${VST3_SDK_VERSION} required")
+
+option(AU_MODULE_EFFECTS_NYQUIST "Build audacity nyquist module" ON)
+if(AU_MODULE_EFFECTS_NYQUIST)
+    add_compile_definitions(AU_MODULE_EFFECTS_NYQUIST)
+endif()
 
 if (OS_IS_LIN)
     option(AU_MODULE_EFFECTS_LV2 "Build audacity lv2 module" ON)
+    if (AU_MODULE_EFFECTS_LV2)
+        add_compile_definitions(AU_MODULE_EFFECTS_LV2)
+    endif()
 endif(OS_IS_LIN)
 
 if( CMAKE_SYSTEM_NAME MATCHES "Darwin" )
     option(AU_MODULE_EFFECTS_AUDIO_UNIT "Build Audacity Audio Unit module" ON)
+    if (AU_MODULE_EFFECTS_AUDIO_UNIT)
+        add_compile_definitions(AU_MODULE_EFFECTS_AUDIO_UNIT)
+    endif()
 endif()
 
 # Time-stretching and pitch-shifting libraries
 option(AU_USE_SBSMS "Build with SBSMS support for time-stretching effects" ON)
 option(AU_USE_SOUNDTOUCH "Build with SoundTouch support for pitch/tempo effects" ON)
 
+# Networking
+option(AU_USE_LIBCURL "Use libcurl for HTTP requests" OFF)
+
 # === Setup ===
 
 # === Pack ===
-option(MU_RUN_LRELEASE "Generate .qm files" ON)
+option(AU_RUN_LRELEASE "Generate .qm files" ON)
 
 # === Compile ===
 option(MU_COMPILE_INSTALL_QTQML_FILES "Whether to bundle qml files along with the installation (relevant on MacOS only)" ON)

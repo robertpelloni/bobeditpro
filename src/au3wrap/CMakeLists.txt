@@ -48,6 +48,8 @@ set(MODULE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/internal/au3basicui.h
     ${CMAKE_CURRENT_LIST_DIR}/internal/projectsnap.cpp
     ${CMAKE_CURRENT_LIST_DIR}/internal/projectsnap.h
+    ${CMAKE_CURRENT_LIST_DIR}/internal/projectthumbnail.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/internal/projectthumbnail.h
     ${CMAKE_CURRENT_LIST_DIR}/internal/trackcolor.cpp
     ${CMAKE_CURRENT_LIST_DIR}/internal/trackcolor.h
     ${CMAKE_CURRENT_LIST_DIR}/internal/trackviewtypeattachment.cpp
@@ -86,6 +88,9 @@ endif()
 if(AU_MODULE_EFFECTS_VST)
     add_subdirectory(vst3)
 endif()
+
+# RapidJSON (header-only, used by au3-musehub, au3-cloud-audiocom, au3-import-export, au3-sentry-reporting)
+add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/rapidjson rapidjson)
 
 # Include AU3 libraries - this will add all library subdirectories
 # and set AU3_LIBRARIES_LIST in this scope
@@ -146,6 +151,7 @@ set(MODULE_SRC ${MODULE_SRC}
 
     # FFmpeg support (still compiled as sources, not yet converted to library)
     ${IMPORT_EXPORT_MODULE}/mod-ffmpeg/ImportFFmpeg.cpp
+    ${IMPORT_EXPORT_MODULE}/mod-ffmpeg/ImportFFmpeg.h
     ${IMPORT_EXPORT_MODULE}/mod-ffmpeg/ExportFFmpeg.cpp
     ${IMPORT_EXPORT_MODULE}/mod-ffmpeg/ExportFFmpeg.h
     ${IMPORT_EXPORT_MODULE}/mod-ffmpeg/FFmpegDefines.h
@@ -255,7 +261,13 @@ set(MODULE_SRC ${MODULE_SRC}
 set(MODULE_INCLUDE ${AU3_INCLUDE})
 set(MODULE_DEF ${AU3_DEF})
 set(MODULE_SRC ${MODULE_SRC})
-set(MODULE_LINK ${AU3_LINK} project audio)
+set(MODULE_LINK ${AU3_LINK}
+        project # required for projectconfiguration and projecterrors
+        audio # required for audiometer
+        sqlite # static Factory init HACK for au3-project-file-io/SqliteSampleBlock.cpp included in au3project.cpp
+        # TODO: fix Hack and remove sqlite dependency from au3wrap
+        rapidjson::rapidjson # this is a temporary solution and we would need to fix this see: https://github.com/audacity/audacity/issues/10452
+)
 set(MODULE_LINK_PUBLIC ${AU3_LIBRARIES_LIST})
 
 set(MODULE_USE_PCH OFF)
