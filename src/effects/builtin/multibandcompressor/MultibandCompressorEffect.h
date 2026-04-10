@@ -4,7 +4,8 @@
 #include "au3-effects/StatefulPerTrackEffect.h"
 
 namespace au::effects {
-class MultibandCompressorEffect final : public StatefulPerTrackEffect {
+class MultibandCompressorEffect final : public StatefulPerTrackEffect
+{
 public:
     static const ComponentInterfaceSymbol Symbol;
 

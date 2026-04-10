@@ -4,7 +4,8 @@
 #include "au3-effects/StatefulPerTrackEffect.h"
 
 namespace au::effects {
-class SpectralHealEffect final : public StatefulPerTrackEffect {
+class SpectralHealEffect final : public StatefulPerTrackEffect
+{
 public:
     static const ComponentInterfaceSymbol Symbol;
 

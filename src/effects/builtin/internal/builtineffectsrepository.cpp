@@ -112,14 +112,16 @@ void BuiltinEffectsRepository::updateEffectMetaList()
     // It will have to be implemented when we provide the user the possibility of rescanning the effects, though.
     assert(m_metas.empty());
 
-    auto regView = [this](const ::ComponentInterfaceSymbol& symbol, const muse::String& url) {
+    auto regView = [this](const ::ComponentInterfaceSymbol& symbol, const muse::String& url)
+    {
         effectsViewRegister()->regUrl(au3::wxToString(symbol.Internal()), url);
     };
 
     auto regMeta
         = [this](const ::PluginDescriptor& desc, const muse::String& title, const muse::String& description,
                  BuiltinEffectCategoryId category,
-                 bool supportsMultipleClipSelection) {
+                 bool supportsMultipleClipSelection)
+    {
         EffectMeta meta;
         meta.id = au3::wxToString(desc.GetID());
         meta.family = EffectFamily::Builtin;
@@ -315,15 +317,15 @@ void BuiltinEffectsRepository::updateEffectMetaList()
                     BuiltinEffectCategoryId::None,
                     false
                     );
-                } else if (symbol == AdaptiveNoiseReductionEffect::Symbol) {
-                        regView(AdaptiveNoiseReductionEffect::Symbol, u"qrc:/adaptivenoisereduction/AdaptiveNoiseReductionView.qml");
+        } else if (symbol == AdaptiveNoiseReductionEffect::Symbol) {
+            regView(AdaptiveNoiseReductionEffect::Symbol, u"qrc:/adaptivenoisereduction/AdaptiveNoiseReductionView.qml");
             regMeta(desc,
                     muse::mtrc("effects/adaptivenoisereduction", "Adaptive Noise Reduction"),
                     muse::mtrc("effects/adaptivenoisereduction", "Removes noise automatically based on the incoming audio profile."),
                     BuiltinEffectCategoryId::NoiseRemovalAndRepair,
                     true
                     );
-                        } else if (symbol == MultibandCompressorEffect::Symbol) {
+        } else if (symbol == MultibandCompressorEffect::Symbol) {
             regView(MultibandCompressorEffect::Symbol, u"qrc:/multibandcompressor/MultibandCompressorView.qml");
             regMeta(desc,
                     muse::mtrc("effects/multibandcompressor", "Multiband Compressor"),
@@ -375,7 +377,8 @@ void BuiltinEffectsRepository::updateEffectMetaList()
         // These types are used by both Compressor and Limiter, so register them only if at least one of these effects is present.
         qmlRegisterType<DynamicsTimeline>("Audacity.BuiltinEffects", 1, 0, "DynamicsTimeline");
         qmlRegisterSingletonType<DynamicsColors>("Audacity.BuiltinEffects", 1, 0, "DynamicsColors",
-                                                 [](QQmlEngine* engine, QJSEngine* scriptEngine) -> QObject* {
+                                                 [](QQmlEngine* engine, QJSEngine* scriptEngine) -> QObject*
+        {
             Q_UNUSED(engine)
             Q_UNUSED(scriptEngine)
             return new DynamicsColors();
