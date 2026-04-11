@@ -39,7 +39,7 @@ public:
     bool Init() override;
 
 protected:
-    struct Instance : public StatefulPerTrackEffect::Instance, public EffectInstanceWithBlockSize {
+    struct Instance : public StatefulPerTrackEffect::Instance {
         explicit Instance(const PerTrackEffect& effect);
         ~Instance() override;
 
@@ -69,6 +69,6 @@ protected:
         std::vector<float*> mHighPtrs;
     };
 
-    std::unique_ptr<EffectState> MakeState() const override;
+
 };
 }

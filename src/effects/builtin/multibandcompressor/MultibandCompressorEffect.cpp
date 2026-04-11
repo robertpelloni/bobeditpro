@@ -47,10 +47,6 @@ bool MultibandCompressorEffect::Init()
     return true;
 }
 
-std::unique_ptr<EffectState> MultibandCompressorEffect::MakeState() const
-{
-    return std::make_unique<Instance>(*this);
-}
 
 MultibandCompressorEffect::Instance::Instance(const PerTrackEffect& effect)
     : StatefulPerTrackEffect::Instance(effect)
