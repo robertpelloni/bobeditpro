@@ -5,5 +5,6 @@
 - [ ] Ensure all submodules are well documented.
 
 - [ ] Implement Adaptive Noise Reduction DSP logic.
+- [ ] Implement robust UI property bindings for Multiband Compressor.
 - [ ] Implement Spectral Spot Healing Brush DSP logic.
-- [ ] Implement Multiband Compressor DSP logic.
+- [x] Implement Multiband Compressor DSP logic.
