@@ -7,8 +7,8 @@ import Audacity.Theme
 Item {
     id: root
 
-    implicitWidth: 400
-    implicitHeight: 300
+    implicitWidth: 600
+    implicitHeight: 400
 
     Column {
         anchors.centerIn: parent
@@ -20,9 +20,27 @@ Item {
             color: "white"
         }
 
+        // Stub parameter inputs
+        Row {
+            spacing: 20
+
+            Column {
+                Text { text: "Center Freq (Hz)"; color: "white" }
+                TextField { text: "1000"; width: 100 }
+            }
+            Column {
+                Text { text: "Bandwidth (Hz)"; color: "white" }
+                TextField { text: "200"; width: 100 }
+            }
+            Column {
+                Text { text: "Healing Strength (%)"; color: "white" }
+                TextField { text: "100.0"; width: 100 }
+            }
+        }
+
         Text {
-            text: "Under Construction"
-            font.pixelSize: 16
+            text: "Interpolates spectral energy across masked frequency bands."
+            font.pixelSize: 14
             color: "gray"
         }
     }
