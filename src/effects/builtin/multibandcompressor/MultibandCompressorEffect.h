@@ -68,7 +68,5 @@ protected:
         std::vector<float*> mMidPtrs;
         std::vector<float*> mHighPtrs;
     };
-
-
 };
 }

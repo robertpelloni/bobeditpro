@@ -47,7 +47,6 @@ bool MultibandCompressorEffect::Init()
     return true;
 }
 
-
 MultibandCompressorEffect::Instance::Instance(const PerTrackEffect& effect)
     : StatefulPerTrackEffect::Instance(effect)
 {
