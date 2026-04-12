@@ -99,19 +99,43 @@ void SpectralHealEffect::Instance::ProcessFFTWindow(EffectSettings& settings, si
 
     float strength = s.healStrength / 100.0f;
 
-    // Simple interpolation from boundary bins
-    float leftReal = mFFTBuffer[lowBin * 2];
-    float leftImag = mFFTBuffer[lowBin * 2 + 1];
-    float rightReal = mFFTBuffer[highBin * 2];
-    float rightImag = mFFTBuffer[highBin * 2 + 1];
+    // Interpolation from boundary bins (protect against out of bounds)
+    if (lowBin > 0 && highBin < WindowSize / 2 && highBin > lowBin) {
+        float leftReal = mFFTBuffer[lowBin * 2];
+        float leftImag = mFFTBuffer[lowBin * 2 + 1];
+        float rightReal = mFFTBuffer[highBin * 2];
+        float rightImag = mFFTBuffer[highBin * 2 + 1];
 
-    for (int b = lowBin; b <= highBin; ++b) {
-        float t = (float)(b - lowBin) / (highBin - lowBin + 1);
-        float interpReal = leftReal + t * (rightReal - leftReal);
-        float interpImag = leftImag + t * (rightImag - leftImag);
+        // Interpolate magnitude and phase rather than raw real/imag to prevent zero-crossing amplitude drops
+        float leftMag = std::hypot(leftReal, leftImag);
+        float leftPhase = std::atan2(leftImag, leftReal);
+        float rightMag = std::hypot(rightReal, rightImag);
+        float rightPhase = std::atan2(rightImag, rightReal);
 
-        mFFTBuffer[b * 2] = mFFTBuffer[b * 2] * (1.0f - strength) + interpReal * strength;
-        mFFTBuffer[b * 2 + 1] = mFFTBuffer[b * 2 + 1] * (1.0f - strength) + interpImag * strength;
+        // Unwrap phase to ensure smooth interpolation
+        while (rightPhase - leftPhase > M_PI) {
+            rightPhase -= 2.0f * M_PI;
+        }
+        while (leftPhase - rightPhase > M_PI) {
+            rightPhase += 2.0f * M_PI;
+        }
+
+        for (int b = lowBin; b <= highBin; ++b) {
+            // Fix interpolation corner-case: Ensure correct divisor to hit 1.0 at right boundary exactly
+            float t = (float)(b - lowBin) / std::max<float>(1.0f, (float)(highBin - lowBin));
+
+            // Add a slight Hann-like window smoothing to the interpolation to avoid harsh boundary clicks at extreme strengths
+            float smoothed_t = 0.5f * (1.0f - std::cos(M_PI * t));
+
+            float interpMag = leftMag + smoothed_t * (rightMag - leftMag);
+            float interpPhase = leftPhase + smoothed_t * (rightPhase - leftPhase);
+
+            float interpReal = interpMag * std::cos(interpPhase);
+            float interpImag = interpMag * std::sin(interpPhase);
+
+            mFFTBuffer[b * 2] = mFFTBuffer[b * 2] * (1.0f - strength) + interpReal * strength;
+            mFFTBuffer[b * 2 + 1] = mFFTBuffer[b * 2 + 1] * (1.0f - strength) + interpImag * strength;
+        }
     }
 
     InverseRealFFTf(mFFTBuffer.data(), mHFFT.get());
