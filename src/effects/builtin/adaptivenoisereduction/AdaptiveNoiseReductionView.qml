@@ -4,11 +4,20 @@ import QtQuick.Controls
 import Audacity.BuiltinEffects
 import Audacity.Theme
 
-Item {
+BuiltinEffectBase {
     id: root
 
     implicitWidth: 600
     implicitHeight: 400
+
+    builtinEffectModel: {
+        var model = AdaptiveNoiseReductionViewModelFactory.createModel(root, root.instanceId)
+        model.noiseReductionDbChanged.connect(function () { reductionInput.text = Number(model.noiseReductionDb).toString() })
+        model.sensitivityChanged.connect(function () { sensitivityInput.text = Number(model.sensitivity).toString() })
+        model.smoothingChanged.connect(function () { smoothingInput.text = Number(model.smoothing).toString() })
+        return model
+    }
+    property alias adaptiveNoise: root.builtinEffectModel
 
     Column {
         anchors.centerIn: parent
@@ -26,15 +35,30 @@ Item {
 
             Column {
                 Text { text: "Reduction (dB)"; color: "white" }
-                TextField { text: "12.0"; width: 80 }
+                TextField {
+                    id: reductionInput
+                    text: Number(adaptiveNoise.noiseReductionDb).toString()
+                    width: 80
+                    onTextEdited: adaptiveNoise.noiseReductionDb = Number(text)
+                }
             }
             Column {
                 Text { text: "Sensitivity"; color: "white" }
-                TextField { text: "6.0"; width: 80 }
+                TextField {
+                    id: sensitivityInput
+                    text: Number(adaptiveNoise.sensitivity).toString()
+                    width: 80
+                    onTextEdited: adaptiveNoise.sensitivity = Number(text)
+                }
             }
             Column {
                 Text { text: "Smoothing (ms)"; color: "white" }
-                TextField { text: "150.0"; width: 80 }
+                TextField {
+                    id: smoothingInput
+                    text: Number(adaptiveNoise.smoothing).toString()
+                    width: 80
+                    onTextEdited: adaptiveNoise.smoothing = Number(text)
+                }
             }
         }
 

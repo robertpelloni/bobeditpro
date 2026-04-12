@@ -3,6 +3,7 @@
 */
 #include "builtineffectsrepository.h"
 #include "../adaptivenoisereduction/AdaptiveNoiseReductionEffect.h"
+#include "../adaptivenoisereduction/adaptivenoisereductionviewmodel.h"
 #include "../spectralheal/SpectralHealEffect.h"
 #include "../multibandcompressor/MultibandCompressorEffect.h"
 #include "../multibandcompressor/multibandcompressorviewmodel.h"
@@ -319,6 +320,7 @@ void BuiltinEffectsRepository::updateEffectMetaList()
                     false
                     );
         } else if (symbol == AdaptiveNoiseReductionEffect::Symbol) {
+            REGISTER_AUDACITY_EFFECTS_SINGLETON_TYPE(AdaptiveNoiseReductionViewModelFactory);
             regView(AdaptiveNoiseReductionEffect::Symbol, u"qrc:/adaptivenoisereduction/AdaptiveNoiseReductionView.qml");
             regMeta(desc,
                     muse::mtrc("effects/adaptivenoisereduction", "Adaptive Noise Reduction"),

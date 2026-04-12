@@ -136,6 +136,8 @@ set(MODULE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/spectralheal/SpectralHealEffect.h
 
     ${CMAKE_CURRENT_LIST_DIR}/adaptivenoisereduction/AdaptiveNoiseReductionEffect.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/adaptivenoisereduction/adaptivenoisereductionviewmodel.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/adaptivenoisereduction/adaptivenoisereductionviewmodel.h
     ${CMAKE_CURRENT_LIST_DIR}/adaptivenoisereduction/AdaptiveNoiseReductionEffect.h
 
     ${CMAKE_CURRENT_LIST_DIR}/noisereduction/noisereductioneffect.cpp
