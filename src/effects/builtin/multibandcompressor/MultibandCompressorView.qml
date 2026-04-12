@@ -4,11 +4,20 @@ import QtQuick.Controls
 import Audacity.BuiltinEffects
 import Audacity.Theme
 
-Item {
+BuiltinEffectBase {
     id: root
 
     implicitWidth: 600
     implicitHeight: 400
+
+    builtinEffectModel: {
+        var model = MultibandCompressorViewModelFactory.createModel(root, root.instanceId)
+        model.crossover1FreqChanged.connect(function () { lowFreqInput.text = Number(model.crossover1Freq).toString() })
+        model.crossover2FreqChanged.connect(function () { highFreqInput.text = Number(model.crossover2Freq).toString() })
+        model.makeUpGainChanged.connect(function () { makeupGainInput.text = Number(model.makeUpGain).toString() })
+        return model
+    }
+    property alias multiband: root.builtinEffectModel
 
     Column {
         anchors.centerIn: parent
@@ -26,15 +35,30 @@ Item {
 
             Column {
                 Text { text: "Low Freq (Hz)"; color: "white" }
-                TextField { text: "200"; width: 80 }
+                TextField {
+                    id: lowFreqInput
+                    text: Number(multiband.crossover1Freq).toString()
+                    width: 80
+                    onTextEdited: multiband.crossover1Freq = Number(text)
+                }
             }
             Column {
                 Text { text: "High Freq (Hz)"; color: "white" }
-                TextField { text: "2000"; width: 80 }
+                TextField {
+                    id: highFreqInput
+                    text: Number(multiband.crossover2Freq).toString()
+                    width: 80
+                    onTextEdited: multiband.crossover2Freq = Number(text)
+                }
             }
             Column {
                 Text { text: "Makeup Gain (dB)"; color: "white" }
-                TextField { text: "0.0"; width: 80 }
+                TextField {
+                    id: makeupGainInput
+                    text: Number(multiband.makeUpGain).toString()
+                    width: 80
+                    onTextEdited: multiband.makeUpGain = Number(text)
+                }
             }
         }
 

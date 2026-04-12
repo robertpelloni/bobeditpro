@@ -5,6 +5,7 @@
 #include "../adaptivenoisereduction/AdaptiveNoiseReductionEffect.h"
 #include "../spectralheal/SpectralHealEffect.h"
 #include "../multibandcompressor/MultibandCompressorEffect.h"
+#include "../multibandcompressor/multibandcompressorviewmodel.h"
 
 #include <QtQml>
 
@@ -326,6 +327,7 @@ void BuiltinEffectsRepository::updateEffectMetaList()
                     true
                     );
         } else if (symbol == MultibandCompressorEffect::Symbol) {
+            REGISTER_AUDACITY_EFFECTS_SINGLETON_TYPE(MultibandCompressorViewModelFactory);
             regView(MultibandCompressorEffect::Symbol, u"qrc:/multibandcompressor/MultibandCompressorView.qml");
             regMeta(desc,
                     muse::mtrc("effects/multibandcompressor", "Multiband Compressor"),
