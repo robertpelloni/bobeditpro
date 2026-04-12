@@ -133,6 +133,8 @@ set(MODULE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/multibandcompressor/MultibandCompressorEffect.h
 
     ${CMAKE_CURRENT_LIST_DIR}/spectralheal/SpectralHealEffect.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/spectralheal/spectralhealviewmodel.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/spectralheal/spectralhealviewmodel.h
     ${CMAKE_CURRENT_LIST_DIR}/spectralheal/SpectralHealEffect.h
 
     ${CMAKE_CURRENT_LIST_DIR}/adaptivenoisereduction/AdaptiveNoiseReductionEffect.cpp

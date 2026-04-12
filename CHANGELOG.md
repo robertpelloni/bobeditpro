@@ -8,3 +8,7 @@
 ### Added
 - Completed comprehensive architecture summary analysis.
 - Initiated planning for SpectralHealViewModel implementation.
+
+## [4.0.3] - 2025-04-10
+### Added
+- Implemented `SpectralHealViewModel` to bind QML UI elements to C++ DSP properties for the Spectral Spot Healing Brush.

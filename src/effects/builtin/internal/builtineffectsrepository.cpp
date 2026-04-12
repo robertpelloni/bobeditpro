@@ -5,6 +5,7 @@
 #include "../adaptivenoisereduction/AdaptiveNoiseReductionEffect.h"
 #include "../adaptivenoisereduction/adaptivenoisereductionviewmodel.h"
 #include "../spectralheal/SpectralHealEffect.h"
+#include "../spectralheal/spectralhealviewmodel.h"
 #include "../multibandcompressor/MultibandCompressorEffect.h"
 #include "../multibandcompressor/multibandcompressorviewmodel.h"
 
@@ -338,7 +339,8 @@ void BuiltinEffectsRepository::updateEffectMetaList()
                     true
                     );
         } else if (symbol == SpectralHealEffect::Symbol) {
-            regView(SpectralHealEffect::Symbol, u"qrc:/spectralheal/SpectralHealView.qml");
+            regView(SpectralHealEffect::Symbol, u"qrc:/spectralheal/SpectralHealView.qml",
+                    [](const std::shared_ptr<EffectInstanceWithBlockSize>& instance) { return new SpectralHealViewModel(instance); });
             regMeta(desc,
                     muse::mtrc("effects/spectralheal", "Spectral Healing Brush"),
                     muse::mtrc("effects/spectralheal", "Spot healing brush for spectral editing."),
