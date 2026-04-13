@@ -20,3 +20,8 @@
 ## [4.0.7] - 2025-04-10
 ### Added
 - Scaffolded `TrackMinimap.qml` as a new foundation for "Advanced track navigation", giving users an overarching view of the project and quick draggable zooming/panning across large timelines.
+
+## [4.0.8] - 2025-04-10
+### Added
+- Implemented `MixerBoardModel` (C++) from scratch for the modern BobUI architecture to support the Mixer Board UI.
+- Implemented `canRoute` in `MixerBoardModel` to strictly detect and prevent infinite audio feedback loops (cyclic dependencies) in both primary track routing and Aux Sends.

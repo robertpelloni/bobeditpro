@@ -2,7 +2,7 @@
 ## Phase 1: Core Engine & Bussing
 - [x] Bus tracks and routing
 - [x] Real-time effects
-- [ ] Advanced routing matrix
+- [x] Advanced routing matrix
 
 ## Phase 2: Professional Tools
 - [x] Phase 2.1: Spectral Spot Healing Brush
