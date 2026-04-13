@@ -1,7 +1,7 @@
 # TODO
 - [x] Scaffold `AdaptiveNoiseReductionEffect` in `src/effects/builtin/adaptivenoisereduction/`.
 - [x] Wire up frontend for Spectral Spot Healing Brush.
-- [ ] Implement/Refactor Routing Matrix and Cycle Detection (Missing context).
+- [ ] Fix potential routing cycle detection edge cases.
 - [ ] Ensure all submodules are well documented.
 
 - [x] Implement Adaptive Noise Reduction DSP logic.
