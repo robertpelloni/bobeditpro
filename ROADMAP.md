@@ -11,5 +11,5 @@
 
 ## Phase 3: UI/UX Modernization
 - [x] Migrate to BobUI
-- [x] Complete Mixer Board UI
-- [ ] Advanced track navigation
+- [ ] Complete Mixer Board UI
+- [x] Advanced track navigation

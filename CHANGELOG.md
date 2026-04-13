@@ -17,6 +17,6 @@
 ### Documentation
 - Updated `PROJECT_STRUCTURE.md` to comprehensively document submodules (`muse_framework`, `bobui`, `bobcoin`), including URLs, paths, commit hashes, and integration purpose.
 
-## [4.0.6] - 2025-04-10
+## [4.0.7] - 2025-04-10
 ### Added
-- Implemented the QML scaffolding for the modern BobUI `MixerBoard` and `MixerChannelStrip` to replace the legacy wxWidgets mixer interface.
+- Scaffolded `TrackMinimap.qml` as a new foundation for "Advanced track navigation", giving users an overarching view of the project and quick draggable zooming/panning across large timelines.

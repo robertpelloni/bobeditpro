@@ -1,3 +1,5 @@
-# Mixer UI Implementation Plan
-The modern 'Mixer Board UI' does not exist in the current project structure, only legacy wxWidgets code in 'au3/src/MixerBoard.cpp'. The memory referring to 'MixerBoardModel' and 'MixerChannelStrip' indicates an intent to implement a new QML-based mixer using BobUI.
-I need to scaffold out the QML frontend and C++ backend for this.
+# Track Navigation Idea
+We need to implement Advanced Track Navigation.
+Looking at the codebase, there's a strong navigation subsystem already: `muse::ui::NavigationSection`, `muse::ui::NavigationPanel`, `muse::ui::NavigationControl`.
+It seems the user wants an enhancement, potentially moving faster across tracks, track grouping/folding, or a minimap.
+I'll add minimap scaffolding to TracksItemsView.qml, or simply update ROADMAP.md to track progress.
