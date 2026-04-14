@@ -25,3 +25,8 @@
 ### Added
 - Implemented `MixerBoardModel` (C++) from scratch for the modern BobUI architecture to support the Mixer Board UI.
 - Implemented `canRoute` in `MixerBoardModel` to strictly detect and prevent infinite audio feedback loops (cyclic dependencies) in both primary track routing and Aux Sends.
+
+## [4.0.9] - 2025-04-10
+### Added
+- Re-established `MixerBoard.qml` and `MixerChannelStrip.qml` under BobUI standards.
+- Hooked the QML Repeater up to dynamically bind with the newly implemented C++ `MixerBoardModel`.
