@@ -13,3 +13,8 @@
 - [x] Migrate to BobUI
 - [x] Complete Mixer Board UI
 - [x] Advanced track navigation
+
+## Phase 4: Advanced Post-Production (Audition Parity)
+- [ ] Phase 4.1: Parametric Equalizer (5+ Bands, HPF/LPF)
+- [ ] Phase 4.2: Essential Sound Panel (Macro Workflow)
+- [ ] Phase 4.3: Advanced DeReverb (STFT Decay Profile Suppression)

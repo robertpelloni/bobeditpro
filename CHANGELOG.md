@@ -30,3 +30,10 @@
 ### Added
 - Re-established `MixerBoard.qml` and `MixerChannelStrip.qml` under BobUI standards.
 - Hooked the QML Repeater up to dynamically bind with the newly implemented C++ `MixerBoardModel`.
+
+## [4.0.10] - 2025-04-10
+### Added
+- Expanded Roadmap with Phase 4: Advanced Post-Production tools (Audition Parity).
+- Scaffolded `ParametricEQEffect` DSP core logic using Biquad cascade filters (HPF, LPF, and 5 parametric bands).
+- Implemented `ParametricEQViewModel` to expose individual band parameters to QML UI.
+- Implemented `ParametricEQView.qml` UI structure.

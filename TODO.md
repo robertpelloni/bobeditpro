@@ -1,12 +1,7 @@
 # TODO
-- [x] Scaffold `AdaptiveNoiseReductionEffect` in `src/effects/builtin/adaptivenoisereduction/`.
-- [x] Wire up frontend for Spectral Spot Healing Brush.
-- [x] Fix potential routing cycle detection edge cases.
-- [x] Ensure all submodules are well documented.
-
-- [x] Implement Adaptive Noise Reduction DSP logic.
-- [x] Implement robust UI property bindings for Multiband Compressor.
-- [x] Implement robust UI property bindings for Adaptive Noise Reduction.
-- [x] Implement Spectral Spot Healing Brush DSP logic.
-- [x] Implement robust UI property bindings for Spectral Spot Healing Brush.
-- [x] Implement Multiband Compressor DSP logic.
+- [x] Scaffold `ParametricEQEffect` in `src/effects/builtin/parametriceq/`.
+- [x] Implement `ParametricEQViewModel` to expose 5+ bands (Frequency, Gain, Q).
+- [x] Wire up `ParametricEQView.qml` with interactive EQ curve visualization controls.
+- [x] Implement DSP logic for Parametric EQ using Biquad cascade.
+- [ ] Scaffold `EssentialSoundModel` and `EssentialSoundPanel.qml` for macro-control workflows.
+- [ ] Investigate and prototype STFT decay tracking for `DeReverbEffect`.
