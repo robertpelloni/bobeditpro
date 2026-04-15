@@ -3,7 +3,6 @@
 #include <QObject>
 
 namespace au::projectscene {
-
 /**
  * @brief The EssentialSoundModel class
  * Provides macro controls (Clarity, Loudness, Reverb Reduction) for the UI.
@@ -53,5 +52,4 @@ private:
     double m_reverbReduction{ 0.0 };
     bool m_isAutoMatched{ false };
 };
-
 } // namespace au::projectscene

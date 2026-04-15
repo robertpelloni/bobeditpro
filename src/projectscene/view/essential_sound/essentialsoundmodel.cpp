@@ -1,7 +1,6 @@
 #include "essentialsoundmodel.h"
 
 namespace au::projectscene {
-
 EssentialSoundModel::EssentialSoundModel(QObject* parent)
     : QObject(parent)
 {
@@ -14,7 +13,9 @@ QString EssentialSoundModel::audioType() const
 
 void EssentialSoundModel::setAudioType(const QString& type)
 {
-    if (m_audioType == type) return;
+    if (m_audioType == type) {
+        return;
+    }
     m_audioType = type;
     emit audioTypeChanged();
 }
@@ -26,7 +27,9 @@ double EssentialSoundModel::clarity() const
 
 void EssentialSoundModel::setClarity(double value)
 {
-    if (qFuzzyCompare(m_clarity, value)) return;
+    if (qFuzzyCompare(m_clarity, value)) {
+        return;
+    }
     m_clarity = value;
     emit clarityChanged();
 }
@@ -38,7 +41,9 @@ double EssentialSoundModel::dynamics() const
 
 void EssentialSoundModel::setDynamics(double value)
 {
-    if (qFuzzyCompare(m_dynamics, value)) return;
+    if (qFuzzyCompare(m_dynamics, value)) {
+        return;
+    }
     m_dynamics = value;
     emit dynamicsChanged();
 }
@@ -50,7 +55,9 @@ double EssentialSoundModel::reverbReduction() const
 
 void EssentialSoundModel::setReverbReduction(double value)
 {
-    if (qFuzzyCompare(m_reverbReduction, value)) return;
+    if (qFuzzyCompare(m_reverbReduction, value)) {
+        return;
+    }
     m_reverbReduction = value;
     emit reverbReductionChanged();
 }
@@ -62,7 +69,9 @@ bool EssentialSoundModel::isAutoMatched() const
 
 void EssentialSoundModel::setIsAutoMatched(bool value)
 {
-    if (m_isAutoMatched == value) return;
+    if (m_isAutoMatched == value) {
+        return;
+    }
     m_isAutoMatched = value;
     emit isAutoMatchedChanged();
 }
@@ -72,5 +81,4 @@ void EssentialSoundModel::autoMatchLoudness()
     // Pretend to do complex LKFS calculation
     setIsAutoMatched(true);
 }
-
 } // namespace au::projectscene
