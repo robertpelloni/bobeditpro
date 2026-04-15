@@ -15,6 +15,8 @@
 - [x] Advanced track navigation
 
 ## Phase 4: Advanced Post-Production (Audition Parity)
-- [ ] Phase 4.1: Parametric Equalizer (5+ Bands, HPF/LPF)
-- [ ] Phase 4.2: Essential Sound Panel (Macro Workflow)
-- [ ] Phase 4.3: Advanced DeReverb (STFT Decay Profile Suppression)
+- [x] Phase 4.1: Parametric Equalizer (5+ Bands, HPF/LPF)
+- [x] Phase 4.2: Essential Sound Panel (Macro Workflow)
+- [x] Phase 4.3: Advanced DeReverb (STFT Decay Profile Suppression)
+## Phase 5: Routing & Mixing (Next)
+- [ ] Phase 5.1: Track Grouping & VCA Faders

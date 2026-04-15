@@ -37,3 +37,8 @@
 - Scaffolded `ParametricEQEffect` DSP core logic using Biquad cascade filters (HPF, LPF, and 5 parametric bands).
 - Implemented `ParametricEQViewModel` to expose individual band parameters to QML UI.
 - Implemented `ParametricEQView.qml` UI structure.
+
+## [4.0.11] - 2025-04-10
+### Added
+- Implemented `EssentialSoundModel` (C++) and `EssentialSoundPanel.qml` to provide Audition CC parity for macro-control workflows (Phase 4.2).
+- UI bindings support Dialogue tagging, Loudness Auto-Matching, and sliders for Dynamics, Clarity, and Reverb Reduction.
