@@ -48,7 +48,7 @@ public:
     void addTrack(const std::shared_ptr<PlayableTrack>& track);
     void removeTrack(const std::shared_ptr<PlayableTrack>& track);
     bool containsTrack(const std::shared_ptr<PlayableTrack>& track) const;
-    const std::vector<std::weak_ptr<PlayableTrack>>& tracks() const;
+    const std::vector<std::weak_ptr<PlayableTrack> >& tracks() const;
 
 signals:
     void nameChanged();
@@ -68,6 +68,6 @@ private:
     bool m_muted{ false };
     bool m_soloed{ false };
 
-    std::vector<std::weak_ptr<PlayableTrack>> m_tracks;
+    std::vector<std::weak_ptr<PlayableTrack> > m_tracks;
 };
 } // namespace au::projectscene
