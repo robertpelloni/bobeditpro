@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QAbstractListModel>
+#include "trackgroup.h"
 #include <QList>
 #include <memory>
 #include <vector>
