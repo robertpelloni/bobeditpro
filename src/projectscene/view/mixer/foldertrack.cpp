@@ -6,7 +6,7 @@
 
 // Define a type for Folder tracks
 namespace {
-    const std::string_view FOLDER_TRACK_TAG = "foldertrack";
+const std::string_view FOLDER_TRACK_TAG = "foldertrack";
 }
 
 FolderTrack::FolderTrack()

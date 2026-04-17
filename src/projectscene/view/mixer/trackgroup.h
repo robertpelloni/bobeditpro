@@ -5,7 +5,7 @@
 #include <QColor>
 #include <vector>
 #include <memory>
-#include "au3-playable-track/PlayableTrack.h"
+#include "au3-playable-track-interface/PlayableTrack.h"
 
 namespace au::projectscene {
 /**
