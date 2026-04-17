@@ -1,19 +1,15 @@
-# Ideas for Post-Production Parity (Audition CC)
+# Ideas for Routing & Mixing (Audition CC)
 
-Based on a thorough review of the current features and the stated goal in `VISION.md` of reaching Adobe Audition CC parity, the following features are critical next steps for the Core Engine and Professional Production Workflow:
+Based on our progress with Phase 5.1 (Track Grouping & VCA Faders), we need to further modernize the mixer architecture:
 
-## 1. Parametric Equalizer (Phase 4.1)
-- **Concept:** A highly flexible, multi-band (typically 5 to 7 bands plus HPF/LPF) parametric EQ is the cornerstone of any professional audio editing software.
-- **Implementation:** Utilize a cascade of real-time Biquad filters in a new `StatefulPerTrackEffect` (`ParametricEQEffect`). Expose Frequency, Gain, and Q/Width for each band via `ParametricEQViewModel` to a responsive QML canvas.
+## 1. Track Folder Hierarchy (Phase 5.2)
+- **Concept:** Folder tracks allow users to visually collapse and expand multiple tracks in the timeline, and often act as an implicit group or bus.
+- **Implementation:** Extend `PlayableTrack` (or create `FolderTrack`) to maintain a list of child `TrackId`s. The QML `PanelTracksListModel` will need a `parentId` or `folderId` role to filter or indent tracks in the view. `MixerBoardModel` can also treat a Folder Track as an automatic VCA group.
 
-## 2. Essential Sound Panel (Phase 4.2)
-- **Concept:** A unified, macro-control interface (Dialogue, Music, SFX, Ambience) that allows users to rapidly assign tags to clips and adjust high-level parameters (e.g., "Clarity", "Loudness", "Reverb Reduction") which under-the-hood manipulate complex effects chains.
-- **Implementation:** Create an `EssentialSoundModel` (C++) that aggregates states from `WaveClipRealtimeEffects` and `MixerBoardModel`, driving a new BobUI sidebar panel.
+## 2. VCA Group Fader UI (Phase 5.3)
+- **Concept:** Provide actual UI controls (faders, mute/solo) that govern the groups created in Phase 5.1.
+- **Implementation:** In `MixerBoard.qml`, iterate over `mixerModel.groups` to render a separate set of "Master Faders" that are visually distinct from standard tracks. The channel strip will need a UI element to assign a track to a group.
 
-## 3. Advanced DeReverb (Phase 4.3)
-- **Concept:** A machine-learning or advanced statistical algorithm to estimate and suppress room reverberation tails from dialogue.
-- **Implementation:** Port or scaffold a `DeReverbEffect` utilizing envelope tracking on the STFT magnitude spectrum (similar to Adaptive Noise Reduction) to estimate the decay profile and dynamically suppress the late reflections.
-
-## 4. Track Grouping & VCA Faders (Phase 5)
-- **Concept:** Beyond simple bussing, Voltage Controlled Amplifier (VCA) style groups allow users to control the relative volume of multiple tracks without altering their internal routing or post-fader send relationships.
-- **Implementation:** Introduce a `TrackGroup` concept in `MixerBoardModel` that acts as a unified offset multiplier applied during `AudioIO::ProcessPlaybackSlices` before the track's individual fader is calculated.
+## 3. Sidechain Routing Matrix (Phase 5.4)
+- **Concept:** Allow the output of one track to be sent not just to the audio input of another track (bus), but to the sidechain input of an effect (like a Compressor or Ducker) on another track.
+- **Implementation:** This requires modifying `AudioIO` to pass sidechain buffers into `RealtimeEffectState::ProcessBlock`.
