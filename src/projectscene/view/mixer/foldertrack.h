@@ -8,7 +8,8 @@
  * @brief Represents a Track Folder in the timeline.
  * A FolderTrack can visually collapse/expand child tracks and function as a VCA group or an implicit Bus.
  */
-class FolderTrack final : public PlayableTrack {
+class FolderTrack final : public PlayableTrack
+{
 public:
     FolderTrack();
     FolderTrack(const FolderTrack& other);
@@ -35,6 +36,6 @@ public:
     void SetChannelVolume(int channel, float volume) override;
 
 private:
-    bool m_expanded{true};
+    bool m_expanded{ true };
     std::vector<int> m_childTracks;
 };
