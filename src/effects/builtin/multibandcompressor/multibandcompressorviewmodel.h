@@ -119,7 +119,8 @@ private:
 class MultibandCompressorViewModelFactory : public BuiltinEffectModelFactory
 {
 public:
-    BuiltinEffectModel* createModel(const std::shared_ptr<EffectInstanceWithBlockSize>& instance, QObject* parent = nullptr) override {
+    BuiltinEffectModel* createModel(const std::shared_ptr<EffectInstanceWithBlockSize>& instance, QObject* parent = nullptr) override
+    {
         return new MultibandCompressorViewModel(instance, parent);
     }
 };
