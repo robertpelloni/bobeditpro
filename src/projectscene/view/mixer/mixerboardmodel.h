@@ -2,6 +2,7 @@
 
 #include <QAbstractListModel>
 #include "trackgroup.h"
+#include "trackgroup.h"
 #include <QList>
 #include <memory>
 #include <vector>
@@ -15,6 +16,7 @@ namespace au::projectscene {
 class MixerBoardModel : public QAbstractListModel
 {
     Q_OBJECT
+    Q_PROPERTY(QList<QObject*> groups READ groups NOTIFY groupsChanged)
 
 public:
     enum Roles {
@@ -24,6 +26,7 @@ public:
         PanRole,
         IsMutedRole,
         IsSoloedRole,
+        GroupIdRole,
         RouteIdRole,
         SendsRole
     };
@@ -46,6 +49,12 @@ public:
     Q_INVOKABLE void addSend(int rowIndex, int targetRouteId, float sendAmount);
     Q_INVOKABLE void removeSend(int rowIndex, int targetRouteId);
     Q_INVOKABLE void setSendAmount(int rowIndex, int targetRouteId, float sendAmount);
+    QList<QObject*> groups() const;
+    Q_INVOKABLE void createGroup();
+    Q_INVOKABLE void assignTrackToGroup(int trackId, int groupId);
+    Q_INVOKABLE void removeTrackFromGroup(int trackId);
+    Q_INVOKABLE int getTrackGroup(int trackId) const;
+    std::shared_ptr<PlayableTrack> getTrackById(int trackId) const;
 
 private:
     struct MockTrackData {
@@ -60,5 +69,7 @@ private:
     };
 
     std::vector<MockTrackData> m_tracks;
+    QList<std::unique_ptr<TrackGroup>> m_groups;
+    int m_nextGroupId{ 1 };
 };
 } // namespace au::projectscene

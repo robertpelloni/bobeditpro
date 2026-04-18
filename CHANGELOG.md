@@ -42,3 +42,12 @@
 ### Added
 - Implemented `EssentialSoundModel` (C++) and `EssentialSoundPanel.qml` to provide Audition CC parity for macro-control workflows (Phase 4.2).
 - UI bindings support Dialogue tagging, Loudness Auto-Matching, and sliders for Dynamics, Clarity, and Reverb Reduction.
+
+## [4.0.17] - 2025-04-18
+### Fixed
+- Provided explicit empty body `{}` to `TypeEnumerator::detail::Accumulate` forward declaration, fixing template instantiation failures on modern GCC toolchains when calling `TypeSwitch`.
+
+## [4.0.18] - 2025-04-18
+### Added
+- Implemented comprehensive UI representation for `MultibandCompressorEffect`.
+- Added tooltips, specific band controls (Low, Mid, High), and parameter descriptions to QML and ViewModel to expose all backend functionality.

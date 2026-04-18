@@ -196,8 +196,8 @@ void MixerBoardModel::assignTrackToGroup(int trackId, int groupId)
             g->addTrack(track);
 
             // Notify view that this track's GroupIdRole changed
-            for (int row = 0; row < m_playableTracks.size(); ++row) {
-                if (m_playableTracks[row]->GetPersistentId() == trackId) {
+            for (int row = 0; row < m_tracks.size(); ++row) {
+                if (m_tracks[row].id == trackId) {
                     emit dataChanged(index(row, 0), index(row, 0), { GroupIdRole });
                     break;
                 }
@@ -218,8 +218,8 @@ void MixerBoardModel::removeTrackFromGroup(int trackId)
         if (g->containsTrack(track)) {
             g->removeTrack(track);
 
-            for (int row = 0; row < m_playableTracks.size(); ++row) {
-                if (m_playableTracks[row]->GetPersistentId() == trackId) {
+            for (int row = 0; row < m_tracks.size(); ++row) {
+                if (m_tracks[row].id == trackId) {
                     emit dataChanged(index(row, 0), index(row, 0), { GroupIdRole });
                     break;
                 }
@@ -227,6 +227,11 @@ void MixerBoardModel::removeTrackFromGroup(int trackId)
             return;
         }
     }
+}
+
+std::shared_ptr<PlayableTrack> MixerBoardModel::getTrackById(int trackId) const
+{
+    return nullptr;
 }
 
 int MixerBoardModel::getTrackGroup(int trackId) const

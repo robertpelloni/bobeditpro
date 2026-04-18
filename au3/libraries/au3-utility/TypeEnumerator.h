@@ -96,7 +96,7 @@ template<typename Tag, typename Location> class CollectTypes
         using type = TypeList::List<Types...>;
     };
     // This works by mutual recursion of Accumulate and AccumulateType
-    template<unsigned U, typename ... Types> struct Accumulate;
+    template<unsigned U, typename ... Types> struct Accumulate {};
     template<unsigned U, typename Type, typename ... Types> struct AccumulateType : std::conditional_t<std::is_same_v<detail::Unenumerated,
                                                                                                                       Type>,
                                                                                                        Stop<Types...>,
