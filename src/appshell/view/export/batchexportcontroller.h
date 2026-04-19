@@ -5,12 +5,12 @@
 #include <QUrl>
 
 namespace au::appshell {
-
 /**
  * @brief Manages Advanced Batch Export workflows (Phase 6.1).
  * Allows exporting stems, individual tracks, or the entire master bus to multiple formats simultaneously.
  */
-class BatchExportController : public QObject {
+class BatchExportController : public QObject
+{
     Q_OBJECT
     Q_PROPERTY(QStringList availableFormats READ availableFormats CONSTANT)
     Q_PROPERTY(QString exportPath READ exportPath WRITE setExportPath NOTIFY exportPathChanged)
@@ -45,8 +45,7 @@ signals:
 private:
     QStringList m_formats{ "WAV (32-bit float)", "FLAC (24-bit)", "MP3 (320kbps)", "Ogg Vorbis" };
     QString m_exportPath;
-    bool m_exportStems{false};
-    bool m_normalizeToLUFS{false};
+    bool m_exportStems{ false };
+    bool m_normalizeToLUFS{ false };
 };
-
 } // namespace au::appshell

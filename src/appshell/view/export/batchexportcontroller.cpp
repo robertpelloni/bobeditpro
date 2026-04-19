@@ -2,7 +2,6 @@
 #include <QTimer>
 
 namespace au::appshell {
-
 BatchExportController::BatchExportController(QObject* parent)
     : QObject(parent)
 {
@@ -20,7 +19,9 @@ QString BatchExportController::exportPath() const
 
 void BatchExportController::setExportPath(const QString& path)
 {
-    if (m_exportPath == path) return;
+    if (m_exportPath == path) {
+        return;
+    }
     m_exportPath = path;
     emit exportPathChanged();
 }
@@ -32,7 +33,9 @@ bool BatchExportController::exportStems() const
 
 void BatchExportController::setExportStems(bool value)
 {
-    if (m_exportStems == value) return;
+    if (m_exportStems == value) {
+        return;
+    }
     m_exportStems = value;
     emit exportStemsChanged();
 }
@@ -44,7 +47,9 @@ bool BatchExportController::normalizeToLUFS() const
 
 void BatchExportController::setNormalizeToLUFS(bool value)
 {
-    if (m_normalizeToLUFS == value) return;
+    if (m_normalizeToLUFS == value) {
+        return;
+    }
     m_normalizeToLUFS = value;
     emit normalizeToLUFSChanged();
 }
@@ -67,5 +72,4 @@ void BatchExportController::startExport()
         });
     });
 }
-
 } // namespace au::appshell
