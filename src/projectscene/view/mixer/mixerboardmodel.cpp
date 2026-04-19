@@ -163,7 +163,6 @@ void MixerBoardModel::setSendAmount(int rowIndex, int targetRouteId, float sendA
         }
     }
 }
-} // namespace au::projectscene
 
 QList<QObject*> MixerBoardModel::groups() const
 {
@@ -247,3 +246,4 @@ int MixerBoardModel::getTrackGroup(int trackId) const
     }
     return 0;
 }
+} // namespace au::projectscene

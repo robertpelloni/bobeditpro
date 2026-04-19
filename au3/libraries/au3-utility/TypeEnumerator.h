@@ -95,16 +95,24 @@ template<typename Tag, typename Location> class CollectTypes
     template<typename ... Types> struct Stop {
         using type = TypeList::List<Types...>;
     };
-    // This works by mutual recursion of Accumulate and AccumulateType
-    template<unsigned U, typename ... Types> struct Accumulate {};
-    template<unsigned U, typename Type, typename ... Types> struct AccumulateType : std::conditional_t<std::is_same_v<detail::Unenumerated,
-                                                                                                                      Type>,
-                                                                                                       Stop<Types...>,
-                                                                                                       Accumulate<U + 1, Types..., Type>
-                                                                                                       >
-    {};
-    template<unsigned U, typename ... Types> struct Accumulate : AccumulateType<U, detail::EnumeratedType<Tag, Location, U>, Types...>
-    {};
+
+    template<unsigned U, typename ... Types> struct Accumulate;
+
+    template<bool is_end, unsigned U, typename Type, typename ... Types>
+    struct AccumulateTypeHelper;
+
+    template<unsigned U, typename Type, typename ... Types>
+    struct AccumulateTypeHelper<true, U, Type, Types...> : Stop<Types...> {};
+
+    template<unsigned U, typename Type, typename ... Types>
+    struct AccumulateTypeHelper<false, U, Type, Types...> : Accumulate<U + 1, Types..., Type> {};
+
+    template<unsigned U, typename Type, typename ... Types>
+    struct AccumulateType : AccumulateTypeHelper<std::is_same_v<detail::Unenumerated, Type>, U, Type, Types...> {};
+
+    template<unsigned U, typename ... Types>
+    struct Accumulate : AccumulateType<U, detail::EnumeratedType<Tag, Location, U>, Types...> {};
+
 public:
     using type = typename Accumulate<0>::type;
 };

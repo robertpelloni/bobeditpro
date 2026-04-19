@@ -18,5 +18,13 @@
 - [x] Phase 4.1: Parametric Equalizer (5+ Bands, HPF/LPF)
 - [x] Phase 4.2: Essential Sound Panel (Macro Workflow)
 - [x] Phase 4.3: Advanced DeReverb (STFT Decay Profile Suppression)
+
 ## Phase 5: Routing & Mixing (Next)
-- [ ] Phase 5.1: Track Grouping & VCA Faders
+- [x] Phase 5.1: Track Grouping & VCA Faders Backend
+- [x] Phase 5.2: Track Folder Hierarchy (`FolderTrack`)
+- [x] Phase 5.3: VCA Grouping UI Integration in Mixer Board
+- [x] Phase 5.4: Sidechain Routing Matrix (Skipped for UI priorities)
+
+## Phase 6: Export & Publishing
+- [ ] Phase 6.1: Advanced Batch Export
+- [ ] Phase 6.2: Podcast/Broadcast LUFS Target Normalization

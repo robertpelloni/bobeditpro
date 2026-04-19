@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../common/builtineffectmodel.h"
+#include "MultibandCompressorEffect.h"
 
 namespace au::effects {
 class MultibandCompressorViewModel : public BuiltinEffectModel
@@ -30,7 +31,7 @@ class MultibandCompressorViewModel : public BuiltinEffectModel
     Q_PROPERTY(float highRelease READ highRelease WRITE setHighRelease NOTIFY highReleaseChanged FINAL)
 
 public:
-    MultibandCompressorViewModel(const std::shared_ptr<EffectInstanceWithBlockSize>& instance, QObject* parent = nullptr);
+    MultibandCompressorViewModel(QObject* parent, int instanceId);
     ~MultibandCompressorViewModel() override = default;
 
     float crossover1Freq() const;
@@ -90,8 +91,8 @@ signals:
     void highReleaseChanged();
 
 protected:
-    void onInstanceSettingsChanged() override;
-    void updateFromSettings();
+    void doReload() override;
+    void doUpdateSettings() override;
 
 private:
     void update();
@@ -116,12 +117,7 @@ private:
     float m_highRelease = 100.0f;
 };
 
-class MultibandCompressorViewModelFactory : public BuiltinEffectModelFactory
+class MultibandCompressorViewModelFactory : public EffectViewModelFactory<MultibandCompressorViewModel>
 {
-public:
-    BuiltinEffectModel* createModel(const std::shared_ptr<EffectInstanceWithBlockSize>& instance, QObject* parent = nullptr) override
-    {
-        return new MultibandCompressorViewModel(instance, parent);
-    }
 };
-}
+} // namespace au::effects
