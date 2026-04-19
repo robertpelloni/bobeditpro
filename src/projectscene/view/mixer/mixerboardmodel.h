@@ -69,7 +69,7 @@ private:
     };
 
     std::vector<MockTrackData> m_tracks;
-    QList<std::unique_ptr<TrackGroup>> m_groups;
+    QList<std::unique_ptr<TrackGroup> > m_groups;
     int m_nextGroupId{ 1 };
 };
 } // namespace au::projectscene

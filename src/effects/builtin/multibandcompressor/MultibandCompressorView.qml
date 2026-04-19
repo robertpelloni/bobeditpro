@@ -3,13 +3,18 @@ import QtQuick.Controls
 import QtQuick.Layouts
 
 import Audacity.Theme
+import Audacity.Effects
+import Muse.UiComponents
+import Audacity.BuiltinEffects
 
-Item {
+BuiltinEffectBase {
     id: root
+
     width: 640
     height: 480
 
-    property var model: null
+    property var builtinEffectModel: MultibandCompressorViewModelFactory.createModel(root, root.instanceId)
+    property var model: root.builtinEffectModel
 
     component CompressorBand: ColumnLayout {
         property string titleText
