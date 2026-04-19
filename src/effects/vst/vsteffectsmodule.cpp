@@ -9,16 +9,16 @@
 #include "audioplugins/iaudiopluginsscannerregister.h"
 #include "audioplugins/iaudiopluginmetareaderregister.h"
 
+#include "effects/effects_base/ieffectloadersregister.h"
 #include "effects/effects_base/ieffectviewlaunchregister.h"
 #include "effects/effects_base/view/effectsviewutils.h"
 
-#include "internal/vsteffectsrepository.h"
+#include "internal/vst3effectloader.h"
 #include "internal/vst3pluginsscanner.h"
 #include "internal/vst3pluginsmetareader.h"
 #include "internal/vst3viewlauncher.h"
 
 #include "internal/musevstpluginsregister.h"
-#include "internal/musevstmodulesrepository.h"
 
 #include "view/vstviewmodel.h"
 
@@ -34,7 +34,8 @@ static void vst_init_qrc()
 }
 
 VstEffectsModule::VstEffectsModule()
-    : m_vstMetaReader(std::make_shared<Vst3PluginsMetaReader>())
+    : m_vstMetaReader(std::make_shared<Vst3PluginsMetaReader>()), m_effectLoader(std::make_shared<Vst3EffectLoader>()), m_pluginsScanner(
+        std::make_shared<Vst3PluginsScanner>())
 {
 }
 
@@ -54,16 +55,13 @@ void VstEffectsModule::registerExports()
 
     // for muse
     globalIoc()->registerExport<muse::vst::IVstInstancesRegister>(mname, new MuseVstInstancesRegister());
-    globalIoc()->registerExport<muse::vst::IVstModulesRepository>(mname, m_museVstModulesRepository);
-
-    globalIoc()->registerExport<IVstEffectsRepository>(mname, m_vstEffectsRepository);
 }
 
 void VstEffectsModule::resolveImports()
 {
     auto scannerRegister = globalIoc()->resolve<muse::audioplugins::IAudioPluginsScannerRegister>(mname);
     if (scannerRegister) {
-        scannerRegister->registerScanner(std::make_shared<Vst3PluginsScanner>());
+        scannerRegister->registerScanner(m_pluginsScanner);
     }
 
     auto metaReaderRegister = globalIoc()->resolve<muse::audioplugins::IAudioPluginMetaReaderRegister>(mname);
@@ -81,6 +79,11 @@ void VstEffectsModule::resolveImports()
         paramExtractorRegistry->registerExtractor(std::make_shared<VstParameterExtractorService>());
 >>>>>>> upstream/master
     }
+
+    auto loadersRegister = globalIoc()->resolve<IEffectLoadersRegister>(mname);
+    if (loadersRegister) {
+        loadersRegister->registerLoader(m_effectLoader);
+    }
 }
 
 void VstEffectsModule::registerResources()
@@ -94,15 +97,17 @@ void VstEffectsModule::registerUiTypes()
     REGISTER_AUDACITY_EFFECTS_SINGLETON_TYPE(VstViewModelFactory);
 }
 
-void VstEffectsModule::onInit(const muse::IApplication::RunMode& runMode)
+void VstEffectsModule::onInit(const muse::IApplication::RunMode&)
 {
-    m_museVstModulesRepository->init();
-    m_vstMetaReader->init(runMode);
+    m_vstMetaReader->init();
+    m_effectLoader->init();
+    m_pluginsScanner->init();
 }
 
 void VstEffectsModule::onDeinit()
 {
-    m_museVstModulesRepository->deinit();
+    m_effectLoader->deinit();
+    m_pluginsScanner->deinit();
     m_vstMetaReader->deinit();
 }
 
@@ -123,7 +128,7 @@ void VstEffectsContext::resolveImports()
 {
     auto lr = ioc()->resolve<IEffectViewLaunchRegister>(mname);
     if (lr) {
-        lr->regLauncher("VST3", std::make_shared<Vst3ViewLauncher>(iocContext()));
+        lr->regLauncher(EffectFamily::VST3, std::make_shared<Vst3ViewLauncher>(iocContext()));
     }
 }
 

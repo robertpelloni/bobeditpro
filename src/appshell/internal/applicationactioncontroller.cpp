@@ -45,8 +45,9 @@ void ApplicationActionController::preInit()
 
 void ApplicationActionController::init()
 {
-    dispatcher()->reg(this, "quit", [this] {
-        quit();
+    dispatcher()->reg(this, "quit", [this](const muse::actions::ActionData& args) {
+        muse::io::path_t installerPath = args.count() > 1 ? args.arg<muse::io::path_t>(1) : "";
+        quit(installerPath);
     });
 
     dispatcher()->reg(this, "restart", [this]() {
@@ -197,7 +198,7 @@ bool ApplicationActionController::eventFilter(QObject* watched, QEvent* event)
     return QObject::eventFilter(watched, event);
 }
 
-bool ApplicationActionController::quit()
+bool ApplicationActionController::quit(const muse::io::path_t& installerPath)
 {
     if (m_quiting) {
         return false;
@@ -220,17 +221,14 @@ bool ApplicationActionController::quit()
         if (pfc && !pfc->closeOpenedProject()) {
             return false;
         }
+    }
 
-        auto window = muse::modularity::ioc(ctx)->resolve<muse::ui::IMainWindow>("appshell");
-
-        IF_ASSERT_FAILED(window) {
-            continue;
-        }
-
-        if (auto w = window->qWindow()) {
-            w->hide();
-            w->deleteLater();
-        }
+    if (!installerPath.empty()) {
+#if defined(Q_OS_LINUX)
+        platformInteractive()->revealInFileBrowser(installerPath);
+#else
+        platformInteractive()->openUrl(QUrl::fromLocalFile(installerPath.toQString()));
+#endif
     }
 
     QCoreApplication::exit();

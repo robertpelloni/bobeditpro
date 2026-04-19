@@ -97,7 +97,8 @@ set(MUSE_MODULE_NETWORK ON)
 set(MUSE_MODULE_SHORTCUTS ON)
 set(MUSE_MODULE_UI ON)
 set(MUSE_MODULE_UI_TESTS OFF)
-set(MUSE_MODULE_UPDATE OFF)
+set(MUSE_MODULE_UPDATE ON)
+set(MUSE_MODULE_UPDATE_QML ON)
 set(MUSE_MODULE_WORKSPACE ON)
 
 # Modules (alphabetical order please)
@@ -125,29 +126,17 @@ option(AU_BUILD_UICOMPONENTS_TESTS "Build uicomponents tests" ON)
 option(AU_BUILD_TRACKEDIT_TESTS "Build trackedit tests" ON)
 
 option(AU_MODULE_EFFECTS_VST "Build audacity vst module" ON)
-if (AU_MODULE_EFFECTS_VST)
-    add_compile_definitions(AU_MODULE_EFFECTS_VST)
-endif()
 
 set(AU_MODULE_VST_VST3_SDK_PATH "" CACHE PATH "[optional] Path to VST3_SDK. SDK version >= ${VST3_SDK_VERSION} required")
 
 option(AU_MODULE_EFFECTS_NYQUIST "Build audacity nyquist module" ON)
-if(AU_MODULE_EFFECTS_NYQUIST)
-    add_compile_definitions(AU_MODULE_EFFECTS_NYQUIST)
-endif()
 
 if (OS_IS_LIN)
     option(AU_MODULE_EFFECTS_LV2 "Build audacity lv2 module" ON)
-    if (AU_MODULE_EFFECTS_LV2)
-        add_compile_definitions(AU_MODULE_EFFECTS_LV2)
-    endif()
 endif(OS_IS_LIN)
 
 if( CMAKE_SYSTEM_NAME MATCHES "Darwin" )
     option(AU_MODULE_EFFECTS_AUDIO_UNIT "Build Audacity Audio Unit module" ON)
-    if (AU_MODULE_EFFECTS_AUDIO_UNIT)
-        add_compile_definitions(AU_MODULE_EFFECTS_AUDIO_UNIT)
-    endif()
 endif()
 
 # Time-stretching and pitch-shifting libraries
@@ -156,6 +145,9 @@ option(AU_USE_SOUNDTOUCH "Build with SoundTouch support for pitch/tempo effects"
 
 # Networking
 option(AU_USE_LIBCURL "Use libcurl for HTTP requests" OFF)
+
+# Time track
+option(AU_LOAD_TIMETRACK "Load time track from Audacity 3 projects" OFF)
 
 # === Setup ===
 

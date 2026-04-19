@@ -32,6 +32,7 @@ public:
 
     TrackIdList trackIdList() const override;
     std::vector<Track> trackList() const override;
+    bool timeTrackFound() const override;
     std::optional<Track> track(TrackId trackId) const override;
     Clip clip(const ClipKey& key) const override;
     Label label(const LabelKey& key) const override;

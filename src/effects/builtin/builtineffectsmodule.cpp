@@ -3,22 +3,34 @@
 */
 #include "builtineffectsmodule.h"
 
-#include "internal/builtineffectsrepository.h"
+#include "effects/effects_base/ieffectloadersregister.h"
+
+#include "internal/builtineffectsloader.h"
+#include "internal/builtineffectsmetareader.h"
+#include "internal/builtineffectsscanner.h"
 
 #include "view/builtineffectmodel.h"
 #include "view/builtineffectviewloader.h"
 #include "view/builtineffectsviewregister.h"
 
-using namespace au::effects;
+#include "framework/audioplugins/iaudiopluginsscannerregister.h"
+#include "framework/audioplugins/iaudiopluginmetareaderregister.h"
 
 static void effects_builtin_init_qrc()
 {
     Q_INIT_RESOURCE(effects_builtin);
 }
 
+namespace au::effects {
 std::string BuiltinEffectsModule::moduleName() const
 {
     return "effects_builtin";
+}
+
+BuiltinEffectsModule::BuiltinEffectsModule()
+    : m_effectLoader(std::make_shared<BuiltinEffectsLoader>()), m_pluginsScanner(std::make_shared<BuiltinEffectsScanner>()), m_metaReader(
+        std::make_shared<BuiltinEffectsMetaReader>())
+{
 }
 
 void BuiltinEffectsModule::registerExports()
@@ -58,8 +70,19 @@ void BuiltinEffectsModule::registerUiTypes()
 
 void BuiltinEffectsModule::onInit(const muse::IApplication::RunMode&)
 {
+    m_effectLoader->init();
+    m_pluginsScanner->init();
+    m_metaReader->init();
 }
 
 void BuiltinEffectsModule::onDelayedInit()
 {
+}
+
+void BuiltinEffectsModule::onDeinit()
+{
+    m_effectLoader->deinit();
+    m_pluginsScanner->deinit();
+    m_metaReader->deinit();
+}
 }

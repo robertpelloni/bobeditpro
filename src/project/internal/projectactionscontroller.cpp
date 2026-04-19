@@ -435,7 +435,7 @@ bool ProjectActionsController::closeOpenedProject(const bool quitApp)
     }
 
     if (result) {
-        interactive()->closeAllDialogs();
+        interactive()->closeAllDialogsSync();
 
         project->close();
 
@@ -473,7 +473,7 @@ bool ProjectActionsController::saveProjectToCloud(const CloudProjectInfo& cloudI
         return false;
     }
 
-    if (!authorization()->ensureAuthorization()) {
+    if (!ensureAuthorization()) {
         return false;
     }
 
@@ -838,7 +838,7 @@ Ret ProjectActionsController::openCloudProject(const io::path_t& localPath, cons
         return make_ret(Ret::Code::NotSupported);
     }
 
-    if (!authorization()->ensureAuthorization()) {
+    if (!ensureAuthorization()) {
         return make_ret(Ret::Code::Cancel);
     }
 
@@ -856,7 +856,7 @@ Ret ProjectActionsController::openCloudProject(const io::path_t& localPath, cons
             return;
         }
 
-        if (!authorization()->ensureAuthorization()) {
+        if (!ensureAuthorization()) {
             return;
         }
 
@@ -906,6 +906,23 @@ Ret ProjectActionsController::doOpenProject(const io::path_t& filePath)
     }
 
     globalContext()->setCurrentProject(project);
+
+#ifndef AU_LOAD_TIMETRACK
+    const auto trackeditProject = project->trackeditProject();
+    if (trackeditProject && trackeditProject->timeTrackFound()) {
+        interactive()->infoSync(muse::trc("project/open", "Time Track not supported"),
+                                muse::trc("project/open",
+                                          "The project contains a time track, which is not yet supported in Audacity 4, and will need to be removed. This does not affect your original Audacity 3 project."),
+        {
+            muse::IInteractive::ButtonData(
+                muse::IInteractive::Button::Ok, muse::trc("project/open", "Ok"), false)
+        });
+
+        // When saving we do a full project rewrite
+        // We need to save the project immediately to remove the time track from the project file and avoid showing this message repeatedly
+        saveProject(SaveMode::Save);
+    }
+#endif
 
     projectHistory()->init();
 
@@ -1149,6 +1166,21 @@ void ProjectActionsController::openMetadataDialog()
 void ProjectActionsController::openCustomMapping()
 {
     interactive()->open(CUSTOM_MAPPING);
+}
+
+muse::Ret ProjectActionsController::ensureAuthorization()
+{
+    if (authorization()->isAuthorized()) {
+        return make_ret(Ret::Code::Ok);
+    }
+
+    muse::actions::ActionQuery query("audacity://cloud/open-signin-dialog");
+    query.addParam("sync", muse::Val(true));
+    query.addParam("showTourPage", muse::Val(false));
+
+    dispatcher()->dispatch(query);
+
+    return authorization()->isAuthorized() ? make_ret(Ret::Code::Ok) : make_ret(Ret::Code::Cancel);
 }
 
 namespace {

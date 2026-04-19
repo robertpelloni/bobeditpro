@@ -29,8 +29,7 @@
 #include "global/iglobalconfiguration.h"
 #include "global/iapplication.h"
 
-//! TODO AU4
-//#include "update/iupdateconfiguration.h"
+#include "update/iupdateconfiguration.h"
 
 class QUrl;
 
@@ -50,7 +49,6 @@ class AboutModel : public QObject, public muse::Contextable
 =======
     muse::GlobalInject<IAppShellConfiguration> configuration;
     muse::GlobalInject<muse::IGlobalConfiguration> globalConfiguration;
-
     muse::GlobalInject<muse::IApplication> application;
 >>>>>>> upstream/master:src/appshell/qml/Audacity/AppShell/aboutmodel.h
 

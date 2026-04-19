@@ -32,7 +32,7 @@ RealtimeEffectListItemModel::~RealtimeEffectListItemModel()
         // Effect state lifetime is expected to span more than this.
         return;
     }
-    effectsProvider()->hideEffect(state);
+    effectViewController()->hideEffect(state);
 }
 
 bool RealtimeEffectListItemModel::prop_isMasterEffect() const
@@ -69,7 +69,7 @@ effects::RealtimeEffectStatePtr RealtimeEffectListItemModel::effectStatePtr() co
 
 void RealtimeEffectListItemModel::showEffectDialog()
 {
-    effectsProvider()->showEffect(m_effectState.lock());
+    effectViewController()->showEffect(m_effectState.lock());
 }
 
 bool RealtimeEffectListItemModel::prop_isActive() const

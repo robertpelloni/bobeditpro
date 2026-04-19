@@ -72,10 +72,8 @@ QVariantMap AboutModel::contributionUrl() const
 
 QVariantMap AboutModel::privacyPolicyUrl() const
 {
-//! TODO AU4
-    // QUrl url(QString::fromStdString(updateConfiguration()->privacyPolicyUrl()));
-    // return makeUrl(url);
-    return QVariantMap();
+    QUrl url(QString::fromStdString(updateConfiguration()->privacyPolicyUrl()));
+    return makeUrl(url);
 }
 
 void AboutModel::copyRevisionToClipboard() const

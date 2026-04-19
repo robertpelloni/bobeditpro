@@ -61,6 +61,7 @@ class ProjectActionsController : public IProjectFilesController, public muse::ac
     muse::GlobalInject<IRecentFilesController> recentFilesController;
     muse::GlobalInject<muse::mi::IMultiWindowsProvider> multiwindowsProvider;
     muse::GlobalInject<toast::IToastService> toastService;
+    muse::GlobalInject<au3cloud::IAuthorization> authorization;
 
     muse::ContextInject<muse::actions::IActionsDispatcher> dispatcher { this };
     muse::ContextInject<muse::ui::IMainWindow> mainWindow { this };
@@ -146,6 +147,8 @@ private:
 
     void openCustomFFmpegOptions();
     void openMetadataDialog();
+
+    muse::Ret ensureAuthorization();
 
     bool m_isProjectSaving = false;
     bool m_isProjectClosing = false;

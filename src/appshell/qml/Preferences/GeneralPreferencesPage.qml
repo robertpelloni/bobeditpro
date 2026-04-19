@@ -42,6 +42,14 @@ PreferencesPage {
         }
     }
 
+    UpdatePreferencesModel {
+        id: updateModel
+    }
+
+    UsageInfoPreferencesModel {
+        id: usageInfoModel
+    }
+
     Column {
         width: parent.width
         spacing: root.sectionsSpacing
@@ -93,11 +101,52 @@ PreferencesPage {
 
         SeparatorLine { }
 
+        AutomaticUpdateSection {
+            isAppUpdatable: updateModel.isAppUpdatable()
+            needCheckForNewAppVersion: updateModel.needCheckForNewAppVersion
+            privacyPolicyUrl: updateModel.privacyPolicyUrl()
+
+            navigation.section: root.navigationSection
+            navigation.order: root.navigationOrderStart + 3
+
+            onNeedCheckForNewAppVersionChangeRequested: function(check) {
+                updateModel.needCheckForNewAppVersion = check
+            }
+
+            onFocusChanged: {
+                if (activeFocus) {
+                    root.ensureContentVisibleRequested(Qt.rect(x, y, width, height))
+                }
+            }
+        }
+
+        SeparatorLine { }
+
+        UsageInfoSection {
+            sendAnonymousUsageInfo: usageInfoModel.sendAnonymousUsageInfo
+            privacyPolicyUrl: updateModel.privacyPolicyUrl()
+
+            navigation.section: root.navigationSection
+            navigation.order: root.navigationOrderStart + 4
+
+            onSendAnonymousUsageInfoChangeRequested: function(send) {
+                usageInfoModel.sendAnonymousUsageInfo = send
+            }
+
+            onFocusChanged: {
+                if (activeFocus) {
+                    root.ensureContentVisibleRequested(Qt.rect(x, y, width, height))
+                }
+            }
+        }
+
+        SeparatorLine { }
+
         TemporaryFilesSection {
             id: temporaryFilesSection
 
             navigation.section: root.navigationSection
-            navigation.order: root.navigationOrderStart + 3
+            navigation.order: root.navigationOrderStart + 5
 
             temporaryPath: preferencesModel.temporaryDir
 
@@ -126,7 +175,7 @@ PreferencesPage {
             id: ffmpegLibrarySection
 
             navigation.section: root.navigationSection
-            navigation.order: root.navigationOrderStart + 4
+            navigation.order: root.navigationOrderStart + 6
 
             onFocusChanged: {
                 if (activeFocus) {

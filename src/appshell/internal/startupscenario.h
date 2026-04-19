@@ -52,10 +52,11 @@ class StartupScenario : public au::appshell::IStartupScenario, public muse::asyn
 {
     muse::GlobalInject<IAppShellConfiguration> configuration;
     muse::GlobalInject<muse::mi::IMultiWindowsProvider> multiwindowsProvider;
+    muse::GlobalInject<muse::update::IUpdateConfiguration> updateConfiguration;
+    muse::GlobalInject<muse::io::IFileSystem> fileSystem;
 
     muse::ContextInject<muse::IInteractive> interactive { this };
     muse::ContextInject<muse::actions::IActionsDispatcher> dispatcher { this };
-    muse::ContextInject<muse::audioplugins::IRegisterAudioPluginsScenario> registerAudioPluginsScenario { this };
     muse::ContextInject<ISessionsManager> sessionsManager { this };
 >>>>>>> upstream/master
 
@@ -91,11 +92,16 @@ private:
     void openProject(const au::project::ProjectFile& file);
 
     void restoreLastSession();
+    bool alreadyCheckedForUpdateToday() const;
+    bool isAudioActive() const;
+    void tryCheckForUpdate();
+    void startUpdateCheckTimer();
 
     std::string m_startupTypeStr;
     au::project::ProjectFile m_startupProjectFile;
     muse::io::paths_t m_startupMediaFiles;
     bool m_startupCompleted = false;
+    QTimer m_updateCheckTimer;
 };
 }
 

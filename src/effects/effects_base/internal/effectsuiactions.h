@@ -24,9 +24,9 @@ class EffectsUiActions : public muse::ui::IUiActionsModule, public muse::async::
 class EffectsUiActions : public muse::ui::IUiActionsModule, public muse::async::Asyncable, public muse::Contextable
 {
     muse::GlobalInject<IEffectsConfiguration> configuration;
+    muse::GlobalInject<IEffectsProvider> effectsProvider;
 
     muse::ContextInject<context::IUiContextResolver> uicontextResolver{ this };
-    muse::ContextInject<IEffectsProvider> effectsProvider{ this };
     muse::ContextInject<IEffectExecutionScenario> effectExecutionScenario{ this };
 >>>>>>> upstream/master
 

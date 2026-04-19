@@ -19,8 +19,9 @@ protected:
 class AbstractViewLauncher : public IEffectViewLauncher, public muse::Contextable
 {
 protected:
+    muse::GlobalInject<IEffectInstancesRegister> instancesRegister;
+
     muse::ContextInject<muse::IInteractive> interactive{ this };
-    muse::ContextInject<IEffectInstancesRegister> instancesRegister{ this };
 
 public:
     AbstractViewLauncher(const muse::modularity::ContextPtr& ctx)

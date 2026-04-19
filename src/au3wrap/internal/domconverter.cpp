@@ -26,6 +26,10 @@ au::trackedit::TrackType trackType(const Au3Track* track)
         return au::trackedit::TrackType::Label;
     }
 
+    if (dynamic_cast<const TimeTrack*>(track)) {
+        return au::trackedit::TrackType::Undefined;
+    }
+
     switch (track->NChannels()) {
     case 1:
         return au::trackedit::TrackType::Mono;

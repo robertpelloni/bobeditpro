@@ -15,16 +15,13 @@
 #include "effects/audio_unit/iaudiouniteffectsrepository.h"
 #include "audioplugins/iknownaudiopluginsregister.h"
 #include "../ieffectsconfiguration.h"
-#include "../ieffectviewlaunchregister.h"
+#include "../ieffectloadersregister.h"
 
 #include "../ieffectsprovider.h"
 
 class EffectBase;
 class EffectSettingsAccess;
-
-namespace BasicUI {
-class ProgressDialog;
-}
+class TrackList;
 
 namespace au::effects {
 <<<<<<< HEAD
@@ -48,20 +45,11 @@ class EffectsProvider : public IEffectsProvider, public muse::async::Asyncable, 
 {
     muse::GlobalInject<IEffectsConfiguration> configuration;
     muse::GlobalInject<muse::audioplugins::IKnownAudioPluginsRegister> knownPluginsRegister;
-    muse::GlobalInject<IAudioUnitEffectsRepository> audioUnitEffectsRepository;
-    muse::GlobalInject<IBuiltinEffectsRepository> builtinEffectsRepository;
-    muse::GlobalInject<ILv2EffectsRepository> lv2EffectsRepository;
-    muse::GlobalInject<INyquistEffectsRepository> nyquistEffectsRepository;
-    muse::GlobalInject<IVstEffectsRepository> vstEffectsRepository;
-
-    muse::ContextInject<au::context::IGlobalContext> globalContext{ this };
-    muse::ContextInject<muse::IInteractive> interactive{ this };
-    muse::ContextInject<playback::IPlayback> playback{ this };
-    muse::ContextInject<IEffectViewLaunchRegister> viewLaunchRegister{ this };
+    muse::GlobalInject<IEffectLoadersRegister> effectLoadersRegister;
+    muse::GlobalInject<muse::audioplugins::IAudioPluginMetaReaderRegister> metaReaderRegister;
 
 public:
-    EffectsProvider(const muse::modularity::ContextPtr& ctx)
-        : muse::Contextable(ctx) {}
+    void deinit();
 
 >>>>>>> upstream/master
     void init();
@@ -75,7 +63,6 @@ public:
     bool loadEffect(const EffectId& effectId) const override;
     std::string effectName(const std::string& effectId) const override;
     std::string effectName(const effects::RealtimeEffectState& state) const override;
-    std::string effectSymbol(const std::string& effectId) const override;
     Effect* effect(const EffectId& effectId) const override;
 
     bool supportsMultipleClipSelection(const EffectId& effectId) const override;
@@ -113,8 +100,8 @@ private:
 
     muse::Ret doEffectPreview(EffectBase& effect, EffectSettings& settings);
 
-    mutable EffectMetaList m_effects;
+    EffectMetaList m_effects;
     muse::async::Notification m_effectsChanged;
-    std::optional<EffectPreviewState> m_effectPreviewState;
+    muse::async::Notification m_initialized;
 };
 }

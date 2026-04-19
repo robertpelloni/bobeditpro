@@ -12,11 +12,13 @@
 #include "../ieffectinstancesregister.h"
 #include "../ieffectsprovider.h"
 #include "ieffectsconfiguration.h"
+#include "ieffectviewcontroller.h"
 #include "trackedit/iprojecthistory.h"
 #include "trackedit/iselectioncontroller.h"
 #include "au3wrap/au3types.h"
 #include "spectrogram/iglobalspectrogramconfiguration.h"
 #include "spectrogram/ifrequencyselectioncontroller.h"
+#include "playback/iplayback.h"
 
 #include <optional>
 
@@ -26,6 +28,11 @@ class Effect;
 class EffectBase;
 class EffectInstance;
 class SimpleEffectSettingsAccess;
+
+namespace BasicUI {
+class ProgressDialog;
+}
+
 namespace au::effects {
 <<<<<<< HEAD
 class EffectExecutionScenario : public IEffectExecutionScenario
@@ -45,15 +52,17 @@ class EffectExecutionScenario : public IEffectExecutionScenario, public muse::Co
 {
     muse::GlobalInject<IEffectsConfiguration> effectsConfiguration;
     muse::GlobalInject<spectrogram::IGlobalSpectrogramConfiguration> spectrogramConfiguration;
+    muse::GlobalInject<IEffectsProvider> effectsProvider;
+    muse::GlobalInject<IEffectInstancesRegister> effectInstancesRegister;
 
+    muse::ContextInject<IEffectViewController> effectViewController{ this };
     muse::ContextInject<context::IGlobalContext> globalContext{ this };
-    muse::ContextInject<IEffectsProvider> effectsProvider{ this };
-    muse::ContextInject<IEffectInstancesRegister> effectInstancesRegister{ this };
     muse::ContextInject<trackedit::ISelectionController> selectionController{ this };
     muse::ContextInject<muse::IInteractive> interactive{ this };
     muse::ContextInject<trackedit::IProjectHistory> projectHistory{ this };
     muse::ContextInject<trackedit::ITrackNavigationController> trackNavigationController { this };
     muse::ContextInject<spectrogram::IFrequencySelectionController> frequencySelectionController { this };
+    muse::ContextInject<playback::IPlayback> playback{ this };
 
 public:
     EffectExecutionScenario(const muse::modularity::ContextPtr& ctx)
@@ -67,12 +76,16 @@ public:
     muse::Ret repeatLastProcessor() override;
 
     muse::Ret previewEffect(const EffectInstanceId& effectInstanceId, EffectSettings& settings) override;
+    void stopPreview() override;
 
 private:
+    muse::Ret doPreviewEffect(const EffectId& effectId, EffectSettings& settings);
 
     std::pair<std::string, std::string> makeErrorMsg(const muse::Ret& ret, const EffectId& effectId);
     muse::Ret performEffectWithShowError(au3::Au3Project& project, const EffectId& effectId, unsigned int flags);
     muse::Ret doPerformEffect(au3::Au3Project& project, const EffectId& effectId, unsigned int flags);
+    muse::Ret performEffectInternal(au3::Au3Project& project, Effect* effect, std::shared_ptr<EffectInstance> effectInstance,
+                                    EffectSettings& settings);
     muse::Ret performGenerator(au3::Au3Project& project, Effect&, const std::shared_ptr<EffectInstanceEx>&, EffectSettings&);
     std::optional<trackedit::ClipId> performEffectOnSingleClip(au3::Au3Project&, Effect&, const std::shared_ptr<EffectInstanceEx>&,
                                                                EffectSettings&, trackedit::TrackId trackId, muse::Ret&);
@@ -85,8 +98,27 @@ private:
 
     bool DoEffect(const EffectId& effectId, au3::Au3Project& project, unsigned flags);
 
+    struct EffectContext {
+        double t0 = 0.0;
+        double t1 = 0.0;
+        std::shared_ptr<::TrackList> tracks;
+        BasicUI::ProgressDialog* preparingPreviewProgress = nullptr;
+        bool isPreview = false;
+    };
+
+    struct EffectPreviewState {
+        EffectPreviewState(const EffectId& effectId, const EffectContext& originContext,
+                           const std::shared_ptr<::TrackList>& previewTracks, bool loopWasActive)
+            : effectId(effectId), originContext(originContext), previewTracks(previewTracks), loopWasActive(loopWasActive) {}
+        const EffectId effectId;
+        const EffectContext originContext;
+        const std::shared_ptr<::TrackList> previewTracks;
+        const bool loopWasActive;
+    };
+
     muse::async::Notification m_lastProcessorIsAvailableChanged;
     muse::async::Channel<EffectId> m_lastProcessorIdChanged;
     std::optional<EffectId> m_lastProcessorId;
+    std::optional<EffectPreviewState> m_effectPreviewState;
 };
 }

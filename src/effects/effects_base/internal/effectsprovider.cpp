@@ -2,108 +2,108 @@
 * Audacity: A Digital Audio Editor
 */
 #include "effectsprovider.h"
-#include "effecterrors.h"
+#include "effectsutils.h"
 
-#include "au3wrap/internal/domconverter.h"
 #include "au3wrap/internal/wxtypes_convert.h"
-#include "au3wrap/internal/progressdialog.h"
 
 #include "au3-effects/Effect.h"
-#include "au3-components/EffectInterface.h"
 #include "au3-effects/EffectManager.h"
-#include "au3-effects/MixAndRender.h"
-#include "au3-numeric-formats/ProjectTimeSignature.h"
-#include "au3-stretching-sequence/TempoChange.h"
 #include "au3-realtime-effects/RealtimeEffectState.h"
-#include "au3-wave-track/WaveTrack.h"
-#include "au3-transactions/TransactionScope.h"
-#include "au3-exceptions/AudacityException.h"
 
-#include "au3-module-manager/PluginManager.h" // for NYQUIST_PROMPT_ID
-#include "au3-basic-ui/BasicUI.h"
-
-#include "au3wrap/au3types.h"
-#include "playback/iplayer.h"
+#include "au3-module-manager/ModuleManager.h"
 
 #include "framework/global/log.h"
-#include "framework/global/translation.h"
-#include "framework/global/async/async.h"
 
 using namespace muse;
 using namespace au::effects;
 
-void EffectsProvider::init()
+void EffectsProvider::initOnce(muse::IInteractive& interactive,
+                               muse::audioplugins::IRegisterAudioPluginsScenario& registerAudioPluginsScenario)
 {
+    muse::audioplugins::PluginScanResult scanResult = registerAudioPluginsScenario.scanPlugins();
+
+    // Audacity plugins (built-in effects and nyquist plugins) are safe. Register them in-process,
+    // because out-of-process registration is slow and users may opt out.
+    muse::io::paths_t& thirdPartyPluginPaths = scanResult.newPluginPaths;
+    muse::io::paths_t audacityPluginPaths;
+    auto it = thirdPartyPluginPaths.begin();
+    while (it != thirdPartyPluginPaths.end()) {
+        std::optional<bool> isAudacityPlugin;
+        for (const auto& reader : metaReaderRegister()->readers()) {
+            if (reader->canReadMeta(*it)) {
+                using namespace muse::audio;
+                const auto metaType = reader->metaType();
+                isAudacityPlugin = metaType == AudioResourceType::NyquistPlugin || metaType == AudioResourceType::NativeEffect;
+                break;
+            }
+        }
+        assert(isAudacityPlugin.has_value());
+        if (isAudacityPlugin.has_value() && *isAudacityPlugin) {
+            audacityPluginPaths.push_back(*it);
+            it = thirdPartyPluginPaths.erase(it);
+        } else {
+            ++it;
+        }
+    }
+
+    registerAudioPluginsScenario.unregisterRemovedPlugins(scanResult.missingPluginIds);
+
+    for (const io::path_t& path : audacityPluginPaths) {
+        registerAudioPluginsScenario.registerPlugin(path);
+    }
+
+    if (!thirdPartyPluginPaths.empty()) {
+        auto ret = interactive.questionSync(muse::trc("appshell", "Scanning audio plugins"),
+                                            muse::trc(
+                                                "appshell",
+                                                "Audacity has found plugins that need to be scanned before use. Would you like to scan them now or skip?"),
+                                            { muse::IInteractive::ButtonData(
+                                                  muse::IInteractive::Button::Cancel,
+                                                  muse::trc("appshell", "Skip this time"),
+                                                  false),
+                                              muse::IInteractive::ButtonData(
+                                                  muse::IInteractive::Button::Apply, muse::trc("appshell", "Scan plugins"),
+                                                  true) });
+        if (ret.standardButton() == muse::IInteractive::Button::Apply) {
+            registerAudioPluginsScenario.registerNewPlugins(thirdPartyPluginPaths);
+        }
+    }
+
+    // Providers must be available in ModuleManager for on-demand plugin loading.
+    ModuleManager::Get().DiscoverProviders();
+
+    reloadEffects();
+
+    m_initialized.notify();
+
+    // Register for future changes
     knownPluginsRegister()->pluginInfoListChanged().onNotify(this, [this]() {
         reloadEffects();
     });
 }
 
-bool EffectsProvider::isVstSupported() const
+void EffectsProvider::deinit()
 {
-    return vstEffectsRepository() ? true : false;
-}
-
-bool EffectsProvider::isNyquistSupported() const
-{
-    return nyquistEffectsRepository() ? true : false;
-}
-
-bool EffectsProvider::isAudioUnitSupported() const
-{
-    return audioUnitEffectsRepository() ? true : false;
-}
-
-bool EffectsProvider::isLv2Supported() const
-{
-    return lv2EffectsRepository() ? true : false;
 }
 
 void EffectsProvider::reloadEffects()
 {
     m_effects.clear();
 
-    // built-in
-    {
-        EffectMetaList metaList = builtinEffectsRepository()->effectMetaList();
-        for (EffectMeta meta : metaList) {
-            m_effects.push_back(std::move(meta));
+    const auto knownPlugins = knownPluginsRegister()->pluginInfoList();
+    std::for_each(knownPlugins.begin(), knownPlugins.end(),
+                  [this](const muse::audioplugins::AudioPluginInfo& info) {
+        if (info.enabled) {
+            m_effects.push_back(utils::museToAuEffectMeta(info.path, info.meta));
         }
-    }
-
-    // VST
-    if (isVstSupported()) {
-        EffectMetaList metaList = vstEffectsRepository()->effectMetaList();
-        for (EffectMeta meta : metaList) {
-            m_effects.push_back(std::move(meta));
-        }
-    }
-
-    // Nyquist
-    if (isNyquistSupported()) {
-        EffectMetaList metaList = nyquistEffectsRepository()->effectMetaList();
-        for (EffectMeta meta : metaList) {
-            m_effects.push_back(std::move(meta));
-        }
-    }
-
-    // AudioUnit
-    if (isAudioUnitSupported()) {
-        EffectMetaList metaList = audioUnitEffectsRepository()->effectMetaList();
-        for (EffectMeta meta : metaList) {
-            m_effects.push_back(std::move(meta));
-        }
-    }
-
-    // LV2
-    if (isLv2Supported()) {
-        EffectMetaList metaList = lv2EffectsRepository()->effectMetaList();
-        for (EffectMeta meta : metaList) {
-            m_effects.push_back(std::move(meta));
-        }
-    }
+    });
 
     m_effectsChanged.notify();
+}
+
+muse::async::Notification EffectsProvider::initialized() const
+{
+    return m_initialized;
 }
 
 EffectMetaList EffectsProvider::effectMetaList() const
@@ -128,68 +128,40 @@ EffectMeta EffectsProvider::meta(const EffectId& effectId) const
     return EffectMeta();
 }
 
-bool EffectsProvider::loadEffect(const EffectId& effectId) const
+IEffectLoaderPtr EffectsProvider::loader(const EffectId& effectId) const
 {
     const auto it = std::find_if(m_effects.begin(), m_effects.end(), [&](const EffectMeta& meta) {
         return meta.id == effectId;
     });
     if (it == m_effects.end()) {
+        return nullptr;
+    }
+    return effectLoadersRegister()->loader(it->family);
+}
+
+bool EffectsProvider::loadEffect(const EffectId& effectId) const
+{
+    const IEffectLoaderPtr loader = this->loader(effectId);
+    if (!loader) {
         return false;
     }
-    if (it->family == EffectFamily::Builtin) {
-        // If an effect is not a VST and is in m_effects, then it's a built-in effect and it's loaded already.
-        return true;
-    }
-    if (it->family == EffectFamily::Nyquist) {
-        // Nyquist effects are loaded on-demand like built-in effects
-        return true;
-    }
-    switch (it->family) {
-    case EffectFamily::AudioUnit: {
-        IF_ASSERT_FAILED(audioUnitEffectsRepository()) {
-            return false;
-        }
-        return audioUnitEffectsRepository()->ensurePluginIsLoaded(effectId);
-    }
-    case EffectFamily::LV2: {
-        IF_ASSERT_FAILED(lv2EffectsRepository()) {
-            return false;
-        }
-        return lv2EffectsRepository()->ensurePluginIsLoaded(effectId);
-    }
-    case EffectFamily::VST3: {
-        IF_ASSERT_FAILED(vstEffectsRepository()) {
-            return false;
-        }
-        return vstEffectsRepository()->ensurePluginIsLoaded(effectId);
-    }
-    default:
-        LOGE() << "unknown family: " << static_cast<int>(it->family);
-        return false;
-    }
+    return loader->ensurePluginIsLoaded(effectId);
 }
 
 std::string EffectsProvider::effectName(const std::string& effectId) const
 {
-    const auto desc = PluginManager::Get().GetPlugin(effectId);
-    if (!desc) {
+    const auto it = std::find_if(m_effects.begin(), m_effects.end(), [&](const EffectMeta& meta) {
+        return meta.id == effectId;
+    });
+    if (it == m_effects.end()) {
         return "";
     }
-    return desc->GetSymbol().Msgid().Translation().ToStdString();
+    return it->title.toStdString();
 }
 
 std::string EffectsProvider::effectName(const effects::RealtimeEffectState& state) const
 {
     return effectName(state.GetID().ToStdString());
-}
-
-std::string EffectsProvider::effectSymbol(const std::string& effectId) const
-{
-    const auto desc = PluginManager::Get().GetPlugin(effectId);
-    if (!desc) {
-        return "";
-    }
-    return desc->GetSymbol().Internal().ToStdString();
 }
 
 bool EffectsProvider::supportsMultipleClipSelection(const EffectId& effectId) const
@@ -209,10 +181,9 @@ Effect* EffectsProvider::effect(const EffectId& effectId) const
     if (!loadEffect(effectId)) {
         return nullptr;
     }
-    PluginID pluginID = effectId.toStdString();
-    const PluginDescriptor* plug = PluginManager::Get().GetPlugin(pluginID);
-    if (!plug || !PluginManager::IsPluginAvailable(*plug)) {
-        LOGE() << "plugin not available, effectId: " << effectId;
+
+    const IEffectLoaderPtr loader = this->loader(effectId);
+    if (!loader) {
         return nullptr;
     }
 

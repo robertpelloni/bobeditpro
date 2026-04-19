@@ -17,8 +17,6 @@
 #include <QObject>
 #include <QQuickItem>
 
-#include <variant>
-
 class LV2PortUIStates;
 struct LV2EffectOutputs;
 typedef unsigned long XID;

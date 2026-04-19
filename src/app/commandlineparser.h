@@ -3,13 +3,15 @@
 */
 #pragma once
 
+#include <memory>
+
 #include <QCommandLineParser>
 #include <QStringList>
-#include <optional>
 
 #include "framework/global/logger.h"
 #include "framework/global/iapplication.h"
-#include "framework/global/io/path.h"
+
+#include "cmdoptions.h"
 
 class QCoreApplication;
 

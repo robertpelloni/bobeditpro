@@ -7,6 +7,7 @@
 #include "async/asyncable.h"
 #include "effects/effects_base/ieffectsprovider.h"
 #include "effects/effects_base/irealtimeeffectservice.h"
+#include "effects/effects_base/ieffectviewcontroller.h"
 
 #include <QObject>
 

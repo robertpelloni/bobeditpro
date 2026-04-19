@@ -20,9 +20,8 @@ public:
 =======
 class EffectsMenuProvider : public IEffectsMenuProvider, public muse::async::Asyncable, public muse::Contextable
 {
-    muse::GlobalInject<effects::IEffectsConfiguration> configuration;
-
-    muse::ContextInject<effects::IEffectsProvider> effectsProvider{ this };
+    muse::GlobalInject<IEffectsConfiguration> configuration;
+    muse::GlobalInject<IEffectsProvider> effectsProvider;
 
 public:
     EffectsMenuProvider(const muse::modularity::ContextPtr& ctx)

@@ -64,7 +64,7 @@ TrackItemsContainer {
                     hoverEnabled: true
                     pressAndHoldInterval: 0
 
-                    cursorShape: root.selectionEditInProgress ? Qt.SizeHorCursor : Qt.IBeamCursor
+                    cursorShape: Qt.BlankCursor
                     enabled: !root.selectionInProgress
 
                     onPressed: function(e) {

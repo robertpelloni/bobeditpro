@@ -5,6 +5,7 @@
 
 #include "effects/effects_base/ieffectinstancesregister.h"
 #include "effects/effects_base/ieffectexecutionscenario.h"
+#include "effects/effects_base/ieffectsprovider.h"
 #include "playback/iplayback.h"
 
 #include "framework/global/async/asyncable.h"

@@ -6,10 +6,11 @@
 #include "audioplugins/iaudiopluginsscannerregister.h"
 #include "audioplugins/iaudiopluginmetareaderregister.h"
 
+#include "effects/effects_base/ieffectloadersregister.h"
 #include "effects/effects_base/ieffectviewlaunchregister.h"
 #include "effects/effects_base/view/effectsviewutils.h"
 
-#include "internal/lv2effectsrepository.h"
+#include "internal/lv2effectloader.h"
 #include "internal/lv2pluginmetareader.h"
 #include "internal/lv2pluginsscanner.h"
 #include "internal/lv2viewlauncher.h"
@@ -31,7 +32,8 @@ static void lv2_init_qrc()
 }
 
 Lv2EffectsModule::Lv2EffectsModule()
-    : m_metaReader{std::make_shared<Lv2PluginMetaReader>()}
+    : m_metaReader{std::make_shared<Lv2PluginMetaReader>()}, m_effectLoader{std::make_shared<Lv2EffectLoader>()},
+    m_pluginsScanner{std::make_shared<Lv2PluginsScanner>()}
 {
 }
 
@@ -53,7 +55,7 @@ void Lv2EffectsModule::resolveImports()
 {
     auto scannerRegister = globalIoc()->resolve<muse::audioplugins::IAudioPluginsScannerRegister>(mname);
     if (scannerRegister) {
-        scannerRegister->registerScanner(std::make_shared<Lv2PluginsScanner>());
+        scannerRegister->registerScanner(m_pluginsScanner);
     }
 
     auto metaReaderRegister = globalIoc()->resolve<muse::audioplugins::IAudioPluginMetaReaderRegister>(mname);
@@ -86,13 +88,17 @@ void Lv2EffectsModule::registerUiTypes()
     REGISTER_AUDACITY_EFFECTS_SINGLETON_TYPE(Lv2ViewModelFactory);
 }
 
-void Lv2EffectsModule::onInit(const muse::IApplication::RunMode& runMode)
+void Lv2EffectsModule::onInit(const muse::IApplication::RunMode&)
 {
-    m_metaReader->init(runMode);
+    m_metaReader->init();
+    m_effectLoader->init();
+    m_pluginsScanner->init();
 }
 
 void Lv2EffectsModule::onDeinit()
 {
+    m_effectLoader->deinit();
+    m_pluginsScanner->deinit();
     m_metaReader->deinit();
 }
 
@@ -113,7 +119,7 @@ void Lv2EffectsContext::resolveImports()
 {
     auto lr = ioc()->resolve<IEffectViewLaunchRegister>(mname);
     if (lr) {
-        lr->regLauncher("LV2", std::make_shared<Lv2ViewLauncher>(iocContext()));
+        lr->regLauncher(EffectFamily::LV2, std::make_shared<Lv2ViewLauncher>(iocContext()));
     }
 }
 
