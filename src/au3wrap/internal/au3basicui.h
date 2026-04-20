@@ -6,7 +6,6 @@
 
 #include "framework/global/async/asyncable.h"
 #include "framework/global/modularity/ioc.h"
-<<<<<<< HEAD
 #include "framework/global/iinteractive.h"
 
 #include "au3-basic-ui/BasicUI.h"
@@ -14,28 +13,6 @@
 class Au3BasicUI final : public BasicUI::Services, public muse::async::Asyncable
 {
     muse::Inject<muse::IInteractive> interactive;
-=======
-#include "framework/interactive/iinteractive.h"
-#include "framework/global/iapplication.h"
-
-#include "au3-basic-ui/BasicUI.h"
-
-// WindowPlacement subclass that carries a muse context.
-// Created by WindowPlacementFactory when au3 code calls
-// ProjectFramePlacement(&project).
-class Au3WindowPlacement : public BasicUI::WindowPlacement, public kors::modularity::Contextable
-{
-public:
-    Au3WindowPlacement(muse::modularity::ContextPtr ctx)
-        : Contextable(std::move(ctx)) {}
-};
-
-class Au3BasicUI final : public BasicUI::Services, public muse::async::Asyncable
-{
-public:
-    Au3BasicUI(std::shared_ptr<muse::IApplication> app)
-        : m_app(std::move(app)) {}
->>>>>>> upstream/master
 
 protected:
     void DoCallAfter(const BasicUI::Action& action) override;

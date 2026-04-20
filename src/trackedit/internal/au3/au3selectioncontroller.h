@@ -16,7 +16,6 @@
 #include "../../iselectioncontroller.h"
 
 namespace au::trackedit {
-<<<<<<< HEAD
 struct ClipAndTimeSelection;
 
 class Au3SelectionController : public ISelectionController, public muse::async::Asyncable
@@ -25,17 +24,6 @@ class Au3SelectionController : public ISelectionController, public muse::async::
 
 public:
     Au3SelectionController() = default;
-=======
-class Au3SelectionController : public ISelectionController, public muse::async::Asyncable, public muse::Contextable
-{
-    muse::ContextInject<au::context::IGlobalContext> globalContext { this };
-    muse::ContextInject<IProjectHistory> projectHistory { this };
-    muse::ContextInject<spectrogram::IFrequencySelectionController> frequencySelectionController { this };
-
-public:
-    Au3SelectionController(const muse::modularity::ContextPtr& ctx)
-        : muse::Contextable(ctx) {}
->>>>>>> upstream/master
 
     void init();
 
@@ -76,7 +64,7 @@ public:
     // data selection
     void setSelectedTrackAudioData(trackedit::TrackId trackId) override;
     void resetDataSelection() override;
-    bool timeSelectionIsNotEmpty() const override;
+    bool timeSelectionIsEmpty() const override;
     bool timeSelectionHasAudioData() const override;
     bool isDataSelectedOnTrack(TrackId trackId) const override;
     void setSelectedAllAudioData(const std::optional<secs_t>& fromTime = std::nullopt,
@@ -98,6 +86,8 @@ public:
     trackedit::secs_t selectionStartTime() const override;
     void setSelectionStartTime(trackedit::secs_t time) override;
 
+    void initSelectionAtPlayhead() override;
+
     // grouping
     bool selectionContainsGroup() const override;
     bool isSelectionGrouped() const override;
@@ -118,11 +108,7 @@ public:
 private:
     void addSelectedTrack(const trackedit::TrackId& trackId);
     void updateSelectionController();
-<<<<<<< HEAD
     void restoreSelection(const ClipAndTimeSelection& selection);
-=======
-    void onHistoryEvent(const trackedit::HistoryEvent& event);
->>>>>>> upstream/master
     ClipKeyList findClipsIntersectingRangeSelection() const;
 
     au3::Au3Project& projectRef() const;

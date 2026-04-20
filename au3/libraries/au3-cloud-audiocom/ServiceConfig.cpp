@@ -17,12 +17,7 @@
 #include <string_view>
 
 #include <rapidjson/document.h>
-<<<<<<< HEAD
 
-=======
-#include <rapidjson/stringbuffer.h>
-#include <rapidjson/writer.h>
->>>>>>> upstream/master
 #include "au3-string-utils/CodeConversions.h"
 #include "au3-preferences/Prefs.h"
 

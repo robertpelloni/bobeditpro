@@ -35,7 +35,6 @@
 // maybe use the #include "appshell/internal/isessionsmanager.h"
 
 namespace au::project {
-<<<<<<< HEAD
 class ProjectAutoSaver : public IProjectAutoSaver, public muse::async::Asyncable
 {
     muse::Inject<au::context::IGlobalContext> globalContext;
@@ -46,20 +45,6 @@ class ProjectAutoSaver : public IProjectAutoSaver, public muse::async::Asyncable
 
 public:
     ProjectAutoSaver() = default;
-=======
-class ProjectAutoSaver : public IProjectAutoSaver, public muse::async::Asyncable, public muse::Contextable
-{
-    muse::GlobalInject<muse::io::IFileSystem> fileSystem;
-    muse::GlobalInject<IProjectConfiguration> configuration;
-    muse::GlobalInject<au::au3::IAu3ProjectCreator> au3ProjectCreator;
-
-    muse::ContextInject<au::context::IGlobalContext> globalContext { this };
-    // maybe use the muse::ContextInject<au::appshell::ISessionsManager> sessionsManager;
-
-public:
-    ProjectAutoSaver(const muse::modularity::ContextPtr& ctx)
-        : muse::Contextable(ctx) {}
->>>>>>> upstream/master
 
     void init();
 

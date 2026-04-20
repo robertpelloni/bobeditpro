@@ -44,11 +44,7 @@ std::string Lv2EffectsModule::moduleName() const
 
 void Lv2EffectsModule::registerExports()
 {
-<<<<<<< HEAD
     ioc()->registerExport<ILv2EffectsRepository>(moduleName(), new Lv2EffectsRepository());
-=======
-    globalIoc()->registerExport<ILv2EffectsRepository>(mname, std::make_shared<Lv2EffectsRepository>());
->>>>>>> upstream/master
 }
 
 void Lv2EffectsModule::resolveImports()
@@ -63,16 +59,12 @@ void Lv2EffectsModule::resolveImports()
         metaReaderRegister->registerReader(m_metaReader);
     }
 
-<<<<<<< HEAD
     auto lr = ioc()->resolve<IEffectViewLaunchRegister>(moduleName());
     if (lr) {
         lr->regLauncher("LV2", std::make_shared<Lv2ViewLauncher>());
     }
 
     // auto ir = ioc()->resolve<IInteractiveUriRegister>(moduleName());
-=======
-    // auto ir = ioc()->resolve<IInteractiveUriRegister>(mname);
->>>>>>> upstream/master
     // if (ir) {
     //     ir->registerQmlUri(Uri("audacity://effects/lv2_viewer"), "Audacity/Lv2/Lv2ViewerDialog.qml");
     // }

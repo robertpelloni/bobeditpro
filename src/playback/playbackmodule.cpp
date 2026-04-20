@@ -42,7 +42,6 @@ std::string PlaybackModule::moduleName() const
 void PlaybackModule::registerExports()
 {
     m_configuration = std::make_shared<PlaybackConfiguration>();
-<<<<<<< HEAD
     m_controller = std::make_shared<PlaybackController>();
     m_uiActions = std::make_shared<PlaybackUiActions>(m_controller);
     m_playback = std::make_shared<Au3Playback>();
@@ -64,11 +63,6 @@ void PlaybackModule::resolveImports()
     if (ir) {
         ir->registerQmlUri(muse::Uri("audacity://playback/loop_region_in_out"), "Audacity/Playback/dialogs/LoopRegionInOut.qml");
     }
-=======
-
-    globalIoc()->registerExport<PlaybackConfiguration>(mname, m_configuration);
-    globalIoc()->registerExport<IPlaybackMeterController>(mname, std::make_shared<PlaybackMeterController>());
->>>>>>> upstream/master
 }
 
 void PlaybackModule::registerResources()

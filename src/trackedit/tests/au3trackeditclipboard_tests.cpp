@@ -28,14 +28,7 @@ class Au3TrackEditClipboardTests : public ::testing::Test
 public:
     void SetUp() override
     {
-<<<<<<< HEAD
         m_au3TrackEditClipboard = std::make_unique<Au3TrackeditClipboard>();
-=======
-        m_clipboardData = std::make_shared<ClipboardData>();
-        muse::modularity::globalIoc()->registerExport<IClipboardData>("test", m_clipboardData);
-
-        m_au3TrackEditClipboard = std::make_unique<Au3TrackeditClipboard>(muse::modularity::globalCtx());
->>>>>>> upstream/master
 
         m_globalContext = std::make_shared<au::context::GlobalContextMock>();
 

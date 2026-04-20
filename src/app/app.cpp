@@ -50,10 +50,6 @@ using namespace au::appshell;
 static GlobalModule globalModule;
 
 App::App()
-<<<<<<< HEAD
-=======
-    : muse::Contextable(muse::modularity::globalCtx())
->>>>>>> upstream/master
 {
 }
 

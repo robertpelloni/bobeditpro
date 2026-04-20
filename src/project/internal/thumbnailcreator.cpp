@@ -1,10 +1,6 @@
 #include "thumbnailcreator.h"
 
-<<<<<<< HEAD
 #include "global/io/fileinfo.h"
-=======
-#include <QEventLoop>
->>>>>>> upstream/master
 
 using namespace au::project;
 

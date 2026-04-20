@@ -37,11 +37,6 @@
 
 #include "au3-files/TempDirectory.h"
 #include "au3-files/FileNames.h"
-<<<<<<< HEAD
-=======
-#include <rapidjson/document.h>
-#include <rapidjson/writer.h>
->>>>>>> upstream/master
 
 namespace audacity::cloud::audiocom {
 namespace {

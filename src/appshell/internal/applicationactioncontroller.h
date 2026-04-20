@@ -26,7 +26,6 @@
 
 #include "../iapplicationactioncontroller.h"
 
-<<<<<<< HEAD
 #include "modularity/ioc.h"
 #include "actions/actionable.h"
 #include "actions/iactionsdispatcher.h"
@@ -34,16 +33,6 @@
 #include "async/asyncable.h"
 #include "ui/imainwindow.h"
 #include "iinteractive.h"
-=======
-#include "framework/global/async/asyncable.h"
-#include "framework/global/modularity/ioc.h"
-#include "framework/actions/actionable.h"
-#include "framework/actions/iactionsdispatcher.h"
-#include "framework/interactive/iplatforminteractive.h"
-#include "framework/ui/iuiactionsregister.h"
-#include "framework/ui/imainwindow.h"
-
->>>>>>> upstream/master
 #include "iappshellconfiguration.h"
 #include "iapplication.h"
 #include "startupscenario.h"
@@ -60,7 +49,6 @@
 
 namespace au::appshell {
 class ApplicationActionController : public QObject, public IApplicationActionController, public muse::actions::Actionable,
-<<<<<<< HEAD
     public muse::async::Asyncable
 {
     muse::Inject<muse::actions::IActionsDispatcher> dispatcher;
@@ -83,28 +71,6 @@ class ApplicationActionController : public QObject, public IApplicationActionCon
     // INJECT(audio::ISoundFontRepository, soundFontRepository)
     // INJECT(IStartupScenario, startupScenario)
 public:
-=======
-    public muse::async::Asyncable, public muse::Contextable
-{
-    muse::GlobalInject<muse::IApplication> application;
-    muse::GlobalInject<IAppShellConfiguration> configuration;
-    muse::GlobalInject<muse::IPlatformInteractive> platformInteractive;
-    muse::GlobalInject<muse::mi::IMultiWindowsProvider> multiwindowsProvider;
-
-    muse::ContextInject<muse::actions::IActionsDispatcher> dispatcher { this };
-    muse::ContextInject<muse::ui::IUiActionsRegister> actionsRegister { this };
-    muse::ContextInject<muse::ui::IMainWindow> mainWindow { this };
-    muse::ContextInject<muse::IInteractive> interactive { this };
-    muse::ContextInject<appshell::IStartupScenario> startupScenario { this };
-    muse::ContextInject<project::IProjectFilesController> projectFilesController { this };
-    muse::ContextInject<record::IRecordController> recordController { this };
-    muse::ContextInject<context::IUiContextResolver> uiContextResolver { this };
-    muse::ContextInject<context::IGlobalContext> globalContext { this };
-public:
-    ApplicationActionController(const muse::modularity::ContextPtr& ctx)
-        : muse::Contextable(ctx) {}
-
->>>>>>> upstream/master
     void preInit();
     void init();
     const std::vector<muse::actions::ActionCode>& prohibitedActionsWhileRecording() const;

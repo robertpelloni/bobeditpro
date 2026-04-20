@@ -14,11 +14,7 @@
 #include "timelinecontext.h"
 
 namespace au::projectscene {
-<<<<<<< HEAD
 class PlayRegionController : public QObject, public muse::async::Asyncable
-=======
-class PlayRegionController : public QObject, public muse::async::Asyncable, public muse::Contextable
->>>>>>> upstream/master
 {
     Q_OBJECT
 
@@ -26,15 +22,9 @@ class PlayRegionController : public QObject, public muse::async::Asyncable, publ
     Q_PROPERTY(double guidelinePosition READ guidelinePosition NOTIFY guidelinePositionChanged FINAL)
     Q_PROPERTY(bool guidelineVisible READ guidelineVisible NOTIFY guidelineVisibleChanged FINAL)
 
-<<<<<<< HEAD
     muse::Inject<playback::IPlaybackController> playbackController;
     muse::Inject<context::IUiContextResolver> uicontextResolver;
     muse::Inject<context::IGlobalContext> globalContext;
-=======
-    muse::ContextInject<playback::IPlaybackController> playbackController{ this };
-    muse::ContextInject<context::IUiContextResolver> uicontextResolver{ this };
-    muse::ContextInject<context::IGlobalContext> globalContext{ this };
->>>>>>> upstream/master
 
     enum class UserInputAction {
         None,

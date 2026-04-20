@@ -19,13 +19,8 @@ class SnapToolBarItem : public muse::uicomponents::ToolBarItem
 
     Q_PROPERTY(QVariantList availableSnapTypes READ availableSnapTypes NOTIFY availableSnapTypesChanged)
 
-<<<<<<< HEAD
     muse::Inject<context::IGlobalContext> globalContext;
     muse::Inject<muse::ui::IUiActionsRegister> uiActionsRegister;
-=======
-    muse::ContextInject<context::IGlobalContext> globalContext{ this };
-    muse::ContextInject<muse::ui::IUiActionsRegister> uiActionsRegister{ this };
->>>>>>> upstream/master
 
 public:
     explicit SnapToolBarItem(const muse::ui::UiAction& action, muse::uicomponents::ToolBarItemType::Type type, QObject* parent = nullptr);

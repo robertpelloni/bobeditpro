@@ -177,13 +177,8 @@ const UiActionList ApplicationUiActions::m_actions = {
              ),
 };
 
-<<<<<<< HEAD
 ApplicationUiActions::ApplicationUiActions(std::shared_ptr<ApplicationActionController> controller)
     : m_controller(controller)
-=======
-ApplicationUiActions::ApplicationUiActions(const muse::modularity::ContextPtr& ctx, std::shared_ptr<ApplicationActionController> controller)
-    : muse::Contextable(ctx), m_controller(controller)
->>>>>>> upstream/master
 {
 }
 

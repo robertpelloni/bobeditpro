@@ -707,11 +707,7 @@ const UiActionList ProjectUiActions::m_actions = {
 };
 
 ProjectUiActions::ProjectUiActions(const std::shared_ptr<ProjectActionsController>& controller)
-<<<<<<< HEAD
     : m_controller(controller)
-=======
-    : muse::Contextable(controller->iocContext()), m_controller(controller)
->>>>>>> upstream/master
 {
 }
 

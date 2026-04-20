@@ -18,11 +18,7 @@ class PlaybackToolBarControlItem : public muse::uicomponents::ToolBarItem
     Q_PROPERTY(QColor iconColor READ iconColor WRITE setIconColor NOTIFY iconColorChanged)
     Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor NOTIFY backgroundColorChanged)
 
-<<<<<<< HEAD
     muse::Inject<IPlayback> playback;
-=======
-    muse::ContextInject<IPlayback> playback{ this };
->>>>>>> upstream/master
 
 public:
     explicit PlaybackToolBarControlItem(const muse::ui::UiAction& action, muse::uicomponents::ToolBarItemType::Type type,

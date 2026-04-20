@@ -16,20 +16,11 @@ class TrackContextMenuModel : public muse::uicomponents::AbstractMenuModel
 {
     Q_OBJECT
 
-<<<<<<< HEAD
     muse::Inject<audio::IAudioDevicesProvider> audioDevicesProvider;
     muse::Inject<context::IGlobalContext> globalContext;
     muse::Inject<projectscene::IProjectSceneConfiguration> projectSceneConfiguration;
     muse::Inject<trackedit::IProjectHistory> projectHistory;
     muse::Inject<trackedit::ISelectionController> selectionController;
-=======
-    muse::GlobalInject<projectscene::IProjectSceneConfiguration> projectSceneConfiguration;
-
-    muse::ContextInject<audio::IAudioDevicesProvider> audioDevicesProvider{ this };
-    muse::ContextInject<context::IGlobalContext> globalContext{ this };
-    muse::ContextInject<trackedit::IProjectHistory> projectHistory{ this };
-    muse::ContextInject<trackedit::ISelectionController> selectionController{ this };
->>>>>>> upstream/master
 
     Q_PROPERTY(trackedit::TrackId trackId READ trackId WRITE setTrackId NOTIFY trackIdChanged FINAL)
 

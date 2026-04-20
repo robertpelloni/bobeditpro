@@ -36,22 +36,12 @@ class RealtimeEffectViewerDialogModel : public QObject, public muse::Contextable
     Q_PROPERTY(bool useVendorUI READ useVendorUI NOTIFY useVendorUIChanged FINAL);
     Q_PROPERTY(ViewerComponentType viewerComponentType READ viewerComponentType NOTIFY viewerComponentTypeChanged FINAL);
 
-<<<<<<< HEAD
     muse::Inject<IEffectInstancesRegister> instancesRegister;
     muse::Inject<IEffectsProvider> effectsProvider;
     muse::Inject<IEffectsConfiguration> configuration;
     muse::Inject<effects::IRealtimeEffectService> realtimeEffectService;
     muse::Inject<context::IGlobalContext> globalContext;
     muse::Inject<muse::ui::INavigationController> navigationController;
-=======
-    muse::GlobalInject<IEffectsConfiguration> configuration;
-    muse::GlobalInject<IEffectInstancesRegister> instancesRegister;
-    muse::GlobalInject<IEffectsProvider> effectsProvider;
-
-    muse::ContextInject<effects::IRealtimeEffectService> realtimeEffectService{ this };
-    muse::ContextInject<context::IGlobalContext> globalContext{ this };
-    muse::ContextInject<muse::ui::INavigationController> navigationController{ this };
->>>>>>> upstream/master
 
 public:
     Q_INVOKABLE void load();

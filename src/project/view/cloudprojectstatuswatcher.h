@@ -34,11 +34,7 @@ class CloudScoreStatusWatcher : public QObject, public muse::async::Asyncable, p
 {
     Q_OBJECT
 
-<<<<<<< HEAD
     muse::Inject<IProjectFilesController> projectFilesController;
-=======
-    muse::ContextInject<IProjectFilesController> projectFilesController { this };
->>>>>>> upstream/master
 
     Q_PROPERTY(bool isDownloadedAndUpToDate READ isDownloadedAndUpToDate CONSTANT)
 

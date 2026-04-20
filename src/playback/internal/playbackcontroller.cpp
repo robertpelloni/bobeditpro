@@ -177,7 +177,7 @@ PlaybackRegion PlaybackController::selectionPlaybackRegion() const
         return { labelStartTime, labelEndTime };
     }
 
-    if (selectionController()->timeSelectionIsNotEmpty()) {
+    if (!selectionController()->timeSelectionIsEmpty()) {
         return { selectionController()->dataSelectedStartTime(),
                  selectionController()->dataSelectedEndTime() };
     }
@@ -594,7 +594,7 @@ void PlaybackController::setLoopRegionToSelection()
     double start = 0;
     double end = 0;
 
-    if (selectionController()->timeSelectionIsNotEmpty()) {
+    if (!selectionController()->timeSelectionIsEmpty()) {
         start = selectionController()->dataSelectedStartTime();
         end = selectionController()->dataSelectedEndTime();
     } else if (selectionController()->hasSelectedClips()) {

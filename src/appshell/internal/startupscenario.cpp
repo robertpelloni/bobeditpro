@@ -22,16 +22,9 @@
 
 #include "startupscenario.h"
 
-<<<<<<< HEAD
 #include "global/async/async.h"
 #include "global/translation.h"
 #include "global/log.h"
-=======
-#include "framework/global/log.h"
-#include "framework/global/types/uri.h"
-
-#include "appshell/appshelltypes.h"
->>>>>>> upstream/master
 
 using namespace au::appshell;
 using namespace muse::actions;
@@ -39,12 +32,7 @@ using namespace au::project;
 
 static const muse::UriQuery FIRST_LAUNCH_SETUP_URI("musescore://firstLaunchSetup?floating=true");
 static const muse::Uri ALPHA_WELCOME_POPUP("audacity://alphaWelcomePopup");
-<<<<<<< HEAD
 static const muse::Uri HOME_URI("musescore://home");
-=======
-static const muse::UriQuery WELCOME_DIALOG_URI("audacity://welcomedialog");
-static const muse::Uri HOME_URI("audacity://home");
->>>>>>> upstream/master
 static const muse::Uri PROJECT_URI("audacity://project");
 
 static StartupModeType modeTypeTromString(const std::string& str)
@@ -80,11 +68,7 @@ bool StartupScenario::isStartWithNewFileAsSecondaryInstance() const
     }
 
     if (!m_startupTypeStr.empty()) {
-<<<<<<< HEAD
         return modeTypeTromString(m_startupTypeStr) == StartupModeType::StartWithNewScore;
-=======
-        return modeTypeFromString(m_startupTypeStr) == StartupModeType::StartWithNewProject;
->>>>>>> upstream/master
     }
 
     return false;
@@ -129,13 +113,9 @@ void StartupScenario::runAfterSplashScreen()
     }
 
     StartupModeType modeType = resolveStartupModeType();
-<<<<<<< HEAD
     //! TODO AU4
     // bool isMainInstance = multiInstancesProvider()->isMainInstance();
     if (/*isMainInstance && */ sessionsManager()->hasProjectsForRestore()) {
-=======
-    if (multiwindowsProvider()->isFirstWindow() && sessionsManager()->hasProjectsForRestore()) {
->>>>>>> upstream/master
         modeType = StartupModeType::Recovery;
     }
     if (multiwindowsProvider()->isFirstWindow() && !configuration()->hasCompletedFirstLaunchSetup()) {
@@ -150,7 +130,6 @@ void StartupScenario::runAfterSplashScreen()
             return;
         }
 
-<<<<<<< HEAD
         muse::io::paths_t newPluginPaths = registerAudioPluginsScenario()->scanForNewPluginPaths();
 
         if (!newPluginPaths.empty()) {
@@ -167,34 +146,6 @@ void StartupScenario::runAfterSplashScreen()
                 muse::Ret ret = registerAudioPluginsScenario()->registerNewPlugins(newPluginPaths);
                 if (!ret) {
                     LOGE() << ret.toString();
-=======
-        m_startupCompleted = true;
-
-        muse::async::Channel<muse::Uri> mut = opened;
-        mut.disconnect(this);
-
-        static bool pluginsScanned = false;
-        if (!pluginsScanned) {
-            pluginsScanned = true;
-
-            muse::audioplugins::PluginScanResult scanResult = registerAudioPluginsScenario()->scanPlugins();
-
-            registerAudioPluginsScenario()->unregisterRemovedPlugins(scanResult.missingPluginIds);
-
-            if (!scanResult.newPluginPaths.empty()) {
-                auto ret = interactive()->questionSync(muse::trc("appshell", "Scanning audio plugins"),
-                                                       muse::trc(
-                                                           "appshell",
-                                                           "Audacity has found plugins that need to be scanned before use. Would you like to scan them now or skip?"),
-                                                       { muse::IInteractive::ButtonData(
-                                                             muse::IInteractive::Button::Cancel, muse::trc("appshell", "Skip this time"),
-                                                             false),
-                                                         muse::IInteractive::ButtonData(
-                                                             muse::IInteractive::Button::Apply, muse::trc("appshell", "Scan plugins"),
-                                                             true) });
-                if (ret.standardButton() == muse::IInteractive::Button::Apply) {
-                    registerAudioPluginsScenario()->registerNewPlugins(scanResult.newPluginPaths);
->>>>>>> upstream/master
                 }
             }
         }
@@ -263,13 +214,10 @@ void StartupScenario::onStartupPageOpened(StartupModeType modeType)
     } break;
     case StartupModeType::FirstLaunch: {
         dispatcher()->dispatch("file-new");
-<<<<<<< HEAD
         interactive()->openSync(FIRST_LAUNCH_SETUP_URI);
 #ifndef MUSE_APP_UNSTABLE
         interactive()->openSync(ALPHA_WELCOME_POPUP);
 #endif
-=======
->>>>>>> upstream/master
     } break;
     }
 }

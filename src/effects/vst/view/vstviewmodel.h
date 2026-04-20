@@ -19,14 +19,8 @@ class VstViewModel : public AbstractEffectViewModel
     Q_OBJECT
 
 public:
-<<<<<<< HEAD
     muse::Inject<IRealtimeEffectService> realtimeEffectService;
     muse::Inject<trackedit::IProjectHistory> projectHistory;
-=======
-    muse::ContextInject<IRealtimeEffectService> realtimeEffectService{ this };
-    muse::ContextInject<trackedit::IProjectHistory> projectHistory{ this };
-    muse::ContextInject<IEffectsProvider> effectsProvider{ this };
->>>>>>> upstream/master
 
 public:
     VstViewModel(QObject* parent, int instanceId);

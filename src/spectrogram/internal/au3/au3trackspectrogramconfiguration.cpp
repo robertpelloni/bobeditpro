@@ -21,27 +21,10 @@ std::shared_ptr<Au3TrackSpectrogramConfiguration> Au3TrackSpectrogramConfigurati
     if (!project) {
         return nullptr;
     }
-<<<<<<< HEAD
     auto au3Project = reinterpret_cast<au::au3::Au3Project*>(project->au3ProjectPtr());
     au::au3::Au3WaveTrack* waveTrack = au::au3::DomAccessor::findWaveTrack(*au3Project, au::au3::Au3TrackId { trackId });
     IF_ASSERT_FAILED(waveTrack) {
         return nullptr;
-=======
-    auto au3Project = reinterpret_cast<au3::Au3Project*>(project->au3ProjectPtr());
-    return std::make_shared<Au3TrackSpectrogramConfiguration>(trackId, *au3Project);
-}
-
-Au3TrackSpectrogramConfiguration::Au3TrackSpectrogramConfiguration(int trackId, AudacityProject& project)
-    : m_trackId(trackId), m_weakProject(project.shared_from_this())
-{
-    maybeReloadSettings();
-}
-
-bool Au3TrackSpectrogramConfiguration::maybeReloadSettings()
-{
-    if (!m_weakWaveTrack.expired()) {
-        return true;
->>>>>>> upstream/master
     }
     const auto project = m_weakProject.lock();
     IF_ASSERT_FAILED(project) {

@@ -42,14 +42,9 @@ std::string Au3WrapModule::moduleName() const
 
 void Au3WrapModule::registerExports()
 {
-<<<<<<< HEAD
     m_au3BasicUi = std::make_shared<Au3BasicUI>();
 
     ioc()->registerExport<IAu3ProjectCreator>(moduleName(), new Au3ProjectCreator());
-=======
-    globalIoc()->registerExport<IAu3ProjectCreator>(moduleName(), new Au3ProjectCreator());
-    globalIoc()->registerExport<IAu3ProjectReader>(moduleName(), new Au3ProjectReader());
->>>>>>> upstream/master
 }
 
 void Au3WrapModule::onPreInit(const muse::IApplication::RunMode&)

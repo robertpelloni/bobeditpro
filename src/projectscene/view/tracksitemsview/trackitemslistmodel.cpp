@@ -14,11 +14,7 @@ constexpr int CACHE_BUFFER_PX = 200;
 constexpr double MOVE_THRESHOLD = 3.0;
 
 TrackItemsListModel::TrackItemsListModel(QObject* parent)
-<<<<<<< HEAD
     : QAbstractListModel(parent)
-=======
-    : QAbstractListModel(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
->>>>>>> upstream/master
 {
 }
 

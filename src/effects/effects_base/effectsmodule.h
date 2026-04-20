@@ -24,10 +24,6 @@ public:
     void registerUiTypes() override;
     void onPreInit(const muse::IApplication::RunMode& mode) override;
     void onInit(const muse::IApplication::RunMode& mode) override;
-<<<<<<< HEAD
-=======
-    void onDeinit() override;
->>>>>>> upstream/master
     void onDelayedInit() override;
 
     muse::modularity::IContextSetup* newContext(const muse::modularity::ContextPtr& ctx) const override;

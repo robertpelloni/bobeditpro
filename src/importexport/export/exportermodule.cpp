@@ -35,10 +35,7 @@ std::string ExporterModule::moduleName() const
 
 void ExporterModule::registerExports()
 {
-<<<<<<< HEAD
     m_exporter = std::make_shared<Au3Exporter>();
-=======
->>>>>>> upstream/master
     m_configuration = std::make_shared<ExportConfiguration>();
     m_ffmpegOptionsAccessor = std::make_shared<Au3FFmpegOptionsAccessor>();
 
@@ -48,11 +45,7 @@ void ExporterModule::registerExports()
 
 void ExporterModule::resolveImports()
 {
-<<<<<<< HEAD
     auto ir = ioc()->resolve<muse::ui::IInteractiveUriRegister>(moduleName());
-=======
-    auto ir = globalIoc()->resolve<muse::interactive::IInteractiveUriRegister>(mname);
->>>>>>> upstream/master
     if (ir) {
         ir->registerQmlUri(Uri("audacity://project/export"), "Export/ExportDialog.qml");
         ir->registerQmlUri(Uri("audacity://project/export/ffmpeg"), "Export/CustomFFmpegDialog.qml");

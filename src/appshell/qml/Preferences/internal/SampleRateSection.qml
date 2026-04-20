@@ -56,7 +56,7 @@ BaseSection {
             navigation.row: 1
             navigation.column: 0
 
-            onValueEdited: function(newIndex, newValue) {
+            onValueEdited: function (newIndex, newValue) {
                 apiModel.defaultSampleRateSelected(newValue)
             }
         }
@@ -75,7 +75,7 @@ BaseSection {
             navigation.row: 1
             navigation.column: 1
 
-            onValueEdited: function(newIndex, newValue) {
+            onValueEdited: function (newIndex, newValue) {
                 apiModel.defaultSampleFormatSelected(newValue)
             }
         }
@@ -102,7 +102,7 @@ BaseSection {
             navigation.row: 2
             navigation.column: 0
 
-            onValueEdited: function(newValue) {
+            onValueEdited: function (newValue) {
                 apiModel.defaultSampleRateValueSelected(newValue)
             }
         }
@@ -130,14 +130,11 @@ BaseSection {
 =======
 >>>>>>> upstream/master:src/preferences/qml/Audacity/Preferences/internal/SampleRateSection.qml
     StyledTextLabel {
-        text: qsTrc("preferences",
-                "Default sample rates and formats apply to newly created tracks only. " +
-                "Recording into existing tracks will use the track\'s sample rate and format instead.")
+        text: qsTrc("preferences", "Default sample rates and formats apply to newly created tracks only. " + "Recording into existing tracks will use the track’s sample rate and format instead.")
         width: root.width
 
         horizontalAlignment: Text.AlignLeft
 
         wrapMode: Text.WordWrap
-
     }
 }

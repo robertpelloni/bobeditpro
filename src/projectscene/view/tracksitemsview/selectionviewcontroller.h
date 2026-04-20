@@ -9,24 +9,12 @@
 #include "context/iglobalcontext.h"
 #include "trackedit/iselectioncontroller.h"
 #include "trackedit/itrackeditinteraction.h"
-<<<<<<< HEAD
-=======
-#include "spectrogram/view/spectrogramhit.h"
-#include "spectrogram/ifrequencyselectioncontroller.h"
-#include "spectrogram/ispectrogramservice.h"
-#include "spectrogram/iglobalspectrogramconfiguration.h"
-#include "trackedit/internal/itracknavigationcontroller.h"
->>>>>>> upstream/master
 
 #include "types/projectscenetypes.h"
 #include "../timeline/timelinecontext.h"
 
 namespace au::projectscene {
-<<<<<<< HEAD
 class SelectionViewController : public QObject
-=======
-class SelectionViewController : public QObject, public muse::async::Asyncable, public muse::Contextable
->>>>>>> upstream/master
 {
     Q_OBJECT
     Q_PROPERTY(TimelineContext * context READ timelineContext WRITE setTimelineContext NOTIFY timelineContextChanged FINAL)
@@ -35,21 +23,9 @@ class SelectionViewController : public QObject, public muse::async::Asyncable, p
     Q_PROPERTY(bool selectionEditInProgress READ selectionEditInProgress NOTIFY selectionEditInProgressChanged FINAL)
     Q_PROPERTY(bool selectionInProgress READ selectionInProgress NOTIFY selectionInProgressChanged FINAL)
 
-<<<<<<< HEAD
     muse::Inject<context::IGlobalContext> globalContext;
     muse::Inject<trackedit::ISelectionController> selectionController;
     muse::Inject<trackedit::ITrackeditInteraction> trackeditInteraction;
-=======
-    muse::GlobalInject<spectrogram::IGlobalSpectrogramConfiguration> spectrogramConfiguration;
-
-    muse::ContextInject<context::IGlobalContext> globalContext { this };
-    muse::ContextInject<trackedit::ISelectionController> selectionController { this };
-    muse::ContextInject<trackedit::ITrackeditInteraction> trackeditInteraction { this };
-    muse::ContextInject<trackedit::ITrackNavigationController> trackNavigationController { this };
-
-    muse::ContextInject<spectrogram::IFrequencySelectionController> frequencySelectionController { this };
-    muse::ContextInject<spectrogram::ISpectrogramService> spectrogramService { this };
->>>>>>> upstream/master
 
 public:
     SelectionViewController(QObject* parent = nullptr);
@@ -66,13 +42,7 @@ public:
     Q_INVOKABLE void onPositionChanged(double x, double y);
     Q_INVOKABLE void onReleased(double x, double y);
 
-<<<<<<< HEAD
     Q_INVOKABLE void onSelectionDraged(double x, double x2, bool completed);
-=======
-    Q_INVOKABLE void onSelectionHorizontalResize(double x, double x2, bool completed);
-    Q_INVOKABLE void startSelectionVerticalResize(spectrogram::SpectrogramHit hit, bool isTop);
-    Q_INVOKABLE void updateSelectionVerticalResize(double y, bool completed);
->>>>>>> upstream/master
 
     Q_INVOKABLE void selectTrackAudioData(double y);
     Q_INVOKABLE void selectItemData(const TrackItemKey& key);
@@ -103,10 +73,6 @@ private:
     IProjectViewStatePtr viewState() const;
     trackedit::TrackIdList trackIdList() const;
     void setSelection(double x1, double x2, bool complete);
-<<<<<<< HEAD
-=======
-    void setFrequencySelectionEdge(double y, bool complete = true, uintptr_t handle = 0); // If handle is 0, sets both
->>>>>>> upstream/master
 
     Qt::KeyboardModifiers keyboardModifiers() const;
 
@@ -120,14 +86,5 @@ private:
     bool m_selectionEditInProgress = false;
     QPointF m_startPoint;
     QPointF m_lastPoint;
-<<<<<<< HEAD
-=======
-
-    double spectrogramHitFrequency(const spectrogram::SpectrogramHit& hit, double y) const;
-    bool isInExtendedSpectrogram(const spectrogram::SpectrogramHit& hit, double y) const;
-
-    std::optional<const spectrogram::SpectrogramHit> m_spectrogramHit;
-    uintptr_t m_frequencyEdgeHandle = 0;
->>>>>>> upstream/master
 };
 }

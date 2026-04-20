@@ -21,19 +21,12 @@
  */
 #include "recentfilescontroller.h"
 
-<<<<<<< HEAD
 #include "global/concurrency/concurrent.h"
 #include "global/async/async.h"
 #include "global/defer.h"
 #include "global/serialization/json.h"
 
 #include "multiinstances/resourcelockguard.h"
-=======
-#include "framework/global/async/async.h"
-#include "framework/global/defer.h"
-#include "framework/global/serialization/json.h"
-#include "framework/multiwindows/resourcelockguard.h"
->>>>>>> upstream/master
 
 using namespace au::project;
 using namespace muse;
@@ -250,7 +243,6 @@ void RecentFilesController::saveRecentFilesList() const
         LOGE() << "Failed to save recent files list: " << ret.toString();
     }
 }
-<<<<<<< HEAD
 
 Promise<QPixmap> RecentFilesController::thumbnail(const muse::io::path_t& filePath) const
 {
@@ -307,5 +299,3 @@ void RecentFilesController::cleanUpThumbnailCache(const RecentFilesList& files) 
         }
     });
 }
-=======
->>>>>>> upstream/master

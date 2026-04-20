@@ -11,15 +11,7 @@
 #include "types/projectscenetypes.h"
 
 namespace au::projectscene {
-<<<<<<< HEAD
 class IProjectSceneConfiguration : MODULE_EXPORT_INTERFACE
-=======
-struct ClipColorInfo {
-    std::string name;
-    trackedit::ClipColorIndex index = 0;
-};
-class IProjectSceneConfiguration : MODULE_GLOBAL_INTERFACE
->>>>>>> upstream/master
 {
     INTERFACE_ID(IProjectSceneConfiguration)
 public:

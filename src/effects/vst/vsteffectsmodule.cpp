@@ -46,10 +46,7 @@ std::string VstEffectsModule::moduleName() const
 
 void VstEffectsModule::registerExports()
 {
-<<<<<<< HEAD
     m_vstEffectsRepository = std::make_shared<VstEffectsRepository>();
-=======
->>>>>>> upstream/master
     m_museVstModulesRepository = std::make_shared<MuseVstModulesRepository>();
     m_vstEffectsRepository = std::make_shared<VstEffectsRepository>();
 
@@ -69,15 +66,9 @@ void VstEffectsModule::resolveImports()
         metaReaderRegister->registerReader(m_vstMetaReader);
     }
 
-<<<<<<< HEAD
     auto lr = ioc()->resolve<IEffectViewLaunchRegister>(moduleName());
     if (lr) {
         lr->regLauncher("VST3", std::make_shared<Vst3ViewLauncher>());
-=======
-    auto paramExtractorRegistry = globalIoc()->resolve<IParameterExtractorRegistry>(mname);
-    if (paramExtractorRegistry) {
-        paramExtractorRegistry->registerExtractor(std::make_shared<VstParameterExtractorService>());
->>>>>>> upstream/master
     }
 
     auto loadersRegister = globalIoc()->resolve<IEffectLoadersRegister>(mname);

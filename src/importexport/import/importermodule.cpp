@@ -27,11 +27,7 @@ std::string ImporterModule::moduleName() const
 
 void ImporterModule::registerExports()
 {
-<<<<<<< HEAD
     m_importer = std::make_shared<Au3Importer>();
-=======
-    m_configuration = std::make_shared<ImporterConfiguration>();
->>>>>>> upstream/master
 
     globalIoc()->registerExport<IImporterConfiguration>(mname, m_configuration);
 }

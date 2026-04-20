@@ -31,11 +31,7 @@
 #include "appshelltypes.h"
 
 namespace au::appshell {
-<<<<<<< HEAD
 class IAppShellConfiguration : MODULE_EXPORT_INTERFACE
-=======
-class IAppShellConfiguration : MODULE_GLOBAL_INTERFACE
->>>>>>> upstream/master
 {
     INTERFACE_ID(IAppshellConfiguration)
 

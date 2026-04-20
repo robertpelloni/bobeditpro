@@ -2,6 +2,7 @@
 
 #include <QObject>
 #include <QTimer>
+#include <QVariantAnimation>
 
 #include "modularity/ioc.h"
 #include "context/iglobalcontext.h"
@@ -26,11 +27,7 @@ namespace au::projectscene {
 using Direction = DirectionType::Direction;
 
 class SnapTimeFormatter;
-<<<<<<< HEAD
 class TimelineContext : public QObject, public muse::async::Asyncable, public muse::actions::Actionable
-=======
-class TimelineContext : public QObject, public muse::async::Asyncable, public muse::actions::Actionable, public muse::Contextable
->>>>>>> upstream/master
 {
     Q_OBJECT
 
@@ -60,29 +57,16 @@ class TimelineContext : public QObject, public muse::async::Asyncable, public mu
     Q_PROPERTY(qreal verticalScrollbarSize READ verticalScrollbarSize NOTIFY verticalScrollChanged)
 
     Q_PROPERTY(bool playbackOnRulerClickEnabled READ playbackOnRulerClickEnabled NOTIFY playbackOnRulerClickEnabledChanged FINAL)
-<<<<<<< HEAD
 
     muse::Inject<muse::actions::IActionsDispatcher> dispatcher;
     muse::Inject<context::IGlobalContext> globalContext;
     muse::Inject<trackedit::ISelectionController> selectionController;
     muse::Inject<IProjectSceneConfiguration> configuration;
     muse::Inject<playback::IPlayback> playback;
-=======
-    Q_PROPERTY(
-        bool updateDisplayWhilePlayingEnabled READ updateDisplayWhilePlayingEnabled NOTIFY updateDisplayWhilePlayingEnabledChanged FINAL)
-    Q_PROPERTY(bool pinnedPlayHeadEnabled READ pinnedPlayHeadEnabled NOTIFY pinnedPlayHeadEnabledChanged FINAL)
-    Q_PROPERTY(double lastPlaybackSeekPosition READ lastPlaybackSeekPosition NOTIFY lastPlaybackSeekPositionChanged FINAL)
-
-    muse::GlobalInject<IProjectSceneConfiguration> configuration;
-
-    muse::ContextInject<muse::actions::IActionsDispatcher> dispatcher{ this };
-    muse::ContextInject<context::IGlobalContext> globalContext{ this };
-    muse::ContextInject<trackedit::ISelectionController> selectionController{ this };
-    muse::ContextInject<playback::IPlayback> playback{ this };
-    muse::ContextInject<playback::IPlaybackController> playbackController{ this };
->>>>>>> upstream/master
 
 public:
+
+    static constexpr int ANIMATION_DURATION_MS = 500;
 
     TimelineContext(QObject* parent = nullptr);
 
@@ -128,6 +112,7 @@ public:
     Q_INVOKABLE void scrollVertical(qreal newPos);
 
     Q_INVOKABLE void insureVisible(double posSec);
+    Q_INVOKABLE void animatedInsureVisible(double posSec);
     Q_INVOKABLE void startAutoScroll(double posSec);
     Q_INVOKABLE void stopAutoScroll();
 
@@ -145,6 +130,10 @@ public:
     void moveToFrameTime(double startTime);
     void shiftFrameTime(double secs);
 
+    void animatedCenterOnTime(double secs);
+    bool isAnimating() const;
+    void stopAnimation();
+
     qreal startHorizontalScrollPosition() const;
     qreal horizontalScrollbarSize() const;
 
@@ -156,12 +145,6 @@ public:
     Q_INVOKABLE void updateSelectedItemTime();
 
     bool playbackOnRulerClickEnabled() const;
-<<<<<<< HEAD
-=======
-    bool updateDisplayWhilePlayingEnabled() const;
-    bool pinnedPlayHeadEnabled() const;
-    double lastPlaybackSeekPosition() const;
->>>>>>> upstream/master
 
 signals:
 
@@ -193,15 +176,6 @@ signals:
 
     void playbackOnRulerClickEnabledChanged();
 
-<<<<<<< HEAD
-=======
-    void updateDisplayWhilePlayingEnabledChanged();
-    void pinnedPlayHeadEnabledChanged();
-    void lastPlaybackSeekPositionChanged();
-
-    void userHorizontalScrolled();
-
->>>>>>> upstream/master
 private:
     trackedit::ITrackeditProjectPtr trackEditProject() const;
     IProjectViewStatePtr viewState() const;
@@ -230,6 +204,7 @@ private:
     void shiftFrameTimeOnStep(int direction);
     void updateFrameTime();
     void autoScrollView(double scrollStep);
+    void animateToFrameTime(double targetStartTime);
 
     void setSelectionStartTime(double time);
     void setSelectionEndTime(double time);
@@ -284,5 +259,7 @@ private:
 
     QTimer m_scrollTimer;
     double m_autoScrollStep = 0.0;
+
+    QVariantAnimation m_frameStartAnimation;
 };
 }

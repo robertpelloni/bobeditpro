@@ -46,25 +46,9 @@ public:
     void resolveImports() override;
     void onInit(const muse::IApplication::RunMode& mode) override;
 
-<<<<<<< HEAD
     void registerResources() override;
     void registerUiTypes() override;
 
-=======
-    muse::modularity::IContextSetup* newContext(const muse::modularity::ContextPtr& ctx) const override;
-
-private:
-    std::shared_ptr<AppShellConfiguration> m_appShellConfiguration;
-};
-
-class AppShellContext : public muse::modularity::IContextSetup
-{
-public:
-    AppShellContext(const muse::modularity::ContextPtr& ctx)
-        : muse::modularity::IContextSetup(ctx) {}
-
-    void registerExports() override;
->>>>>>> upstream/master
     void onPreInit(const muse::IApplication::RunMode& mode) override;
     void onInit(const muse::IApplication::RunMode& mode) override;
     void onAllInited(const muse::IApplication::RunMode& mode) override;

@@ -104,7 +104,6 @@ void ProjectSceneModule::registerResources()
 
 void ProjectSceneModule::registerExports()
 {
-<<<<<<< HEAD
     m_projectSceneActionsController = std::make_shared<ProjectSceneActionsController>();
     m_uiActions = std::make_shared<ProjectSceneUiActions>(m_projectSceneActionsController);
     m_configuration = std::make_shared<ProjectSceneConfiguration>();
@@ -118,12 +117,6 @@ void ProjectSceneModule::registerExports()
     ioc()->registerExport<IConnectingDotsPainter>(moduleName(), new ConnectingDotsPainter());
     ioc()->registerExport<IMinMaxRMSPainter>(moduleName(), new MinMaxRMSPainter());
     ioc()->registerExport<ISamplesPainter>(moduleName(), new SamplesPainter());
-=======
-    m_configuration = std::make_shared<ProjectSceneConfiguration>();
-
-    globalIoc()->registerExport<IProjectSceneConfiguration>(mname, m_configuration);
-    globalIoc()->registerExport<IProjectViewStateCreator>(mname, std::make_shared<ProjectViewStateCreator>());
->>>>>>> upstream/master
 }
 
 void ProjectSceneModule::resolveImports()

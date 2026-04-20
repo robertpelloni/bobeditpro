@@ -14,7 +14,6 @@
 #include "../ieffectinstancesregister.h"
 
 namespace au::effects {
-<<<<<<< HEAD
 class EffectPresetsScenario : public IEffectPresetsScenario
 {
     muse::Inject<muse::IInteractive> interactive;
@@ -24,19 +23,6 @@ class EffectPresetsScenario : public IEffectPresetsScenario
 
 public:
     EffectPresetsScenario() = default;
-=======
-class EffectPresetsScenario : public IEffectPresetsScenario, public muse::Contextable
-{
-    muse::GlobalInject<muse::IGlobalConfiguration> globalConfiguration;
-    muse::GlobalInject<IEffectInstancesRegister> instancesRegister;
-
-    muse::Inject<muse::IInteractive> interactive{ this };
-    muse::Inject<IEffectPresetsProvider> presetsProvider{ this };
-
-public:
-    EffectPresetsScenario(const muse::modularity::ContextPtr& ctx)
-        : muse::Contextable(ctx) {}
->>>>>>> upstream/master
 
     void loadPreset(const EffectInstanceId& effectInstanceId, const PresetId& presetId) override;
     void savePresetAs(const EffectInstanceId& effectInstanceId) override;

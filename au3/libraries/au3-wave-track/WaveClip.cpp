@@ -1096,12 +1096,7 @@ static constexpr auto ClipStretchToMatchTempo_attr = "clipStretchToMatchTempo";
 static constexpr auto ClipTempo_attr = "clipTempo";
 static constexpr auto Name_attr = "name";
 static constexpr auto GroupId_attr = "groupId";
-<<<<<<< HEAD
 static constexpr auto Color_attr = "color";
-=======
-static constexpr auto ColorIndex_attr = "colorindex";
-static constexpr auto Selected_attr = "isSelected";
->>>>>>> upstream/master
 
 bool WaveClip::HandleXMLTag(const std::string_view& tag, const AttributesList& attrs)
 {
@@ -1254,12 +1249,7 @@ void WaveClip::WriteXML(size_t ii, XMLWriter& xmlFile) const
     xmlFile.WriteAttr(ClipStretchToMatchTempo_attr, mStretchToMatchProjectTempo);
     xmlFile.WriteAttr(Name_attr, mName);
     xmlFile.WriteAttr(GroupId_attr, static_cast<long>(mGroupId));
-<<<<<<< HEAD
     xmlFile.WriteAttr(Color_attr, mColor);
-=======
-    xmlFile.WriteAttr(ColorIndex_attr, mColorIndex);
-    xmlFile.WriteAttr(Selected_attr, mSelected);
->>>>>>> upstream/master
 
     if (mClipTempo) {
         xmlFile.WriteAttr(ClipTempo_attr, *mClipTempo, 8);

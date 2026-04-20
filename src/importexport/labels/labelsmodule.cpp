@@ -35,13 +35,9 @@ void LabelsModule::registerExports()
 {
     m_configuration = std::make_shared<LabelsConfiguration>();
 
-<<<<<<< HEAD
     ioc()->registerExport<ILabelsImporter>(moduleName(), new Au3LabelsImporter());
     ioc()->registerExport<ILabelsExporter>(moduleName(), new Au3LabelsExporter());
     ioc()->registerExport<ILabelsConfiguration>(moduleName(), m_configuration);
-=======
-    globalIoc()->registerExport<ILabelsConfiguration>(mname, m_configuration);
->>>>>>> upstream/master
 }
 
 void LabelsModule::registerResources()
@@ -56,11 +52,7 @@ void LabelsModule::registerUiTypes()
 
 void LabelsModule::resolveImports()
 {
-<<<<<<< HEAD
     auto ir = ioc()->resolve<muse::ui::IInteractiveUriRegister>(moduleName());
-=======
-    auto ir = globalIoc()->resolve<muse::interactive::IInteractiveUriRegister>(mname);
->>>>>>> upstream/master
     if (ir) {
         ir->registerQmlUri(Uri("audacity://project/export/labels"), "Export/ExportLabelsDialog.qml");
     }

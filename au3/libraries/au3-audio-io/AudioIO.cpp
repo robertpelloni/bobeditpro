@@ -975,14 +975,9 @@ int AudioIO::StartStream(const TransportSequences& sequences,
     // Clamp lead-in time so we don't play before time 0
     const auto leadInTime = std::max(0.0, std::min(t0, options.leadInTime));
     mRecordingSchedule = {};
-<<<<<<< HEAD
     mRecordingSchedule.mPreRoll = preRoll;
     mRecordingSchedule.mLatencyCorrection
         =AudioIOLatencyCorrection.Read() / 1000.0;
-=======
-    mRecordingSchedule.mLeadInTime = leadInTime;
-    mRecordingSchedule.mLatencyCompensation = AudioIOLatencyCompensation.Read() / 1000.0;
->>>>>>> upstream/master
     mRecordingSchedule.mDuration = t1 - t0;
     if (options.pCrossfadeData) {
         mRecordingSchedule.mCrossfadeData.swap(*options.pCrossfadeData);

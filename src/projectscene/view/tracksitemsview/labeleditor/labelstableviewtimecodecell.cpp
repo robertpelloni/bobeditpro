@@ -8,19 +8,11 @@
 using namespace au::projectscene;
 
 LabelsTableViewTimecodeCell::LabelsTableViewTimecodeCell(QObject* parent)
-<<<<<<< HEAD
     : muse::uicomponents::TableViewCell(parent)
-=======
-    : muse::uicomponents::TableViewCell(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
->>>>>>> upstream/master
 {
 }
 
 LabelsTableViewTimecodeCell::LabelsTableViewTimecodeCell(const TableViewCell* other)
-<<<<<<< HEAD
-=======
-    : muse::uicomponents::TableViewCell(other->parent()), muse::Contextable(muse::iocCtxForQmlObject(this))
->>>>>>> upstream/master
 {
     setValue(other->value());
 }

@@ -10,24 +10,12 @@
 #include "async/asyncable.h"
 
 namespace au::projectscene {
-<<<<<<< HEAD
 class RealtimeEffectPanelTrackSelection : public IRealtimeEffectPanelTrackSelection, muse::async::Asyncable
 {
     muse::Inject<trackedit::ISelectionController> selectionController;
     muse::Inject<context::IGlobalContext> globalContext;
 
 public:
-=======
-class RealtimeEffectPanelTrackSelection : public IRealtimeEffectPanelTrackSelection, muse::async::Asyncable, public muse::Contextable
-{
-    muse::ContextInject<trackedit::ISelectionController> selectionController{ this };
-    muse::ContextInject<context::IGlobalContext> globalContext{ this };
-
-public:
-    RealtimeEffectPanelTrackSelection(const muse::modularity::ContextPtr& ctx)
-        : muse::Contextable(ctx) {}
-
->>>>>>> upstream/master
     void init();
 
     std::optional<au::trackedit::TrackId> selectedTrackId() const override;

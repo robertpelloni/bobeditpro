@@ -20,11 +20,6 @@
 #include "au3-string-utils/CodeConversions.h"
 #include "au3-preferences/Prefs.h"
 
-<<<<<<< HEAD
-=======
-#include <rapidjson/document.h>
-#include <rapidjson/writer.h>
->>>>>>> upstream/master
 #include "au3-network-manager/IResponse.h"
 #include "au3-network-manager/NetworkManager.h"
 #include "au3-network-manager/Request.h"

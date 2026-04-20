@@ -113,17 +113,6 @@ void PlaybackToolBarModel::reload()
     updateStates();
 }
 
-<<<<<<< HEAD
-=======
-void PlaybackToolBarModel::setupProjectConnections(project::IAudacityProject& project)
-{
-    const auto vs = project.viewState();
-    vs->clipGainAutomationEnabled().ch.onReceive(this, [this](bool){ updateClipGainAutomationState(); });
-    vs->splitToolEnabled().ch.onReceive(this, [this](bool){ updateSplitState(); });
-    vs->globalSpectrogramToggleIsOnChanged().onNotify(this, [this] { updateGlobalSpectrogramViewState(); });
-}
-
->>>>>>> upstream/master
 void PlaybackToolBarModel::onActionsStateChanges(const muse::actions::ActionCodeList& codes)
 {
     if (containsAction(codes, PLAYBACK_PLAY_QUERY.toString()) || containsAction(codes, PLAYBACK_PAUSE_QUERY.toString())
@@ -309,33 +298,7 @@ void PlaybackToolBarModel::updateSplitState()
         backgroundColor = QColor(uiConfiguration()->currentTheme().values.value(muse::ui::ACCENT_COLOR).toString());
     }
 
-<<<<<<< HEAD
     item->setIconColor(iconColor);
-=======
-    item->setBackgroundColor(backgroundColor);
-}
-
-void PlaybackToolBarModel::updateGlobalSpectrogramViewState()
-{
-    auto prj = context()->currentProject();
-
-    if (!prj) {
-        return;
-    }
-
-    PlaybackToolBarControlItem* const item
-        = dynamic_cast<PlaybackToolBarControlItem*>(findItemPtr(TOGGLE_GLOBAL_SPECTROGRAM_VIEW_ACTION_CODE));
-
-    if (item == nullptr) {
-        return;
-    }
-
-    const auto vs = prj->viewState();
-    const bool isOn = vs->globalSpectrogramToggleIsOn();
-    item->setSelected(isOn);
-    const auto key = isOn ? muse::ui::ThemeStyleKey::ACCENT_COLOR : muse::ui::ThemeStyleKey::BUTTON_COLOR;
-    const QColor backgroundColor{ uiConfiguration()->currentTheme().values.value(key).toString() };
->>>>>>> upstream/master
     item->setBackgroundColor(backgroundColor);
 }
 

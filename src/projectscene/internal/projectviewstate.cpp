@@ -130,34 +130,11 @@ void setVerticalDisplayBounds(const std::shared_ptr<au::project::IAudacityProjec
     cache.SetDisplayBounds(bounds.first, bounds.second);
 }
 
-<<<<<<< HEAD
 int getTrackRulerType(std::shared_ptr<au::project::IAudacityProject> project, const au::trackedit::TrackId& trackId)
 {
     au::au3::Au3Project* au3Project = reinterpret_cast<au::au3::Au3Project*>(project->au3ProjectPtr());
 
     au::au3::Au3Track* track = au::au3::DomAccessor::findTrack(*au3Project, au::au3::Au3TrackId(trackId));
-=======
-au::trackedit::TrackViewType getTrackViewType(const std::shared_ptr<au::project::IAudacityProject>& project,
-                                              const au::trackedit::TrackId& trackId)
-{
-    const au::au3::Au3Project* au3Project = reinterpret_cast<au::au3::Au3Project*>(project->au3ProjectPtr());
-
-    const au::au3::Au3WaveTrack* waveTrack = au::au3::DomAccessor::findWaveTrack(*au3Project, au::au3::Au3TrackId(trackId));
-    if (waveTrack == nullptr) {
-        return au::trackedit::TrackViewType::Undefined;
-    }
-
-    const auto& cache = au::au3::TrackViewTypeAttachment::Get(waveTrack);
-    const auto viewType = cache.GetTrackViewType();
-    return viewType == au::trackedit::TrackViewType::Undefined ? au::trackedit::TrackViewType::Waveform : viewType;
-}
-
-int getTrackRulerType(const std::shared_ptr<au::project::IAudacityProject>& project, const au::trackedit::TrackId& trackId)
-{
-    const au::au3::Au3Project* au3Project = reinterpret_cast<const au::au3::Au3Project*>(project->au3ProjectPtr());
-
-    const au::au3::Au3Track* track = au::au3::DomAccessor::findTrack(*au3Project, au::au3::Au3TrackId(trackId));
->>>>>>> upstream/master
     if (track == nullptr) {
         return static_cast<int>(au::trackedit::TrackRulerType::Linear);
     }
@@ -180,16 +157,7 @@ void setTrackRulerType(const std::shared_ptr<au::project::IAudacityProject>& pro
 }
 }
 
-<<<<<<< HEAD
 ProjectViewState::ProjectViewState(std::shared_ptr<au::au3::IAu3Project> project)
-=======
-ProjectViewState::ProjectViewState(const muse::modularity::ContextPtr& ctx)
-    : muse::Contextable(ctx)
-{
-}
-
-void ProjectViewState::init(const std::shared_ptr<au3::IAu3Project>& project)
->>>>>>> upstream/master
 {
     configuration()->setIsEffectsPanelVisible(false);
     qApp->installEventFilter(this);
@@ -791,84 +759,6 @@ void ProjectViewState::toggleHalfWave(const trackedit::TrackId& trackId)
     }
 }
 
-<<<<<<< HEAD
-=======
-muse::ValCh<au::trackedit::TrackViewType> ProjectViewState::trackViewType(const au::trackedit::TrackId& trackId) const
-{
-    auto it = m_tracks.find(trackId);
-    if (it != m_tracks.end()) {
-        return it->second.viewType;
-    }
-
-    const ProjectViewState::TrackData& d = makeTrackData(trackId);
-    return d.viewType;
-}
-
-void ProjectViewState::setTrackViewType(const trackedit::TrackId& trackId, trackedit::TrackViewType viewType)
-{
-    if (trackViewType(trackId).val == viewType) {
-        return;
-    }
-
-    const auto project = globalContext()->currentProject();
-    if (!project) {
-        return;
-    }
-
-    if (doSetTrackViewType(trackId, viewType)) {
-        projectHistory()->modifyState();
-        projectHistory()->markUnsaved();
-    }
-}
-
-void ProjectViewState::toggleGlobalSpectrogramView()
-{
-    const auto prj = globalContext()->currentProject();
-    IF_ASSERT_FAILED(prj) {
-        return;
-    }
-    auto changed = false;
-    using namespace trackedit;
-
-    if (!m_globalSpectrogramToggleIsOn) {
-        // Enable spectrogram view: convert ALL waveform and multi-view tracks to spectrogram
-        for (auto& [trackId, trackData] : m_tracks) {
-            if (trackData.viewType.val == TrackViewType::Waveform || trackData.viewType.val == TrackViewType::WaveformAndSpectrogram) {
-                changed = true;
-                doSetTrackViewType(trackId, TrackViewType::Spectrogram);
-            }
-        }
-    } else {
-        // Disable spectrogram view: convert ALL spectrogram and multi-view tracks back to waveform
-        for (auto& [trackId, trackData] : m_tracks) {
-            if (trackData.viewType.val == TrackViewType::Spectrogram || trackData.viewType.val == TrackViewType::WaveformAndSpectrogram) {
-                changed = true;
-                trackData.viewType.set(TrackViewType::Waveform);
-                doSetTrackViewType(trackId, TrackViewType::Waveform);
-            }
-        }
-    }
-
-    m_globalSpectrogramToggleIsOn = !m_globalSpectrogramToggleIsOn;
-    m_globalSpectrogramToggleIsOnChanged.notify();
-
-    if (changed) {
-        projectHistory()->modifyState();
-        projectHistory()->markUnsaved();
-    }
-}
-
-bool ProjectViewState::globalSpectrogramToggleIsOn() const
-{
-    return m_globalSpectrogramToggleIsOn;
-}
-
-muse::async::Notification ProjectViewState::globalSpectrogramToggleIsOnChanged() const
-{
-    return m_globalSpectrogramToggleIsOnChanged;
-}
-
->>>>>>> upstream/master
 muse::ValCh<int> ProjectViewState::trackRulerType(const trackedit::TrackId& trackId) const
 {
     auto it = m_tracks.find(trackId);

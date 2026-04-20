@@ -5,7 +5,6 @@
 
 #include "framework/global/log.h"
 #include "effects/effects_base/effectstypes.h"
-<<<<<<< HEAD
 #include "effects/effects_base/internal/effectsutils.h"
 #include "effects/effects_base/view/effectsviewutils.h"
 
@@ -56,8 +55,6 @@
 #include "changepitch/changepitcheffect.h"
 #include "changepitch/changepitchviewmodel.h"
 #endif
-=======
->>>>>>> upstream/master
 
 #include <QtQml>
 #include <algorithm>
@@ -69,7 +66,6 @@ void BuiltinEffectsRepository::registerMeta(const EffectMeta& meta)
     IF_ASSERT_FAILED(meta.isValid()) {
         LOGW() << "Trying to register invalid meta with id: " << meta.id.toStdString();
     }
-<<<<<<< HEAD
 
     if (hasDynamicRangeProcessor) {
         // These types are used by both Compressor and Limiter, so register them only if at least one of these effects is present.
@@ -85,10 +81,6 @@ void BuiltinEffectsRepository::registerMeta(const EffectMeta& meta)
         qmlRegisterType<OutputDbMeterModel>("Audacity.BuiltinEffects", 1, 0, "OutputDbMeterModel");
         qmlRegisterType<Stopwatch>("Audacity.BuiltinEffects", 1, 0, "Stopwatch");
         qmlRegisterType<DynamicsPlayStateModel>("Audacity.BuiltinEffects", 1, 0, "DynamicsPlayStateModel");
-=======
-    IF_ASSERT_FAILED(std::none_of(m_metas.begin(), m_metas.end(), [&meta](const EffectMeta& m) { return m.id == meta.id; })) {
-        LOGW() << "Registering meta with duplicate id: " << meta.id.toStdString();
->>>>>>> upstream/master
     }
     m_metas.push_back(meta);
     m_effectMetaListUpdated.notify();

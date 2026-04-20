@@ -14,12 +14,7 @@ class Au3LabelsExporter : public ILabelsExporter, public muse::Contextable
     muse::ContextInject<context::IGlobalContext> globalContext = { this };
 
 public:
-<<<<<<< HEAD
     Au3LabelsExporter() = default;
-=======
-    Au3LabelsExporter(const muse::modularity::ContextPtr& ctx)
-        : muse::Contextable(ctx) {}
->>>>>>> upstream/master
 
     muse::Ret exportData(const muse::io::path_t& filePath, const trackedit::TrackIdList& includedLabelTracksIds = {}) override;
 };

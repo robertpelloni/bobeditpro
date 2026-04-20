@@ -37,15 +37,6 @@ static const QString OPEN_PROJECT_URL_HOSTNAME("open-project");
 
 static const muse::actions::ActionCode OPEN_CUSTOM_FFMPEG_OPTIONS("open-custom-ffmpeg-options");
 static const muse::actions::ActionCode OPEN_METADATA_DIALOG("open-metadata-dialog");
-<<<<<<< HEAD
-=======
-static const muse::actions::ActionCode OPEN_CUSTOM_MAPPING("open-custom-mapping");
-
-ProjectActionsController::ProjectActionsController(muse::modularity::ContextPtr ctx)
-    : muse::Contextable(ctx)
-{
-}
->>>>>>> upstream/master
 
 void ProjectActionsController::init()
 {
@@ -75,18 +66,9 @@ void ProjectActionsController::init()
         // reset preferred export sample rate
         exportConfiguration()->setExportSampleRate(-1);
 
-<<<<<<< HEAD
         //! TODO AU4
         bool quitApp = false; //multiInstancesProvider()->instances().size() > 1;
         closeOpenedProject(quitApp);
-=======
-        if (multiwindowsProvider()->windowCount() > 1) {
-            mainWindow()->qWindow()->close();
-            return;
-        }
-
-        closeOpenedProject(false);
->>>>>>> upstream/master
     });
 
     dispatcher()->reg(this, OPEN_CUSTOM_FFMPEG_OPTIONS, this, &ProjectActionsController::openCustomFFmpegOptions);
@@ -188,20 +170,14 @@ void ProjectActionsController::newProject()
     if (globalContext()->currentProject()) {
         //! Check, if any project is already open in the current window
         //! and there is already a created instance without a project, then activate it
-<<<<<<< HEAD
         if (multiInstancesProvider()->isHasAppInstanceWithoutProject()) {
             multiInstancesProvider()->activateWindowWithoutProject();
-=======
-        if (multiwindowsProvider()->isHasWindowWithoutProject()) {
-            multiwindowsProvider()->activateWindowWithoutProject();
->>>>>>> upstream/master
             return;
         }
 
         //! Otherwise, we will create a new instance
         QStringList args;
         args << "--session-type" << "start-with-new";
-<<<<<<< HEAD
         multiInstancesProvider()->openNewAppInstance(args);
 #else
         LOGE() << "Has current project, but no multiinstance module, create new unable, need close current";
@@ -216,13 +192,6 @@ void ProjectActionsController::newProject()
 
     projectHistory()->init();
 
-=======
-        multiwindowsProvider()->openNewWindow(args);
-        return;
-    }
-
-    createProjectInCurrentWindow();
->>>>>>> upstream/master
     openPageIfNeed(PROJECT_PAGE_URI);
 }
 
@@ -775,14 +744,9 @@ muse::Ret ProjectActionsController::openProject(const muse::io::path_t& path, co
     }
 
     //! Step 3. Check, if the project already opened in another window, then activate the window with the project
-<<<<<<< HEAD
 #ifdef MU_BUILD_MULTIINSTANCE_MODULE
     if (multiInstancesProvider()->isProjectAlreadyOpened(actualPath)) {
         multiInstancesProvider()->activateWindowWithProject(actualPath);
-=======
-    if (multiwindowsProvider()->isProjectAlreadyOpened(actualPath)) {
-        multiwindowsProvider()->activateWindowWithProject(actualPath);
->>>>>>> upstream/master
         return make_ret(Ret::Code::Ok);
     }
 
@@ -795,15 +759,8 @@ muse::Ret ProjectActionsController::openProject(const muse::io::path_t& path, co
         if (!displayNameOverride.isEmpty()) {
             args << "--score-display-name-override" << displayNameOverride;
         }
-<<<<<<< HEAD
 #ifdef MU_BUILD_MULTIINSTANCE_MODULE
         multiInstancesProvider()->openNewAppInstance(args);
-=======
-        if (!projectId.empty()) {
-            args << "--cloud-project-id" << projectId;
-        }
-        multiwindowsProvider()->openNewWindow(args);
->>>>>>> upstream/master
         return make_ret(Ret::Code::Ok);
     }
 
@@ -1160,337 +1117,3 @@ void ProjectActionsController::openMetadataDialog()
 {
     interactive()->open(METADATA_DIALOG_URI);
 }
-<<<<<<< HEAD
-=======
-
-void ProjectActionsController::openCustomMapping()
-{
-    interactive()->open(CUSTOM_MAPPING);
-}
-
-muse::Ret ProjectActionsController::ensureAuthorization()
-{
-    if (authorization()->isAuthorized()) {
-        return make_ret(Ret::Code::Ok);
-    }
-
-    muse::actions::ActionQuery query("audacity://cloud/open-signin-dialog");
-    query.addParam("sync", muse::Val(true));
-    query.addParam("showTourPage", muse::Val(false));
-
-    dispatcher()->dispatch(query);
-
-    return authorization()->isAuthorized() ? make_ret(Ret::Code::Ok) : make_ret(Ret::Code::Cancel);
-}
-
-namespace {
-const char* OPEN_SYNC_ERROR_TITLE = "Cloud sync failed";
-const char* OPEN_SYNC_ERROR_MESSAGE = "Opened from local copy. Your project may not be up to date.";
-const char* OPEN_SYNC_ERROR_NO_LOCAL_FILE_MESSAGE = "No local copy is available. Could not open the project.";
-
-const char* OPEN_DEFAULT_ERROR_TITLE = "Cannot open cloud project";
-const char* OPEN_DEFAULT_ERROR_MESSAGE = "An error occurred while opening the cloud project.";
-
-const char* OPEN_CONFLICT_TITLE = "Project version conflict";
-const char* OPEN_CONFLICT_MESSAGE
-    = "There is a newer version of this project on audio.com. You can open your local version or discard it and download the latest.";
-const char* OPEN_CONFLICT_LOCAL_BTN = "Open local version";
-const char* OPEN_CONFLICT_REMOTE_BTN = "Discard and open latest";
-
-const char* SAVE_CONFLICT_TITLE = "Project version conflict";
-const char* SAVE_CONFLICT_MESSAGE
-    =
-        "A newer version of this project exists on audio.com. You can overwrite it with your local version or discard your changes and open the latest version.";
-const char* SAVE_CONFLICT_LOCAL_BTN = "Overwrite cloud version";
-const char* SAVE_CONFLICT_REMOTE_BTN = "Discard and open latest";
-
-const char* OPEN_FORBIDDEN_TITLE = "Access denied";
-const char* OPEN_FORBIDDEN_MESSAGE
-    = "You don’t have permission to sync this project. It may belong to a different account. Opened from local copy.";
-const char* OPEN_FORBIDDEN_NO_LOCAL_FILE_MESSAGE
-    = "You don’t have access to this cloud project. It may belong to a different account.";
-
-const char* SAVE_FORBIDDEN_TITLE = "Access denied";
-const char* SAVE_FORBIDDEN_MESSAGE
-    = "You don’t have permission to save this project to the cloud. It may belong to a different account.";
-
-const char* OPEN_NOT_FOUND_ERROR_TITLE = "Cloud project unavailable";
-const char* OPEN_NOT_FOUND_ERROR_MESSAGE
-    = "Your project is no longer linked to its previous cloud save. This may happen if the cloud version was deleted.\n\n"
-      "Save to audio.com to re-upload this project to the cloud.";
-const char* OPEN_NOT_FOUND_ERROR_NO_LOCAL_FILE_MESSAGE
-    =
-        "Your project is no longer linked to its previous cloud save and no local copy is available. This may happen if the cloud version was deleted.";
-const char* PRJ_SIZE_EXCEEDED_TITLE = "Project size limit exceeded";
-const char* PRJ_SIZE_EXCEEDED_TEXT
-    = "Your project exceeds the maximum size of 10GB. Please consider reducing its size or save it to your computer.";
-
-const char* PRJ_LIMIT_REACHED_TITLE = "Your project limit has been reached";
-const char* PRJ_LIMIT_REACHED_TEXT
-    =
-        "You have used up all of your available projects. Visit the project page on audio.com to make room for new creations.\n\nYou can also save this project on your computer to avoid losing changes.";
-
-const char* CLOUD_SAVE_UNAVAILABLE_TITLE = "Cloud save unavailable";
-const char* CLOUD_SAVE_UNAVAILABLE_TEXT
-    =
-        "Your project is no longer linked to its previous cloud save. This may happen if the cloud version was deleted.\n\nSave to audio.com to re-upload this project to the cloud.";
-
-const char* DEFAULT_SYNC_ERROR_TITLE = "We encountered an issue syncing your file";
-const char* DEFAULT_SYNC_ERROR_TEXT
-    =
-        "Don’t worry, your changes will be saved to a temporary location and will be synchronized to your cloud copy when your internet connection resumes.";
-
-const char* DEFAULT_CLOUD_ERROR_TITLE = "Cloud error";
-const char* DEFAULT_CLOUD_ERROR_TEXT = "An error occurred while syncing with the cloud. Please try again later.";
-}
-
-void ProjectActionsController::handleCloudOpenError(const muse::Ret& error, const io::path_t& localPath)
-{
-    using Err = au::au3cloud::Err;
-    const auto err = static_cast<Err>(error.code());
-
-    switch (err) {
-    case Err::SyncResultConnectionFailed:
-    case Err::SyncResultUnexpectedResponse:
-    case Err::SyncResultInternalClientError:
-    case Err::SyncResultInternalServerError:
-    case Err::SyncResultSyncImpossible:
-    case Err::SyncResultCancelled: {
-        if (fileSystem()->exists(localPath)) {
-            doOpenProject(localPath);
-            toastService()->showError(
-                trc("project", OPEN_SYNC_ERROR_TITLE),
-                trc("project", OPEN_SYNC_ERROR_MESSAGE));
-        } else {
-            interactive()->infoSync(trc("project", OPEN_SYNC_ERROR_TITLE), trc("project", OPEN_SYNC_ERROR_NO_LOCAL_FILE_MESSAGE));
-        }
-        break;
-    }
-    case Err::SyncResultNotFound: {
-        if (fileSystem()->exists(localPath)) {
-            doOpenProject(localPath);
-            const int saveLocallyBtn = static_cast<int>(muse::IInteractive::Button::CustomButton);
-            const int saveToCloudBtn = static_cast<int>(muse::IInteractive::Button::CustomButton) + 1;
-            muse::IInteractive::ButtonDatas buttons {
-                interactive()->buttonData(IInteractive::Button::Cancel),
-                muse::IInteractive::ButtonData(saveLocallyBtn, muse::trc("project",
-                                                                         "Save to computer"), false, false,
-                                               muse::IInteractive::ButtonRole::ApplyRole),
-                muse::IInteractive::ButtonData(saveToCloudBtn, muse::trc("cloud", "Save to audio.com"), /*accent=*/ true, false,
-                                               muse::IInteractive::ButtonRole::ApplyRole),
-            };
-            muse::IInteractive::Result result = interactive()->infoSync(OPEN_NOT_FOUND_ERROR_TITLE, OPEN_NOT_FOUND_ERROR_MESSAGE,
-                                                                        buttons, saveToCloudBtn, {},
-                                                                        muse::trc("cloud", "Save"));
-            if (result.isButton(saveLocallyBtn)) {
-                IAudacityProjectPtr project = currentProject();
-                if (!project) {
-                    break;
-                }
-
-                const auto ret = openSaveProjectScenario()->askLocalPath(project, SaveMode::Save);
-                if (!ret.ret) {
-                    break;
-                }
-
-                const auto newPath = ret.val;
-                if (newPath.empty()) {
-                    break;
-                }
-
-                saveProjectLocally(newPath, SaveMode::Save);
-                fileSystem()->remove(localPath);
-            } else if (result.isButton(saveToCloudBtn)) {
-                IAudacityProjectPtr project = currentProject();
-                if (!project) {
-                    break;
-                }
-
-                saveProjectToCloud(CloudProjectInfo { QUrl {}, {}, project->displayName() }, SaveMode::Save);
-            }
-        } else {
-            interactive()->infoSync(
-                trc("project", OPEN_NOT_FOUND_ERROR_TITLE),
-                trc("project", OPEN_NOT_FOUND_ERROR_NO_LOCAL_FILE_MESSAGE));
-        }
-        break;
-    }
-    case Err::SyncResultForbidden: {
-        if (fileSystem()->exists(localPath)) {
-            doOpenProject(localPath);
-            toastService()->showError(
-                trc("project", OPEN_FORBIDDEN_TITLE),
-                trc("project", OPEN_FORBIDDEN_MESSAGE));
-        } else {
-            interactive()->infoSync(trc("project", OPEN_FORBIDDEN_TITLE),
-                                    trc("project", OPEN_FORBIDDEN_NO_LOCAL_FILE_MESSAGE));
-        }
-        break;
-    }
-    case Err::SyncResultConflict: {
-        const int useLocalBtn = static_cast<int>(muse::IInteractive::Button::CustomButton);
-        const int useRemoteBtn = static_cast<int>(muse::IInteractive::Button::CustomButton) + 1;
-        muse::IInteractive::ButtonDatas buttons {
-            interactive()->buttonData(IInteractive::Button::Cancel),
-            muse::IInteractive::ButtonData(useLocalBtn, muse::trc("project", OPEN_CONFLICT_LOCAL_BTN), false, false,
-                                           muse::IInteractive::ButtonRole::ApplyRole),
-            muse::IInteractive::ButtonData(useRemoteBtn, muse::trc("project", OPEN_CONFLICT_REMOTE_BTN), /*accent=*/ true, false,
-                                           muse::IInteractive::ButtonRole::ApplyRole),
-        };
-        auto conflictResult = interactive()->infoSync(
-            trc("project", OPEN_CONFLICT_TITLE),
-            trc("project", OPEN_CONFLICT_MESSAGE),
-            buttons, useRemoteBtn);
-        if (conflictResult.isButton(useLocalBtn)) {
-            doOpenProject(localPath);
-        } else if (conflictResult.isButton(useRemoteBtn)) {
-            const bool forceOverwrite = true;
-            openCloudProject(localPath, {}, forceOverwrite);
-        }
-        break;
-    }
-    default: {
-        interactive()->infoSync(trc("project", OPEN_DEFAULT_ERROR_TITLE), trc("project", OPEN_DEFAULT_ERROR_MESSAGE));
-        break;
-    }
-    }
-}
-
-void ProjectActionsController::handleCloudSaveError(const muse::Ret& error)
-{
-    IAudacityProjectPtr project = currentProject();
-    if (!project) {
-        return;
-    }
-
-    using Err = au::au3cloud::Err;
-    const auto err = static_cast<Err>(error.code());
-
-    switch (err) {
-    case Err::ProjectLimitReached:
-    case Err::ProjectStorageLimitReached: {
-        const int saveLocallyBtn = int(muse::IInteractive::Button::Save);
-        muse::IInteractive::ButtonDatas buttons {
-            interactive()->buttonData(IInteractive::Button::Cancel),
-            muse::IInteractive::ButtonData(saveLocallyBtn, muse::trc("project", "Save to computer"), /*accent=*/ true),
-        };
-
-        const char* title = err == Err::ProjectLimitReached ? PRJ_LIMIT_REACHED_TITLE : PRJ_SIZE_EXCEEDED_TITLE;
-        const char* text = err == Err::ProjectLimitReached ? PRJ_LIMIT_REACHED_TEXT : PRJ_SIZE_EXCEEDED_TEXT;
-
-        muse::IInteractive::Result result = interactive()->infoSync(title, text, buttons, saveLocallyBtn, {},
-                                                                    muse::trc("cloud", "Save to audio.com"));
-        if (result.isButton(muse::IInteractive::Button::Save)) {
-            const auto ret = openSaveProjectScenario()->askLocalPath(project, SaveMode::Save);
-            if (!ret.ret) {
-                break;
-            }
-
-            const auto localPath = ret.val;
-            if (localPath.empty()) {
-                break;
-            }
-
-            saveProjectLocally(localPath, SaveMode::Save);
-        }
-    }
-    break;
-    case Err::ProjectNotFound: {
-        const auto localPath = project->path();
-
-        const int saveLocallyBtn = static_cast<int>(muse::IInteractive::Button::CustomButton);
-        const int saveToCloudBtn = static_cast<int>(muse::IInteractive::Button::CustomButton) + 1;
-        muse::IInteractive::ButtonDatas buttons {
-            interactive()->buttonData(IInteractive::Button::Cancel),
-            muse::IInteractive::ButtonData(saveLocallyBtn, muse::trc("project",
-                                                                     "Save to computer"), false, false,
-                                           muse::IInteractive::ButtonRole::ApplyRole),
-            muse::IInteractive::ButtonData(saveToCloudBtn, muse::trc("cloud", "Save to audio.com"), /*accent=*/ true, false,
-                                           muse::IInteractive::ButtonRole::ApplyRole),
-        };
-        muse::IInteractive::Result result = interactive()->infoSync(CLOUD_SAVE_UNAVAILABLE_TITLE, CLOUD_SAVE_UNAVAILABLE_TEXT,
-                                                                    buttons, saveToCloudBtn, {},
-                                                                    muse::trc("cloud", "Save"));
-        if (result.isButton(saveLocallyBtn)) {
-            const auto ret = openSaveProjectScenario()->askLocalPath(project, SaveMode::Save);
-            if (!ret.ret) {
-                break;
-            }
-
-            const auto newPath = ret.val;
-            if (newPath.empty()) {
-                break;
-            }
-
-            saveProjectLocally(newPath, SaveMode::Save);
-            fileSystem()->remove(localPath);
-        } else if (result.isButton(saveToCloudBtn)) {
-            saveProjectToCloud(CloudProjectInfo { QUrl {}, {}, project->displayName() }, SaveMode::Save);
-        }
-    }
-    break;
-    case Err::ProjectVersionConflict: {
-        const int useLocalBtn = static_cast<int>(muse::IInteractive::Button::CustomButton);
-        const int useRemoteBtn = static_cast<int>(muse::IInteractive::Button::CustomButton) + 1;
-        muse::IInteractive::ButtonDatas buttons {
-            muse::IInteractive::ButtonData(useLocalBtn, muse::trc("project", SAVE_CONFLICT_LOCAL_BTN), /*accent=*/ true, false,
-                                           muse::IInteractive::ButtonRole::ApplyRole),
-            muse::IInteractive::ButtonData(useRemoteBtn, muse::trc("project", SAVE_CONFLICT_REMOTE_BTN), false, false,
-                                           muse::IInteractive::ButtonRole::ApplyRole),
-        };
-        auto conflictResult = interactive()->infoSync(
-            trc("project", SAVE_CONFLICT_TITLE),
-            trc("project", SAVE_CONFLICT_MESSAGE),
-            buttons, useLocalBtn);
-        if (conflictResult.isButton(useLocalBtn)) {
-            const bool forceOverwrite = true;
-            saveProjectToCloud(CloudProjectInfo { QUrl {}, {}, project->displayName() }, SaveMode::Save, forceOverwrite);
-        } else if (conflictResult.isButton(useRemoteBtn)) {
-            const io::path_t localPath = project->path();
-            closeOpenedProject(false);
-            const bool forceOverwrite = true;
-            openCloudProject(localPath, {}, forceOverwrite);
-        }
-        break;
-    }
-    case Err::ProjectForbidden:
-    case Err::SyncResultForbidden: {
-        const int saveLocallyBtn = static_cast<int>(muse::IInteractive::Button::CustomButton);
-        muse::IInteractive::ButtonDatas buttons {
-            interactive()->buttonData(IInteractive::Button::Cancel),
-            muse::IInteractive::ButtonData(saveLocallyBtn, muse::trc("project", "Save to computer"), /*accent=*/ true, false,
-                                           muse::IInteractive::ButtonRole::ApplyRole),
-        };
-        muse::IInteractive::Result result = interactive()->infoSync(
-            trc("project", SAVE_FORBIDDEN_TITLE),
-            trc("project", SAVE_FORBIDDEN_MESSAGE),
-            buttons, saveLocallyBtn);
-        if (result.isButton(saveLocallyBtn)) {
-            const auto ret = openSaveProjectScenario()->askLocalPath(project, SaveMode::Save);
-            if (!ret.ret) {
-                break;
-            }
-
-            const auto newPath = ret.val;
-            if (newPath.empty()) {
-                break;
-            }
-
-            saveProjectLocally(newPath, SaveMode::Save);
-        }
-        break;
-    }
-    case Err::NetworkError:
-    case Err::DataUploadFailed:
-    case Err::ServerError:
-    case Err::ClientFailure:
-        interactive()->infoSync(DEFAULT_SYNC_ERROR_TITLE, DEFAULT_SYNC_ERROR_TEXT);
-        break;
-    case Err::SyncCancelled:
-        break;
-    default:
-        interactive()->infoSync(DEFAULT_CLOUD_ERROR_TITLE, DEFAULT_CLOUD_ERROR_TEXT);
-        break;
-    }
-}
->>>>>>> upstream/master

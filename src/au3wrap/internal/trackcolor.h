@@ -6,11 +6,8 @@
 namespace au::au3 {
 class TrackColor : public TrackAttachment
 {
-<<<<<<< HEAD
     muse::Inject<projectscene::IProjectSceneConfiguration> projectSceneConfiguration;
 
-=======
->>>>>>> upstream/master
 public:
     static TrackColor& Get(const Track* track);
     static TrackColor& Get(Track* track);

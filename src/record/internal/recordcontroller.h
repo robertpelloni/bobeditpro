@@ -21,7 +21,6 @@
 namespace au::record {
 class RecordController : public IRecordController, public muse::actions::Actionable, public muse::async::Asyncable, public muse::Contextable
 {
-<<<<<<< HEAD
     muse::Inject<muse::actions::IActionsDispatcher> dispatcher;
     muse::Inject<au::context::IGlobalContext> globalContext;
     muse::Inject<muse::IInteractive> interactive;
@@ -30,21 +29,6 @@ class RecordController : public IRecordController, public muse::actions::Actiona
     muse::Inject<record::IRecordConfiguration> configuration;
 
 public:
-=======
-    muse::GlobalInject<record::IRecordConfiguration> configuration;
-
-    muse::ContextInject<muse::actions::IActionsDispatcher> dispatcher{ this };
-    muse::ContextInject<au::context::IGlobalContext> globalContext{ this };
-    muse::ContextInject<muse::IInteractive> interactive{ this };
-    muse::ContextInject<IRecord> record{ this };
-    muse::ContextInject<playback::IPlaybackController> playbackController{ this };
-    muse::ContextInject<trackedit::ISelectionController> selectionController{ this };
-
-public:
-    RecordController(const muse::modularity::ContextPtr& ctx)
-        : muse::Contextable(ctx) {}
-
->>>>>>> upstream/master
     void init();
     void deinit();
 

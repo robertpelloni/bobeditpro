@@ -1063,13 +1063,7 @@ private:
 
     int64_t mGroupId = -1;
 
-<<<<<<< HEAD
     wxString mColor;
-=======
-    int mColorIndex = 0;
-
-    bool mSelected{ false };
->>>>>>> upstream/master
 };
 
 #endif

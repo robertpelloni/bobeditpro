@@ -38,7 +38,6 @@
 // #include "multiinstances/imultiinstancesprovider.h"
 
 namespace au::appshell {
-<<<<<<< HEAD
 class StartupScenario : public au::appshell::IStartupScenario, public muse::async::Asyncable
 {
     muse::Inject<muse::IInteractive> interactive;
@@ -47,27 +46,10 @@ class StartupScenario : public au::appshell::IStartupScenario, public muse::asyn
     muse::Inject<ISessionsManager> sessionsManager;
     muse::Inject<muse::audioplugins::IRegisterAudioPluginsScenario> registerAudioPluginsScenario;
     // muse::Inject<au::project::IProjectAutoSaver> projectAutoSaver; // we don't use at the moment 01/09/2025 the project auto saver as we already have the autosave table
-=======
-class StartupScenario : public au::appshell::IStartupScenario, public muse::async::Asyncable, public muse::Contextable
-{
-    muse::GlobalInject<IAppShellConfiguration> configuration;
-    muse::GlobalInject<muse::mi::IMultiWindowsProvider> multiwindowsProvider;
-    muse::GlobalInject<muse::update::IUpdateConfiguration> updateConfiguration;
-    muse::GlobalInject<muse::io::IFileSystem> fileSystem;
-
-    muse::ContextInject<muse::IInteractive> interactive { this };
-    muse::ContextInject<muse::actions::IActionsDispatcher> dispatcher { this };
-    muse::ContextInject<ISessionsManager> sessionsManager { this };
->>>>>>> upstream/master
 
 //! TODO AU4
     // INJECT(mi::IMultiInstancesProvider, multiInstancesProvider)
 public:
-<<<<<<< HEAD
-=======
-    StartupScenario(const muse::modularity::ContextPtr& ctx)
-        : muse::Contextable(ctx) {}
->>>>>>> upstream/master
 
     void setStartupType(const std::optional<std::string>& type) override;
 

@@ -229,29 +229,11 @@ void TrackLabelsListModel::selectLabel(const LabelKey& key)
 
     if (modifiers.testFlag(Qt::ShiftModifier)) {
         if (muse::contains(selectionController()->selectedLabels(), key.key)) {
-<<<<<<< HEAD
             return;
         }
 
         selectionController()->resetSelectedClips();
         selectionController()->setSelectedLabels(LabelKeyList({ key.key }), true);
-=======
-            selectionController()->removeLabelSelection(key.key);
-        } else {
-            selectionController()->addSelectedLabel(key.key);
-        }
-    } else {
-        if (!muse::contains(selectionController()->selectedLabels(), key.key)) {
-            if (selectionController()->timeSelectionIsNotEmpty()
-                && muse::contains(selectionController()->labelsIntersectingRangeSelection(), key.key)) {
-                selectionController()->addSelectedLabel(key.key);
-            } else {
-                selectionController()->resetDataSelection();
-                selectionController()->resetSelectedClips();
-                selectionController()->setSelectedLabels(LabelKeyList({ key.key }), true);
-            }
-        }
->>>>>>> upstream/master
     }
 
     setFocusedItem(key);
@@ -443,7 +425,7 @@ void TrackLabelsListModel::doSelectTracksData(const LabelKey& key)
 
 bool TrackLabelsListModel::isTrackDataSelected() const
 {
-    return !selectionController()->selectedTracks().empty() && selectionController()->timeSelectionIsNotEmpty();
+    return !selectionController()->selectedTracks().empty() && !selectionController()->timeSelectionIsEmpty();
 }
 
 void TrackLabelsListModel::resetSelectedTracksData()

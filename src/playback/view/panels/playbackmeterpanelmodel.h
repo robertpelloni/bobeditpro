@@ -15,7 +15,6 @@
 #include "playback/iplaybackcontroller.h"
 
 namespace au::playback {
-<<<<<<< HEAD
 class PlaybackMeterPanelModel : public QObject, public muse::async::Asyncable
 {
     Q_OBJECT
@@ -23,16 +22,6 @@ class PlaybackMeterPanelModel : public QObject, public muse::async::Asyncable
     muse::Inject<IPlayback> playback;
     muse::Inject<IPlaybackConfiguration> configuration;
     muse::Inject<IPlaybackController> playbackController;
-=======
-class PlaybackMeterPanelModel : public QObject, public muse::async::Asyncable, public muse::Contextable
-{
-    Q_OBJECT
-
-    muse::GlobalInject<IPlaybackConfiguration> configuration;
-
-    muse::ContextInject<IPlayback> playback{ this };
-    muse::ContextInject<IPlaybackController> playbackController{ this };
->>>>>>> upstream/master
 
     Q_PROPERTY(float leftChannelPressure READ leftChannelPressure NOTIFY leftChannelPressureChanged)
     Q_PROPERTY(float leftChannelRMS READ leftChannelRMS NOTIFY leftChannelRMSChanged)

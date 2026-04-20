@@ -28,10 +28,6 @@
 #include "UploadService.h"
 
 #include "au3-basic-ui/BasicUI.h"
-<<<<<<< HEAD
-=======
-#include <rapidjson/document.h>
->>>>>>> upstream/master
 
 namespace audacity::cloud::audiocom::sync {
 namespace {

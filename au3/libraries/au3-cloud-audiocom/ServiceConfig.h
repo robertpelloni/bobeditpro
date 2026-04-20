@@ -13,10 +13,7 @@
 #include <chrono>
 #include <string>
 #include <vector>
-<<<<<<< HEAD
 #include <rapidjson/fwd.h>
-=======
->>>>>>> upstream/master
 
 enum class AudiocomTrace;
 

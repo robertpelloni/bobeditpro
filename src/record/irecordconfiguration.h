@@ -8,11 +8,7 @@
 #include "draw/types/color.h"
 
 namespace au::record {
-<<<<<<< HEAD
 class IRecordConfiguration : MODULE_EXPORT_INTERFACE
-=======
-class IRecordConfiguration : MODULE_GLOBAL_INTERFACE
->>>>>>> upstream/master
 {
     INTERFACE_ID(IRecordConfiguration)
 

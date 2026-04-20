@@ -46,15 +46,6 @@ void ProjectConfiguration::init()
     });
 
     initTempDir();
-<<<<<<< HEAD
-=======
-    if (!userProjectsPath().empty()) {
-        fileSystem()->makePath(userProjectsPath());
-    }
-    if (!cloudProjectsPath().empty()) {
-        fileSystem()->makePath(cloudProjectsPath());
-    }
->>>>>>> upstream/master
 }
 
 muse::io::path_t ProjectConfiguration::recentFilesJsonPath() const

@@ -33,11 +33,7 @@
 #include "../timeline/timelinecontext.h"
 
 namespace au::projectscene {
-<<<<<<< HEAD
 class PlayCursorController : public QObject, public muse::async::Asyncable
-=======
-class PlayCursorController : public QObject, public muse::async::Asyncable, public muse::Contextable
->>>>>>> upstream/master
 {
     Q_OBJECT
 
@@ -45,14 +41,8 @@ class PlayCursorController : public QObject, public muse::async::Asyncable, publ
 
     Q_PROPERTY(double positionX READ positionX NOTIFY positionXChanged FINAL)
 
-<<<<<<< HEAD
     muse::Inject<context::IGlobalContext> globalContext;
     muse::Inject<muse::actions::IActionsDispatcher> dispatcher;
-=======
-    muse::ContextInject<context::IGlobalContext> globalContext{ this };
-    muse::ContextInject<record::IRecordController> recordController{ this };
-    muse::ContextInject<muse::actions::IActionsDispatcher> dispatcher{ this };
->>>>>>> upstream/master
 
 public:
     PlayCursorController(QObject* parent = nullptr);

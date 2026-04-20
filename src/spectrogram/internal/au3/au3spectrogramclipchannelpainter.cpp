@@ -178,16 +178,11 @@ void Au3SpectrogramClipChannelPainter::fillImage(QImage& image,
         }
     } // updating cache
 
-<<<<<<< HEAD
     float selBinLo = settings.findBin(startFrequency, binUnit);
     float selBinHi = settings.findBin(endFrequency, binUnit);
     float selBinCenter = (startFrequency < 0 || endFrequency < 0)
                          ? -1
                          : settings.findBin(sqrt(startFrequency * endFrequency), binUnit);
-=======
-    const float selBinLo = settings.findBin(selectionInfo.startFrequency, binUnit);
-    const float selBinHi = settings.findBin(selectionInfo.endFrequency, binUnit);
->>>>>>> upstream/master
 
     SpecCache specCache;
 
@@ -226,11 +221,7 @@ void Au3SpectrogramClipChannelPainter::fillImage(QImage& image,
 
             // If we are in the time selected range, then we may use a different color set.
             if (maybeSelected) {
-<<<<<<< HEAD
                 selected = ChooseColorSet(bin, nextBin, selBinLo, selBinCenter, selBinHi, (xx + leftOffset - leftOffset) / DASH_LENGTH);
-=======
-                selected = ChooseColorSet(bin, nextBin, selBinLo, selBinHi);
->>>>>>> upstream/master
             }
 
             const float value = specPxCache->values[xx * imageHeight + yy];

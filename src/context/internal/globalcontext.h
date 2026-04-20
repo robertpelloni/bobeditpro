@@ -11,22 +11,11 @@
 namespace au::context {
 class GlobalContext : public au::context::IGlobalContext, public muse::Contextable
 {
-<<<<<<< HEAD
     muse::Inject<au::record::IRecordController> recordController;
 
 public:
 
     GlobalContext();
-=======
-    muse::ContextInject<au::record::IRecordController> recordController { this };
-
-public:
-    GlobalContext(muse::modularity::ContextPtr ctx)
-        : muse::Contextable(std::move(ctx))
-        , m_playbackState(std::make_shared<PlaybackState>())
-    {
-    }
->>>>>>> upstream/master
 
     void setCurrentProject(const au::project::IAudacityProjectPtr& project) override;
     au::project::IAudacityProjectPtr currentProject() const override;

@@ -21,10 +21,7 @@ std::string Au3AudioModule::moduleName() const
 void Au3AudioModule::registerExports()
 {
     m_audioEngine = std::make_shared<Au3AudioEngine>();
-<<<<<<< HEAD
     m_audioDevicesProvider = std::make_shared<Au3AudioDevicesProvider>();
-=======
->>>>>>> upstream/master
 
     globalIoc()->registerExport<audio::IAudioEngine>(mname, m_audioEngine);
 }

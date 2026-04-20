@@ -8,7 +8,6 @@
 namespace au::effects {
 class BuiltinEffectsRepository : public IBuiltinEffectsRepository
 {
-<<<<<<< HEAD
     muse::Inject<IEffectsViewRegister> effectsViewRegister;
 
 public:
@@ -17,9 +16,6 @@ public:
     void preInit();
     void init();
 
-=======
-public:
->>>>>>> upstream/master
     muse::async::Notification effectMetaListUpdated() const override;
     EffectMetaList effectMetaList() const override;
     void registerMeta(const EffectMeta& meta) override;

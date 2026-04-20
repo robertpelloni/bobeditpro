@@ -30,11 +30,7 @@
 class QPixmap;
 
 namespace au::project {
-<<<<<<< HEAD
 class IRecentFilesController : MODULE_EXPORT_INTERFACE
-=======
-class IRecentFilesController : MODULE_GLOBAL_INTERFACE
->>>>>>> upstream/master
 {
     INTERFACE_ID(IRecentFilesProvider)
 

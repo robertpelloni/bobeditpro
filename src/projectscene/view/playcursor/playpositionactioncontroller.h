@@ -27,27 +27,21 @@
 #include "modularity/ioc.h"
 #include "context/iglobalcontext.h"
 #include "actions/iactionsdispatcher.h"
+#include "trackedit/iselectioncontroller.h"
 
 #include "../timeline/timelinecontext.h"
 
 namespace au::projectscene {
-<<<<<<< HEAD
 class PlayPositionActionController : public QObject, public muse::actions::Actionable, public muse::async::Asyncable
-=======
-class PlayPositionActionController : public QObject, public muse::actions::Actionable, public muse::async::Asyncable,
-    public muse::Contextable
->>>>>>> upstream/master
 {
     Q_OBJECT
 
     Q_PROPERTY(TimelineContext * context READ timelineContext WRITE setTimelineContext NOTIFY timelineContextChanged FINAL)
 
-<<<<<<< HEAD
     muse::Inject<context::IGlobalContext> globalContext;
     muse::Inject<muse::actions::IActionsDispatcher> dispatcher;
 =======
-    muse::ContextInject<context::IGlobalContext> globalContext{ this };
-    muse::ContextInject<muse::actions::IActionsDispatcher> dispatcher{ this };
+    muse::ContextInject<trackedit::ISelectionController> selectionController{ this };
 >>>>>>> upstream/master
 
 public:
@@ -61,6 +55,11 @@ public:
     void playPositionDecrease();
     void playPositionIncrease();
 
+    void selectionExtendLeft();
+    void selectionExtendRight();
+    void selectionContractLeft();
+    void selectionContractRight();
+
 signals:
     void timelineContextChanged();
 
@@ -69,6 +68,8 @@ private:
 
     void snapCurrentPosition();
     void applySingleStep(Direction direction);
+
+    muse::secs_t stepFromTime(muse::secs_t from, Direction direction) const;
 
     context::IPlaybackStatePtr playbackState() const;
 

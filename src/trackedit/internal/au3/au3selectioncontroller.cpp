@@ -61,23 +61,6 @@ void Au3SelectionController::init()
                 const auto it = tracks.begin();
                 setFocusedTrack(TrackId((*it)->GetId()));
             }
-<<<<<<< HEAD
-=======
-
-            setSelectedLabels(savedSelectedLabels, true);
-            setSelectedClips(savedSelectedClips, true);
-
-            if (savedSelectedClips.empty()) {
-                setSelectedTracks(savedSelectedTracks, true);
-            }
-
-            setClipsIntersectingRangeSelection(findClipsIntersectingRangeSelection());
-            setLabelsIntersectingRangeSelection(findLabelsIntersectingRangeSelection());
-
-            projectHistory()->historyChanged().onReceive(this, [this](auto event) {
-                onHistoryEvent(event);
-            }, Asyncable::Mode::SetReplace);
->>>>>>> upstream/master
         } else {
             m_tracksSubc.Reset();
         }
@@ -90,11 +73,7 @@ void Au3SelectionController::init()
     });
 }
 
-<<<<<<< HEAD
 void Au3SelectionController::restoreSelection(const ClipAndTimeSelection& selection)
-=======
-void Au3SelectionController::onHistoryEvent(const trackedit::HistoryEvent& event)
->>>>>>> upstream/master
 {
     MYLOG() << "restoreSelection";
 
@@ -102,21 +81,11 @@ void Au3SelectionController::onHistoryEvent(const trackedit::HistoryEvent& event
     m_selectedStartTime.set(selection.dataSelectedStartTime, true);
     m_selectedEndTime.set(selection.dataSelectedEndTime, true);
     updateSelectionController();
-<<<<<<< HEAD
-=======
-
-    if (event == HistoryEvent::RestoredState) {
-        frequencySelectionController()->restoreFrequencySelection();
-    }
-
-    setClipsIntersectingRangeSelection(findClipsIntersectingRangeSelection());
-    setLabelsIntersectingRangeSelection(findLabelsIntersectingRangeSelection());
->>>>>>> upstream/master
 }
 
 ClipKeyList Au3SelectionController::findClipsIntersectingRangeSelection() const
 {
-    if (!timeSelectionIsNotEmpty() || selectedTracks().empty()) {
+    if (timeSelectionIsEmpty() || selectedTracks().empty()) {
         return {};
     }
 
@@ -616,15 +585,15 @@ void Au3SelectionController::resetDataSelection()
     setClipsIntersectingRangeSelection({});
 }
 
-bool Au3SelectionController::timeSelectionIsNotEmpty() const
+bool Au3SelectionController::timeSelectionIsEmpty() const
 {
-    return muse::RealIsEqualOrMore(m_selectedEndTime.val, 0.0) && !muse::RealIsEqualOrLess(
+    return !muse::RealIsEqualOrMore(m_selectedEndTime.val, 0.0) || muse::RealIsEqualOrLess(
         m_selectedEndTime.val, m_selectedStartTime.val);
 }
 
 bool au::trackedit::Au3SelectionController::timeSelectionHasAudioData() const
 {
-    if (!timeSelectionIsNotEmpty() || m_selectedTracks.val.empty()) {
+    if (timeSelectionIsEmpty() || m_selectedTracks.val.empty()) {
         return false;
     }
 
@@ -644,7 +613,7 @@ bool au::trackedit::Au3SelectionController::timeSelectionHasAudioData() const
 
 bool Au3SelectionController::isDataSelectedOnTrack(TrackId trackId) const
 {
-    return muse::contains(m_selectedTracks.val, trackId) && timeSelectionIsNotEmpty();
+    return muse::contains(m_selectedTracks.val, trackId) && !timeSelectionIsEmpty();
 }
 
 void Au3SelectionController::setSelectedAllAudioData(const std::optional<secs_t>& fromTime, const std::optional<secs_t>& toTime)
@@ -725,6 +694,13 @@ void Au3SelectionController::setDataSelectedEndTime(au::trackedit::secs_t time, 
     if (complete) {
         setClipsIntersectingRangeSelection(findClipsIntersectingRangeSelection());
     }
+}
+
+void Au3SelectionController::initSelectionAtPlayhead()
+{
+    const secs_t playhead = globalContext()->playbackState()->playbackPosition();
+    setDataSelectedStartTime(playhead, true);
+    setDataSelectedEndTime(playhead, true);
 }
 
 bool Au3SelectionController::selectionContainsGroup() const

@@ -13,7 +13,6 @@
 #include "trackedit/iselectioncontroller.h"
 
 namespace au::projectscene {
-<<<<<<< HEAD
 class PitchAndSpeedChangeModel : public QObject, public muse::async::Asyncable
 {
     Q_OBJECT
@@ -21,15 +20,6 @@ class PitchAndSpeedChangeModel : public QObject, public muse::async::Asyncable
     muse::Inject<au::context::IGlobalContext> globalContext;
     muse::Inject<trackedit::ITrackeditInteraction> trackeditInteraction;
     muse::Inject<trackedit::ISelectionController> selectionController;
-=======
-class PitchAndSpeedChangeModel : public QObject, public muse::async::Asyncable, public muse::Contextable
-{
-    Q_OBJECT
-
-    muse::ContextInject<au::context::IGlobalContext> globalContext{ this };
-    muse::ContextInject<trackedit::ITrackeditInteraction> trackeditInteraction{ this };
-    muse::ContextInject<trackedit::ISelectionController> selectionController{ this };
->>>>>>> upstream/master
 
     Q_PROPERTY(QString clipTitle READ clipTitle NOTIFY clipTitleChanged FINAL)
 

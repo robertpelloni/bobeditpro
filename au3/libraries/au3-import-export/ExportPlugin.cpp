@@ -73,17 +73,10 @@ std::vector<std::string> ExportPlugin::GetMimeTypes(int formatIndex) const
     return {};
 }
 
-<<<<<<< HEAD
 // bool ExportPlugin::ParseConfig(int, const rapidjson::Value&, ExportProcessor::Parameters&) const
 // {
 //     return false;
 // }
-=======
-bool ExportPlugin::ParseConfig(int, const std::string&, ExportProcessor::Parameters&) const
-{
-     return false;
-}
->>>>>>> upstream/master
 
 bool ExportPlugin::CheckFileName(wxFileName&, int) const
 {

@@ -30,15 +30,12 @@
 #include "internal/projectprovider.h"
 #include "internal/au3/au3metadata.h"
 
-<<<<<<< HEAD
 #include "ui/iuiactionsregister.h"
 #include "ui/iinteractiveuriregister.h"
 
 #include "context/iglobalcontext.h"
 #include "internal/audacityproject.h"
 
-=======
->>>>>>> upstream/master
 #include "view/projectpropertiesmodel.h"
 #include "view/projectspagemodel.h"
 #include "view/recentprojectsmodel.h"
@@ -76,14 +73,11 @@ std::string ProjectModule::moduleName() const
 void ProjectModule::registerExports()
 {
     m_configuration = std::make_shared<ProjectConfiguration>();
-<<<<<<< HEAD
     m_actionsController = std::make_shared<ProjectActionsController>();
     m_uiActions = std::make_shared<ProjectUiActions>(m_actionsController);
     m_thumbnailCreator = std::make_shared<ThumbnailCreator>();
     m_tagsAccessor = std::make_shared<Au3Metadata>();
     // m_projectAutoSaver = std::make_shared<ProjectAutoSaver>(); // we don't use at the moment 01/09/2025 the project auto saver as we already have the autosave table
-=======
->>>>>>> upstream/master
 
 #ifdef Q_OS_MAC
     m_recentFilesController = std::make_shared<MacOSRecentFilesController>();
@@ -93,7 +87,6 @@ void ProjectModule::registerExports()
     m_recentFilesController = std::make_shared<RecentFilesController>();
 #endif
 
-<<<<<<< HEAD
     ioc()->registerExport<IProjectConfiguration>(moduleName(), m_configuration);
     ioc()->registerExport<IRecentFilesController>(moduleName(), m_recentFilesController);
     ioc()->registerExport<IOpenSaveProjectScenario>(moduleName(), new OpenSaveProjectScenario());
@@ -101,23 +94,15 @@ void ProjectModule::registerExports()
     ioc()->registerExport<IThumbnailCreator>(moduleName(), m_thumbnailCreator);
     ioc()->registerExport<IMetadata>(moduleName(), m_tagsAccessor);
     // ioc()->registerExport<IProjectAutoSaver>(moduleName(), m_projectAutoSaver);
-=======
-    globalIoc()->registerExport<IProjectConfiguration>(mname, m_configuration);
-    globalIoc()->registerExport<IRecentFilesController>(mname, m_recentFilesController);
->>>>>>> upstream/master
 }
 
 void ProjectModule::resolveImports()
 {
-<<<<<<< HEAD
     auto ar = ioc()->resolve<muse::ui::IUiActionsRegister>(moduleName());
     if (ar) {
         ar->reg(m_uiActions);
     }
     auto ir = ioc()->resolve<muse::ui::IInteractiveUriRegister>(moduleName());
-=======
-    auto ir = globalIoc()->resolve<muse::interactive::IInteractiveUriRegister>(mname);
->>>>>>> upstream/master
     if (ir) {
         ir->registerQmlUri(muse::Uri("audacity://project/new"), "Audacity/Project/NewProjectDialog.qml");
         ir->registerQmlUri(muse::Uri("audacity://project/asksavelocationtype"), "Audacity/Project/AskSaveLocationTypeDialog.qml");

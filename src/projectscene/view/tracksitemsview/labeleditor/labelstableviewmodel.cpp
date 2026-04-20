@@ -46,11 +46,7 @@ static std::vector<std::string> importExportFilter(const std::vector<au::importe
 }
 
 LabelsTableViewModel::LabelsTableViewModel(QObject* parent)
-<<<<<<< HEAD
     : AbstractTableViewModel(parent)
-=======
-    : AbstractTableViewModel(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
->>>>>>> upstream/master
 {
 }
 

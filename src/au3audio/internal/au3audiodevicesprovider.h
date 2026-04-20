@@ -12,25 +12,12 @@
 #include "audio/iaudioengine.h"
 
 namespace au::au3audio {
-<<<<<<< HEAD
 class Au3AudioDevicesProvider : public audio::IAudioDevicesProvider
 {
     muse::Inject<context::IGlobalContext> globalContext;
     muse::Inject<au::audio::IAudioEngine> audioEngine;
 
 public:
-=======
-class Au3AudioDevicesProvider : public audio::IAudioDevicesProvider, public muse::Contextable
-{
-    muse::GlobalInject<au::audio::IAudioEngine> audioEngine;
-
-    muse::ContextInject<context::IGlobalContext> globalContext { this };
-
-public:
-    Au3AudioDevicesProvider(const muse::modularity::ContextPtr& ctx)
-        : muse::Contextable(ctx) {}
-
->>>>>>> upstream/master
     void init();
 
     std::vector<std::string> outputDevices() const override;

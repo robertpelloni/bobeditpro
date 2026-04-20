@@ -7,14 +7,6 @@
 
 using namespace au::projectscene;
 
-<<<<<<< HEAD
-=======
-SelectionStatusModel::SelectionStatusModel(QObject* parent)
-    : QObject(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
-{
-}
-
->>>>>>> upstream/master
 void SelectionStatusModel::init()
 {
     m_currentFormat = configuration()->selectionTimecodeFormat();

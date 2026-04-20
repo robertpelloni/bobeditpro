@@ -71,13 +71,8 @@ static UiActionList STATIC_ACTIONS = {
              )
 };
 
-<<<<<<< HEAD
 EffectsUiActions::EffectsUiActions(std::shared_ptr<EffectsActionsController> controller)
     : m_controller{controller}
-=======
-EffectsUiActions::EffectsUiActions(const muse::modularity::ContextPtr& ctx, std::shared_ptr<EffectsActionsController> controller)
-    : muse::Contextable(ctx), m_controller{controller}
->>>>>>> upstream/master
 {
     effectExecutionScenario()->lastProcessorIdChanged().onReceive(this, [this](const EffectId& effectId) {
         const auto it = std::find_if(m_actions.begin(), m_actions.end(), [](const UiAction& action) {

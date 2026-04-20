@@ -22,12 +22,7 @@
 #include "trackedit/dom/track.h"
 
 namespace au::projectscene {
-<<<<<<< HEAD
 class ViewTracksListModel : public QAbstractListModel, public muse::async::Asyncable, public muse::actions::Actionable
-=======
-class ViewTracksListModel : public QAbstractListModel, public muse::async::Asyncable, public muse::actions::Actionable,
-    public muse::Contextable
->>>>>>> upstream/master
 {
     Q_OBJECT
 
@@ -43,16 +38,6 @@ class ViewTracksListModel : public QAbstractListModel, public muse::async::Async
     muse::Inject<playback::ITrackPlaybackControl> trackPlaybackControl;
     muse::Inject<playback::IPlaybackConfiguration> playbackConfiguration;
 
-<<<<<<< HEAD
-=======
-    muse::ContextInject<au::context::IGlobalContext> globalContext{ this };
-    muse::ContextInject<trackedit::ISelectionController> selectionController{ this };
-    muse::ContextInject<trackedit::ITrackeditInteraction> trackeditInteraction{ this };
-    muse::ContextInject<playback::ITrackPlaybackControl> trackPlaybackControl{ this };
-    muse::ContextInject<trackedit::ITrackNavigationController> trackNavigationController{ this };
-    muse::ContextInject<spectrogram::IFrequencySelectionController> frequencySelectionController{ this };
-
->>>>>>> upstream/master
 public:
     explicit ViewTracksListModel(QObject* parent = nullptr);
 
@@ -79,11 +64,6 @@ private:
     enum RoleNames {
         TypeRole = Qt::UserRole + 1,
         TrackIdRole,
-<<<<<<< HEAD
-=======
-        TrackTitleRole,
-        TrackSampleRateRole,
->>>>>>> upstream/master
         IsDataSelectedRole,
         IsTrackSelectedRole,
         IsTrackFocusedRole,

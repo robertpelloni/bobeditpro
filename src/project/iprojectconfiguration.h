@@ -10,11 +10,7 @@
 #include "iaudacityproject.h"
 
 namespace au::project {
-<<<<<<< HEAD
 class IProjectConfiguration : MODULE_EXPORT_INTERFACE
-=======
-class IProjectConfiguration : MODULE_GLOBAL_INTERFACE
->>>>>>> upstream/master
 {
     INTERFACE_ID(IProjectConfiguration)
 

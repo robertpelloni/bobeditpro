@@ -6,12 +6,7 @@
 
 #include <algorithm>
 
-<<<<<<< HEAD
 #include "au3-track/Track.h"
-=======
-#include <QCoreApplication>
-
->>>>>>> upstream/master
 #include "au3-stretching-sequence/TempoChange.h"
 #include "au3-track/Track.h"
 #include "au3-wave-track/TimeStretching.h"
@@ -45,12 +40,7 @@ namespace {
 static const std::string mixingDownToMonoLabel = muse::trc("trackedit", "Mixing down to mono…");
 }
 
-<<<<<<< HEAD
 Au3ClipsInteraction::Au3ClipsInteraction()
-=======
-Au3ClipsInteraction::Au3ClipsInteraction(const muse::modularity::ContextPtr& ctx)
-    : muse::Contextable(ctx)
->>>>>>> upstream/master
 {
     m_progress.setMaxNumIncrements(200);
 }
@@ -942,7 +932,6 @@ NeedsDownmixing Au3ClipsInteraction::moveSelectedClipsUpOrDown(int offset)
     const auto copy = orig.Duplicate();
     const auto prj = globalContext()->currentTrackeditProject();
 
-<<<<<<< HEAD
     ClipKeyList selectedClips = selectionController()->timeSelectionIsNotEmpty()
                                 ? selectionController()->clipsIntersectingRangeSelection()
                                 : selectionController()->selectedClips();
@@ -950,22 +939,13 @@ NeedsDownmixing Au3ClipsInteraction::moveSelectedClipsUpOrDown(int offset)
     const auto dragDirection = offset == -1 ? utils::VerticalDrag::Up : utils::VerticalDrag::Down;
     // Make sure clips aren't dragged past the topmost track:
     if (dragDirection == utils::VerticalDrag::Up && std::any_of(selectedClips.begin(), selectedClips.end(), [&](const ClipKey& clip) {
-=======
-    // Make sure clips aren't dragged past the topmost track:
-    if (offset < 0 && std::any_of(clipKeyList.begin(), clipKeyList.end(), [&](const ClipKey& clip) {
->>>>>>> upstream/master
         return utils::getTrackIndex(orig, clip.trackId) == 0;
     })) {
         return NeedsDownmixing::No;
     }
 
-<<<<<<< HEAD
     const NeedsDownmixing needsDownmixing = utils::moveClipsVertically(dragDirection, orig,
                                                                        *copy, selectedClips);
-=======
-    const NeedsDownmixing needsDownmixing = utils::moveClipsVertically(offset, orig,
-                                                                       *copy, clipKeyList);
->>>>>>> upstream/master
 
     // Clean-up after ourselves, preserving original track formats:
     // Tracks that were empty at the start of the interaction, are empty now and differ in format must be restored.

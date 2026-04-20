@@ -3,11 +3,7 @@
 using namespace au::trackedit;
 
 TrackNavigationModel::TrackNavigationModel(QObject* parent)
-<<<<<<< HEAD
     : QObject(parent)
-=======
-    : QObject(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
->>>>>>> upstream/master
 {
 }
 
@@ -148,6 +144,11 @@ void TrackNavigationModel::addPanels(trackedit::TrackId trackId, int pos)
     clipPanel->setOrder(2 * pos + 1);
     clipPanel->setSection(m_section);
     clipPanel->componentComplete();
+
+    connect(itemsPanel, &muse::ui::NavigationPanel::navigationEvent, this,
+            [this](muse::ui::NavigationEvent* event) {
+        handleArrowKeyFallback(event);
+    });
 
     m_trackItemPanels.append(trackPanel);
     m_clipItemPanels.append(clipPanel);

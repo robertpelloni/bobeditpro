@@ -32,11 +32,7 @@ using namespace au::project;
 using namespace muse::actions;
 
 ProjectsPageModel::ProjectsPageModel(QObject* parent)
-<<<<<<< HEAD
     : QObject(parent)
-=======
-    : QObject(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
->>>>>>> upstream/master
 {
 }
 

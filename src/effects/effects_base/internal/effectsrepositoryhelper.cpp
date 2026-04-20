@@ -33,12 +33,7 @@ constexpr EffectFamily toEffectFamily(muse::audio::AudioResourceType type)
     }
 }
 
-<<<<<<< HEAD
 EffectsRepositoryHelper::EffectsRepositoryHelper(PluginProvider& provider, muse::audio::AudioResourceType resourceType,
-=======
-EffectsRepositoryHelper::EffectsRepositoryHelper(PluginProvider& provider,
-                                                 muse::audio::AudioResourceType resourceType,
->>>>>>> upstream/master
                                                  GetTitleFunc getTitle)
     : m_pluginProvider{provider}, m_resourceType{resourceType}, m_getTitle{std::move(getTitle)}
 {

@@ -20,11 +20,7 @@ class PlayRegionModel : public QObject, public muse::Contextable, public muse::a
     Q_PROPERTY(double end READ end WRITE setEnd NOTIFY endChanged FINAL)
     Q_PROPERTY(bool active READ active WRITE setActive NOTIFY activeChanged FINAL)
 
-<<<<<<< HEAD
     muse::Inject<playback::IPlaybackController> playbackController;
-=======
-    muse::ContextInject<playback::IPlaybackController> playbackController{ this };
->>>>>>> upstream/master
 
 public:
     explicit PlayRegionModel(QObject* parent = nullptr);

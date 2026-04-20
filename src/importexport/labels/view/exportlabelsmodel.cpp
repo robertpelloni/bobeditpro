@@ -13,11 +13,7 @@
 using namespace au::importexport;
 
 ExportLabelsModel::ExportLabelsModel(QObject* parent)
-<<<<<<< HEAD
     : QObject(parent)
-=======
-    : QObject(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
->>>>>>> upstream/master
 {
 }
 

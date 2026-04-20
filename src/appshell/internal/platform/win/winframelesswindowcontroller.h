@@ -34,17 +34,10 @@
 #include "windows.h"
 
 namespace au::appshell {
-<<<<<<< HEAD
 class WinFramelessWindowController : public QObject, public FramelessWindowController
 {
     INJECT(muse::ui::IUiConfiguration, uiConfiguration)
     INJECT(muse::ui::IMainWindow, mainWindow)
-=======
-class WinFramelessWindowController : public QObject, public FramelessWindowController, public muse::Contextable
-{
-    muse::ContextInject<muse::ui::IUiContextConfiguration> uiContextConfiguration = { this };
-    muse::ContextInject<muse::ui::IMainWindow> mainWindow { this };
->>>>>>> upstream/master
 
 public:
     explicit WinFramelessWindowController();

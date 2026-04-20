@@ -390,8 +390,6 @@ bool TrackClipsListModel::moveSelectedClips(const ClipKey& key, bool completed)
     if (vs->moveInitiated()) {
 <<<<<<< HEAD
         trackeditInteraction()->moveClips(moveOffset.timeOffset, moveOffset.trackOffset, completed, clipsMovedToOtherTrack);
-=======
-        if (selectionController()->timeSelectionIsNotEmpty()) {
             trackeditInteraction()->moveRangeSelection(moveOffset.timeOffset, completed);
         } else {
             ClipKeyList selectedClips = selectionController()->selectedClipsInTrackOrder();
@@ -493,15 +491,7 @@ bool TrackClipsListModel::trimLeftClip(const ClipKey& key, bool completed, ClipB
 
     newStartTime = std::max(newStartTime, 0.0);
 
-<<<<<<< HEAD
     bool ok = trackeditInteraction()->trimClipLeft(key.key, newStartTime - item->time().startTime, minClipTime, completed, undoType);
-=======
-    const bool ok = trackeditInteraction()->trimClipsLeft(clipsForInteraction(key),
-                                                          newStartTime - item->time().startTime,
-                                                          minClipTime,
-                                                          completed,
-                                                          undoType);
->>>>>>> upstream/master
 
     if (ok) {
         vs->setLastEditedClip(key.key);
@@ -564,15 +554,7 @@ bool TrackClipsListModel::trimRightClip(const ClipKey& key, bool completed, Clip
         newEndTime = item->time().startTime + minClipTime;
     }
 
-<<<<<<< HEAD
     bool ok = trackeditInteraction()->trimClipRight(key.key, item->time().endTime - newEndTime, minClipTime, completed, undoType);
-=======
-    bool ok = trackeditInteraction()->trimClipsRight(clipsForInteraction(key),
-                                                     item->time().endTime - newEndTime,
-                                                     minClipTime,
-                                                     completed,
-                                                     undoType);
->>>>>>> upstream/master
 
     if (ok) {
         vs->setLastEditedClip(key.key);
@@ -637,15 +619,7 @@ bool TrackClipsListModel::stretchLeftClip(const ClipKey& key, bool completed, Cl
 
     newStartTime = std::max(newStartTime, 0.0);
 
-<<<<<<< HEAD
     bool ok = trackeditInteraction()->stretchClipLeft(key.key, newStartTime - item->time().startTime, minClipTime, completed, undoType);
-=======
-    bool ok = trackeditInteraction()->stretchClipsLeft(clipsForInteraction(key),
-                                                       newStartTime - item->time().startTime,
-                                                       minClipTime,
-                                                       completed,
-                                                       undoType);
->>>>>>> upstream/master
 
     if (ok) {
         vs->setLastEditedClip(key.key);
@@ -708,15 +682,7 @@ bool TrackClipsListModel::stretchRightClip(const ClipKey& key, bool completed, C
         newEndTime = item->time().startTime + minClipTime;
     }
 
-<<<<<<< HEAD
     bool ok = trackeditInteraction()->stretchClipRight(key.key, item->time().endTime - newEndTime, minClipTime, completed, undoType);
-=======
-    bool ok = trackeditInteraction()->stretchClipsRight(clipsForInteraction(key),
-                                                        item->time().endTime - newEndTime,
-                                                        minClipTime,
-                                                        completed,
-                                                        undoType);
->>>>>>> upstream/master
 
     if (ok) {
         vs->setLastEditedClip(key.key);

@@ -13,7 +13,6 @@
 #include "iffmpegoptionsaccessor.h"
 
 namespace au::importexport {
-<<<<<<< HEAD
 class CustomFFmpegPreferencesModel : public QObject, public muse::async::Asyncable
 {
     Q_OBJECT
@@ -21,21 +20,6 @@ class CustomFFmpegPreferencesModel : public QObject, public muse::async::Asyncab
     muse::Inject<IExportConfiguration> exportConfiguration;
     muse::Inject<IExporter> exporter;
     muse::Inject<IFFmpegOptionsAccessor> ffmpegOptionsAccessor;
-=======
-class CustomFFmpegPreferencesModel : public QObject, public muse::async::Asyncable, public muse::Contextable
-{
-    Q_OBJECT
-
-    muse::GlobalInject<IExportConfiguration> exportConfiguration;
-    muse::GlobalInject<muse::IGlobalConfiguration> globalConfiguration;
-
-    muse::GlobalInject<IFFmpegOptionsAccessor> ffmpegOptionsAccessor;
-    muse::ContextInject<IExporter> exporter{ this };
-    muse::ContextInject<muse::IInteractive> interactive{ this };
-
-    Q_PROPERTY(QString ffmpegVersion READ ffmpegVersion NOTIFY ffmpegVersionChanged)
-    Q_PROPERTY(QString ffmpegLibraryPath READ ffmpegLibraryPath NOTIFY ffmpegLibraryPathChanged)
->>>>>>> upstream/master
 
     // formats
     Q_PROPERTY(int ffmpegFormatIndex READ ffmpegFormatIndex NOTIFY ffmpegFormatIndexChanged)

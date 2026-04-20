@@ -13,22 +13,12 @@
 #include "ieffectsprovider.h"
 
 namespace au::effects {
-<<<<<<< HEAD
 class EffectsUiActions : public muse::ui::IUiActionsModule, public muse::async::Asyncable
 {
     muse::Inject<context::IUiContextResolver> uicontextResolver;
     muse::Inject<IEffectsProvider> effectsProvider;
     muse::Inject<IEffectExecutionScenario> effectExecutionScenario;
     muse::Inject<IEffectsConfiguration> configuration;
-=======
-class EffectsUiActions : public muse::ui::IUiActionsModule, public muse::async::Asyncable, public muse::Contextable
-{
-    muse::GlobalInject<IEffectsConfiguration> configuration;
-    muse::GlobalInject<IEffectsProvider> effectsProvider;
-
-    muse::ContextInject<context::IUiContextResolver> uicontextResolver{ this };
-    muse::ContextInject<IEffectExecutionScenario> effectExecutionScenario{ this };
->>>>>>> upstream/master
 
 public:
     EffectsUiActions(std::shared_ptr<EffectsActionsController> controller);

@@ -7,13 +7,8 @@
 #include "progressdialog.h"
 #include "wxtypes_convert.h"
 
-<<<<<<< HEAD
 ProgressDialog::ProgressDialog(const std::string& title)
     : m_progressTitle{title}
-=======
-ProgressDialog::ProgressDialog(const muse::modularity::ContextPtr& ctx, const std::string& title)
-    : muse::Contextable(ctx), m_progressTitle{title}
->>>>>>> upstream/master
 {
     // Of course, the least number of increments to yield a smooth animation depends on the width of the progress bar,
     // yet 300 increments should be enough to provide a smooth animation in most cases.

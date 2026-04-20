@@ -5,24 +5,13 @@
 
 #include "modularity/ioc.h"
 #include "global/iglobalconfiguration.h"
-<<<<<<< HEAD
-=======
-#include "io/ifilesystem.h"
-#include "au3cloud/iau3cloudconfiguration.h"
->>>>>>> upstream/master
 
 #include "../iprojectconfiguration.h"
 
 namespace au::project {
 class ProjectConfiguration final : public IProjectConfiguration
 {
-<<<<<<< HEAD
     muse::Inject<muse::IGlobalConfiguration> globalConfiguration;
-=======
-    muse::GlobalInject<muse::IGlobalConfiguration> globalConfiguration;
-    muse::GlobalInject<muse::io::IFileSystem> fileSystem;
-    muse::GlobalInject<au3cloud::IAu3CloudConfiguration> cloudConfiguration;
->>>>>>> upstream/master
 
 public:
     ProjectConfiguration() = default;

@@ -19,13 +19,8 @@ using namespace au::record;
 using namespace au::playback;
 using namespace au::au3;
 
-<<<<<<< HEAD
 Au3AudioInput::Au3AudioInput()
     : m_inputMeter{au::au3::createAudioMeter()}
-=======
-Au3AudioInput::Au3AudioInput(const muse::modularity::ContextPtr& ctx)
-    : muse::Contextable(ctx), m_inputMeter{au::au3::createAudioMeter()}
->>>>>>> upstream/master
 {
     globalContext()->currentProjectChanged().onNotify(this, [this](){
         auto currentProject = globalContext()->currentProject();

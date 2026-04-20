@@ -20,12 +20,6 @@ static const ActionCode CLIP_PITCH_AND_SPEED_CODE("clip-pitch-speed");
 static const ActionCode TOGGLE_PLAYBACK_ON_RULER_CLICK_ENABLED_CODE("toggle-playback-on-ruler-click-enabled");
 static const ActionQuery TOGGLE_TRACK_HALF_WAVE("action://projectscene/track-view-half-wave");
 static const ActionCode LABEL_OPEN_EDITOR_CODE("toggle-label-editor");
-<<<<<<< HEAD
-=======
-static const ActionCode CLIP_GAIN_CODE("clip-gain");
-
-static const muse::Uri EDIT_PITCH_AND_SPEED_URI("audacity://projectscene/editpitchandspeed");
->>>>>>> upstream/master
 
 void ProjectSceneActionsController::init()
 {
@@ -41,10 +35,6 @@ void ProjectSceneActionsController::init()
                       &ProjectSceneActionsController::togglePlaybackOnRulerClickEnabled);
     dispatcher()->reg(this, TOGGLE_TRACK_HALF_WAVE, this, &ProjectSceneActionsController::toggleTrackHalfWave);
     dispatcher()->reg(this, LABEL_OPEN_EDITOR_CODE, this, &ProjectSceneActionsController::openLabelEditor);
-<<<<<<< HEAD
-=======
-    dispatcher()->reg(this, CLIP_GAIN_CODE, this, &ProjectSceneActionsController::toggleAutomation);
->>>>>>> upstream/master
 }
 
 void ProjectSceneActionsController::notifyActionCheckedChanged(const ActionCode& actionCode)
@@ -193,12 +183,4 @@ Channel<ActionCode> ProjectSceneActionsController::actionCheckedChanged() const
 bool ProjectSceneActionsController::canReceiveAction(const ActionCode&) const
 {
     return globalContext()->currentProject() != nullptr;
-<<<<<<< HEAD
-=======
-}
-
-Channel<ActionCode> ProjectSceneActionsController::actionEnabledChanged() const
-{
-    return m_actionEnabledChanged;
->>>>>>> upstream/master
 }

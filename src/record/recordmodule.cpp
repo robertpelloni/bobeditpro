@@ -39,14 +39,10 @@ std::string RecordModule::moduleName() const
 void RecordModule::registerExports()
 {
     m_configuration = std::make_shared<RecordConfiguration>();
-<<<<<<< HEAD
     m_controller = std::make_shared<RecordController>();
     m_meterController = std::make_shared<RecordMeterController>();
     m_uiActions = std::make_shared<RecordUiActions>(m_controller);
     m_record = std::make_shared<Au3Record>();
-=======
-    m_meterController = std::make_shared<RecordMeterController>();
->>>>>>> upstream/master
 
     globalIoc()->registerExport<IRecordConfiguration>(mname, m_configuration);
     globalIoc()->registerExport<IRecordMeterController>(mname, m_meterController);

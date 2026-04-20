@@ -28,18 +28,11 @@
 
 #include "framework/global/async/asyncable.h"
 
-<<<<<<< HEAD
 #include "modularity/ioc.h"
 #include "iprojectconfiguration.h"
 #include "imscmetareader.h"
 #include "io/ifilesystem.h"
 #include "multiinstances/imultiinstancesprovider.h"
-=======
-#include "framework/global/modularity/ioc.h"
-#include "project/iprojectconfiguration.h"
-#include "framework/global/io/ifilesystem.h"
-#include "framework/multiwindows/imultiwindowsprovider.h"
->>>>>>> upstream/master
 
 namespace au::project {
 class RecentFilesController : public IRecentFilesController, public muse::async::Asyncable

@@ -36,7 +36,6 @@
 #include "cloud/cloudqmltypes.h"
 
 namespace au::project {
-<<<<<<< HEAD
 class OpenSaveProjectScenario : public IOpenSaveProjectScenario
 {
     muse::Inject<IProjectConfiguration> configuration;
@@ -48,21 +47,6 @@ class OpenSaveProjectScenario : public IOpenSaveProjectScenario
 
 public:
     OpenSaveProjectScenario() = default;
-=======
-class OpenSaveProjectScenario : public IOpenSaveProjectScenario, public muse::Contextable
-{
-    muse::GlobalInject<IProjectConfiguration> configuration;
-    muse::GlobalInject<muse::io::IFileSystem> fileSystem;
-    muse::GlobalInject<muse::cloud::IMuseScoreComService> museScoreComService;
-    muse::GlobalInject<muse::cloud::IAudioComService> audioComService;
-
-    muse::ContextInject<IProjectFilesController> projectFilesController { this };
-    muse::ContextInject<muse::IInteractive> interactive { this };
-
-public:
-    OpenSaveProjectScenario(const muse::modularity::ContextPtr& ctx)
-        : muse::Contextable(ctx) {}
->>>>>>> upstream/master
 
     muse::RetVal<SaveLocation> askSaveLocation(IAudacityProjectPtr project, SaveMode mode,
                                                SaveLocationType preselectedType = SaveLocationType::Undefined) const override;

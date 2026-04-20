@@ -74,13 +74,8 @@ const UiActionList RecordUiActions::m_mainActions = {
              ),
 };
 
-<<<<<<< HEAD
 RecordUiActions::RecordUiActions(std::shared_ptr<RecordController> controller)
     : m_controller(controller)
-=======
-RecordUiActions::RecordUiActions(const muse::modularity::ContextPtr& ctx, std::shared_ptr<RecordController> controller)
-    : muse::Contextable(ctx), m_controller(controller)
->>>>>>> upstream/master
 {
 }
 

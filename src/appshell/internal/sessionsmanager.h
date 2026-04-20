@@ -37,7 +37,6 @@
 #include "project/iprojectconfiguration.h"
 
 namespace au::appshell {
-<<<<<<< HEAD
 class SessionsManager : public ISessionsManager, public muse::async::Asyncable
 {
     INJECT(muse::actions::IActionsDispatcher, dispatcher)
@@ -49,23 +48,6 @@ class SessionsManager : public ISessionsManager, public muse::async::Asyncable
     INJECT(au::au3::IAu3ProjectCreator, au3ProjectCreator)
 
 public:
-=======
-class SessionsManager : public ISessionsManager, public muse::async::Asyncable, public muse::Contextable
-{
-    muse::GlobalInject<muse::io::IFileSystem> fileSystem;
-    muse::GlobalInject<project::IProjectConfiguration> projectConfiguration;
-    muse::GlobalInject<IAppShellConfiguration> configuration;
-    muse::GlobalInject<muse::mi::IMultiWindowsProvider> multiwindowsProvider;
-    muse::GlobalInject<au::au3::IAu3ProjectCreator> au3ProjectCreator;
-
-    muse::ContextInject<muse::actions::IActionsDispatcher> dispatcher { this };
-    muse::ContextInject<au::context::IGlobalContext> globalContext { this };
-
-public:
-    SessionsManager(const muse::modularity::ContextPtr& ctx)
-        : muse::Contextable(ctx) {}
-
->>>>>>> upstream/master
     void init();
     void deinit();
 

@@ -114,7 +114,6 @@ void Au3Exporter::init()
     ExportPluginRegistry::Get().Initialize();
 }
 
-<<<<<<< HEAD
 muse::Ret Au3Exporter::exportData(std::string filename)
 {
     muse::io::path_t directoryPath = exportConfiguration()->directoryPath();
@@ -131,71 +130,6 @@ muse::Ret Au3Exporter::exportData(std::string filename)
     }
 
     wxFileName wxfilename = wxFromString(filePath.toString());
-=======
-muse::Ret Au3Exporter::exportData(const muse::io::path_t& path, const Options& options, muse::ProgressPtr progress)
-{
-    const std::string formatName = options.count(OptionKey::Format)
-                                   ? options.at(OptionKey::Format).toString()
-                                   : exportConfiguration()->currentFormat();
-
-    const ExportProcessType processType = options.count(OptionKey::ProcessType)
-                                          ? options.at(OptionKey::ProcessType).toEnum<ExportProcessType>()
-                                          : exportConfiguration()->processType();
-
-    const int exportChannelsType = options.count(OptionKey::ExportChannelsType)
-                                   ? options.at(OptionKey::ExportChannelsType).toInt()
-                                   : exportConfiguration()->exportChannelsType();
-
-    const int exportChannels = options.count(OptionKey::ExportChannels)
-                               ? options.at(OptionKey::ExportChannels).toInt()
-                               : exportConfiguration()->exportChannels();
-
-    const muse::Val exportCustomChannelMapping = options.count(OptionKey::ExportCustomChannelMapping)
-                                                 ? options.at(OptionKey::ExportCustomChannelMapping)
-                                                 : exportConfiguration()->exportCustomChannelMapping();
-
-    const int exportSampleRate = options.count(OptionKey::ExportSampleRate)
-                                 ? options.at(OptionKey::ExportSampleRate).toInt()
-                                 : exportConfiguration()->exportSampleRate();
-
-    ExportParameters parameters;
-    if (options.count(OptionKey::Parameters)) {
-        for (const auto& entryVal : options.at(OptionKey::Parameters).toList()) {
-            const auto& m = entryVal.toMap();
-            const int id = m.at("id").toInt();
-            const auto& valueVal = m.at("value");
-            OptionValue value;
-            switch (valueVal.type()) {
-            case muse::Val::Type::Bool:
-                value = valueVal.toBool();
-                break;
-            case muse::Val::Type::Int:
-                value = valueVal.toInt();
-                break;
-            case muse::Val::Type::Double:
-                value = valueVal.toDouble();
-                break;
-            case muse::Val::Type::String:
-                value = valueVal.toString();
-                break;
-            default: break;
-            }
-            parameters.emplace_back(id, value);
-        }
-    } else {
-        const int fmt = formatIndex(formatName);
-        const ExportPlugin* plugin = formatPlugin(formatName);
-        if (plugin) {
-            auto editor = plugin->CreateOptionsEditor(fmt, nullptr);
-            editor->Load(*gPrefs);
-            for (const auto& [id, val] : ExportUtils::ParametersFromEditor(*editor)) {
-                parameters.emplace_back(id, std::visit([](auto v) -> OptionValue { return v; }, val));
-            }
-        }
-    }
-
-    wxFileName wxfilename = wxFromString(path.toString());
->>>>>>> upstream/master
 
     Au3Project* project = reinterpret_cast<Au3Project*>(globalContext()->currentProject()->au3ProjectPtr());
     IF_ASSERT_FAILED(project) {
@@ -230,8 +164,6 @@ muse::Ret Au3Exporter::exportData(const muse::io::path_t& path, const Options& o
                                                                                                                             secs_t>(
                   selectionController()->rightMostSelectedClipEndTime());
     } else if (exportConfiguration()->processType() == ExportProcessType::AUDIO_IN_LOOP_REGION) {
-=======
-            = selectionController()->timeSelectionIsNotEmpty() ? selectionController()->dataSelectedEndTime()
               : selectionController()->rightMostSelectedClipEndTime().value_or(0.0);
         m_selectedOnly = true;
     } else if (processType == ExportProcessType::AUDIO_IN_LOOP_REGION) {
@@ -256,7 +188,6 @@ muse::Ret Au3Exporter::exportData(const muse::io::path_t& path, const Options& o
         return muse::make_ret(muse::Ret::Code::InternalError, muse::trc("export", "All selected audio is muted"));
     }
 
-<<<<<<< HEAD
     // TODO: update when custom mapping is implemented
     if (ExportChannelsPref::ExportChannels(exportConfiguration()->exportChannels()) == ExportChannelsPref::ExportChannels::MONO) {
         m_numChannels = 1;
@@ -267,49 +198,6 @@ muse::Ret Au3Exporter::exportData(const muse::io::path_t& path, const Options& o
     // TODO: m_mixerSpec should be created ONLY when custom mapping is applied
     // m_mixerSpec = std::make_unique<MixerOptions::Downmix>(exportedTracks.size(), m_numChannels).get();
     m_sampleRate = exportConfiguration()->exportSampleRate();
-=======
-    int inputChannelsCount = 0;
-    for (const auto& exportedTrack : exportedTracks) {
-        inputChannelsCount += exportedTrack->NChannels();
-    }
-
-    auto downMix = std::make_unique<MixerOptions::Downmix>(inputChannelsCount, exportChannels);
-    if (ExportChannelsPref::ExportChannels(exportChannelsType) == ExportChannelsPref::ExportChannels::MONO) {
-        m_numChannels = 1;
-    } else if (ExportChannelsPref::ExportChannels(exportChannelsType)
-               == ExportChannelsPref::ExportChannels::STEREO) {
-        m_numChannels = 2;
-    } else {
-        //Figure out the final channel mapping: mixer dialog shows
-        //all tracks regardless of their mute/solo state, but
-        //muted channels should not be present in exported file -
-        //apply channel mask to exclude them
-        auto channelMask = prepareChannelMask();
-        downMix = std::make_unique<MixerOptions::Downmix>(*downMix, channelMask);
-        m_mixerSpec = downMix.get();
-
-        const std::vector<std::vector<bool> > matrix = utils::valToMatrix(exportCustomChannelMapping);
-        m_numChannels = exportChannels;
-
-        for (int in = 0; in < inputChannelsCount; ++in) {
-            for (unsigned int out = 0; out < m_numChannels; ++out) {
-                m_mixerSpec->mMap[in][out] = false;
-            }
-        }
-
-        const int rows = std::min(inputChannelsCount, static_cast<int>(matrix.size()));
-        for (int in = 0; in < rows; ++in) {
-            const int cols = std::min(static_cast<int>(m_numChannels), static_cast<int>(matrix[in].size()));
-            for (int out = 0; out < cols; ++out) {
-                if (matrix[in][out]) {
-                    m_mixerSpec->mMap[in][out] = true;
-                }
-            }
-        }
-    }
-
-    m_sampleRate = exportSampleRate;
->>>>>>> upstream/master
 
     try {
         auto processor = m_plugin->CreateProcessor(m_format);

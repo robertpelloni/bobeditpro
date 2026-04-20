@@ -221,13 +221,8 @@ const UiActionList PlaybackUiActions::m_settingsActions = {
              ),
 };
 
-<<<<<<< HEAD
 PlaybackUiActions::PlaybackUiActions(std::shared_ptr<PlaybackController> controller)
     : m_controller(controller)
-=======
-PlaybackUiActions::PlaybackUiActions(const muse::modularity::ContextPtr& ctx, std::shared_ptr<PlaybackController> controller)
-    : muse::Contextable(ctx), m_controller(controller)
->>>>>>> upstream/master
 {
 }
 

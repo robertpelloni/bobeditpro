@@ -46,11 +46,7 @@ double calculateScrollSpeed(double value, double inMin, double inMax, double out
 }
 
 TimelineContext::TimelineContext(QObject* parent)
-<<<<<<< HEAD
     : QObject(parent)
-=======
-    : QObject(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
->>>>>>> upstream/master
 {
     m_snapTimeFormatter = std::make_shared<SnapTimeFormatter>();
 
@@ -118,31 +114,11 @@ void TimelineContext::init(double frameWidth)
     dispatcher()->reg(this, "zoom-default", this, &TimelineContext::zoomDefault);
     dispatcher()->reg(this, "zoom-to-selection", this, &TimelineContext::fitSelectionToWidth);
     dispatcher()->reg(this, "zoom-to-fit-project", this, &TimelineContext::fitProjectToWidth);
-<<<<<<< HEAD
-=======
-    dispatcher()->reg(this, "center-view-on-playhead", this, &TimelineContext::centerViewOnPlayhead);
-    dispatcher()->reg(this, "zoom-toggle", this, &TimelineContext::zoomToggle);
->>>>>>> upstream/master
 
     configuration()->playbackOnRulerClickEnabledChanged().onNotify(this, [this]() {
         emit playbackOnRulerClickEnabledChanged();
     });
 
-<<<<<<< HEAD
-=======
-    configuration()->updateDisplayWhilePlayingEnabledChanged().onNotify(this, [this]() {
-        emit updateDisplayWhilePlayingEnabledChanged();
-    });
-
-    configuration()->pinnedPlayHeadEnabledChanged().onNotify(this, [this]() {
-        emit pinnedPlayHeadEnabledChanged();
-    });
-
-    playbackController()->lastPlaybackSeekTimeChanged().onNotify(this, [this]() {
-        emit lastPlaybackSeekPositionChanged();
-    });
-
->>>>>>> upstream/master
     onProjectChanged();
 }
 
@@ -284,6 +260,35 @@ void TimelineContext::insureVisible(double posSec)
     moveToFrameTime(newFrameTime);
 }
 
+void TimelineContext::animatedInsureVisible(double posSec)
+{
+    if (posSec >= m_frameStartTime && posSec <= m_frameEndTime) {
+        return;
+    }
+
+    const double frameTime = m_frameEndTime - m_frameStartTime;
+
+    if (posSec > m_frameEndTime) {
+        // Scrolling right: place clip start at ~75% of view width
+        animateToFrameTime(posSec - frameTime * 0.75);
+    } else {
+        // Scrolling left: place clip start at ~25% of view width
+        animateToFrameTime(posSec - frameTime * 0.25);
+    }
+}
+
+void TimelineContext::animatedCenterOnTime(double secs)
+{
+    const double frameTime = m_frameEndTime - m_frameStartTime;
+    const double targetStartTime = secs - frameTime * 0.5;
+    animateToFrameTime(targetStartTime);
+}
+
+bool TimelineContext::isAnimating() const
+{
+    return m_frameStartAnimation.state() == QAbstractAnimation::Running;
+}
+
 void TimelineContext::autoScrollView(double scrollStep)
 {
     if (!muse::RealIsEqualOrMore(scrollStep, 0.0)) {
@@ -365,8 +370,24 @@ void TimelineContext::onResizeFrameContentHeight(double frameHeight)
 
 void TimelineContext::moveToFrameTime(double startTime)
 {
+    stopAnimation();
     setFrameStartTime(std::max(startTime, 0.0));
     updateFrameTime();
+}
+
+void TimelineContext::animateToFrameTime(double targetStartTime)
+{
+    stopAnimation();
+    m_frameStartAnimation.setStartValue(m_frameStartTime);
+    m_frameStartAnimation.setEndValue(std::max(targetStartTime, 0.0));
+    m_frameStartAnimation.start();
+}
+
+void TimelineContext::stopAnimation()
+{
+    if (m_frameStartAnimation.state() == QAbstractAnimation::Running) {
+        m_frameStartAnimation.stop();
+    }
 }
 
 void TimelineContext::shiftFrameTime(double shift)
@@ -374,6 +395,8 @@ void TimelineContext::shiftFrameTime(double shift)
     if (muse::is_zero(shift)) {
         return;
     }
+
+    stopAnimation();
 
     double timeShift = shift;
     double endTimeShift = shift;
@@ -1156,21 +1179,3 @@ bool TimelineContext::playbackOnRulerClickEnabled() const
 {
     return configuration()->playbackOnRulerClickEnabled();
 }
-<<<<<<< HEAD
-=======
-
-bool TimelineContext::updateDisplayWhilePlayingEnabled() const
-{
-    return configuration()->updateDisplayWhilePlayingEnabled();
-}
-
-bool TimelineContext::pinnedPlayHeadEnabled() const
-{
-    return configuration()->pinnedPlayHeadEnabled();
-}
-
-double TimelineContext::lastPlaybackSeekPosition() const
-{
-    return timeToPosition(playbackController()->lastPlaybackSeekTime());
-}
->>>>>>> upstream/master

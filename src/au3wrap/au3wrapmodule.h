@@ -18,14 +18,8 @@ class Au3Record;
 class Au3AudioDevicesProvider;
 class Au3WrapModule : public muse::modularity::IModuleSetup
 {
-<<<<<<< HEAD
     muse::Inject<muse::IGlobalConfiguration> globalConfiguration;
     muse::Inject<au::project::IProjectConfiguration> projectConfiguration;
-=======
-    muse::GlobalInject<muse::IGlobalConfiguration> globalConfiguration;
-    muse::GlobalInject<au::project::IProjectConfiguration> projectConfiguration;
-    muse::GlobalInject<muse::IApplication> application;
->>>>>>> upstream/master
 public:
 
     std::string moduleName() const override;

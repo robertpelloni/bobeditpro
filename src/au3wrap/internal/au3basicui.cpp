@@ -2,16 +2,6 @@
 * Audacity: A Digital Audio Editor
 */
 
-<<<<<<< HEAD
-=======
-#include "framework/global/runtime.h"
-#include "framework/global/async/async.h"
-#include "framework/ui/imainwindow.h"
-
-#include <QGuiApplication>
-
-#include "progressdialog.h"
->>>>>>> upstream/master
 #include "au3basicui.h"
 #include "progressdialog.h"
 
@@ -161,11 +151,7 @@ std::unique_ptr<BasicUI::ProgressDialog> Au3BasicUI::DoMakeProgress(const Transl
 {
     Q_UNUSED(flags);
     Q_UNUSED(remainingLabelText);
-<<<<<<< HEAD
     auto dialog = std::make_unique<ProgressDialog>();
-=======
-    auto dialog = std::make_unique<ProgressDialog>(activeContext());
->>>>>>> upstream/master
     dialog->SetDialogTitle(title);
     dialog->SetMessage(message);
     return dialog;

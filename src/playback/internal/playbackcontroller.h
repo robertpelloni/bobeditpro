@@ -22,7 +22,6 @@
 
 namespace au::playback {
 class PlaybackUiActions;
-<<<<<<< HEAD
 class PlaybackController : public IPlaybackController, public muse::actions::Actionable, public muse::async::Asyncable
 {
 public:
@@ -37,27 +36,6 @@ public:
     muse::Inject<trackedit::ISelectionController> selectionController;
 
 public:
-=======
-class PlaybackController : public IPlaybackController, public muse::actions::Actionable, public muse::async::Asyncable,
-    public muse::Contextable
-{
-public:
-    muse::GlobalInject<au::playback::IPlaybackConfiguration> playbackConfiguration;
-    muse::GlobalInject<muse::IApplication> application;
-
-    muse::ContextInject<au::context::IGlobalContext> globalContext { this };
-    muse::ContextInject<audio::IAudioDevicesProvider> audioDevicesProvider { this };
-    muse::ContextInject<IPlayback> playback { this };
-    muse::ContextInject<muse::actions::IActionsDispatcher> dispatcher { this };
-    muse::ContextInject<muse::IInteractive> interactive { this };
-    muse::ContextInject<record::IRecordController> recordController{ this };
-    muse::ContextInject<trackedit::ISelectionController> selectionController{ this };
-
-public:
-    PlaybackController(const muse::modularity::ContextPtr& ctx)
-        : muse::Contextable(ctx) {}
-
->>>>>>> upstream/master
     void init();
     void deinit();
 

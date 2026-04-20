@@ -24,7 +24,6 @@ class EffectSettingsAccess;
 class TrackList;
 
 namespace au::effects {
-<<<<<<< HEAD
 class EffectsProvider : public IEffectsProvider, public muse::async::Asyncable
 {
     muse::Inject<au::context::IGlobalContext> globalContext;
@@ -40,18 +39,6 @@ class EffectsProvider : public IEffectsProvider, public muse::async::Asyncable
     muse::Inject<muse::audioplugins::IKnownAudioPluginsRegister> knownPluginsRegister;
 
 public:
-=======
-class EffectsProvider : public IEffectsProvider, public muse::async::Asyncable, public muse::Contextable
-{
-    muse::GlobalInject<IEffectsConfiguration> configuration;
-    muse::GlobalInject<muse::audioplugins::IKnownAudioPluginsRegister> knownPluginsRegister;
-    muse::GlobalInject<IEffectLoadersRegister> effectLoadersRegister;
-    muse::GlobalInject<muse::audioplugins::IAudioPluginMetaReaderRegister> metaReaderRegister;
-
-public:
-    void deinit();
-
->>>>>>> upstream/master
     void init();
 
     void reloadEffects();

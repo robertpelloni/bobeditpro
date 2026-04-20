@@ -4,16 +4,7 @@
 
 #include "tracknavigationcontroller.h"
 
-<<<<<<< HEAD
 #include "global/containers.h"
-=======
-#include "framework/global/async/async.h"
-#include "framework/global/containers.h"
-
-#include "au3wrap/internal/domaccessor.h"
-
-#include "trackedit/trackedittypes.h"
->>>>>>> upstream/master
 
 using namespace au::trackedit;
 
@@ -62,7 +53,6 @@ void TrackNavigationController::init()
     m_selectionStart = std::nullopt;
 }
 
-<<<<<<< HEAD
 void TrackNavigationController::focusTrackByIndex(const muse::actions::ActionData& args)
 {
     if (args.count() != 1) {
@@ -112,18 +102,6 @@ void TrackNavigationController::navigateUp(const muse::actions::ActionData& args
 
     const auto& panel = std::find_if(panels.begin(), panels.end(), [position](const muse::ui::INavigationPanel* p) {
         return p->index().order() == 2 * position;
-=======
-    globalContext()->currentTrackeditProjectChanged().onNotify(this, [this]() {
-        muse::async::Async::call(this, [this]() {
-            ITrackeditProjectPtr prj = globalContext()->currentTrackeditProject();
-            if (prj) {
-                std::vector<Track> trackList = prj->trackList();
-                if (!trackList.empty()) {
-                    setFocusedTrack(trackList.front().id);
-                }
-            }
-        });
->>>>>>> upstream/master
     });
 
     if (panel == panels.end()) {

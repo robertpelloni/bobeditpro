@@ -74,7 +74,6 @@
 #endif
 
 using namespace au::appshell;
-<<<<<<< HEAD
 using namespace au::appshell;
 using namespace mu;
 using namespace muse;
@@ -85,10 +84,6 @@ static void appshell_init_qrc()
 {
     Q_INIT_RESOURCE(appshell);
 }
-=======
-
-static const std::string mname("appshell");
->>>>>>> upstream/master
 
 AppShellModule::AppShellModule()
 {
@@ -101,7 +96,6 @@ std::string AppShellModule::moduleName() const
 
 void AppShellModule::registerExports()
 {
-<<<<<<< HEAD
     m_applicationActionController = std::make_shared<ApplicationActionController>();
     m_applicationUiActions = std::make_shared<ApplicationUiActions>(m_applicationActionController);
     m_appShellConfiguration = std::make_shared<AppShellConfiguration>();
@@ -111,11 +105,6 @@ void AppShellModule::registerExports()
     ioc()->registerExport<IApplicationActionController>(moduleName(), m_applicationActionController);
     ioc()->registerExport<IStartupScenario>(moduleName(), new StartupScenario());
     ioc()->registerExport<ISessionsManager>(moduleName(), m_sessionsManager);
-=======
-    m_appShellConfiguration = std::make_shared<AppShellConfiguration>(muse::modularity::globalCtx());
-
-    globalIoc()->registerExport<IAppShellConfiguration>(mname, m_appShellConfiguration);
->>>>>>> upstream/master
 
 #ifdef Q_OS_MAC
     globalIoc()->registerExport<IAppMenuModelHook>(mname, std::make_shared<MacOSAppMenuModelHook>());
@@ -126,7 +115,6 @@ void AppShellModule::registerExports()
 
 void AppShellModule::resolveImports()
 {
-<<<<<<< HEAD
     auto ar = ioc()->resolve<ui::IUiActionsRegister>(moduleName());
     if (ar) {
         ar->reg(m_applicationUiActions);
@@ -208,23 +196,6 @@ void AppShellModule::onPreInit(const IApplication::RunMode& mode)
 }
 
 void AppShellModule::onInit(const IApplication::RunMode& mode)
-=======
-    auto ir = globalIoc()->resolve<muse::interactive::IInteractiveUriRegister>(mname);
-    if (ir) {
-        ir->registerPageUri(muse::Uri("audacity://home"));
-        ir->registerPageUri(muse::Uri("audacity://project"));
-        ir->registerPageUri(muse::Uri("audacity://publish"));
-        ir->registerPageUri(muse::Uri("audacity://devtools"));
-
-        ir->registerQmlUri(muse::Uri("audacity://about/audacity"), "Audacity.AppShell", "AboutDialog");
-        ir->registerQmlUri(muse::Uri("audacity://firstLaunchSetup"), "Audacity.AppShell", "FirstLaunchSetupDialog");
-        ir->registerQmlUri(muse::Uri("audacity://signin/audiocom"), "Audacity.AppShell", "SigninAudiocomDialog");
-        ir->registerQmlUri(muse::Uri("audacity://welcomedialog"), "Audacity.AppShell", "WelcomeDialog");
-    }
-}
-
-void AppShellModule::onInit(const muse::IApplication::RunMode& mode)
->>>>>>> upstream/master
 {
     if (mode == IApplication::RunMode::AudioPluginRegistration) {
         return;
@@ -278,11 +249,7 @@ void AppShellContext::onInit(const muse::IApplication::RunMode& mode)
     }
 }
 
-<<<<<<< HEAD
 void AppShellModule::onAllInited(const IApplication::RunMode& mode)
-=======
-void AppShellContext::onAllInited(const muse::IApplication::RunMode& mode)
->>>>>>> upstream/master
 {
     if (mode == IApplication::RunMode::AudioPluginRegistration) {
         return;

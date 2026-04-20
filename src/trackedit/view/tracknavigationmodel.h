@@ -10,7 +10,6 @@
 #include "ui/inavigationcontroller.h"
 
 namespace au::trackedit {
-<<<<<<< HEAD
 class TrackNavigationModel : public QObject, public muse::async::Asyncable
 {
     Q_OBJECT
@@ -18,16 +17,6 @@ class TrackNavigationModel : public QObject, public muse::async::Asyncable
     muse::Inject<au::context::IGlobalContext> globalContext;
     muse::Inject<muse::actions::IActionsDispatcher> dispatcher;
     muse::Inject<muse::ui::INavigationController> navigationController;
-=======
-class TrackNavigationModel : public QObject, public muse::async::Asyncable, public muse::Contextable
-{
-    Q_OBJECT
-
-    muse::ContextInject<au::context::IGlobalContext> globalContext{ this };
-    muse::ContextInject<muse::actions::IActionsDispatcher> dispatcher{ this };
-    muse::ContextInject<muse::ui::INavigationController> navigationController{ this };
-    muse::ContextInject<ITrackNavigationController> tracksNavigationController{ this };
->>>>>>> upstream/master
 
     Q_PROPERTY(QList<muse::ui::NavigationPanel*> trackItemPanels READ trackItemPanels NOTIFY trackItemPanelsChanged)
     Q_PROPERTY(QList<muse::ui::NavigationPanel*> clipItemPanels READ clipItemPanels NOTIFY clipItemPanelsChanged)
@@ -54,6 +43,7 @@ private:
     void addPanels(trackedit::TrackId trackId, int pos);
     void resetPanelOrder();
     void addDefaultNavigation();
+    void handleArrowKeyFallback(muse::ui::NavigationEvent* event);
 
     muse::ui::NavigationControl* m_default_control = nullptr;
     muse::ui::NavigationPanel* m_default_panel = nullptr;

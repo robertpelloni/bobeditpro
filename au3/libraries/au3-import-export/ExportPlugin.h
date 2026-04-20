@@ -160,11 +160,7 @@ public:
      * @param parameters Where to put parameters
      * @return Whether the parsing was successful
      **/
-<<<<<<< HEAD
     // virtual bool ParseConfig(int formatIndex, const rapidjson::Value& config, ExportProcessor::Parameters& parameters) const;
-=======
-    virtual bool ParseConfig(int formatIndex, const std::string& config, ExportProcessor::Parameters& parameters) const;
->>>>>>> upstream/master
 
     virtual bool CheckFileName(wxFileName& filename, int format = 0) const;
 

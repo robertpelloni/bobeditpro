@@ -7,11 +7,7 @@ using namespace muse;
 using namespace au::projectscene;
 
 RealtimeEffectSectionModel::RealtimeEffectSectionModel(QObject* parent)
-<<<<<<< HEAD
     : QObject(parent)
-=======
-    : QObject(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
->>>>>>> upstream/master
 {
 }
 

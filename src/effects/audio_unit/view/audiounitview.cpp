@@ -9,11 +9,7 @@
 
 namespace au::effects {
 AudioUnitView::AudioUnitView(QQuickItem* parent)
-<<<<<<< HEAD
     : QQuickItem(parent)
-=======
-    : QQuickItem(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
->>>>>>> upstream/master
 {
 }
 

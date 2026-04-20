@@ -41,7 +41,6 @@ namespace au::project {
 //! it cannot be used in parts, therefore, to avoid duplication of symbols,
 //! we can add (as source) it only to one library
 //! * Thanks to this wrapper we will see exactly what we are using from AU3
-<<<<<<< HEAD
 class Audacity4Project : public IAudacityProject, public muse::async::Asyncable
 {
     muse::Inject<au3::IAu3ProjectCreator> au3ProjectCreator;
@@ -57,25 +56,6 @@ class Audacity4Project : public IAudacityProject, public muse::async::Asyncable
 
 public:
     Audacity4Project();
-=======
-class Audacity4Project : public IAudacityProject, public muse::async::Asyncable, public muse::Contextable
-{
-    muse::GlobalInject<muse::io::IFileSystem> fileSystem;
-    muse::GlobalInject<IProjectConfiguration> configuration;
-    muse::GlobalInject<au3::IAu3ProjectCreator> au3ProjectCreator;
-    muse::GlobalInject<trackedit::ITrackeditProjectCreator> trackeditProjectCreator;
-    muse::GlobalInject<projectscene::IProjectViewStateCreator> viewStateCreator;
-
-    muse::ContextInject<context::IGlobalContext> globalContext { this };
-    muse::ContextInject<au::trackedit::IProjectHistory> projectHistory { this };
-    muse::ContextInject<au::trackedit::ITrackeditClipboard> clipboard { this };
-    muse::ContextInject<IThumbnailCreator> thumbnailCreator { this };
-    muse::ContextInject<importexport::IImporter> importer { this };
-
-public:
-    Audacity4Project(const muse::modularity::ContextPtr& ctx)
-        : muse::Contextable(ctx) {}
->>>>>>> upstream/master
 
     muse::Ret createNew() override;
 

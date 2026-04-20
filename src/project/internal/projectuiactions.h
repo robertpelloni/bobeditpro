@@ -8,17 +8,10 @@
 #include "async/asyncable.h"
 
 namespace au::project {
-<<<<<<< HEAD
 class ProjectUiActions final : public muse::ui::IUiActionsModule, public muse::async::Asyncable
 {
     muse::Inject<context::IUiContextResolver> uicontextResolver;
     muse::Inject<record::IRecordController> recordController;
-=======
-class ProjectUiActions final : public muse::ui::IUiActionsModule, public muse::async::Asyncable, public muse::Contextable
-{
-    muse::ContextInject<context::IUiContextResolver> uicontextResolver { this };
-    muse::ContextInject<record::IRecordController> recordController { this };
->>>>>>> upstream/master
 
 public:
     explicit ProjectUiActions(const std::shared_ptr<ProjectActionsController>& controller);

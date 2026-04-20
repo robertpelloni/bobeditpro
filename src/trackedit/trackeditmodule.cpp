@@ -81,7 +81,6 @@ std::string TrackeditModule::moduleName() const
 
 void TrackeditModule::registerExports()
 {
-<<<<<<< HEAD
     ioc()->registerExport<ITrackeditProjectCreator>(moduleName(), new Au3TrackeditProjectCreator());
     ioc()->registerExport<ITrackeditInteraction>(moduleName(),
                                                  new TrackeditInteraction(std::make_unique<TrackeditOperationController>(
@@ -95,13 +94,6 @@ void TrackeditModule::registerExports()
     ioc()->registerExport<ITracksInteraction>(moduleName(), new Au3TracksInteraction());
     ioc()->registerExport<IClipsInteraction>(moduleName(), new Au3ClipsInteraction());
     ioc()->registerExport<ILabelsInteraction>(moduleName(), new Au3LabelsInteraction());
-=======
-    m_configuration = std::make_shared<TrackeditConfiguration>();
-
-    globalIoc()->registerExport<ITrackeditConfiguration>(mname, m_configuration);
-    globalIoc()->registerExport<IClipboardData>(mname, std::make_shared<ClipboardData>());
-    globalIoc()->registerExport<ITrackeditProjectCreator>(mname, std::make_shared<Au3TrackeditProjectCreator>());
->>>>>>> upstream/master
 }
 
 void TrackeditModule::registerUiTypes()
@@ -113,11 +105,7 @@ void TrackeditModule::registerUiTypes()
 
 void TrackeditModule::resolveImports()
 {
-<<<<<<< HEAD
     auto ir = ioc()->resolve<muse::ui::IInteractiveUriRegister>(moduleName());
-=======
-    auto ir = globalIoc()->resolve<muse::interactive::IInteractiveUriRegister>(mname);
->>>>>>> upstream/master
     if (ir) {
         ir->registerQmlUri(muse::Uri("audacity://trackedit/custom_rate"), "Audacity/TrackEdit/CustomRateDialog.qml");
         ir->registerQmlUri(muse::Uri("audacity://trackedit/custom_time"), "Audacity/TrackEdit/CustomTimeDialog.qml");

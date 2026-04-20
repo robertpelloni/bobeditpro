@@ -37,13 +37,7 @@ void CloudProjectsModel::load()
         }
     };
 
-<<<<<<< HEAD
     ValCh<bool> authorized = museScoreComService()->authorization()->userAuthorized();
-=======
-    auto isAuthorized = [](au::au3cloud::AuthState authState) {
-        return std::holds_alternative<au::au3cloud::Authorized>(authState);
-    };
->>>>>>> upstream/master
 
     onUserAuthorizedChanged(isAuthorized(authorization()->authState().val));
 

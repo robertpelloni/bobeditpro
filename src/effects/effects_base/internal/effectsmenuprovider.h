@@ -10,24 +10,12 @@
 #include "global/async/asyncable.h"
 
 namespace au::effects {
-<<<<<<< HEAD
 class EffectsMenuProvider : public IEffectsMenuProvider, public muse::async::Asyncable
 {
     muse::Inject<effects::IEffectsConfiguration> configuration;
     muse::Inject<effects::IEffectsProvider> effectsProvider;
 
 public:
-=======
-class EffectsMenuProvider : public IEffectsMenuProvider, public muse::async::Asyncable, public muse::Contextable
-{
-    muse::GlobalInject<IEffectsConfiguration> configuration;
-    muse::GlobalInject<IEffectsProvider> effectsProvider;
-
-public:
-    EffectsMenuProvider(const muse::modularity::ContextPtr& ctx)
-        : muse::Contextable(ctx) {}
-
->>>>>>> upstream/master
     void init();
 
     muse::uicomponents::MenuItemList destructiveEffectMenu(IEffectMenuItemFactory& effectMenu, EffectFilter filter) override;

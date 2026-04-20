@@ -11,18 +11,12 @@ namespace au::projectscene {
 class ProjectSceneConfiguration : public IProjectSceneConfiguration
 {
 public:
-<<<<<<< HEAD
     muse::Inject<muse::ui::IUiConfiguration> uiConfiguration;
     muse::Inject<muse::workspace::IWorkspaceManager> workspaceManager;
 
 public:
     ProjectSceneConfiguration() = default;
 
-=======
-    muse::GlobalInject<muse::ui::IUiConfiguration> uiConfiguration;
-
-public:
->>>>>>> upstream/master
     void init();
 
     bool isVerticalRulersVisible() const override;

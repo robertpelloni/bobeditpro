@@ -8,11 +8,7 @@
 #include "async/notification.h"
 
 namespace au::trackedit {
-<<<<<<< HEAD
 class ITrackeditConfiguration : MODULE_EXPORT_INTERFACE
-=======
-class ITrackeditConfiguration : MODULE_GLOBAL_INTERFACE
->>>>>>> upstream/master
 {
     INTERFACE_ID(ITrackeditConfiguration)
 

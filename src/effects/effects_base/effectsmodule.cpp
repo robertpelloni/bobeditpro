@@ -6,14 +6,9 @@
 #include "au3-module-manager/PluginManager.h"
 #include "au3-files/FileNames.h"
 
-<<<<<<< HEAD
 #include "ui/iuiactionsregister.h"
 #include "ui/iinteractiveuriregister.h"
 #include "diagnostics/idiagnosticspathsregister.h"
-=======
-#include "framework/interactive/iinteractiveuriregister.h"
-#include "framework/diagnostics/idiagnosticspathsregister.h"
->>>>>>> upstream/master
 
 #include "internal/effectconfigsettings.h"
 #include "internal/effectsprovider.h"
@@ -50,7 +45,6 @@ std::string EffectsModule::moduleName() const
 
 void EffectsModule::registerExports()
 {
-<<<<<<< HEAD
     m_effectsProvider = std::make_shared<EffectsProvider>();
     m_effectsMenuProvider = std::make_shared<EffectsMenuProvider>();
     m_configuration = std::make_shared<EffectsConfiguration>();
@@ -67,23 +61,11 @@ void EffectsModule::registerExports()
     ioc()->registerExport<IEffectPresetsProvider>(moduleName(), new EffectPresetsProvider());
     ioc()->registerExport<IEffectPresetsScenario>(moduleName(), new EffectPresetsScenario());
     ioc()->registerExport<IEffectViewLaunchRegister>(moduleName(), new EffectViewLaunchRegister());
-=======
-    m_configuration = std::make_shared<EffectsConfiguration>();
-    m_effectsProvider = std::make_shared<EffectsProvider>();
-
-    globalIoc()->registerExport<IEffectsConfiguration>(mname, m_configuration);
-    globalIoc()->registerExport<IEffectsProvider>(mname, m_effectsProvider);
-    globalIoc()->registerExport<IParameterExtractorRegistry>(mname, new ParameterExtractorRegistry());
->>>>>>> upstream/master
 }
 
 void EffectsModule::resolveImports()
 {
-<<<<<<< HEAD
     auto ir = ioc()->resolve<muse::ui::IInteractiveUriRegister>(moduleName());
-=======
-    auto ir = globalIoc()->resolve<muse::interactive::IInteractiveUriRegister>(mname);
->>>>>>> upstream/master
     if (ir) {
         ir->registerQmlUri(muse::Uri("audacity://effects/destructive_viewer"), "Audacity/Effects/DestructiveEffectsViewerDialog.qml");
         ir->registerQmlUri(muse::Uri("audacity://effects/realtime_viewer"), "Audacity/Effects/RealtimeEffectViewerDialog.qml");
@@ -125,13 +107,6 @@ void EffectsModule::onInit(const muse::IApplication::RunMode&)
     }
 }
 
-<<<<<<< HEAD
-=======
-void EffectsModule::onDeinit()
-{
-}
-
->>>>>>> upstream/master
 void EffectsModule::onDelayedInit()
 {
     m_effectsProvider->deinit();

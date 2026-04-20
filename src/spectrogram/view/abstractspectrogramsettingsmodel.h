@@ -36,11 +36,8 @@ class AbstractSpectrogramSettingsModel : public QObject
     Q_PROPERTY(int windowSize READ windowSize WRITE setWindowSize NOTIFY windowSizeChanged)
     Q_PROPERTY(int zeroPaddingFactor READ zeroPaddingFactor WRITE setZeroPaddingFactor NOTIFY zeroPaddingFactorChanged)
 
-<<<<<<< HEAD
     muse::Inject<audio::IAudioDevicesProvider> audioDevicesProvider;
 
-=======
->>>>>>> upstream/master
 public:
     explicit AbstractSpectrogramSettingsModel(QObject* parent = nullptr);
     virtual ~AbstractSpectrogramSettingsModel() = default;

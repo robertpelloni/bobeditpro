@@ -8,11 +8,8 @@
 namespace au::playback {
 class PlaybackConfiguration : public IPlaybackConfiguration
 {
-<<<<<<< HEAD
     muse::Inject<muse::ui::IUiConfiguration> uiConfiguration;
 
-=======
->>>>>>> upstream/master
 public:
     void init();
 

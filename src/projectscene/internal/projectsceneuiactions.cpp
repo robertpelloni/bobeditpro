@@ -64,32 +64,11 @@ static UiActionList STATIC_ACTIONS = {
              TranslatableString("action", "Zoom to fit project"),
              IconCode::Code::FIT_PROJECT
              ),
-<<<<<<< HEAD
     UiAction("spectral-editing",
              au::context::UiCtxProjectOpened,
              au::context::CTX_ANY,
              TranslatableString("action", "Spectral editing"),
              TranslatableString("action", "Spectral editing"),
-=======
-    UiAction("zoom-toggle",
-             au::context::UiCtxProjectOpened,
-             au::context::CTX_ANY,
-             TranslatableString("action", "Zoom toggle"),
-             TranslatableString("action", "Zoom toggle"),
-             IconCode::Code::ZOOM_TOGGLE
-             ),
-    UiAction("center-view-on-playhead",
-             au::context::UiCtxProjectOpened,
-             au::context::CTX_ANY,
-             TranslatableString("action", "Center view on playhead"),
-             TranslatableString("action", "Center view on playhead")
-             ),
-    UiAction("action://trackedit/global-view-spectrogram",
-             au::context::UiCtxProjectOpened,
-             au::context::CTX_PROJECT_FOCUSED,
-             TranslatableString("action", "Toggle spectral view"),
-             TranslatableString("action", "Toggle spectral view"),
->>>>>>> upstream/master
              IconCode::Code::SPECTROGRAM
              ),
     UiAction("spectral-box-select",
@@ -203,6 +182,30 @@ static UiActionList STATIC_ACTIONS = {
              TranslatableString("action", "Move play cursor right"),
              TranslatableString("action", "Move play cursor right")
              ),
+    UiAction("sel-ext-left",
+             au::context::UiCtxProjectOpened,
+             muse::shortcuts::CTX_PROJECT_OPENED,
+             TranslatableString("action", "Extend selection left"),
+             TranslatableString("action", "Extend selection left")
+             ),
+    UiAction("sel-ext-right",
+             au::context::UiCtxProjectOpened,
+             muse::shortcuts::CTX_PROJECT_OPENED,
+             TranslatableString("action", "Extend selection right"),
+             TranslatableString("action", "Extend selection right")
+             ),
+    UiAction("sel-cntr-left",
+             au::context::UiCtxProjectOpened,
+             muse::shortcuts::CTX_PROJECT_OPENED,
+             TranslatableString("action", "Contract selection from left"),
+             TranslatableString("action", "Contract selection from left")
+             ),
+    UiAction("sel-cntr-right",
+             au::context::UiCtxProjectOpened,
+             muse::shortcuts::CTX_PROJECT_OPENED,
+             TranslatableString("action", "Contract selection from right"),
+             TranslatableString("action", "Contract selection from right")
+             ),
     UiAction("clip-pitch-speed",
              au::context::UiCtxAny,
              au::context::CTX_ANY,
@@ -286,14 +289,8 @@ static UiActionList STATIC_ACTIONS = {
              )
 };
 
-<<<<<<< HEAD
 ProjectSceneUiActions::ProjectSceneUiActions(std::shared_ptr<ProjectSceneActionsController> controller)
     : m_controller(controller)
-=======
-ProjectSceneUiActions::ProjectSceneUiActions(const muse::modularity::ContextPtr& ctx,
-                                             std::shared_ptr<ProjectSceneActionsController> controller)
-    : muse::Contextable(ctx), m_controller(controller)
->>>>>>> upstream/master
 {
     m_actions = STATIC_ACTIONS;
 }
@@ -386,13 +383,9 @@ const ToolConfig& ProjectSceneUiActions::defaultPlaybackToolBarConfig()
             { "zoom-out", true },
             { "zoom-to-selection", true },
             { "zoom-to-fit-project", true },
-<<<<<<< HEAD
             { "zoom", true },
             { "", true },
             // { "spectral-editing", false },
-=======
-            { "zoom-toggle", true },
->>>>>>> upstream/master
             // { "spectral-box-select", false },
             // { "spectral-brush", false },
             // { "", true },

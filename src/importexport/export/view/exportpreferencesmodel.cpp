@@ -63,11 +63,7 @@ const std::vector<int> DEFAULT_SAMPLE_RATE_LIST {
 };
 
 ExportPreferencesModel::ExportPreferencesModel(QObject* parent)
-<<<<<<< HEAD
     : QObject(parent)
-=======
-    : QObject(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
->>>>>>> upstream/master
 {
 }
 
@@ -91,7 +87,7 @@ void ExportPreferencesModel::init()
     if ((exportConfiguration()->processType() == ExportProcessType::AUDIO_IN_LOOP_REGION
          && !playbackController()->loopRegion().isValid())
         || (exportConfiguration()->processType() == ExportProcessType::SELECTED_AUDIO
-            && !selectionController()->timeSelectionIsNotEmpty())) {
+            && selectionController()->timeSelectionIsEmpty())) {
         setCurrentProcess(QString::fromStdString(EXPORT_PROCESS_MAPPING[ExportProcessType::FULL_PROJECT_AUDIO]));
     }
 
@@ -287,16 +283,7 @@ QStringList ExportPreferencesModel::formatsList() const
 
 ExportChannelsPref::ExportChannels ExportPreferencesModel::exportChannels() const
 {
-<<<<<<< HEAD
     return ExportChannelsPref::ExportChannels(exportConfiguration()->exportChannels());
-=======
-    if (type == exportChannelsType()) {
-        return;
-    }
-
-    exportConfiguration()->setExportChannelsType(static_cast<int>(type));
-    emit exportChannelsTypeChanged();
->>>>>>> upstream/master
 }
 
 void ExportPreferencesModel::setExportChannels(ExportChannelsPref::ExportChannels exportChannels)
@@ -436,22 +423,8 @@ void ExportPreferencesModel::updateExportChannels()
 {
     int maxChannels = exporter()->maxChannels();
 
-<<<<<<< HEAD
     if (static_cast<int>(exportChannels()) > maxChannels) {
         setExportChannels(ExportChannelsPref::ExportChannels(maxChannels));
-=======
-    const auto project = globalContext()->currentTrackeditProject();
-    if (project) {
-        const bool hasStereo = au::trackedit::utils::hasStereoTrack(project->trackList());
-        ExportChannelsPref::ExportChannels recommended = hasStereo
-                                                         ? ExportChannelsPref::ExportChannels::STEREO
-                                                         : ExportChannelsPref::ExportChannels::MONO;
-
-        if (static_cast<int>(recommended) <= maxChannels) {
-            setExportChannelsType(recommended);
-            return;
-        }
->>>>>>> upstream/master
     }
 
     const auto fallback = maxChannels >= static_cast<int>(ExportChannelsPref::ExportChannels::STEREO)
@@ -491,52 +464,7 @@ QStringList ExportPreferencesModel::fileFilter()
 
 void ExportPreferencesModel::exportData()
 {
-<<<<<<< HEAD
     muse::Ret result = exporter()->exportData(filename().toStdString());
-=======
-    bool needToDisableMasterFx = needToDisableMasterFxBeforeExport();
-    if (needToDisableMasterFx) {
-        if (!warnAndDisableMasterFxBeforeExport()) {
-            return;
-        }
-    }
-
-    bool restoreMasterFx = needToDisableMasterFx;
-
-    const muse::Defer restoreMasterFxState([this, restoreMasterFx] {
-        if (restoreMasterFx) {
-            enableMasterFx();
-        }
-    });
-
-    muse::io::path_t directoryPath = exportConfiguration()->directoryPath();
-    muse::io::path_t filePath = directoryPath.appendingComponent(filename());
-
-    if (suffix(filePath).empty()) {
-        auto extensions = exporter()->formatExtensions(exportConfiguration()->currentFormat());
-        std::string defaultExtension;
-        if (!extensions.empty()) {
-            defaultExtension = extensions.front();
-        }
-
-        filePath = filePath.appendingSuffix(defaultExtension);
-    }
-
-    if (fileSystem()->exists(filePath)) {
-        const int overwriteBtn = int(muse::IInteractive::Button::CustomButton) + 1;
-        const auto question = muse::trc("export", "Do you want to overwrite?");
-        const auto btnText = muse::trc("export", "Overwrite");
-        muse::IInteractive::Result result = interactive()->questionSync("", question,
-                                                                        { muse::IInteractive::ButtonData(overwriteBtn, btnText),
-                                                                          interactive()->buttonData(muse::IInteractive::Button::Cancel)
-                                                                        });
-        if (result.button() != overwriteBtn) {
-            return;
-        }
-    }
-
-    muse::Ret result = exporter()->exportData(filePath);
->>>>>>> upstream/master
     if (!result.success() && !result.text().empty()) {
         interactive()->error(muse::trc("export", "Export error"), result.text());
     }

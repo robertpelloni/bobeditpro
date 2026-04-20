@@ -30,7 +30,6 @@ using Au3Project = ::AudacityProject;
 }
 
 namespace au::effects {
-<<<<<<< HEAD
 class RealtimeEffectService : public IRealtimeEffectService, muse::async::Asyncable,
     public std::enable_shared_from_this<RealtimeEffectService>
 {
@@ -39,20 +38,6 @@ class RealtimeEffectService : public IRealtimeEffectService, muse::async::Asynca
     muse::Inject<IEffectsProvider> effectsProvider;
 
 public:
-=======
-class RealtimeEffectService : public IRealtimeEffectService, muse::async::Asyncable, public muse::Contextable,
-    public std::enable_shared_from_this<RealtimeEffectService>
-{
-    muse::GlobalInject<IEffectsProvider> effectsProvider;
-
-    muse::ContextInject<context::IGlobalContext> globalContext{ this };
-    muse::ContextInject<trackedit::IProjectHistory> projectHistory{ this };
-
-public:
-    RealtimeEffectService(const muse::modularity::ContextPtr& ctx)
-        : muse::Contextable(ctx) {}
-
->>>>>>> upstream/master
     void init();
 
     RealtimeEffectStatePtr addRealtimeEffect(TrackId, const EffectId&) override;

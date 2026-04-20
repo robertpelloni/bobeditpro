@@ -15,11 +15,7 @@
 #include "playback/iplayback.h"
 
 namespace au::projectscene {
-<<<<<<< HEAD
 class SelectionStatusModel : public QObject, public muse::async::Asyncable
-=======
-class SelectionStatusModel : public QObject, public muse::async::Asyncable, public muse::Contextable
->>>>>>> upstream/master
 {
     Q_OBJECT
 
@@ -36,18 +32,10 @@ class SelectionStatusModel : public QObject, public muse::async::Asyncable, publ
 
     Q_PROPERTY(bool isEnabled READ isEnabled NOTIFY isEnabledChanged)
 
-<<<<<<< HEAD
     muse::Inject<context::IGlobalContext> globalContext;
     muse::Inject<trackedit::ISelectionController> selectionController;
     muse::Inject<playback::IPlayback> playback;
     muse::Inject<IProjectSceneConfiguration> configuration;
-=======
-    muse::GlobalInject<IProjectSceneConfiguration> configuration;
-
-    muse::ContextInject<context::IGlobalContext> globalContext { this };
-    muse::ContextInject<trackedit::ISelectionController> selectionController { this };
-    muse::ContextInject<playback::IPlayback> playback { this };
->>>>>>> upstream/master
 
 public:
     Q_INVOKABLE void init();

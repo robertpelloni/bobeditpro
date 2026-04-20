@@ -1,12 +1,8 @@
 #include "domconverter.h"
 
-<<<<<<< HEAD
 #include "au3types.h"
 #include "trackcolor.h"
 #include "trackviewtypeattachment.h"
-=======
-#include "au3-label-track/LabelTrack.h"
->>>>>>> upstream/master
 #include "au3-track/Track.h"
 #include "au3-wave-track/WaveClip.h"
 #include "au3-wave-track/WaveTrack.h"

@@ -69,14 +69,8 @@ public:
 
         struct {
             std::optional<std::string> type;
-<<<<<<< HEAD
             std::optional<QUrl> scoreUrl;
             std::optional<QString> scoreDisplayNameOverride;
-=======
-            std::optional<QUrl> projectUrl;
-            std::optional<QString> projectDisplayNameOverride;
-            muse::io::paths_t mediaFiles;
->>>>>>> upstream/master
         } startup;
     };
 

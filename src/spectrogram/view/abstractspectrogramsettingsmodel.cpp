@@ -11,12 +11,8 @@
 
 namespace au::spectrogram {
 AbstractSpectrogramSettingsModel::AbstractSpectrogramSettingsModel(QObject* parent)
-<<<<<<< HEAD
     : QObject(parent)
 {}
-=======
-    : QObject(parent) {}
->>>>>>> upstream/master
 
 void AbstractSpectrogramSettingsModel::setMinFreq(int value)
 {

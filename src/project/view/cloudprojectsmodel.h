@@ -9,13 +9,7 @@
 
 #include "modularity/ioc.h"
 #include "iprojectconfiguration.h"
-<<<<<<< HEAD
 #include "cloud/musescorecom/imusescorecomservice.h"
-=======
-#include "au3cloud/iau3audiocomservice.h"
-#include "au3cloud/iauthorization.h"
-#include "framework/interactive/iinteractive.h"
->>>>>>> upstream/master
 
 namespace au::project {
 class CloudProjectsModel : public AbstractItemModel, public muse::async::Asyncable, public muse::Contextable

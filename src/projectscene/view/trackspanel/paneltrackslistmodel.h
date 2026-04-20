@@ -24,19 +24,11 @@ class ItemMultiSelectionModel;
 class QItemSelectionModel;
 
 namespace au::projectscene {
-<<<<<<< HEAD
 class PanelTracksListModel : public QAbstractListModel, public muse::async::Asyncable
 {
     Q_OBJECT
 
     muse::Inject<au::context::IGlobalContext> globalContext;
-=======
-class PanelTracksListModel : public QAbstractListModel, public muse::async::Asyncable, public muse::Contextable
-{
-    Q_OBJECT
-
-    muse::ContextInject<au::context::IGlobalContext> globalContext{ this };
->>>>>>> upstream/master
 
     Q_PROPERTY(bool isMovingUpAvailable READ isMovingUpAvailable NOTIFY isMovingUpAvailableChanged)
     Q_PROPERTY(bool isMovingDownAvailable READ isMovingDownAvailable NOTIFY isMovingDownAvailableChanged)
@@ -44,18 +36,10 @@ class PanelTracksListModel : public QAbstractListModel, public muse::async::Asyn
     Q_PROPERTY(bool isAddingAvailable READ isAddingAvailable NOTIFY isAddingAvailableChanged)
     Q_PROPERTY(bool isEmpty READ isEmpty NOTIFY isEmptyChanged)
 
-<<<<<<< HEAD
     muse::Inject<trackedit::ISelectionController> selectionController;
     muse::Inject<trackedit::ITrackeditInteraction> trackeditInteraction;
     muse::Inject<trackedit::IProjectHistory> projectHistory;
     muse::Inject<muse::actions::IActionsDispatcher> dispatcher;
-=======
-    muse::ContextInject<trackedit::ISelectionController> selectionController{ this };
-    muse::ContextInject<trackedit::ITrackeditInteraction> trackeditInteraction{ this };
-    muse::ContextInject<trackedit::IProjectHistory> projectHistory{ this };
-    muse::ContextInject<muse::actions::IActionsDispatcher> dispatcher{ this };
-    muse::ContextInject<trackedit::ITrackNavigationController> trackNavigationController{ this };
->>>>>>> upstream/master
 
 public:
     explicit PanelTracksListModel(QObject* parent = nullptr);

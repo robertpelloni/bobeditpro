@@ -5,21 +5,12 @@
 
 #include <QObject>
 
-<<<<<<< HEAD
 #include "async/asyncable.h"
 
 #include "modularity/ioc.h"
 #include "actions/iactionsdispatcher.h"
 #include "iinteractive.h"
 #include "io/ifilesystem.h"
-=======
-#include "framework/global/async/asyncable.h"
-
-#include "framework/global/modularity/ioc.h"
-#include "framework/global/io/ifilesystem.h"
-#include "framework/actions/iactionsdispatcher.h"
-#include "framework/interactive/iinteractive.h"
->>>>>>> upstream/master
 #include "appshell/iappshellconfiguration.h"
 #include "importexport/export/iexportconfiguration.h"
 #include "context/iglobalcontext.h"
@@ -29,7 +20,6 @@
 #include "trackedit/iselectioncontroller.h"
 
 namespace au::importexport {
-<<<<<<< HEAD
 class ExportPreferencesModel : public QObject, public muse::async::Asyncable
 {
     Q_OBJECT
@@ -43,23 +33,6 @@ class ExportPreferencesModel : public QObject, public muse::async::Asyncable
     muse::Inject<IExporter> exporter;
     muse::Inject<au::playback::IPlaybackController> playbackController;
     muse::Inject<trackedit::ISelectionController> selectionController;
-=======
-class ExportPreferencesModel : public QObject, public muse::async::Asyncable, public muse::Contextable
-{
-    Q_OBJECT
-
-    muse::GlobalInject<muse::io::IFileSystem> fileSystem;
-    muse::GlobalInject<appshell::IAppShellConfiguration> configuration;
-    muse::GlobalInject<IExportConfiguration> exportConfiguration;
-
-    muse::ContextInject<muse::actions::IActionsDispatcher> dispatcher{ this };
-    muse::ContextInject<muse::IInteractive> interactive{ this };
-    muse::ContextInject<context::IGlobalContext> globalContext{ this };
-    muse::ContextInject<IExporter> exporter{ this };
-    muse::ContextInject<effects::IRealtimeEffectService> realtimeEffectService{ this };
-    muse::ContextInject<au::playback::IPlaybackController> playbackController{ this };
-    muse::ContextInject<trackedit::ISelectionController> selectionController{ this };
->>>>>>> upstream/master
 
     Q_PROPERTY(QString currentProcess READ currentProcess NOTIFY currentProcessChanged)
     Q_PROPERTY(QVariantList processList READ processList NOTIFY processListChanged)

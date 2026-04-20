@@ -3,18 +3,7 @@
 */
 #pragma once
 
-<<<<<<< HEAD
 #include "modularity/imoduleinterface.h"
-=======
-#include <map>
-#include <tuple>
-#include <vector>
-
-#include "framework/global/io/path.h"
-#include "framework/global/modularity/imoduleinterface.h"
-#include "framework/global/progress.h"
-#include "framework/global/types/val.h"
->>>>>>> upstream/master
 
 #include "types/exporttypes.h"
 #include "types/ret.h"
@@ -42,11 +31,7 @@ public:
     virtual ~IExporter() = default;
 
     virtual void init() = 0;
-<<<<<<< HEAD
     virtual muse::Ret exportData(std::string filename) = 0;
-=======
-    virtual muse::Ret exportData(const muse::io::path_t& path, const Options& options = {}, muse::ProgressPtr progress = nullptr) = 0;
->>>>>>> upstream/master
 
     virtual std::vector<std::string> formatsList() const = 0;
     virtual int formatIndex(const std::string& format) const = 0;

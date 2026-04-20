@@ -10,11 +10,7 @@
 #include "labelstypes.h"
 
 namespace au::importexport {
-<<<<<<< HEAD
 class ILabelsConfiguration : MODULE_EXPORT_INTERFACE
-=======
-class ILabelsConfiguration : MODULE_GLOBAL_INTERFACE
->>>>>>> upstream/master
 {
     INTERFACE_ID(ILabelsConfiguration)
 

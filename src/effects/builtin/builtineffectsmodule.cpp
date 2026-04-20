@@ -35,26 +35,18 @@ BuiltinEffectsModule::BuiltinEffectsModule()
 
 void BuiltinEffectsModule::registerExports()
 {
-<<<<<<< HEAD
     m_builtinEffectsRepository = std::make_shared<BuiltinEffectsRepository>();
 
     ioc()->registerExport<IBuiltinEffectsRepository>(moduleName(), m_builtinEffectsRepository);
     ioc()->registerExport<IEffectsViewRegister>(moduleName(), new EffectsViewRegister());
-=======
-    globalIoc()->registerExport<IBuiltinEffectsViewRegister>(moduleName(), new BuiltinEffectsViewRegister());
-    globalIoc()->registerExport<IBuiltinEffectsRepository>(moduleName(), new BuiltinEffectsRepository());
->>>>>>> upstream/master
 }
 
 void BuiltinEffectsModule::resolveImports()
 {
-<<<<<<< HEAD
     auto lr = ioc()->resolve<IEffectViewLaunchRegister>(moduleName());
     if (lr) {
         lr->regLauncher("Audacity" /*builtin*/, std::make_shared<BuiltinViewLauncher>());
     }
-=======
->>>>>>> upstream/master
 }
 
 void BuiltinEffectsModule::registerResources()

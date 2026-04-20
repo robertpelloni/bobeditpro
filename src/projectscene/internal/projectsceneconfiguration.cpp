@@ -32,13 +32,6 @@ static const muse::Settings::Key SELECTION_TIMECODE_FORMAT(moduleName, "projects
 static const muse::Settings::Key DURATION_TIMECODE_FORMAT(moduleName, "projectscene/durationTimecodeFormat");
 static const muse::Settings::Key PLAYBACK_ON_RULER_CLICK_ENABLED(moduleName, "projectscene/playbackOnRulerClickEnabled");
 static const muse::Settings::Key LABEL_EDITOR_COLUMN_FORMAT(moduleName, "projectscene/labelEditorColumnFormat");
-<<<<<<< HEAD
-=======
-static const muse::Settings::Key UPDATE_DISPLAY_WHILE_PLAYING_ENABLED(moduleName, "projectscene/updateDisplayWhilePlayingEnabled");
-static const muse::Settings::Key PINNED_PLAY_HEAD_ENABLED(moduleName, "projectscene/pinnedPlayHeadEnabled");
-static const muse::Settings::Key ZOOM_PRESET_1(moduleName, "projectscene/zoomPreset1");
-static const muse::Settings::Key ZOOM_PRESET_2(moduleName, "projectscene/zoomPreset2");
->>>>>>> upstream/master
 
 static constexpr bool DEFAULT_VERTICAL_RULERS_VISIBILITY = false;
 static constexpr bool DEFAULT_RMS_IN_WAVEFORM_VISIBILITY = false;
@@ -108,22 +101,6 @@ void ProjectSceneConfiguration::init()
     muse::settings()->valueChanged(PLAYBACK_ON_RULER_CLICK_ENABLED).onReceive(nullptr, [this](const muse::Val&) {
         m_playbackOnRulerClickEnabledChanged.notify();
     });
-<<<<<<< HEAD
-=======
-
-    muse::settings()->setDefaultValue(UPDATE_DISPLAY_WHILE_PLAYING_ENABLED, muse::Val(DEFAULT_UPDATE_DISPLAY_WHILE_PLAYING_ENABLED));
-    muse::settings()->valueChanged(UPDATE_DISPLAY_WHILE_PLAYING_ENABLED).onReceive(nullptr, [this](const muse::Val&) {
-        m_updateDisplayWhilePlayingEnabledChanged.notify();
-    });
-
-    muse::settings()->setDefaultValue(PINNED_PLAY_HEAD_ENABLED, muse::Val(DEFAULT_PINNED_PLAY_HEAD_ENABLED));
-    muse::settings()->valueChanged(PINNED_PLAY_HEAD_ENABLED).onReceive(nullptr, [this](const muse::Val&) {
-        m_pinnedPlayHeadEnabledChanged.notify();
-    });
-
-    muse::settings()->setDefaultValue(ZOOM_PRESET_1, muse::Val(static_cast<int>(ZoomPresets::ZoomDefault)));
-    muse::settings()->setDefaultValue(ZOOM_PRESET_2, muse::Val(static_cast<int>(ZoomPresets::Zoom4To1)));
->>>>>>> upstream/master
 }
 
 bool ProjectSceneConfiguration::isVerticalRulersVisible() const
@@ -220,7 +197,6 @@ muse::async::Notification ProjectSceneConfiguration::isEffectsPanelVisibleChange
 
 const std::vector<ClipColorInfo>& ProjectSceneConfiguration::clipColorInfos() const
 {
-<<<<<<< HEAD
     static std::vector<std::pair<std::string /*name*/, std::string /*color*/> > colors = {
         { "Blue", "#66A3FF" },
         { "Violet", "#9996FC" },
@@ -231,18 +207,6 @@ const std::vector<ClipColorInfo>& ProjectSceneConfiguration::clipColorInfos() co
         { "Green", "#74BE59" },
         { "Turquoise", "#34B494" },
         { "Cyan", "#48BECF" }
-=======
-    static const std::vector<ClipColorInfo> infos = {
-        { "Blue", 1 },
-        { "Violet", 2 },
-        { "Magenta", 3 },
-        { "Red", 4 },
-        { "Orange", 5 },
-        { "Yellow", 6 },
-        { "Green", 7 },
-        { "Turquoise", 8 },
-        { "Cyan", 9 }
->>>>>>> upstream/master
     };
 
     return infos;
@@ -425,56 +389,3 @@ muse::async::Notification ProjectSceneConfiguration::playbackOnRulerClickEnabled
 {
     return m_playbackOnRulerClickEnabledChanged;
 }
-<<<<<<< HEAD
-=======
-
-bool ProjectSceneConfiguration::updateDisplayWhilePlayingEnabled() const
-{
-    return muse::settings()->value(UPDATE_DISPLAY_WHILE_PLAYING_ENABLED).toBool();
-}
-
-void ProjectSceneConfiguration::setUpdateDisplayWhilePlayingEnabled(bool enabled)
-{
-    muse::settings()->setSharedValue(UPDATE_DISPLAY_WHILE_PLAYING_ENABLED, muse::Val(enabled));
-}
-
-muse::async::Notification ProjectSceneConfiguration::updateDisplayWhilePlayingEnabledChanged() const
-{
-    return m_updateDisplayWhilePlayingEnabledChanged;
-}
-
-bool ProjectSceneConfiguration::pinnedPlayHeadEnabled() const
-{
-    return muse::settings()->value(PINNED_PLAY_HEAD_ENABLED).toBool();
-}
-
-void ProjectSceneConfiguration::setPinnedPlayHeadEnabled(bool enabled)
-{
-    muse::settings()->setSharedValue(PINNED_PLAY_HEAD_ENABLED, muse::Val(enabled));
-}
-
-muse::async::Notification ProjectSceneConfiguration::pinnedPlayHeadEnabledChanged() const
-{
-    return m_pinnedPlayHeadEnabledChanged;
-}
-
-ZoomPresets::Preset ProjectSceneConfiguration::zoomPreset1() const
-{
-    return muse::settings()->value(ZOOM_PRESET_1).toEnum<ZoomPresets::Preset>();
-}
-
-void ProjectSceneConfiguration::setZoomPreset1(ZoomPresets::Preset preset)
-{
-    muse::settings()->setSharedValue(ZOOM_PRESET_1, muse::Val(static_cast<int>(preset)));
-}
-
-ZoomPresets::Preset ProjectSceneConfiguration::zoomPreset2() const
-{
-    return muse::settings()->value(ZOOM_PRESET_2).toEnum<ZoomPresets::Preset>();
-}
-
-void ProjectSceneConfiguration::setZoomPreset2(ZoomPresets::Preset preset)
-{
-    muse::settings()->setSharedValue(ZOOM_PRESET_2, muse::Val(static_cast<int>(preset)));
-}
->>>>>>> upstream/master

@@ -9,11 +9,7 @@
 
 namespace au::effects {
 AbstractEffectViewModel::AbstractEffectViewModel(QObject* parent, int instanceId)
-<<<<<<< HEAD
     : QObject(parent), m_instanceId{instanceId}
-=======
-    : QObject(parent), muse::Contextable(muse::iocCtxForQmlObject(this)), m_instanceId{instanceId}
->>>>>>> upstream/master
 {
     assert(m_instanceId != -1);
 }

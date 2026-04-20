@@ -42,11 +42,7 @@ static_assert(numDecimals(0.005) == 3);
 }
 
 ViewTracksListModel::ViewTracksListModel(QObject* parent)
-<<<<<<< HEAD
     : QAbstractListModel(parent)
-=======
-    : QAbstractListModel(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
->>>>>>> upstream/master
 {
 }
 
@@ -129,17 +125,6 @@ void ViewTracksListModel::load()
         emit dataChanged(index(0), index(lastIndex), { IsDataSelectedRole });
     }, muse::async::Asyncable::Mode::SetReplace);
 
-<<<<<<< HEAD
-=======
-    frequencySelectionController()->frequencySelectionChanged().onReceive(this, [this](auto) {
-        if (m_trackList.empty()) {
-            return;
-        }
-        const int lastIndex = static_cast<int>(m_trackList.size()) - 1;
-        emit dataChanged(index(0), index(lastIndex), { FrequencySelectionRole });
-    }, muse::async::Asyncable::Mode::SetReplace);
-
->>>>>>> upstream/master
     prj->tracksChanged().onReceive(this, [this](const std::vector<au::trackedit::Track> tracks) {
         Q_UNUSED(tracks);
         muse::async::Async::call(this, [this]() {
@@ -254,16 +239,8 @@ QVariant ViewTracksListModel::data(const QModelIndex& index, int role) const
     switch (role) {
     case TrackIdRole:
         return QVariant::fromValue(track.id);
-<<<<<<< HEAD
-=======
-    case TrackTitleRole:
-        return QVariant::fromValue(track.title.toQString());
-    case TrackSampleRateRole: {
-        return static_cast<int>(track.rate);
-    }
->>>>>>> upstream/master
     case IsDataSelectedRole: {
-        return muse::contains(selectionController()->selectedTracks(), track.id) && selectionController()->timeSelectionIsNotEmpty();
+        return muse::contains(selectionController()->selectedTracks(), track.id) && !selectionController()->timeSelectionIsEmpty();
     }
     case IsTrackSelectedRole: {
         return muse::contains(selectionController()->selectedTracks(), track.id);
@@ -296,7 +273,6 @@ QVariant ViewTracksListModel::data(const QModelIndex& index, int role) const
     case IsStereoRole:
         return track.type == au::trackedit::TrackType::Stereo;
 
-<<<<<<< HEAD
     case IsWaveformViewVisibleRole:
         return track.viewType == au::trackedit::TrackViewType::Waveform
                || track.viewType == au::trackedit::TrackViewType::WaveformAndSpectrogram;
@@ -304,40 +280,6 @@ QVariant ViewTracksListModel::data(const QModelIndex& index, int role) const
     case IsSpectrogramViewVisibleRole:
         return track.viewType == au::trackedit::TrackViewType::Spectrogram
                || track.viewType == au::trackedit::TrackViewType::WaveformAndSpectrogram;
-=======
-    case IsAutomationEnabledRole: {
-        const project::IAudacityProjectPtr prj = globalContext()->currentProject();
-        const IProjectViewStatePtr vs = prj ? prj->viewState() : nullptr;
-
-        if (!vs) {
-            return false;
-        }
-
-        return vs->clipGainAutomationEnabled().val;
-    }
-
-    case IsWaveformViewVisibleRole: {
-        const auto vt = getTrackViewType(globalContext()->currentProject(), track.id);
-        return vt == trackedit::TrackViewType::Waveform || vt == trackedit::TrackViewType::WaveformAndSpectrogram;
-    }
-
-    case IsSpectrogramViewVisibleRole: {
-        const auto vt = getTrackViewType(globalContext()->currentProject(), track.id);
-        return vt == trackedit::TrackViewType::Spectrogram || vt == trackedit::TrackViewType::WaveformAndSpectrogram;
-    }
-
-    case FrequencySelectionRole: {
-        const spectrogram::FrequencySelection selection = frequencySelectionController()->frequencySelection();
-        const auto startFrequency = selection.trackId
-                                    == track.id ? selection.startFrequency() : spectrogram::SelectionInfo::UndefinedFrequency;
-        const auto endFrequency = selection.trackId == track.id ? selection.endFrequency() : spectrogram::SelectionInfo::UndefinedFrequency;
-        const QVariantMap frequencySelectionMap {
-            { "startFrequency", startFrequency },
-            { "endFrequency", endFrequency }
-        };
-        return frequencySelectionMap;
-    }
->>>>>>> upstream/master
 
     case DbRangeRole:
         return playback::PlaybackMeterDbRange::toDouble(playbackConfiguration()->playbackMeterDbRange());
@@ -359,11 +301,6 @@ QHash<int, QByteArray> ViewTracksListModel::roleNames() const
     {
         { TypeRole, "trackType" },
         { TrackIdRole, "trackId" },
-<<<<<<< HEAD
-=======
-        { TrackTitleRole, "trackTitle" },
-        { TrackSampleRateRole, "trackSampleRate" },
->>>>>>> upstream/master
         { IsDataSelectedRole, "isDataSelected" },
         { IsTrackSelectedRole, "isTrackSelected" },
         { IsTrackFocusedRole, "isTrackFocused" },

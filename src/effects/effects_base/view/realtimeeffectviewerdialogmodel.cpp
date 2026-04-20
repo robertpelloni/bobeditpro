@@ -10,11 +10,7 @@
 
 namespace au::effects {
 RealtimeEffectViewerDialogModel::RealtimeEffectViewerDialogModel(QObject* parent)
-<<<<<<< HEAD
     : QObject(parent)
-=======
-    : QObject(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
->>>>>>> upstream/master
 {
 }
 

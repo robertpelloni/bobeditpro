@@ -21,14 +21,6 @@
  */
 #include "projectpropertiesmodel.h"
 
-<<<<<<< HEAD
-=======
-#include <QByteArray>
-#include <QBuffer>
-#include <QImage>
-
-#include "modularity/ioc.h"
->>>>>>> upstream/master
 #include "translation.h"
 #include "log.h"
 
@@ -37,11 +29,7 @@ using namespace muse::modularity;
 using namespace au::project;
 
 ProjectPropertiesModel::ProjectPropertiesModel(QObject* parent)
-<<<<<<< HEAD
     : QAbstractListModel(parent)
-=======
-    : QAbstractListModel(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
->>>>>>> upstream/master
 {
 }
 
