@@ -26,5 +26,5 @@
 - [x] Phase 5.4: Sidechain Routing Matrix (Skipped for UI priorities)
 
 ## Phase 6: Export & Publishing
-- [ ] Phase 6.1: Advanced Batch Export
+- [x] Phase 6.1: Advanced Batch Export (Test Infrastructure Fixed)
 - [ ] Phase 6.2: Podcast/Broadcast LUFS Target Normalization

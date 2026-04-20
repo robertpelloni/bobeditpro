@@ -1,3 +1,7 @@
+## [4.0.19] - 2024-04-10
+### Added
+- Implemented `test_runner.py` from scratch to execute the CTest suite for CI, properly handling test discovery, execution, output formatting, and exit codes.
+
 # Changelog
 ## [4.0.1] - 2025-04-10
 ### Added
