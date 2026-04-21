@@ -1,3 +1,9 @@
+## [4.0.20] - 2024-04-10
+### Added
+- Phase 6.1: Implemented Advanced Batch Export logic in `BatchExportController`, allowing users to export multitrack stems or single mixes using the core `IExporter` backend.
+- Scaffolded Phase 6.2 for Broadcast LUFS normalization.
+- Documented new IDEAS.md for repository health improvements.
+
 ## [4.0.19] - 2024-04-10
 ### Added
 - Implemented `test_runner.py` from scratch to execute the CTest suite for CI, properly handling test discovery, execution, output formatting, and exit codes.
