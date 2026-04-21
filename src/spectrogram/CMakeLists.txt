@@ -8,13 +8,10 @@ set(MODULE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/ispectrogramconfiguration.h
     ${CMAKE_CURRENT_LIST_DIR}/iglobalspectrogramconfiguration.h
     ${CMAKE_CURRENT_LIST_DIR}/itrackspectrogramconfiguration.h
-<<<<<<< HEAD
     ${CMAKE_CURRENT_LIST_DIR}/ispectrogrampainter.h
-=======
     ${CMAKE_CURRENT_LIST_DIR}/ifrequencyselectioncontroller.h
     ${CMAKE_CURRENT_LIST_DIR}/ispectraleffectsregister.h
     ${CMAKE_CURRENT_LIST_DIR}/ispectrogramservice.h
->>>>>>> upstream/master
     ${CMAKE_CURRENT_LIST_DIR}/spectrogrammodule.cpp
     ${CMAKE_CURRENT_LIST_DIR}/spectrogrammodule.h
     ${CMAKE_CURRENT_LIST_DIR}/spectrogramtypes.cpp
@@ -86,10 +83,8 @@ set(MODULE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/view/scalesectionparameterlistmodel.h
     ${CMAKE_CURRENT_LIST_DIR}/view/globalspectrogramsettingsmodel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/view/globalspectrogramsettingsmodel.h
-<<<<<<< HEAD
     ${CMAKE_CURRENT_LIST_DIR}/view/spectrogramview.cpp
     ${CMAKE_CURRENT_LIST_DIR}/view/spectrogramview.h
-=======
     ${CMAKE_CURRENT_LIST_DIR}/view/channelspectralselectionmodel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/view/channelspectralselectionmodel.h
     ${CMAKE_CURRENT_LIST_DIR}/view/clipchannelspectrogramview.cpp
@@ -98,7 +93,6 @@ set(MODULE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/view/spectrogramchannelrulermodel.h
     ${CMAKE_CURRENT_LIST_DIR}/view/spectrogramhit.cpp
     ${CMAKE_CURRENT_LIST_DIR}/view/spectrogramhit.h
->>>>>>> upstream/master
     ${CMAKE_CURRENT_LIST_DIR}/view/spectrogramviewutils.h
     ${CMAKE_CURRENT_LIST_DIR}/view/trackspectrogramsettingsmodel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/view/trackspectrogramsettingsmodel.h

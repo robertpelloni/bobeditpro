@@ -25,8 +25,6 @@ set(MODULE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/ieffectpresetsscenario.h
     ${CMAKE_CURRENT_LIST_DIR}/ieffectviewlauncher.h
     ${CMAKE_CURRENT_LIST_DIR}/ieffectviewlaunchregister.h
-<<<<<<< HEAD
-=======
     ${CMAKE_CURRENT_LIST_DIR}/ieffectparametersprovider.h
     ${CMAKE_CURRENT_LIST_DIR}/iparameterextractorregistry.h
     ${CMAKE_CURRENT_LIST_DIR}/ipresetstatesregister.h
@@ -34,7 +32,6 @@ set(MODULE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/ieffectloadersregister.h
     # interfaces for optional services
     ${CMAKE_CURRENT_LIST_DIR}/iparameterextractorservice.h
->>>>>>> upstream/master
 
     # internal
     ${CMAKE_CURRENT_LIST_DIR}/internal/abstractviewlauncher.cpp

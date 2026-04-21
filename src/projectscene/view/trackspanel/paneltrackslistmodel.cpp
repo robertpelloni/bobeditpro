@@ -137,6 +137,8 @@ void PanelTracksListModel::addTrack(TrackTypes::Type type)
         dispatcher()->dispatch("new-stereo-track");
     } else if (type == TrackTypes::Type::LABEL) {
         dispatcher()->dispatch("new-label-track");
+    } else if (type == TrackTypes::Type::BUS) {
+        dispatcher()->dispatch("new-bus-track");
     }
 }
 
@@ -549,6 +551,9 @@ TrackItem* PanelTracksListModel::buildTrackItem(const Track& track)
         break;
     case trackedit::TrackType::Label:
         item = new LabelTrackItem(this);
+        break;
+    case trackedit::TrackType::Bus:
+        item = new WaveTrackItem(this);
         break;
     default:
         break;

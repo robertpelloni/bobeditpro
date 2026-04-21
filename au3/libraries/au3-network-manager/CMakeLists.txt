@@ -52,8 +52,6 @@ PRIVATE
 
 set ( DEFINES INTERFACE "HAS_NETWORKING" PRIVATE "WIN32_LEAN_AND_MEAN" )
 
-<<<<<<< HEAD
-=======
 if(AU_USE_LIBCURL)
     list(APPEND SOURCES
         curl/CurlResponse.h
@@ -78,6 +76,5 @@ else()
     list(APPEND LIBRARIES PRIVATE Qt::Network)
     list(APPEND DEFINES PRIVATE "USE_QT_NETWORKMANAGER")
 endif()
->>>>>>> upstream/master
 
 audacity_library( ${TARGET} "${SOURCES}" "${LIBRARIES}" "${DEFINES}" "" )

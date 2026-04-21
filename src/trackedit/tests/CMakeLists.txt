@@ -13,11 +13,8 @@ set(MODULE_TEST_SRC
     ${CMAKE_CURRENT_LIST_DIR}/mocks/selectioncontrollermock.h
     ${CMAKE_CURRENT_LIST_DIR}/mocks/trackeditprojectmock.h
     ${CMAKE_CURRENT_LIST_DIR}/mocks/projecthistorymock.h
-<<<<<<< HEAD
-=======
     ${CMAKE_CURRENT_LIST_DIR}/mocks/tracknavigationcontrollermock.h
     ${CMAKE_CURRENT_LIST_DIR}/mocks/navigationcontrollermock.h
->>>>>>> upstream/master
 
     ${CMAKE_CURRENT_LIST_DIR}/tracknavigationcontroller_tests.cpp
     ${CMAKE_CURRENT_LIST_DIR}/au3tracksinteraction_tests.cpp

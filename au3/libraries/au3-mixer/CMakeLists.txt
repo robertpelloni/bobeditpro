@@ -24,6 +24,8 @@ set( TARGET au3-mixer )
 set( SOURCES
    AudioIOSequences.cpp
    AudioIOSequences.h
+   BusTrack.cpp
+   BusTrack.h
    DownmixSource.cpp
    DownmixSource.h
    DownmixStage.cpp
@@ -45,6 +47,7 @@ set( SOURCES
 )
 set( LIBRARIES
    au3-audio-graph-interface
+   au3-playable-track-interface
    au3-xml-interface
    wxBase
 )

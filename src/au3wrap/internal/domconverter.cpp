@@ -21,6 +21,9 @@ au::trackedit::TrackType trackType(const Au3Track* track)
     if (dynamic_cast<const LabelTrack*>(track)) {
         return au::trackedit::TrackType::Label;
     }
+    if (dynamic_cast<const BusTrack*>(track)) {
+        return au::trackedit::TrackType::Bus;
+    }
 
     if (dynamic_cast<const TimeTrack*>(track)) {
         return au::trackedit::TrackType::Undefined;

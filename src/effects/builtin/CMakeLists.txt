@@ -24,7 +24,6 @@ set(MODULE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/view/builtineffectmodel.h
     ${CMAKE_CURRENT_LIST_DIR}/view/builtineffectviewloader.cpp
     ${CMAKE_CURRENT_LIST_DIR}/view/builtineffectviewloader.h
-<<<<<<< HEAD
     ${CMAKE_CURRENT_LIST_DIR}/view/effectsviewregister.cpp
     ${CMAKE_CURRENT_LIST_DIR}/view/effectsviewregister.h
 
@@ -151,10 +150,8 @@ set(MODULE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/changepitch/changepitcheffect.h
     ${CMAKE_CURRENT_LIST_DIR}/changepitch/changepitchviewmodel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/changepitch/changepitchviewmodel.h
-=======
     ${CMAKE_CURRENT_LIST_DIR}/view/builtineffectsviewregister.cpp
     ${CMAKE_CURRENT_LIST_DIR}/view/builtineffectsviewregister.h
->>>>>>> upstream/master
     )
 
 # AU3

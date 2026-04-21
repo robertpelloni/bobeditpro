@@ -128,8 +128,6 @@ jobs:
         source $HOME/build_tools/environment.sh
         cmake -DCRASH_REPORT_URL=$C_URL -P ${CI_DIR}/macos/ci_build.cmake
 
-<<<<<<< HEAD
-=======
     - name: Show ccache stats
       run: |
         ccache -sv
@@ -142,7 +140,6 @@ jobs:
         path: ./build.install/
         retention-days: 1
 
->>>>>>> upstream/master
     - name: Package
       env:
         SIGN_CERTIFICATE_ENCRYPT_SECRET: ${{ secrets.MAC_SIGN_CERTIFICATE_ENCRYPT_SECRET }}
@@ -177,16 +174,11 @@ jobs:
 
     - name: Upload artifacts on GitHub
       if: env.DO_BUILD == 'true'
-<<<<<<< HEAD
       uses: actions/upload-artifact@v4
-=======
       uses: actions/upload-artifact@v7
->>>>>>> upstream/master
       with:
         name: ${{ env.UPLOAD_ARTIFACT_NAME }}
         path: ./build.artifacts
-<<<<<<< HEAD
-=======
 
     - name: Prepare ccache files for saving
       id: prepare-save-ccache
@@ -231,4 +223,3 @@ jobs:
       uses: geekyeggo/delete-artifact@176a747ab7e287e3ff4787bf8a148716375ca118 # v6.0.0
       with:
         name: selftest-build-macos
->>>>>>> upstream/master

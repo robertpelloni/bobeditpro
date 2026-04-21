@@ -2465,6 +2465,10 @@ static constexpr auto Channel_attr = "channel"; // write-only!
 
 bool WaveTrack::HandleXMLTag(const std::string_view& tag, const AttributesList& attrs)
 {
+    if (tag == "aux_send") {
+        return PlayableTrack::HandleAuxSendTag(tag, attrs);
+    }
+
     if (tag == WaveTrack_tag) {
         double dblValue;
         long nValue;
@@ -2568,6 +2572,10 @@ XMLTagHandler* WaveTrack::HandleXMLChild(const std::string_view& tag)
         return xmlHandler;
     }
 
+    if (tag == "aux_send") {
+        return this;
+    }
+
     return nullptr;
 }
 
@@ -2633,6 +2641,8 @@ void WaveTrack::WriteOneXML(const WaveChannel& channel, XMLWriter& xmlFile,
     xmlFile.WriteAttr(Volume_attr, static_cast<double>(track.GetVolume()));
     xmlFile.WriteAttr(Pan_attr, static_cast<double>(track.GetPan()));
     xmlFile.WriteAttr(SampleFormat_attr, static_cast<long>(useLegacy ? track.mLegacyFormat : track.GetSampleFormat()));
+
+    track.PlayableTrack::WriteXMLAuxSends(xmlFile);
 
     // Other persistent data specified elsewhere;
     // NOT written redundantly any more

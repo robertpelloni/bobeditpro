@@ -107,7 +107,6 @@ set(LINK_LIB
     iex_labels
 )
 
-<<<<<<< HEAD
 if (AU_MODULE_EFFECTS_VST)
     list(APPEND LINK_LIB muse::vst)
     add_definitions(-DAU_MODULE_EFFECTS_VST)
@@ -120,7 +119,6 @@ endif()
 if (AU_MODULE_EFFECTS_AUDIO_UNIT)
     add_definitions(-DAU_MODULE_EFFECTS_AUDIO_UNIT)
 endif()
-=======
 add_to_link_if_exists(muse::accessibility)
 add_to_link_if_exists(muse::actions)
 add_to_link_if_exists(muse::audioplugins)
@@ -170,7 +168,6 @@ add_to_link_if_exists(record)
 add_to_link_if_exists(spectrogram)
 add_to_link_if_exists(toast)
 add_to_link_if_exists(automation)
->>>>>>> upstream/master
 
 if (MUSE_MODULE_AUTOBOT)
     list(APPEND LINK_LIB muse::autobot)

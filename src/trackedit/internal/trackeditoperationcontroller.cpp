@@ -39,6 +39,15 @@ bool TrackeditOperationController::trimTracksData(const std::vector<trackedit::T
     return false;
 }
 
+bool TrackeditOperationController::newBusTrack()
+{
+    if (tracksInteraction()->newBusTrack()) {
+        projectHistory()->pushHistoryState("Created new bus track", "New bus track");
+        return true;
+    }
+    return false;
+}
+
 bool TrackeditOperationController::silenceTracksData(const std::vector<trackedit::TrackId>& tracksIds, secs_t begin, secs_t end)
 {
     if (tracksInteraction()->silenceTracksData(tracksIds, begin, end)) {

@@ -79,12 +79,9 @@ set( LIBRARIES
    au3-menus
 #   au3-note-track # not yet used in AU4
    au3-viewport
-<<<<<<< HEAD
 #   au3-music-information-retrieval # not yet used in AU4
 #   au3-crypto # not yet used in AU4
-=======
    au3-crypto
->>>>>>> upstream/master
    au3-fft
 #   au3-concurrency # not yet used in AU4
    au3-sqlite-helpers
@@ -112,7 +109,6 @@ if (AU_MODULE_EFFECTS_AUDIO_UNIT)
    list( APPEND LIBRARIES au3-audio-unit)
 endif()
 
-<<<<<<< HEAD
 # AU3-specific conditional libraries (not used in AU4 yet)
 # These use ${_OPT} variables from AU3's build system
 if ( DEFINED ${_OPT}has_networking AND ${_OPT}has_networking )
@@ -125,7 +121,6 @@ endif()
 
 if ( DEFINED ${_OPT}has_audiocom_upload AND ${_OPT}has_audiocom_upload)
    list( APPEND LIBRARIES au3-cloud-audiocom)
-=======
 if (AU_MODULE_EFFECTS_NYQUIST)
    list( APPEND LIBRARIES au3-nyquist-effects )
 endif()
@@ -136,7 +131,6 @@ list( APPEND LIBRARIES au3-network-manager)
 
 if (AU_BUILD_CLOUD_AUDIOCOM)
    list( APPEND LIBRARIES au3-url-schemes au3-cloud-audiocom)
->>>>>>> upstream/master
 endif()
 
 if( DEFINED ${_OPT}has_crashreports AND ${_OPT}has_crashreports )

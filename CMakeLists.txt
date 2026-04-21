@@ -86,12 +86,9 @@ set(MUSE_MODULE_LANGUAGES ON)
 set(MUSE_MODULE_LEARN ON)
 set(MUSE_MODULE_MIDI OFF)
 set(MUSE_MODULE_MPE OFF)
-<<<<<<< HEAD
 set(MUSE_MODULE_MULTIINSTANCES OFF)
-=======
 set(MUSE_MODULE_MULTIWINDOWS ON)
 set(MUSE_MODULE_MULTIWINDOWS_SINGLEPROC_MODE ON)
->>>>>>> upstream/master
 set(MUSE_MODULE_MUSESAMPLER OFF)
 set(MUSE_MODULE_NETWORK ON)
 set(MUSE_MODULE_SHORTCUTS ON)
@@ -103,14 +100,11 @@ set(MUSE_MODULE_WORKSPACE ON)
 
 # Modules (alphabetical order please)
 option(AU_BUILD_APPSHELL_MODULE "Build appshell module" ON)
-<<<<<<< HEAD
-=======
 option(AU_BUILD_AUTOMATION_TESTS "Build automation tests" ON)
 option(AU_BUILD_CLOUD_AUDIOCOM "Build cloud audiocom module" ON)
 if (AU_BUILD_CLOUD_AUDIOCOM)
     add_compile_definitions(AU_BUILD_CLOUD_AUDIOCOM)
 endif()
->>>>>>> upstream/master
 option(AU_BUILD_CONTEXT_TESTS "Build context tests" ON)
 option(AU_BUILD_EFFECTS_BUILTIN_TESTS "Build builtin-effect tests" ON)
 option(AU_BUILD_EFFECTS_MODULE "Build effects module" ON)
@@ -191,7 +185,8 @@ endif(MUE_COMPILE_USE_CCACHE)
 # Setup external dependencies
 ###########################################
 set(QT_MIN_VERSION "6.2.4")
-include(SetupQt6)
+# include(SetupQt6) # Replaced by BobUI
+include(SetupBobUi)
 
 ###########################################
 # Add source tree

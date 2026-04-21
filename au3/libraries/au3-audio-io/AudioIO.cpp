@@ -114,6 +114,7 @@ time warp info and AudioIOListener and whether the playback is looped.
 #include "au3-project-rate/QualitySettings.h"
 #include "au3-basic-ui/BasicUI.h"
 #include "au3-wave-track/WaveTrack.h"
+#include "au3-mixer/BusTrack.h"
 
 namespace {
 float GetAbsValue(const float* buffer, size_t frames, size_t step)
@@ -1018,6 +1019,7 @@ int AudioIO::StartStream(const TransportSequences& sequences,
     mPlaybackMixers.clear();
     mCaptureBuffers.clear();
     mResample.clear();
+    mBusAccumulators.clear();
     ResetCaptureRouting();
     mPlaybackSchedule.mTimeQueue.Clear();
 
@@ -1345,6 +1347,16 @@ bool AudioIO::AllocateBuffers(
                     for (auto& buffer : mMasterBuffers) {
                         buffer.reserve(playbackBufferSize);
                     }
+
+                // Allocate Bus Accumulators
+                mBusAccumulators.clear();
+                for (const auto& pSequence : mPlaybackSequences) {
+                    if (auto bus = dynamic_cast<const BusTrack*>(pSequence->FindChannelGroup())) {
+                        auto& busBufs = mBusAccumulators[bus->GetId()];
+                        busBufs.resize(mNumPlaybackChannels); // Assuming Stereo Busses for now
+                        for(auto& buf : busBufs) buf.reserve(playbackBufferSize);
+                    }
+                }
 
                     // Number of scratch buffers depends on device playback channels
                     if (mNumPlaybackChannels > 0) {
@@ -2239,12 +2251,20 @@ bool AudioIO::ProcessPlaybackSlices(
         for (auto& buffer : mMasterBuffers) {
             buffer.clear();
         }
+        for (auto& pair : mBusAccumulators) {
+            for (auto& buffer : pair.second) {
+                buffer.clear();
+            }
+        }
     });
 
     for (auto& buffer : mMasterBuffers) {
-        //assert(buffer.size() == 0);
-        //assert(buffer.capacity() >= samplesAvailable);
         buffer.resize(samplesAvailable, 0);
+    }
+    for (auto& pair : mBusAccumulators) {
+        for (auto& buffer : pair.second) {
+            buffer.resize(samplesAvailable, 0);
+        }
     }
 
     {
@@ -2255,24 +2275,80 @@ bool AudioIO::ProcessPlaybackSlices(
                 continue;
             }
 
+            auto pPlayable = dynamic_cast<const PlayableTrack*>(seq->FindChannelGroup());
+            int routeId = pPlayable ? pPlayable->GetRouteId() : 0;
+            // Determine destination buffers: Master or a Bus
+            std::vector<std::vector<float>>* pDestBuffers = &mMasterBuffers;
+            if (routeId != 0) {
+                auto it = mBusAccumulators.find(routeId);
+                if (it != mBusAccumulators.end()) {
+                    pDestBuffers = &it->second;
+                }
+            }
+
             auto& buffers = track.mBuffers;
             const auto numChannels = seq->NChannels();
+
+            // Helper to mix into destination
+            auto MixToDest = [&](const float* src, float vol, int channelIndex) {
+                if (channelIndex < pDestBuffers->size()) {
+                    auto& dest = (*pDestBuffers)[channelIndex];
+                    for (size_t i = 0; i < samplesAvailable; ++i) {
+                        dest[i] += src[i] * vol;
+                    }
+                }
+            };
+
+            // Helper for Aux Sends
+            auto ProcessSends = [&](const float* src, int channelIndex) {
+               if (!pPlayable) return;
+               for (const auto& send : pPlayable->GetAuxSends()) {
+                   auto it = mBusAccumulators.find(send.mDestinationId);
+                   if (it != mBusAccumulators.end()) {
+                       auto& busBuffers = it->second;
+                       if (channelIndex < busBuffers.size()) {
+                           // Apply Send Level (Pan ignored for now in mono->stereo logic simplification)
+                           float vol = send.mAmount;
+                           auto& dest = busBuffers[channelIndex];
+                           for (size_t i = 0; i < samplesAvailable; ++i) {
+                               dest[i] += src[i] * vol;
+                           }
+                       }
+                   }
+               }
+            };
+
             if (numChannels > 1) {
                 for (unsigned n = 0, cnt = std::min(numChannels, mNumPlaybackChannels); n < cnt; ++n) {
                     const float volume = seq->GetChannelVolume(n);
+                    float* pSrc = mProcessingBuffers[bufferIndex + n].data();
+
+                    // Mix to Main Route
+                    MixToDest(pSrc, volume, n);
+
+                    // Mix to Aux Sends (Pre-Fader logic missing, assuming Post-Fader for now)
+                    // Note: pSrc here is *raw* processed audio, volume is applied during mix.
+                    // For Post-Fader send, we should apply track volume.
+                    // For Pre-Fader, we should not.
+                    // Assuming Post-Fader send logic for simplicity here:
+                    // Actually, pSrc is unity gain from effects.
+                    // Send Amount is usually relative to that.
+                    ProcessSends(pSrc, n);
+
+                    // Apply volume to source buffer for display/meters/writeback
                     for (unsigned i = 0; i < samplesAvailable; ++i) {
-                        mProcessingBuffers[bufferIndex + n][i] *= volume;
-                        mMasterBuffers[n][i] += mProcessingBuffers[bufferIndex + n][i];
+                        pSrc[i] *= volume;
                     }
 
                     //Copy per track data to ring buffers
                     buffers[n]->Put(
-                        reinterpret_cast<constSamplePtr>(mProcessingBuffers[bufferIndex + n].data()),
+                        reinterpret_cast<constSamplePtr>(pSrc),
                         floatSample,
                         samplesAvailable, 0);
                 }
             } else if (numChannels == 1) {
                 float maxVolume = 0.0f;
+                float* pSrc = mProcessingBuffers[bufferIndex].data();
 
                 for (unsigned n = 0; n < mNumPlaybackChannels; ++n) {
                     maxVolume = std::max(maxVolume, seq->GetChannelVolume(n));
@@ -2282,24 +2358,43 @@ bool AudioIO::ProcessPlaybackSlices(
                 // accounting for panning
                 for (unsigned n = 0; n < mNumPlaybackChannels; ++n) {
                     const float volume = seq->GetChannelVolume(n);
-                    for (unsigned i = 0; i < samplesAvailable; ++i) {
-                        mMasterBuffers[n][i] += mProcessingBuffers[bufferIndex][i] * volume;
-                    }
+                    MixToDest(pSrc, volume, n);
+                    ProcessSends(pSrc, n); // Sends get mono source mixed to both bus channels
                 }
 
                 for (unsigned i = 0; i < samplesAvailable; ++i) {
-                    mProcessingBuffers[bufferIndex][i] *= maxVolume;
+                    pSrc[i] *= maxVolume;
                 }
 
                 for (unsigned n = 0; n < mNumPlaybackChannels; ++n) {
                     //Copy per track data to ring buffers
                     buffers[n]->Put(
-                        reinterpret_cast<constSamplePtr>(mProcessingBuffers[bufferIndex].data()),
+                        reinterpret_cast<constSamplePtr>(pSrc),
                         floatSample,
                         samplesAvailable, 0);
                 }
             }
             bufferIndex += seq->NChannels();
+        }
+
+        // --- BUS PROCESSING ---
+        // Iterate all Bus Accumulators and mix them into Master (or other Busses)
+        // For Phase 1, we just dump them all into Master to support hearing them.
+        // A real implementation needs the topological sort mentioned earlier.
+        for (auto& pair : mBusAccumulators) {
+            // int busId = pair.first;
+            auto& busBuffers = pair.second;
+
+            // TODO: Apply Bus Volume/Pan here (requires looking up BusTrack by ID)
+            // For now, unity gain mix to master
+
+            for (size_t n = 0; n < mNumPlaybackChannels && n < busBuffers.size(); ++n) {
+                float* pSrc = busBuffers[n].data();
+                float* pDest = mMasterBuffers[n].data();
+                for (size_t i = 0; i < samplesAvailable; ++i) {
+                    pDest[i] += pSrc[i];
+                }
+            }
         }
     }
 

@@ -31,6 +31,7 @@
 #include "au3-components/PluginProvider.h" // for PluginID
 #include "au3-utility/Observer.h"
 #include "au3-math/SampleFormat.h"
+#include <map>
 
 class wxArrayString;
 class AudioIOBase;
@@ -249,6 +250,10 @@ public:
     //!These buffers are used to mix and process the result of processed source channels.
     //!Number of buffers equals to number of output channels.
     std::vector<std::vector<float> > mMasterBuffers;
+
+    //! Buffers for Bus Tracks (TrackId -> Channel Data)
+    std::map<int, std::vector<std::vector<float>>> mBusAccumulators;
+
     /*! Read by worker threads but unchanging during playback */
     RingBuffers mPlaybackBuffers;
     std::vector<Track> mPlaybackTracks;

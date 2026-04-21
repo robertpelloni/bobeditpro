@@ -129,18 +129,13 @@
     <SC>
       <key>action://cancel</key>
       <seq>Esc</seq>
-<<<<<<< HEAD
-=======
     </SC>
     <SC>
       <key>action://trigger</key>
       <seq>Space</seq>
->>>>>>> upstream/master
     </SC>
 <!-- end Global actions -->
 
-<<<<<<< HEAD
-=======
 <!-- Tracks view navigation actions -->
 
     <SC>
@@ -204,7 +199,6 @@
 
 <!-- end Tracks view navigation actions -->
 
->>>>>>> upstream/master
 <!-- Trackedit actions -->
     <SC>
         <key>action://trackedit/paste-overlap</key>
@@ -340,17 +334,14 @@
         <key>curs-next-clip-boundary</key>
     </SC>
     <SC>
-<<<<<<< HEAD
         <key>clip-left</key>
     </SC>
     <SC>
         <key>clip-right</key>
-=======
         <key>cut-leave-gap</key>
     </SC>
     <SC>
         <key>cut-per-clip-ripple</key>
->>>>>>> upstream/master
     </SC>
     <SC>
         <key>cut-per-track-ripple</key>
