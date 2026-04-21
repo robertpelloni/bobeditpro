@@ -1,16 +1,15 @@
-# Ideas for Improvement & Refactoring
+# Ideas for Routing & Mixing (Audition CC)
 
-## 1. Test Runner & CI Robustness
-- **Parallel Testing Execution:** The new `test_runner.py` executes CTest. We could refactor it to use parallel testing via `ctest -j $(nproc)` for significantly faster CI pipelines.
-- **JUnit Reporting:** Enhance `test_runner.py` to output a unified JUnit XML report mapping Catch2/GoogleTest results directly into GitHub Actions annotations.
+Based on our progress with Phase 5.1 (Track Grouping & VCA Faders), we need to further modernize the mixer architecture:
 
-## 2. Advanced Routing Matrix (UI)
-- **Nested Folder Tracks & Collapsing:** `FolderTrack` is implemented in Phase 5.2. A major UI improvement would be allowing the user to expand/collapse these tracks seamlessly in the `MixerBoardModel`.
-- **Drag-and-Drop Reordering:** Enable direct Drag-and-Drop in the QML Mixer View (`MixerBoard.qml`) to rearrange track ordering.
+## 1. Track Folder Hierarchy (Phase 5.2)
+- **Concept:** Folder tracks allow users to visually collapse and expand multiple tracks in the timeline, and often act as an implicit group or bus.
+- **Implementation:** Extend `PlayableTrack` (or create `FolderTrack`) to maintain a list of child `TrackId`s. The QML `PanelTracksListModel` will need a `parentId` or `folderId` role to filter or indent tracks in the view. `MixerBoardModel` can also treat a Folder Track as an automatic VCA group.
 
-## 3. Audio & DSP Refactoring
-- **Plugin Architecture Pivot:** Transition built-in effects like `MultibandCompressorEffect` and `SpectralHealEffect` to a unified `RealtimePluginBase` to handle thread-safety constraints automatically via message queues rather than raw locks.
-- **LUFS DSP Implementation:** Currently, Phase 6.2 (LUFS Normalization) is just scaffolded. We should implement an `EBUR128Analyzer` class in `src/effects/` to dynamically measure Short-Term and Integrated LUFS and calculate target makeup gain offsets before the `exportData` pass.
+## 2. VCA Group Fader UI (Phase 5.3)
+- **Concept:** Provide actual UI controls (faders, mute/solo) that govern the groups created in Phase 5.1.
+- **Implementation:** In `MixerBoard.qml`, iterate over `mixerModel.groups` to render a separate set of "Master Faders" that are visually distinct from standard tracks. The channel strip will need a UI element to assign a track to a group.
 
-## 4. UI Modernization
-- **Theme Overhaul:** Currently `BobUI` colors are hardcoded hex values (e.g. `color: "#2C2C2C"` in `BatchExportDialog.qml`). Shift all such values to use a dynamic global theme object (e.g., `Audacity.Theme.backgroundDark`).
+## 3. Sidechain Routing Matrix (Phase 5.4)
+- **Concept:** Allow the output of one track to be sent not just to the audio input of another track (bus), but to the sidechain input of an effect (like a Compressor or Ducker) on another track.
+- **Implementation:** This requires modifying `AudioIO` to pass sidechain buffers into `RealtimeEffectState::ProcessBlock`.

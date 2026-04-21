@@ -79,35 +79,28 @@ void BatchExportController::startExport()
     // Setup configuration
     m_exportConfiguration()->setDirectoryPath(muse::io::path_t(m_exportPath.toStdString()));
 
-    // Use current format from UI (currently using first format for demo)
+    // For demonstration, use a default format or the first available
     auto formats = m_exporter()->formatsList();
     if (!formats.empty()) {
         m_exportConfiguration()->setCurrentFormat(formats[0]);
     }
 
+    // Optionally set export type
     if (m_exportStems) {
         m_exportConfiguration()->setProcessType(importexport::ExportProcessType::MULTIPLE_FILES);
     } else {
         m_exportConfiguration()->setProcessType(importexport::ExportProcessType::PROJECT);
     }
-
-
     // TODO: Phase 6.2 - Implement LUFS normalization before exporting if m_normalizeToLUFS is true
     // Normalization logic would go here
     if (m_normalizeToLUFS) {
-        // Here we would typically insert a loudness normalization DSP pass or
-        // configure the exporter's options to apply -23 LUFS normalization
-        // dynamically across the master output during export mixdown.
         // E.g., m_exportConfiguration()->setLufsTarget(-23.0f);
     }
-
-
     // Generate output file names and trigger export
     QString baseName = "BatchExport";
     muse::Ret result;
 
     if (m_exportStems) {
-        // Simple mock for multiple files export. Ideally we loop over tracks.
         result = m_exporter()->exportData((baseName + "_Master").toStdString());
     } else {
         result = m_exporter()->exportData(baseName.toStdString());
@@ -120,6 +113,4 @@ void BatchExportController::startExport()
         emit exportFinished(false, QString::fromStdString(result.text()));
     }
 }
-
-
 } // namespace au::appshell

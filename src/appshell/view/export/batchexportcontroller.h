@@ -3,6 +3,10 @@
 #include <QObject>
 #include <QStringList>
 #include <QUrl>
+#include "importexport/export/iexporter.h"
+#include "importexport/export/iexportconfiguration.h"
+#include "context/iglobalcontext.h"
+#include "modularity/ioc.h"
 
 namespace au::appshell {
 /**
@@ -43,6 +47,10 @@ signals:
     void exportFinished(bool success, const QString& message);
 
 private:
+    muse::Inject<importexport::IExporter> m_exporter;
+    muse::Inject<importexport::IExportConfiguration> m_exportConfiguration;
+    muse::Inject<context::IGlobalContext> m_globalContext;
+
     QStringList m_formats{ "WAV (32-bit float)", "FLAC (24-bit)", "MP3 (320kbps)", "Ogg Vorbis" };
     QString m_exportPath;
     bool m_exportStems{ false };
