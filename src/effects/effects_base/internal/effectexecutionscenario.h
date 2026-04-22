@@ -48,6 +48,7 @@ public:
     EffectExecutionScenario() = default;
 
     muse::Ret performEffect(const EffectId& effectId) override;
+    muse::Ret performEffect(const EffectId& effectId, const std::string& params) override;
     bool lastProcessorIsAvailable() const override;
     muse::async::Notification lastProcessorIsNowAvailable() const override;
     muse::async::Channel<EffectId> lastProcessorIdChanged() const override;
@@ -60,8 +61,9 @@ private:
     muse::Ret doPreviewEffect(const EffectId& effectId, EffectSettings& settings);
 
     std::pair<std::string, std::string> makeErrorMsg(const muse::Ret& ret, const EffectId& effectId);
-    muse::Ret performEffectWithShowError(au3::Au3Project& project, const EffectId& effectId, unsigned int flags);
-    muse::Ret doPerformEffect(au3::Au3Project& project, const EffectId& effectId, unsigned int flags);
+    muse::Ret performEffectWithShowError(au3::Au3Project& project, const EffectId& effectId, unsigned int flags,
+                                         const std::string& params = {});
+    muse::Ret doPerformEffect(au3::Au3Project& project, const EffectId& effectId, unsigned int flags, const std::string& params = {});
     muse::Ret performEffectInternal(au3::Au3Project& project, Effect* effect, std::shared_ptr<EffectInstance> effectInstance,
                                     EffectSettings& settings);
     muse::Ret performGenerator(au3::Au3Project& project, Effect&, const std::shared_ptr<EffectInstanceEx>&, EffectSettings&);

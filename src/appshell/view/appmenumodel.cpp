@@ -456,8 +456,8 @@ muse::uicomponents::MenuItem* AppMenuModel::makeDiagnosticMenu()
             makeMenuItem("diagnostic-accessible-tree-dump"),
         };
 
-        MenuItemList autobotItems {
-            makeMenuItem("autobot-show-scripts"),
+        MenuItemList testflowItems {
+            makeMenuItem("testflow-show-scripts"),
         };
 
         MenuItemList extensionsItems {
@@ -467,7 +467,7 @@ muse::uicomponents::MenuItem* AppMenuModel::makeDiagnosticMenu()
         items << makeMenu(TranslatableString("appshell/menu/diagnostics", "A&ctions"), actionsItems, "menu-actions")
               << makeMenu(TranslatableString("appshell/menu/diagnostics", "&Accessibility"), accessibilityItems, "menu-accessibility")
               << makeMenu(TranslatableString("appshell/menu/diagnostics", "E&xtensions"), extensionsItems, "menu-extensions")
-              << makeMenu(TranslatableString("appshell/menu/diagnostics", "Auto&bot"), autobotItems, "menu-autobot");
+              << makeMenu(TranslatableString("appshell/menu/diagnostics", "Test&flow"), testflowItems, "menu-testflow");
         //! TODO AU4
         // << makeMenuItem("multiinstances-dev-show-info");
     }
@@ -726,11 +726,11 @@ MenuItemList AppMenuModel::makeDiagnosticsItems()
         items << makeMenu(TranslatableString("appshell/menu/diagnostic", "&Accessibility"), accessibilityItems, "menu-accessibility");
 #endif
 
-#ifdef MUSE_MODULE_AUTOBOT
-        MenuItemList autobotItems {
-            makeMenuItem("autobot-show-scripts"),
+#ifdef MUSE_MODULE_TESTFLOW
+        MenuItemList testflowItems {
+            makeMenuItem("testflow-show-scripts"),
         };
-        items << makeMenu(TranslatableString("appshell/menu/diagnostic", "Auto&bot"), autobotItems, "menu-autobot");
+        items << makeMenu(TranslatableString("appshell/menu/diagnostic", "Test&flow"), testflowItems, "menu-testflow");
 #endif
 
 #ifdef MUSE_MODULE_MULTIINSTANCES
