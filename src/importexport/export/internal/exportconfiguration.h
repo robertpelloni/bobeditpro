@@ -131,7 +131,6 @@ public:
     void setFFmpegPacketSize(int packetSize) override;
     muse::async::Notification ffmpegPacketSizeChanged() const override;
 
-
     std::string defaultMetadata() const override;
     void setDefaultMetadata(const std::string& xmlString) override;
     muse::async::Notification defaultMetadataChanged() const override;
@@ -141,7 +140,6 @@ public:
     muse::async::Notification lufsTargetChanged() const override;
 
 private:
-
 
     muse::async::Notification m_processChanged;
     muse::async::Notification m_filenameChanged;
