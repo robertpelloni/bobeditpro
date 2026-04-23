@@ -1,6 +1,8 @@
 ## [4.0.22] - 2024-04-10
 ### Added
-- Completed `test_runner.py` functionality to enable robust test suite execution in the CI/CD pipeline.
+- Re-implemented Phase 6.1 Advanced Batch Export logic via `BatchExportController` hooking into `Au3Exporter`.
+- Restored Phase 6.2 Broadcast LUFS Target Normalization API in `IExportConfiguration`.
+- Updated `test_runner.py` documentation and generated `IDEAS.md`.
 
 ## [4.0.19] - 2024-04-10
 ### Added

@@ -27,4 +27,4 @@
 
 ## Phase 6: Export & Publishing
 - [x] Phase 6.1: Advanced Batch Export (Test Infrastructure Fixed)
-- [ ] Phase 6.2: Podcast/Broadcast LUFS Target Normalization
+- [x] Phase 6.2: Podcast/Broadcast LUFS Target Normalization
