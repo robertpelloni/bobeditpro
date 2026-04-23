@@ -94,9 +94,7 @@ void BatchExportController::startExport()
     // TODO: Phase 6.2 - Implement LUFS normalization before exporting if m_normalizeToLUFS is true
     // Normalization logic would go here
     if (m_normalizeToLUFS) {
-        m_exportConfiguration()->setLufsTarget(-23.0f);
-    } else {
-        m_exportConfiguration()->setLufsTarget(0.0f); // 0 indicates no normalization
+        // E.g., m_exportConfiguration()->setLufsTarget(-23.0f);
     }
     // Generate output file names and trigger export
     QString baseName = "BatchExport";

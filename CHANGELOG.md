@@ -1,7 +1,6 @@
-## [4.0.21] - 2024-04-10
+## [4.0.22] - 2024-04-10
 ### Added
-- Implemented Phase 6.2 LUFS Normalization Target API in `IExportConfiguration`.
-- Connected LUFS Target configurations via `BatchExportController`.
+- Completed `test_runner.py` functionality to enable robust test suite execution in the CI/CD pipeline.
 
 ## [4.0.19] - 2024-04-10
 ### Added
