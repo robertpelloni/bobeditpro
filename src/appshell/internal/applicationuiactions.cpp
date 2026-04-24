@@ -49,7 +49,7 @@ const UiActionList ApplicationUiActions::m_actions = {
              ),
     UiAction("restart",
              au::context::UiCtxAny,
-             au::context::CTX_ANY,
+             au::context::CTX_DISABLED,
              TranslatableString("action", "Restart")
              ),
     UiAction(FULL_SCREEN_CODE,
@@ -66,18 +66,18 @@ const UiActionList ApplicationUiActions::m_actions = {
              ),
     UiAction("about-qt",
              au::context::UiCtxAny,
-             au::context::CTX_ANY,
+             au::context::CTX_DISABLED,
              TranslatableString("action", "About &Qt…")
              ),
     UiAction("online-handbook",
              au::context::UiCtxUnknown,
-             au::context::CTX_ANY,
+             au::context::CTX_DISABLED,
              TranslatableString("action", "Online &handbook"),
              TranslatableString("action", "Open online handbook")
              ),
     UiAction("ask-help",
              au::context::UiCtxAny,
-             au::context::CTX_ANY,
+             au::context::CTX_DISABLED,
              TranslatableString("action", "As&k for help")
              ),
     UiAction("revert-factory",
@@ -90,7 +90,7 @@ const UiActionList ApplicationUiActions::m_actions = {
     // Docking
     UiAction("dock-restore-default-layout",
              au::context::UiCtxAny,
-             au::context::CTX_ANY,
+             au::context::CTX_DISABLED,
              TranslatableString("action", "Restore the &default layout"),
              TranslatableString("action", "Restore the default layout")
              ),
@@ -170,7 +170,7 @@ const UiActionList ApplicationUiActions::m_actions = {
              ),
     UiAction("action://cancel",
              au::context::UiCtxAny,
-             au::context::CTX_ANY,
+             au::context::CTX_DISABLED,
              TranslatableString("action", "&Cancel"),
              TranslatableString("action", "Cancel"),
              IconCode::Code::DELETE_TANK

@@ -147,6 +147,7 @@ BaseSection {
                     checked: apiModel.automaticCompensationEnabled
                     onClicked: apiModel.setAutomaticCompensationEnabled(!checked)
 
+                    width: parent.width
                     anchors.verticalCenter: parent.verticalCenter
 
                     navigation.name: "AutomaticLatencyCompensationCheckBox"
