@@ -181,4 +181,10 @@ endif(NOT OS_IS_MAC)
 
 list(APPEND MODULE_LINK Qt::Svg)
 
+add_subdirectory(qml/Audacity/AppShell)
+
+if (AU_BUILD_APPSHELL_TESTS)
+    add_subdirectory(tests)
+endif()
+
 setup_module()

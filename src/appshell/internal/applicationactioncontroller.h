@@ -40,7 +40,6 @@
 #include "record/irecordcontroller.h"
 #include "context/iuicontextresolver.h"
 #include "context/iglobalcontext.h"
-
 //! TODO AU4
 // #include "languages/ilanguagesservice.h"
 // #include "multiinstances/imultiinstancesprovider.h"
@@ -56,21 +55,18 @@ class ApplicationActionController : public QObject, public IApplicationActionCon
     muse::Inject<muse::ui::IMainWindow> mainWindow;
     muse::Inject<appshell::IStartupScenario> startupScenario;
 
-    muse::Inject<muse::IInteractive> interactive;
     muse::Inject<muse::IApplication> application;
     muse::Inject<IAppShellConfiguration> configuration;
-    muse::Inject<project::IProjectFilesController> projectFilesController;
-    muse::Inject<record::IRecordController> recordController;
 
-    muse::Inject<context::IUiContextResolver> uiContextResolver;
-    muse::Inject<context::IGlobalContext> globalContext;
+    muse::ContextInject<muse::IInteractive> interactive { this };
+    muse::ContextInject<project::IProjectFilesController> projectFilesController { this };
+    muse::ContextInject<record::IRecordController> recordController { this };
+    muse::ContextInject<context::IUiContextResolver> uiContextResolver { this };
+    muse::ContextInject<context::IGlobalContext> globalContext { this };
 
-//! TODO AU4
-    // INJECT(languages::ILanguagesService, languagesService)
-    // INJECT(mi::IMultiInstancesProvider, multiInstancesProvider)
-    // INJECT(audio::ISoundFontRepository, soundFontRepository)
-    // INJECT(IStartupScenario, startupScenario)
 public:
+
+    friend class FactoryResetActionTests;
     void preInit();
     void init();
     const std::vector<muse::actions::ActionCode>& prohibitedActionsWhileRecording() const;

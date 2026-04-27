@@ -86,7 +86,6 @@ void CommandLineParser::init()
     m_parser.addOption(QCommandLineOption({ "j", "job" }, "Process a conversion job", "file"));
     m_parser.addOption(QCommandLineOption({ "o", "export-to" }, "Export to 'file'. Format depends on file's extension", "file"));
     m_parser.addOption(QCommandLineOption({ "F", "factory-settings" }, "Use factory settings"));
-    m_parser.addOption(QCommandLineOption({ "R", "revert-settings" }, "Revert to factory settings, but keep default preferences"));
     m_parser.addOption(QCommandLineOption({ "M", "midi-operations" }, "Specify MIDI import operations file", "file"));
     m_parser.addOption(QCommandLineOption({ "P", "export-score-parts" }, "Use with '-o <file>.pdf', export score and parts"));
     m_parser.addOption(QCommandLineOption({ "f", "force" },
@@ -239,6 +238,17 @@ void CommandLineParser::parse(int argc, char** argv)
         m_options->startup.cloudProjectId = m_parser.value("cloud-project-id");
     }
 
+    if (m_parser.isSet("import-media-file")) {
+        for (const QString& file : m_parser.values("import-media-file")) {
+            m_options->startup.mediaFiles.emplace_back(fromUserInputPath(file));
+        }
+    }
+
+    if (m_parser.isSet("F")) {
+        m_options->app.revertToFactorySettings = true;
+    }
+
+    // Audio plugin registration
     if (m_parser.isSet("register-audio-plugin")) {
         m_options->runMode = IApplication::RunMode::AudioPluginRegistration;
         m_options->audioPluginRegistration.pluginPath = fromUserInputPath(m_parser.value("register-audio-plugin"));
