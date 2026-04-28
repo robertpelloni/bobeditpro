@@ -28,19 +28,24 @@ import Audacity.Project 1.0
 Item {
     id: root
 
-    property string path: ""
-    property string suffix: ""
-    property string placeholder: ""
+    property alias path: thumbnailLoader.path
+    property alias placeholder: thumbnailLoader.placeholder
 
-    ProjectThumbnailLoader {
+    property alias backgroundColor: thumbnailLoader.backgroundColor
+    property alias lineColor: thumbnailLoader.lineColor
+    property alias borderColor: thumbnailLoader.borderColor
+
+    ThumbnailLoader {
         id: thumbnailLoader
 
-        projectPath: root.path
+        width: root.width
+        height: root.height
     }
 
-    Loader {
+    PixmapProjectThumbnailView {
+        id: pixmapThumbnail
+
         anchors.fill: parent
-        active: visible
 
         sourceComponent: {
             if (thumbnailLoader.isThumbnailValid) {

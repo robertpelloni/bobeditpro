@@ -2,6 +2,7 @@
 
 #include <QFileDialog>
 
+#include "au3cloud/internal/au3audiocomservice.h"
 #include "framework/global/async/async.h"
 #include "framework/global/defer.h"
 #include "framework/global/translation.h"
@@ -55,6 +56,7 @@ void ProjectActionsController::init()
     dispatcher()->reg(this, "file-save-backup", [this]() { saveProject(SaveMode::SaveCopy); });
 
     dispatcher()->reg(this, "file-share-audio", this, &ProjectActionsController::shareAudio);
+    dispatcher()->reg(this, OPEN_CLOUD_AUDIO_FILE_URI, this, &ProjectActionsController::openCloudAudioFile);
 
     dispatcher()->reg(this, "export-audio", this, &ProjectActionsController::exportAudio);
     dispatcher()->reg(this, "export-labels", this, &ProjectActionsController::exportLabels);
@@ -81,6 +83,7 @@ const muse::actions::ActionCodeList& ProjectActionsController::prohibitedActions
         "file-new",
         "file-open",
         "cloud-file-open",
+        "audacity://cloud/open-audio-file",
         "file-close",
         "project-import",
         "file-save",
@@ -104,6 +107,7 @@ bool ProjectActionsController::canReceiveAction(const muse::actions::ActionCode&
             "cloud-file-open",
             "continue-last-session",
             "clear-recent",
+            "audacity://cloud/open-audio-file",
         };
 
         return muse::contains(DONT_REQUIRE_OPEN_PROJECT, code);
@@ -290,6 +294,8 @@ void ProjectActionsController::importFiles(const muse::actions::ActionData& args
 void ProjectActionsController::importStartupMedia(const muse::actions::ActionData& args)
 {
     const QStringList files = !args.empty() ? args.arg<QStringList>(0) : QStringList();
+    const bool removeAfterImport = args.count() >= 2 ? args.arg<bool>(1) : false;
+
     muse::io::paths_t filePaths;
     filePaths.reserve(files.size());
     for (const QString& file : files) {
@@ -297,6 +303,12 @@ void ProjectActionsController::importStartupMedia(const muse::actions::ActionDat
     }
 
     Ret ret = processMediaFiles(filePaths);
+    if (removeAfterImport) {
+        for (const auto& filePath : filePaths) {
+            fileSystem()->remove(filePath);
+        }
+    }
+
     if (!ret) {
         openPageIfNeed(HOME_PAGE_URI);
     }
@@ -453,7 +465,6 @@ bool ProjectActionsController::saveProjectToCloud(const CloudProjectInfo& cloudI
     }
 
     io::path_t projectFilePath = cloudProjectsPath.appendingComponent(cloudInfo.name).appendingSuffix(au::project::AUP4);
-    bool exists = io::FileInfo::exists(projectFilePath);
 
     IAudacityProjectPtr project = currentProject();
     if (!project) {
@@ -461,34 +472,41 @@ bool ProjectActionsController::saveProjectToCloud(const CloudProjectInfo& cloudI
         return false;
     }
 
-    auto progress = audioComService()->uploadProject(project, cloudInfo.name.toStdString(), [this, projectFilePath]() {
+    auto [uploadRet, progress] = audioComService()->uploadProject(project, cloudInfo.name.toStdString(), [this, projectFilePath]() {
         return saveProjectLocally(projectFilePath, SaveMode::Save);
     }, forceOverwrite);
 
-    progress->finished().onReceive(this, [this, exists, projectFilePath](const ProgressResult& result) {
-        if (result.ret.success()) {
-            if (exists) {
-                return;
-            }
+    if (!uploadRet) {
+        handleCloudSaveError(uploadRet);
+        return false;
+    }
 
-            const bool dismissable = false;
-            toastService()->show(trc("global", "Success"),
-                                 trc("project",
-                                     "All saved changes will now update to the cloud.\nYou can manage this file from your updated projects page on audio.com"),
-                                 muse::ui::IconCode::Code::TICK,
-                                 dismissable,
-            {
-                { trc("project", "Dismiss"), au::toast::ToastActionCode::None },
-                { trc("cloud", "View on audio.com"), au::toast::ToastActionCode::Custom }
-            }
-                                 ).onResolve(this, [this, url = result.val.toQString()](au::toast::ToastActionCode actionCode) {
-                if (actionCode == au::toast::ToastActionCode::Custom) {
-                    platformInteractive()->openUrl(url);
-                }
-            });
-        } else {
+    if (!progress) {
+        LOGE() << "Failed to start cloud upload";
+        return false;
+    }
+
+    progress->finished().onReceive(this, [this, projectFilePath](const ProgressResult& result) {
+        if (!result.ret.success()) {
             handleCloudSaveError(result.ret);
+            return;
         }
+
+        const bool dismissable = false;
+        toastService()->show(trc("global", "Success"),
+                             trc("project",
+                                 "All saved changes will now update to the cloud.\nYou can manage this file from your updated projects page on audio.com"),
+                             muse::ui::IconCode::Code::TICK,
+                             dismissable,
+        {
+            { trc("project", "Dismiss"), au::toast::ToastActionCode::None },
+            { trc("cloud", "View on audio.com"), au::toast::ToastActionCode::Custom }
+        }
+                             ).onResolve(this, [this, url = result.val.toQString()](au::toast::ToastActionCode actionCode) {
+            if (actionCode == au::toast::ToastActionCode::Custom) {
+                platformInteractive()->openUrl(url);
+            }
+        });
     });
 
     const bool dismissible = false;
@@ -805,10 +823,20 @@ Ret ProjectActionsController::openCloudProject(const io::path_t& localPath, cons
         return make_ret(Ret::Code::Cancel);
     }
 
-    muse::ProgressPtr progress = audioComService()->openCloudProject(localPath, projectId.toStdString(), forceOverwrite);
-    progress->finished().onReceive(this, [this, localPath](const ProgressResult& result) {
+    const std::string cloudProjectIdStr = projectId.toStdString();
+    auto [openRet, progress] = audioComService()->openCloudProject(localPath, cloudProjectIdStr, forceOverwrite);
+    if (!openRet) {
+        handleCloudOpenError(openRet, localPath, cloudProjectIdStr);
+        return openRet;
+    }
+
+    if (!progress) {
+        return make_ret(Ret::Code::UnknownError);
+    }
+
+    progress->finished().onReceive(this, [this, localPath, cloudProjectIdStr](const ProgressResult& result) {
         if (!result.ret) {
-            handleCloudOpenError(result.ret, localPath);
+            handleCloudOpenError(result.ret, localPath, cloudProjectIdStr);
             return;
         }
 
@@ -823,12 +851,12 @@ Ret ProjectActionsController::openCloudProject(const io::path_t& localPath, cons
             return;
         }
 
-        auto progress = audioComService()->resumeProjectSync(project);
-        if (!progress || progress->isCanceled()) {
+        auto [syncRet, syncProgress] = audioComService()->resumeProjectSync(project);
+        if (!syncRet || !syncProgress || syncProgress->isCanceled()) {
             return;
         }
 
-        progress->finished().onReceive(this, [this](const ProgressResult& result) {
+        syncProgress->finished().onReceive(this, [this](const ProgressResult& result) {
             if (!result.ret.success()) {
                 handleCloudSaveError(result.ret);
             }
@@ -839,7 +867,7 @@ Ret ProjectActionsController::openCloudProject(const io::path_t& localPath, cons
         toastService()->showWithProgress(
             trc("project", "Resuming sync to audio.com…"),
             {},
-            progress,
+            syncProgress,
             muse::ui::IconCode::Code::CLOUD,
             dismissible,
             {},
@@ -1039,7 +1067,11 @@ void ProjectActionsController::shareAudio()
         return;
     }
 
-    auto progress = audioComService()->shareAudio(title);
+    auto [shareRet, progress] = audioComService()->shareAudio(title);
+    if (!shareRet || !progress) {
+        return;
+    }
+
     progress->finished().onReceive(this, [this](const ProgressResult& result) {
         if (result.ret.success()) {
             const bool dismissable = false;
@@ -1057,7 +1089,7 @@ void ProjectActionsController::shareAudio()
                 }
             });
         } else {
-            //handleCloudError(result.ret);
+            handleCloudSaveError(result.ret);
         }
     });
 
@@ -1072,6 +1104,58 @@ void ProjectActionsController::shareAudio()
         {},
         showProgressInfo
         );
+}
+
+void ProjectActionsController::openCloudAudioFile(const muse::actions::ActionQuery& query)
+{
+    const auto audioId = query.param("audioId").toString();
+    if (audioId.empty()) {
+        return;
+    }
+
+    auto [downloadRet, progress] = audioComService()->downloadAudioFile(audioId);
+    if (!downloadRet) {
+        handleCloudAudioOpenError(downloadRet);
+        return;
+    }
+
+    if (!progress) {
+        return;
+    }
+
+    progress->finished().onReceive(this, [this](const ProgressResult& result) {
+        if (!result.ret) {
+            handleCloudAudioOpenError(result.ret);
+            return;
+        }
+
+        const auto localPath = result.val.toQString();
+        const auto project = globalContext()->currentProject();
+        if (project) {
+            QStringList args;
+            args << "--session-type" << "start-with-new";
+            args << "--import-media-file" << localPath;
+            args << "--remove-media-after-import";
+            multiwindowsProvider()->openNewWindow(args);
+            return;
+        }
+
+        auto newproject = createProjectInCurrentWindow();
+        if (!newproject) {
+            return;
+        }
+
+        const auto importRet = newproject->import(muse::io::paths_t { localPath });
+        fileSystem()->remove(localPath);
+        if (!importRet) {
+            LOGE() << importRet.toString();
+            return;
+        }
+
+        openPageIfNeed(PROJECT_PAGE_URI);
+    });
+
+    interactive()->showProgress(muse::trc("cloud", "Downloading audio from cloud…"), *progress);
 }
 
 void ProjectActionsController::exportAudio()

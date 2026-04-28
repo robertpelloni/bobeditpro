@@ -14,6 +14,7 @@
 #include "playback/iplayback.h"
 #include "playback/iplaybackcontroller.h"
 #include "trackedit/iselectioncontroller.h"
+#include "trackedit/iprojecthistory.h"
 
 //! NOTE This class does two things:
 //! 1. This is a context that is passed to other classes

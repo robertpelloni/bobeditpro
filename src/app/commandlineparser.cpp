@@ -244,6 +244,10 @@ void CommandLineParser::parse(int argc, char** argv)
         }
     }
 
+    if (m_parser.isSet("remove-media-after-import")) {
+        m_options->startup.removeMediaFilesAfterImport = true;
+    }
+
     if (m_parser.isSet("F")) {
         m_options->app.revertToFactorySettings = true;
     }
