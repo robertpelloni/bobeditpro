@@ -7,29 +7,14 @@ import Muse.UiComponents 1.0
 import Muse.Ui 1.0
 
 import Audacity.Playback 1.0
+import Audacity.ProjectScene 1.0
 
-Canvas {
+VolumePressureMeterItem {
     id: root
-
-    property real currentVolumePressure: -145.0
-    property real currentRMS: -145.0
-    property real minDisplayedVolumePressure: -60.0
-    property real maxDisplayedVolumePressure: 0.0
-
-    property var meterModel: null
-
-    property real indicatorWidth
-    property bool showClippedInfo: true
-
-    property int recentPeakIntervalMiliseconds: 600
-
-    property int overloadHeight: 4
 
     width: indicatorWidth
 
-    onMeterModelChanged: {
-        requestPaint()
-    }
+    opacity: enabled ? 1.0 : ui.theme.itemOpacityDisabled
 
     QtObject {
         id: meterStyle

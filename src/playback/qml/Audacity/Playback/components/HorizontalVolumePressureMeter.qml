@@ -8,22 +8,8 @@ import Muse.UiComponents 1.0
 
 import Audacity.Playback 1.0
 
-Canvas {
+HorizontalVolumePressureMeterItem {
     id: root
-
-    property real currentVolumePressure: -145.0
-    property real currentRMS: -145.0
-    property real minDisplayedVolumePressure: -60.0
-    property real maxDisplayedVolumePressure: 0.0
-    
-    property int recentPeakIntervalMiliseconds: 600
-
-    property var meterModel: null
-
-    property bool showOverload: true
-    readonly property int overloadWidth: 6
-    readonly property int overloadSpacing: 2
-    readonly property int overloadTotalSpace: root.overloadWidth + root.overloadSpacing
 
     width: parent.width
     height: 6

@@ -7,7 +7,6 @@
 #include "framework/global/dataformatter.h"
 #include "framework/global/types/datetime.h"
 
-#include "au3cloud/cloudtypes.h"
 #include "project/types/projecttypes.h"
 
 using namespace muse;
@@ -115,7 +114,7 @@ void CloudProjectsModel::loadItemsIfNecessary()
         return;
     }
 
-    if (m_state == State::Error || m_state == State::NotSignedIn) {
+    if (m_state == State::Error) {
         return;
     }
 
