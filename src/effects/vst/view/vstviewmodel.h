@@ -7,6 +7,8 @@
 
 #include "modularity/ioc.h"
 #include "trackedit/iprojecthistory.h"
+#include "effects/effects_base/ieffectinstancesregister.h"
+#include "effects/effects_base/ieffectexecutionscenario.h"
 #include "effects/effects_base/irealtimeeffectservice.h"
 #include "effects/effects_base/effectstypes.h"
 #include "effects/effects_base/view/abstracteffectviewmodel.h"
@@ -21,6 +23,10 @@ class VstViewModel : public AbstractEffectViewModel
 public:
     muse::Inject<IRealtimeEffectService> realtimeEffectService;
     muse::Inject<trackedit::IProjectHistory> projectHistory;
+muse::GlobalInject<IEffectInstancesRegister> instancesRegister;
+    muse::ContextInject<IEffectExecutionScenario> executionScenario{ this };
+    muse::ContextInject<IRealtimeEffectService> realtimeEffectService{ this };
+    muse::ContextInject<trackedit::IProjectHistory> projectHistory{ this };
 
 public:
     VstViewModel(QObject* parent, int instanceId);

@@ -3,9 +3,8 @@
  */
 #pragma once
 
-#include "effects/effects_base/ieffectinstancesregister.h"
-#include "effects/effects_base/ieffectexecutionscenario.h"
-#include "effects/effects_base/ieffectsprovider.h"
+#include "effects/effects_base/effectstypes.h"
+
 #include "playback/iplayback.h"
 
 #include "framework/global/async/asyncable.h"
@@ -24,6 +23,7 @@ protected:
     muse::Inject<IEffectInstancesRegister> instancesRegister;
     muse::Inject<IEffectExecutionScenario> executionScenario;
     muse::Inject<au::playback::IPlayback> playback;
+muse::ContextInject<au::playback::IPlayback> playback{ this };
 
 public:
     AbstractEffectViewModel(QObject* parent, int instanceId);

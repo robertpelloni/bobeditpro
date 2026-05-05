@@ -22,31 +22,25 @@
 import QtQuick 2.15
 
 import Muse.Ui 1.0
-import Muse.UiComponents 1.0
+import Muse.UiComponents
 import Muse.Dock 1.0
 
 import "./Gallery"
 import "./Interactive"
+import "./ToastNotification"
 import "./CrashHandler"
 import "./KeyNav"
 import "./Preferences"
+import "./Table"
 
 DockPage {
     id: root
 
     objectName: "DevTools"
-    uri: "musescore://devtools"
+    uri: "audacity://devtools"
 
     function setCurrentCentral(name) {
         switch (name) {
-<<<<<<< HEAD:src/appshell/qml/DevTools/DevToolsPage.qml
-        case "settings": root.central = settingsComp; break
-        case "gallery": root.central = galleryComp; break
-        case "interactive": root.central = interactiveComp; break
-        case "crashhandler": root.central = crashhandlerComp; break
-        case "extensions": root.central = extensionsComp; break
-        case "navigation": root.central = keynavComp; break
-=======
         case "settings":
             root.central = settingsComp
             break
@@ -71,7 +65,9 @@ DockPage {
         case "cloud":
             root.central = cloudComp
             break
->>>>>>> upstream/master:src/appshell/qml/Audacity/AppShell/DevTools/DevToolsPage.qml
+        case "table":
+            root.central = tableComp
+            break
         }
     }
 
@@ -96,14 +92,6 @@ DockPage {
                     anchors.fill: parent
 
                     model: [
-<<<<<<< HEAD:src/appshell/qml/DevTools/DevToolsPage.qml
-                        { "name": "settings", "title": "Settings" },
-                        { "name": "gallery", "title": "UI Gallery" },
-                        { "name": "interactive", "title": "Interactive" },
-                        { "name": "crashhandler", "title": "Crash handler" },
-                        { "name": "extensions", "title": "Extensions" },
-                        { "name": "navigation", "title": "KeyNav" }
-=======
                         {
                             "name": "settings",
                             "title": "Settings"
@@ -135,8 +123,11 @@ DockPage {
                         {
                             "name": "cloud",
                             "title": "Cloud Tests"
+                        },
+                        {
+                            "name": "table",
+                            "title": "Table"
                         }
->>>>>>> upstream/master:src/appshell/qml/Audacity/AppShell/DevTools/DevToolsPage.qml
                     ]
 
                     onSelected: function (name) {
@@ -168,6 +159,12 @@ DockPage {
     }
 
     Component {
+        id: toastNotificationComp
+
+        ToastNotificationTests {}
+    }
+
+    Component {
         id: crashhandlerComp
 
         CrashHandlerDevTools {}
@@ -176,9 +173,7 @@ DockPage {
     Component {
         id: extensionsComp
 
-        Loader {
-            source: "qrc:/qml/DevTools/Extensions/ExtensionsListView.qml"
-        }
+        ExtensionsListView {}
     }
 
     Component {
@@ -186,8 +181,6 @@ DockPage {
 
         KeyNavExample {}
     }
-<<<<<<< HEAD:src/appshell/qml/DevTools/DevToolsPage.qml
-=======
 
     Component {
         id: cloudComp
@@ -196,5 +189,10 @@ DockPage {
             source: "Cloud/CloudTests.qml"
         }
     }
->>>>>>> upstream/master:src/appshell/qml/Audacity/AppShell/DevTools/DevToolsPage.qml
+
+    Component {
+        id: tableComp
+
+        TableTests {}
+    }
 }
