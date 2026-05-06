@@ -40,7 +40,7 @@ static const QColor messageColor("#99FFFFFF");
 static constexpr QRectF messageRect(loadingScreenSize.width() / 2, 269, 0, 0);
 
 static const QString website("www.audacityteam.org");
-static constexpr QRectF websiteRect(76, 240, 0, 0);
+static constexpr QRectF versionRect(38, 322, 0, 0);
 
 static const QColor versionNumberColor("#EB4859");
 static constexpr qreal versionNumberSpacing = 5.0;
@@ -94,15 +94,19 @@ void LoadingScreenView::draw(QPainter* painter)
     // Qt::AlignmentFlag alignment = languagesService()->currentLanguage().direction == Qt::RightToLeft
     //                               ? Qt::AlignLeft : Qt::AlignRight;
 
-    // Draw website URL
-    QRectF websiteBoundingRect;
-    painter->drawText(websiteRect, Qt::AlignBottom | alignment | Qt::TextDontClip, website, &websiteBoundingRect);
-
     // Draw version number
     pen.setColor(versionNumberColor);
     painter->setPen(pen);
 
-    painter->drawText(websiteRect.translated(0.0, -websiteBoundingRect.height() - versionNumberSpacing),
-                      Qt::AlignBottom | alignment | Qt::TextDontClip,
-                      qtrc("appshell", "Version %1").arg(application()->version().major()));
+    QRectF versionBoundingRect;
+    painter->drawText(versionRect, Qt::AlignBottom | alignment | Qt::TextDontClip,
+                      qtrc("appshell", "Version %1").arg(application()->version().major()),
+                      &versionBoundingRect);
+
+    // Draw website URL
+    pen.setColor(messageColor);
+    painter->setPen(pen);
+
+    painter->drawText(versionRect.translated(0.0, versionBoundingRect.height() + versionNumberSpacing),
+                      Qt::AlignBottom | alignment | Qt::TextDontClip, website);
 }

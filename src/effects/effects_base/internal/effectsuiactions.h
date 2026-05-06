@@ -38,7 +38,7 @@ public:
 private:
     void makeActions(EffectMetaList effects);
     muse::ui::UiActionList m_actions;
-    const std::shared_ptr<EffectsActionsController> m_controller;
+    EffectsActionsController* const m_controller = nullptr;
     muse::async::Channel<muse::ui::UiActionList> m_actionsChanged;
     muse::async::Channel<muse::actions::ActionCodeList> m_actionCheckedChanged;
 };
