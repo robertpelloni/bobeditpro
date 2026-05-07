@@ -486,7 +486,7 @@ MenuItemList AppMenuModel::makeRecentProjectsItems()
         MenuItem* item = new MenuItem(this);
 
         UiAction action;
-        action.code = "file-open";
+        action.code = "file-open-recent";
         action.title = TranslatableString::untranslatable(file.displayName(/*includingExtension*/ true));
         item->setAction(action);
 
