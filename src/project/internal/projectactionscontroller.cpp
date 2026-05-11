@@ -839,7 +839,8 @@ Ret ProjectActionsController::openCloudProject(const io::path_t& localPath, cons
             return;
         }
 
-        doOpenProject(localPath);
+        const io::path_t projectPath = !result.val.isNull() ? result.val.toPath() : localPath;
+        doOpenProject(projectPath);
 
         auto project = globalContext()->currentProject();
         if (!project) {
