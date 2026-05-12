@@ -266,6 +266,8 @@ if (AU_MODULE_EFFECTS_NYQUIST)
     add_dependencies(audacity nyquist-runtime nyquist-plug-ins)
 endif()
 
+add_dependencies(audacity builtin-workspaces)
+
 ###########################################
 # INSTALL
 ###########################################

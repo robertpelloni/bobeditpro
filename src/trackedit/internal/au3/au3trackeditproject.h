@@ -24,6 +24,7 @@ public:
 
     TrackIdList trackIdList() const override;
     std::vector<Track> trackList() const override;
+    muse::ValCh<bool> hasAudioContent() const override;
     bool timeTrackFound() const override;
     std::optional<Track> track(TrackId trackId) const override;
     Clip clip(const ClipKey& key) const override;
@@ -76,6 +77,7 @@ private:
 
     au::trackedit::Clips getClips(const TrackId& trackId) const;
     au::trackedit::Labels getLabels(const TrackId& trackId) const;
+    void updateHasAudioContent();
 
     struct Au3Impl;
     std::shared_ptr<Au3Impl> m_impl;
@@ -91,6 +93,8 @@ private:
     mutable muse::async::Channel<trackedit::Track> m_trackRemoved;
     mutable muse::async::Channel<trackedit::Track, int> m_trackInserted;
     mutable muse::async::Channel<trackedit::Track, int> m_trackMoved;
+
+    muse::ValCh<bool> m_hasAudioContent;
 };
 
 class Au3TrackeditProjectCreator : public ITrackeditProjectCreator

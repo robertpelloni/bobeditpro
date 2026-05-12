@@ -4,7 +4,6 @@
 #include "ui/iuiactionsmodule.h"
 #include "context/iuicontextresolver.h"
 #include "projectactionscontroller.h"
-#include "record/irecordcontroller.h"
 #include "async/asyncable.h"
 
 namespace au::project {

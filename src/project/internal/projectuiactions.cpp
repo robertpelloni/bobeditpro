@@ -259,8 +259,8 @@ const UiActionList ProjectUiActions::m_actions = {
     UiAction("toggle-effects",
              au::context::UiCtxAny,
              au::context::CTX_ANY,
-             TranslatableString("action", "Show effects"),
-             TranslatableString("action", "Show effects"),
+             TranslatableString("action", "Show effects panel"),
+             TranslatableString("action", "Show effects panel"),
              Checkable::Yes
              ),
     UiAction("toggle-metadata-editor",
@@ -401,8 +401,8 @@ const UiActionList ProjectUiActions::m_actions = {
     UiAction("add-realtime-effects",
              au::context::UiCtxAny,
              au::context::CTX_ANY,
-             TranslatableString("action", "Add realtime effects"),
-             TranslatableString("action", "Add realtime effects")
+             TranslatableString("action", "Add track effects"),
+             TranslatableString("action", "Add track effects")
              ),
     UiAction("favourite-effect-1",
              au::context::UiCtxAny,
@@ -622,8 +622,8 @@ ProjectUiActions::ProjectUiActions(const std::shared_ptr<ProjectActionsControlle
 
 void ProjectUiActions::init()
 {
-    recordController()->isRecordingChanged().onNotify(this, [this]() {
-        m_actionEnabledChanged.send(m_controller->prohibitedActionsWhileRecording());
+    m_controller->actionEnabledChanged().onReceive(this, [this](const muse::actions::ActionCodeList& codes) {
+        m_actionEnabledChanged.send(codes);
     });
 }
 

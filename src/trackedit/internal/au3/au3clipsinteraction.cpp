@@ -357,6 +357,7 @@ std::optional<TimeSpan> Au3ClipsInteraction::removeClip(const trackedit::ClipKey
     waveTrack->Clear(start, end, false);
 
     trackedit::ITrackeditProjectPtr prj = globalContext()->currentTrackeditProject();
+    prj->notifyAboutClipRemoved(DomConverter::clip(waveTrack, clip.get()));
     prj->notifyAboutTrackChanged(DomConverter::track(waveTrack));
 
     return TimeSpan{ start, end };
@@ -509,9 +510,10 @@ bool Au3ClipsInteraction::splitClipsAtSilences(const ClipKeyList& clipKeyList)
             continue;
         }
 
-        waveTrack->Disjoin(clip->Start(), clip->End());
-
         trackedit::ITrackeditProjectPtr prj = globalContext()->currentTrackeditProject();
+        utils::executeAndNotifyAboutChangedClips(prj, clipKey.trackId, [&] {
+            waveTrack->Disjoin(clip->Start(), clip->End());
+        });
         prj->notifyAboutTrackChanged(DomConverter::track(waveTrack));
     }
 
@@ -536,20 +538,25 @@ bool Au3ClipsInteraction::splitClipsIntoNewTracks(const ClipKeyList& clipKeyList
         auto newTrack = waveTrack->EmptyCopy(pSampleBlockFactory);
         auto& projectTracks = Au3TrackList::Get(projectRef());
 
-        for (const auto& clipKey : clips) {
-            std::shared_ptr<Au3WaveClip> clip = DomAccessor::findWaveClip(waveTrack, clipKey.itemId);
-            IF_ASSERT_FAILED(clip) {
-                continue;
-            }
-
-            newTrack->InsertInterval(waveTrack->CopyClip(*clip, true), false);
-            waveTrack->SplitDelete(clip->Start(), clip->End());
-        }
-        projectTracks.Add(newTrack);
-
         trackedit::ITrackeditProjectPtr prj = globalContext()->currentTrackeditProject();
+        utils::executeAndNotifyAboutChangedClips(prj, trackId, [&] {
+            for (const auto& clipKey : clips) {
+                std::shared_ptr<Au3WaveClip> clip = DomAccessor::findWaveClip(waveTrack, clipKey.itemId);
+                IF_ASSERT_FAILED(clip) {
+                    continue;
+                }
+
+                newTrack->InsertInterval(waveTrack->CopyClip(*clip, true), false);
+                waveTrack->SplitDelete(clip->Start(), clip->End());
+            }
+        });
         prj->notifyAboutTrackChanged(DomConverter::track(waveTrack));
+
+        projectTracks.Add(newTrack);
         prj->notifyAboutTrackAdded(DomConverter::track(newTrack.get()));
+        for (const auto& clip : prj->clipList(newTrack->GetId())) {
+            prj->notifyAboutClipAdded(clip);
+        }
     }
 
     return true;
@@ -614,6 +621,9 @@ bool Au3ClipsInteraction::duplicateClips(const ClipKeyList& clipKeyList)
         }
         projectTracks.Add(newTrack);
         prj->notifyAboutTrackAdded(DomConverter::track(newTrack.get()));
+        for (const auto& clip : prj->clipList(newTrack->GetId())) {
+            prj->notifyAboutClipAdded(clip);
+        }
     }
 
     return true;
@@ -631,10 +641,13 @@ ITrackDataPtr Au3ClipsInteraction::clipSplitCut(const ClipKey& clipKey)
         return nullptr;
     }
 
-    auto track = waveTrack->SplitCut(clip->Start(), clip->End());
-    const auto data = std::make_shared<Au3TrackData>(std::move(track));
-
     trackedit::ITrackeditProjectPtr prj = globalContext()->currentTrackeditProject();
+
+    std::shared_ptr<Au3TrackData> data;
+    utils::executeAndNotifyAboutChangedClips(prj, clipKey.trackId, [&] {
+        auto track = waveTrack->SplitCut(clip->Start(), clip->End());
+        data = std::make_shared<Au3TrackData>(std::move(track));
+    });
     prj->notifyAboutTrackChanged(DomConverter::track(waveTrack));
 
     return data;
@@ -652,9 +665,10 @@ bool Au3ClipsInteraction::clipSplitDelete(const ClipKey& clipKey)
         return false;
     }
 
-    waveTrack->SplitDelete(clip->Start(), clip->End());
-
     trackedit::ITrackeditProjectPtr prj = globalContext()->currentTrackeditProject();
+    utils::executeAndNotifyAboutChangedClips(prj, clipKey.trackId, [&] {
+        waveTrack->SplitDelete(clip->Start(), clip->End());
+    });
     prj->notifyAboutTrackChanged(DomConverter::track(waveTrack));
 
     return true;
@@ -1485,7 +1499,9 @@ void Au3ClipsInteraction::trimOrDeleteOverlapping(::WaveTrack* waveTrack,
 
     if (muse::RealIsEqualOrLess(begin, otherClip->GetPlayStartTime())
         && muse::RealIsEqualOrMore(end, otherClip->GetPlayEndTime())) {
+        auto clipInfo = DomConverter::clip(waveTrack, otherClip.get());
         waveTrack->RemoveInterval(otherClip);
+        prj->notifyAboutClipRemoved(clipInfo);
         prj->notifyAboutTrackChanged(DomConverter::track(waveTrack));
         return;
     }
@@ -1506,7 +1522,7 @@ void Au3ClipsInteraction::trimOrDeleteOverlapping(::WaveTrack* waveTrack,
         leftClip->SetPlayStartTime(otherClipStartTime);
         muse::secs_t leftClipOverlap = (otherClipEndTime - begin);
         leftClip->TrimRight(leftClipOverlap);
-        prj->notifyAboutClipChanged(DomConverter::clip(waveTrack, leftClip.get()));
+        prj->notifyAboutClipAdded(DomConverter::clip(waveTrack, leftClip.get()));
 
         prj->notifyAboutTrackChanged(DomConverter::track(waveTrack));
         return;

@@ -89,6 +89,7 @@ const muse::actions::ActionCodeList& ProjectActionsController::prohibitedActions
         "export-audio",
         "export-labels",
         "export-midi",
+        "file-share-audio",
     };
 
     return PROHIBITED_WHILE_RECORDING;
@@ -110,7 +111,22 @@ bool ProjectActionsController::canReceiveAction(const muse::actions::ActionCode&
         };
 
         return muse::contains(DONT_REQUIRE_OPEN_PROJECT, code);
-    } else if (recordController()->isRecording()) {
+    }
+
+    const bool recording = recordController()->isRecording();
+
+    if (code == "file-share-audio") {
+        trackedit::ITrackeditProjectPtr prj = globalContext()->currentTrackeditProject();
+        if (!prj) {
+            return false;
+        }
+
+        if (!prj->hasAudioContent().val) {
+            return false;
+        }
+    }
+
+    if (recording) {
         return !muse::contains(prohibitedActionsWhileRecording(), code);
     }
 
@@ -917,7 +933,12 @@ Ret ProjectActionsController::doOpenProject(const io::path_t& filePath)
 
     projectHistory()->init();
 
-    return openPageIfNeed(PROJECT_PAGE_URI);
+    const Ret ret = openPageIfNeed(PROJECT_PAGE_URI);
+    if (ret) {
+        missingEffectChecker()->warnIfEffectsMissing();
+    }
+
+    return ret;
 }
 
 //! TODO AU4

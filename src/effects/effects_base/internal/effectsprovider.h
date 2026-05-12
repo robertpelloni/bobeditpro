@@ -64,6 +64,7 @@ void initOnce(muse::IInteractive& interactive,
 
     EffectMeta meta(const EffectId& effectId) const override;
     bool loadEffect(const EffectId& effectId) const override;
+    std::string effectPath(const std::string& effectId) const override;
     std::string effectName(const std::string& effectId) const override;
     std::string effectName(const effects::RealtimeEffectState& state) const override;
     Effect* effect(const EffectId& effectId) const override;

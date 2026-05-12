@@ -19,6 +19,7 @@
 #include "importexport/import/iimporter.h"
 #include "au3cloud/iau3audiocomservice.h"
 #include "au3cloud/iauthorization.h"
+#include "effects/effects_base/imissingeffectchecker.h"
 
 #include "project/iprojectfilescontroller.h"
 #include "project/iaudacityproject.h"
@@ -58,6 +59,7 @@ public:
 
     bool isProjectOpened(const muse::io::path_t& projectPath) const;
     const muse::actions::ActionCodeList& prohibitedActionsWhileRecording() const;
+    muse::async::Channel<muse::actions::ActionCodeList> actionEnabledChanged() const;
 
 private:
     project::IAudacityProjectPtr currentProject() const;
@@ -114,6 +116,8 @@ private:
     void openMetadataDialog();
 
     muse::Ret ensureAuthorization();
+
+    void listenTrackeditProjectChanges();
 
     bool m_isProjectSaving = false;
     bool m_isProjectClosing = false;
