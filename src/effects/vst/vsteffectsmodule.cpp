@@ -88,11 +88,11 @@ void VstEffectsModule::registerUiTypes()
     REGISTER_AUDACITY_EFFECTS_SINGLETON_TYPE(VstViewModelFactory);
 }
 
-void VstEffectsModule::onInit(const muse::IApplication::RunMode&)
+void VstEffectsModule::onInit(const muse::IApplication::RunMode& mode)
 {
     m_vstMetaReader->init();
     m_effectLoader->init();
-    m_pluginsScanner->init();
+    m_pluginsScanner->init(mode);
 }
 
 void VstEffectsModule::onDeinit()

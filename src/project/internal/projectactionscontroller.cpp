@@ -430,6 +430,10 @@ bool ProjectActionsController::closeOpenedProject(const bool quitApp)
         }
     }
 
+    if (result && project->isCloudProject()) {
+        result = askAboutStoppingCloudSync();
+    }
+
     if (result) {
         interactive()->closeAllDialogsSync();
 
@@ -451,6 +455,19 @@ bool ProjectActionsController::closeOpenedProject(const bool quitApp)
     }
 
     return result;
+}
+
+bool ProjectActionsController::askAboutStoppingCloudSync()
+{
+    if (!audioComService()->syncingInProgressChanged().val) {
+        return true;
+    }
+
+    static const Uri CLOUD_PROJECT_SYNC_URI("audacity://project/cloudprojectsyncing");
+
+    RetVal<Val> rv = interactive()->openSync(CLOUD_PROJECT_SYNC_URI);
+    std::string status = rv.val.toString();
+    return status == "stopped" || status == "synced";
 }
 
 bool ProjectActionsController::saveProject(const muse::io::path_t& path)
@@ -532,9 +549,16 @@ bool ProjectActionsController::saveProjectToCloud(const CloudProjectInfo& cloudI
         progress,
         muse::ui::IconCode::Code::CLOUD,
         dismissible,
-        {},
+    {
+        { trc("project", "Dismiss"), au::toast::ToastActionCode::None },
+        { trc("global", "Stop"), au::toast::ToastActionCode::Custom }
+    },
         showProgressInfo
-        );
+        ).onResolve(this, [progress = progress](const au::toast::ToastActionCode& actionCode) {
+        if (actionCode == au::toast::ToastActionCode::Custom) {
+            progress->cancel();
+        }
+    });
 
     return true;
 }
@@ -886,9 +910,16 @@ Ret ProjectActionsController::openCloudProject(const io::path_t& localPath, cons
             syncProgress,
             muse::ui::IconCode::Code::CLOUD,
             dismissible,
-            {},
+        {
+            { trc("project", "Dismiss"), au::toast::ToastActionCode::None },
+            { trc("global", "Stop"), au::toast::ToastActionCode::Custom }
+        },
             showProgressInfo
-            );
+            ).onResolve(this, [progress = syncProgress](const au::toast::ToastActionCode& actionCode) {
+            if (actionCode == au::toast::ToastActionCode::Custom) {
+                progress->cancel();
+            }
+        });
     });
 
     interactive()->showProgress(trc("project", "Syncing project from cloud…"), *progress);
