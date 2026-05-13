@@ -384,4 +384,16 @@ void au::importexport::Au3Importer::addImportedTracks(const muse::io::path_t& fi
     }
 
     applyImportedProjectTitleIfNeeded(fileName);
+
+    auto prj = globalContext()->currentTrackeditProject();
+    if (!prj) {
+        return;
+    }
+
+    for (const auto& newTrack : results) {
+        prj->notifyAboutTrackAdded(DomConverter::track(newTrack));
+        for (const auto& clip : prj->clipList(newTrack->GetId())) {
+            prj->notifyAboutClipAdded(clip);
+        }
+    }
 }
