@@ -6,6 +6,7 @@
 #include <cmath>
 
 #include "framework/global/log.h"
+#include "framework/global/realfn.h"
 
 using namespace au::effects;
 using namespace muse;
@@ -67,6 +68,10 @@ QVariant EffectParametersListModel::data(const QModelIndex& index, int role) con
         return param.stepSize;
     case StepCountRole:
         return param.stepCount;
+    case NumDecimalsRole:
+        return param.numDecimals();
+    case DescriptionRole:
+        return param.description.toQString();
     case CurrentValueStringRole:
         return param.currentValueString.toQString();
     case FormattedValueRole:
@@ -161,6 +166,8 @@ QHash<int, QByteArray> EffectParametersListModel::roleNames() const
         { CurrentValueRole, "currentValue" },
         { StepSizeRole, "stepSize" },
         { StepCountRole, "stepCount" },
+        { NumDecimalsRole, "numDecimals" },
+        { DescriptionRole, "description" },
         { CurrentValueStringRole, "currentValueString" },
         { FormattedValueRole, "formattedValue" },
         { IsToggleCheckedRole, "isToggleChecked" },
@@ -217,8 +224,15 @@ void EffectParametersListModel::load()
 
 void EffectParametersListModel::setParameterValue(const QString& parameterId, double fullRangeValue)
 {
+    const String id = String::fromQString(parameterId);
+
+    const int idx = findParameterIndex(id);
+    if (idx >= 0 && muse::RealIsEqual(m_parameters[idx].currentValue, fullRangeValue)) {
+        return;
+    }
+
     // Update the parameter value through the provider
-    parametersProvider()->setParameterValue(m_instanceId, String::fromQString(parameterId), fullRangeValue);
+    parametersProvider()->setParameterValue(m_instanceId, id, fullRangeValue);
 
     // The actual model update will happen via the parameterChanged signal
 }

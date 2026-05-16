@@ -9,6 +9,7 @@
 
 #include "modularity/ioc.h"
 #include "iplaybackcontroller.h"
+#include "record/irecordcontroller.h"
 
 namespace au::playback {
 class PlaybackStateModel : public QObject, public muse::async::Asyncable
@@ -25,10 +26,12 @@ public:
     bool isPlaying() const;
     bool isPaused() const;
     bool isStopped() const;
+    bool isRecording() const;
     double lastPlaybackSeekTime() const;
 
 signals:
     void isPlayingChanged();
+    void isRecordingChanged();
     void lastPlaybackSeekTimeChanged();
 };
 }

@@ -1,46 +1,37 @@
 import QtQuick 2.15
-import Muse.Ui
-import Muse.UiComponents
+import Audacity.UiComponents
 import Audacity.BuiltinEffectsCollection
 
-Item {
+GridPlot {
     id: root
 
     property alias model: painter.model
-    required property int availableHeight
 
     function requestPaint() {
         painter.requestPaint()
     }
 
-    width: prv.labelWidth + prv.labelMargin + background.width + prv.extraLabelSpace
-    height: prv.labelHeight + prv.labelMargin + background.height
-
     QtObject {
         id: prv
+
         readonly property int min: -36
         readonly property int max: 0
         readonly property int step: 6
-        readonly property int tickLength: 4
         readonly property var ticks: (function () {
-                var result = []
-                for (var i = prv.min; i <= prv.max; i += prv.step) {
-                    result.push(i)
+                const result = []
+                const span = prv.max - prv.min
+                for (let i = prv.min; i <= prv.max; i += prv.step) {
+                    result.push({
+                        label: String(i),
+                        position: (i - prv.min) / span
+                    })
                 }
                 return result
             })()
-
-        property int labelWidth: fontMetrics.boundingRect("-000").width
-        property int labelHeight: fontMetrics.boundingRect("0").height
-        readonly property int labelMargin: 4
-        readonly property int extraLabelSpace: 8
     }
 
-    FontMetrics {
-        id: fontMetrics
-        font.family: ui.theme.bodyFont.family
-        font.pixelSize: ui.theme.bodyFont.pixelSize
-    }
+    xTicks: prv.ticks
+    yTicks: prv.ticks
 
     Rectangle {
         id: background

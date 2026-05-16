@@ -83,8 +83,13 @@ Rectangle {
         id: tracksModel
 
         onTotalTracksHeightChanged: {
-            timeline.context.onResizeFrameContentHeight(
-                tracksModel.totalTracksHeight + tracksViewState.tracksVerticalScrollPadding)
+            let totalContentHeight = tracksModel.totalTracksHeight + tracksViewState.tracksVerticalScrollPadding
+            timeline.context.onResizeFrameContentHeight(totalContentHeight)
+
+            let maxContentY = Math.max(totalContentHeight - tracksItemsView.height, 0)
+            if (tracksItemsView.contentY > maxContentY) {
+                tracksItemsView.contentY = maxContentY
+            }
         }
 
         onEscapePressed: {
@@ -1136,6 +1141,10 @@ Rectangle {
             anchors.bottom: parent.bottom
 
             x: timeline.context.lastPlaybackSeekPosition
+            // The seek line marks "where playback will resume" — meaningless
+            // while recording (the playhead is being driven by record position),
+            // so hide it to avoid showing a stale marker at the pre-record cursor.
+            visible: !playbackState.isRecording
         }
 
         PlayCursorLine {

@@ -16,6 +16,10 @@ PlaybackStateModel::PlaybackStateModel(QObject* parent)
     playbackController()->lastPlaybackSeekTimeChanged().onNotify(this, [this]() {
         emit lastPlaybackSeekTimeChanged();
     });
+
+    recordController()->isRecordingChanged().onNotify(this, [this]() {
+        emit isRecordingChanged();
+    });
 }
 
 void PlaybackStateModel::setLastPlaybackSeekTime(double time)
@@ -36,6 +40,11 @@ bool PlaybackStateModel::isPaused() const
 bool PlaybackStateModel::isStopped() const
 {
     return playbackController()->isStopped();
+}
+
+bool PlaybackStateModel::isRecording() const
+{
+    return recordController()->isRecording();
 }
 
 double PlaybackStateModel::lastPlaybackSeekTime() const

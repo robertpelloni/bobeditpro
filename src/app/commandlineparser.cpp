@@ -252,6 +252,10 @@ void CommandLineParser::parse(int argc, char** argv)
         m_options->app.revertToFactorySettings = true;
     }
 
+    if (m_parser.isSet("memory-leak-report")) {
+        m_options->app.memoryLeakReport = true;
+    }
+
     // Audio plugin registration
     if (m_parser.isSet("register-audio-plugin")) {
         m_options->runMode = IApplication::RunMode::AudioPluginRegistration;

@@ -12,6 +12,8 @@
 #include "trackedit/iselectioncontroller.h"
 #include "context/iglobalcontext.h"
 #include "audio/iaudioengine.h"
+#include "record/irecord.h"
+#include "record/irecordcontroller.h"
 
 #include "au3wrap/au3types.h"
 
@@ -77,6 +79,7 @@ private:
 
     muse::Ret doPlayTracks(TrackList& trackList, double startTime, double endTime, const PlayTracksOptions& options = {});
 
+    void updateStreamState();
     void updatePlaybackState();
 
     muse::async::Notification m_loopRegionChanged;

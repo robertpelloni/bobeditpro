@@ -39,6 +39,7 @@ public:
 
     void load() override;
     Q_INVOKABLE void reload();
+    Q_INVOKABLE void clear();
 
     State state() const;
     bool hasMore() const;
@@ -54,10 +55,12 @@ signals:
     void desiredRowCountChanged();
 
 private:
+    void doClear();
     void setState(State state);
 
     void loadItemsIfNecessary();
     bool needsLoading();
+    void clearContextMenuModels();
 
     State m_state = State::Fine;
     bool m_isWaitingForPromise = false;

@@ -3,6 +3,8 @@
 */
 #pragma once
 
+#include <algorithm>
+#include <cmath>
 #include <vector>
 
 #include "framework/global/types/string.h"

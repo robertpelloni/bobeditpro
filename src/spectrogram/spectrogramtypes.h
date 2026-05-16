@@ -5,6 +5,10 @@
 
 #include "framework/actions/actiontypes.h"
 
+#include "shared/axis/axisscale.h"
+#include "shared/axis/axistypes.h"
+#include "shared/axis/numberscale.h"
+
 namespace au::spectrogram {
 static const muse::actions::ActionCode TRACK_SPECTROGRAM_SETTINGS_ACTION("track-spectrogram-settings");
 
@@ -100,15 +104,8 @@ private:
     double m_centerFrequency = SelectionInfo::UndefinedFrequency;
 };
 
-struct SpectrogramRulerTick {
-    double val = 0.f;
-    double pos = 0.f;
-};
-
-struct SpectrogramRulerTicks {
-    std::vector<SpectrogramRulerTick> major;
-    std::vector<SpectrogramRulerTick> minor;
-};
+using SpectrogramRulerTick = au::shared::AxisTick;
+using SpectrogramRulerTicks = au::shared::AxisTicks;
 
 enum class SpectralEffectId {
     DeleteSelection,
