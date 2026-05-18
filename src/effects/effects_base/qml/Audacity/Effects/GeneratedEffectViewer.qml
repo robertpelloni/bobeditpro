@@ -139,6 +139,12 @@ Rectangle {
                             upperTimeSignature: viewModel.upperTimeSignature
                             lowerTimeSignature: viewModel.lowerTimeSignature
 
+                            navigationPanel: root.parametersNavigationPanel
+                            // 10 slots per row leave headroom for parameter
+                            // types that pair multiple sub-controls (slider +
+                            // incremental, label + dropdown, ...).
+                            navigationOrderStart: index * 10
+
                             onGestureStarted: function (parameterId) {
                                 viewModel.parametersModel.beginGesture(parameterId)
                             }
