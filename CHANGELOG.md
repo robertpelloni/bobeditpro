@@ -1,5 +1,8 @@
 List of significant changes and bug fixes going back to version 1.1.0
 
+Changes in version 4.0.1
+* Fixed hardcoded track panel dimensions by centralizing UI configurations into ProjectSceneConstants singleton.
+
 Changes in version 3.6.4
 
 This is a patch release. It fixes the following bugs: 
