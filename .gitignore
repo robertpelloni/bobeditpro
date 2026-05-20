@@ -271,3 +271,6 @@ build.*
 .vscode/settings.json
 CMakeUserPresets.json
 muse_framework/
+
+# Jules AI session logs (auto-generated, not needed in repo)
+.jules/sessions/
