@@ -21,10 +21,16 @@
  */
 #include "commandlineparser.h"
 
+#include <cstdio>
+
+#include <QCoreApplication>
 #include <QDir>
+#include <QtGlobal>
 
 #include "global/io/dir.h"
 #include "project/types/projecttypes.h"
+
+#include "muse_framework_config.h"
 
 #include "log.h"
 
@@ -178,9 +184,12 @@ void CommandLineParser::parse(int argc, char** argv)
         scorefiles << fromUserInputPath(arg);
     }
 
+    if (m_parser.isSet("version")) {
+        m_options->app.version = true;
+    }
+
     if (m_parser.isSet("long-version")) {
-        printLongVersion();
-        exit(EXIT_SUCCESS);
+        m_options->app.longVersion = true;
     }
 
     if (m_parser.isSet("d")) {
@@ -234,8 +243,8 @@ void CommandLineParser::parse(int argc, char** argv)
         m_options->startup.projectDisplayNameOverride = m_parser.value("project-display-name-override");
     }
 
-    if (m_parser.isSet("cloud-project-id")) {
-        m_options->startup.cloudProjectId = m_parser.value("cloud-project-id");
+    if (m_parser.isSet("u")) {
+        m_options->startup.startupUrl = m_parser.value("u");
     }
 
     if (m_parser.isSet("import-media-file")) {

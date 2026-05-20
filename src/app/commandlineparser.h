@@ -150,9 +150,10 @@ public:
     Autobot autobot() const;
     AudioPluginRegistration audioPluginRegistration() const;
 
-private:
+    void printVersion() const;
     void printLongVersion() const;
 
+private:
     QCommandLineParser m_parser;
     muse::IApplication::RunMode m_runMode = muse::IApplication::RunMode::GuiApp;
     Options m_options;

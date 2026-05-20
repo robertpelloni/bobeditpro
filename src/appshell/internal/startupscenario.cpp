@@ -195,6 +195,11 @@ void StartupScenario::onStartupPageOpened(StartupModeType modeType)
         return;
     }
 
+    if (!m_startupUrl.isEmpty()) {
+        dispatcher()->dispatch("open-url", ActionData::make_arg1<QString>(m_startupUrl));
+        return;
+    }
+
     switch (modeType) {
     case StartupModeType::StartEmpty:
         break;
