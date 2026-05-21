@@ -2,6 +2,12 @@
 * Audacity: A Digital Audio Editor
 */
 #include "builtineffectsrepository.h"
+#include "../adaptivenoisereduction/AdaptiveNoiseReductionEffect.h"
+#include "../adaptivenoisereduction/adaptivenoisereductionviewmodel.h"
+#include "../spectralheal/SpectralHealEffect.h"
+#include "../spectralheal/spectralhealviewmodel.h"
+#include "../multibandcompressor/MultibandCompressorEffect.h"
+#include "../multibandcompressor/multibandcompressorviewmodel.h"
 
 #include "framework/global/log.h"
 #include "effects/effects_base/effectstypes.h"
@@ -71,7 +77,8 @@ void BuiltinEffectsRepository::registerMeta(const EffectMeta& meta)
         // These types are used by both Compressor and Limiter, so register them only if at least one of these effects is present.
         qmlRegisterType<DynamicsTimeline>("Audacity.BuiltinEffects", 1, 0, "DynamicsTimeline");
         qmlRegisterSingletonType<DynamicsColors>("Audacity.BuiltinEffects", 1, 0, "DynamicsColors",
-                                                 [](QQmlEngine* engine, QJSEngine* scriptEngine) -> QObject* {
+                                                 [](QQmlEngine* engine, QJSEngine* scriptEngine) -> QObject*
+        {
             Q_UNUSED(engine)
             Q_UNUSED(scriptEngine)
             return new DynamicsColors();

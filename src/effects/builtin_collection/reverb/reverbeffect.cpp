@@ -369,7 +369,8 @@ ReverbEffect::LoadFactoryPreset(int id, EffectSettings& settings) const
     return { nullptr };
 }
 
-bool au::effects::operator==(const ReverbSettings& a, const ReverbSettings& b)
+namespace au::effects {
+bool operator==(const ReverbSettings& a, const ReverbSettings& b)
 {
     // With C++20, all of this can be replaced by =default
     return muse::is_equal(a.mRoomSize, b.mRoomSize)
@@ -384,7 +385,7 @@ bool au::effects::operator==(const ReverbSettings& a, const ReverbSettings& b)
            && (a.mWetOnly == b.mWetOnly);
 }
 
-bool au::effects::OnlySimpleParametersChanged(
+bool OnlySimpleParametersChanged(
     const ReverbSettings& a, const ReverbSettings& b)
 {
     // A "simple" reverb parameter is one that when changed, does not require the
@@ -407,4 +408,5 @@ bool au::effects::OnlySimpleParametersChanged(
         && muse::is_equal(a.mStereoWidth, b.mStereoWidth);
 
     return oneSimpleParameterChanged && allNonSimpleParametersStayedTheSame;
+}
 }

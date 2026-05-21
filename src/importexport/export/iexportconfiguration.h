@@ -136,5 +136,9 @@ public:
     virtual std::string defaultMetadata() const = 0;
     virtual void setDefaultMetadata(const std::string& xmlString) = 0;
     virtual muse::async::Notification defaultMetadataChanged() const = 0;
+
+    virtual float lufsTarget() const = 0;
+    virtual void setLufsTarget(float target) = 0;
+    virtual muse::async::Notification lufsTargetChanged() const = 0;
 };
 }
