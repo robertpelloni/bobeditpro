@@ -26,7 +26,7 @@ Item {
     Component.onCompleted: {
         if (effectsSectionWidth == 0) {
             console.warn("effectsSectionWidth is not set ; doing some guesswork")
-            effectsSectionWidth = 240
+            effectsSectionWidth = ProjectSceneConstants.effectsSectionWidth
         }
     }
 

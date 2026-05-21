@@ -14,6 +14,7 @@ TracksItemsView 1.0 tracksitemsview/TracksItemsView.qml
 TracksPositionController 1.0 common/TracksPositionController.qml
 SelectionStatus 1.0 statusbar/SelectionStatus.qml
 Snap 1.0 toolbars/Snap.qml
+singleton ProjectSceneConstants 1.0 common/ProjectSceneConstants.qml
 HistoryPanel 1.0 historypanel/HistoryPanel.qml
 VolumePressureMeter 1.0 trackspanel/audio/VolumePressureMeter.qml
 VolumePressureRuler 1.0 trackspanel/audio/VolumePressureRuler.qml

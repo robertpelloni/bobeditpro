@@ -24,7 +24,7 @@ Item {
     property NavigationSection masterEffectsNavigationSection: null
 
     // property alias contextMenuModel: contextMenuModel
-    property int effectsSectionWidth: 240 // TODO: can this be set as a constant that can be imported?
+    property int effectsSectionWidth: ProjectSceneConstants.effectsSectionWidth
     property alias showEffectsSection: effectSectionModel.showEffectsSection
     property int selectedTrackIndex: -1
 
