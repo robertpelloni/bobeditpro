@@ -17,10 +17,6 @@ StyledPopupView {
 
     signal createTrack(type : int)
 
-    AddNewTrackPopupModel {
-        id: addModel
-    }
-
     NavigationPanel {
         id: navPanel
         name: "AddNewTrackPopup"
