@@ -57,7 +57,6 @@ class AppMenuModel : public muse::uicomponents::AbstractMenuModel, public effect
     Q_OBJECT
 
 public:
-<<<<<<< HEAD:src/appshell/view/appmenumodel.h
     muse::Inject<muse::ui::IMainWindow> mainWindow = { this };
     muse::Inject<muse::ui::IUiActionsRegister> uiActionsRegister = { this };
     muse::Inject<muse::ui::INavigationController> navigationController = { this };
@@ -76,28 +75,6 @@ public:
     muse::Inject<au::project::IRecentFilesController> recentFilesController = { this };
     // muse::Inject<extensions::IExtensionsProvider> extensionsProvider = { this };
     // muse::Inject<update::IUpdateConfiguration> updateConfiguration = { this };
-=======
-    muse::GlobalInject<muse::IGlobalConfiguration> globalConfiguration;
-    muse::GlobalInject<muse::ui::IUiConfiguration> uiConfiguration;
-    muse::GlobalInject<au::project::IRecentFilesController> recentFilesController;
-    muse::GlobalInject<effects::IEffectsConfiguration> effectsConfiguration;
-    muse::GlobalInject<IAppShellConfiguration> configuration;
-    muse::GlobalInject<IAppMenuModelHook> appMenuModelHook;
-    muse::GlobalInject<effects::IEffectsProvider> effectsProvider;
-    muse::GlobalInject<muse::update::IUpdateConfiguration> updateConfiguration;
-
-    muse::ContextInject<muse::actions::IActionsDispatcher> actionsDispatcher = { this };
-    muse::ContextInject<muse::ui::IMainWindow> mainWindow { this };
-    muse::ContextInject<muse::ui::INavigationController> navigationController = { this };
-    muse::ContextInject<muse::ui::IUiActionsRegister> uiActionsRegister = { this };
-    muse::ContextInject<effects::IEffectsMenuProvider> effectsMenuProvider = { this };
-    muse::ContextInject<trackedit::IProjectHistory> projectHistory = { this };
-
-    //! TODO AU4
-    // muse::ContextInject<workspace::IWorkspaceManager> workspacesManager = { this };
-    // muse::ContextInject<extensions::IExtensionsProvider> extensionsProvider = { this };
-    // muse::GlobalInject<update::IUpdateConfiguration> updateConfiguration = { this };
->>>>>>> upstream/master:src/appshell/qml/Audacity/AppShell/appmenumodel.h
 
 public:
     explicit AppMenuModel(QObject* parent = nullptr);

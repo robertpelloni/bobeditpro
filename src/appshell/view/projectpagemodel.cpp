@@ -15,11 +15,7 @@ using namespace muse::actions;
 static const ActionQuery PLAYBACK_LEVEL_QUERY("action://playback/level");
 
 ProjectPageModel::ProjectPageModel(QObject* parent)
-<<<<<<< HEAD:src/appshell/view/projectpagemodel.cpp
     : QObject(parent)
-=======
-    : QObject(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
->>>>>>> upstream/master:src/appshell/qml/Audacity/AppShell/projectpagemodel.cpp
 {
 }
 

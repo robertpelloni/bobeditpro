@@ -13,11 +13,7 @@
 #include "playback/iplaybackconfiguration.h"
 
 namespace au::appshell {
-<<<<<<< HEAD:src/appshell/view/preferences/playbackpreferencesmodel.h
 class PlaybackPreferencesModel : public QObject, public muse::async::Asyncable
-=======
-class PlaybackPreferencesModel : public QObject, public muse::async::Asyncable, public muse::Contextable
->>>>>>> upstream/master:src/preferences/qml/Audacity/Preferences/playbackpreferencesmodel.h
 {
     Q_OBJECT
 
@@ -33,16 +29,9 @@ class PlaybackPreferencesModel : public QObject, public muse::async::Asyncable, 
     Q_PROPERTY(double shortSkip READ shortSkip NOTIFY shortSkipChanged)
     Q_PROPERTY(double longSkip READ longSkip NOTIFY longSkipChanged)
 
-<<<<<<< HEAD:src/appshell/view/preferences/playbackpreferencesmodel.h
     muse::Inject<audio::IAudioDevicesProvider> audioDevicesProvider;
     muse::Inject<muse::audio::IAudioConfiguration> audioConfiguration;
     muse::Inject<playback::IPlaybackConfiguration> playbackConfiguration;
-=======
-    muse::GlobalInject<muse::audio::IAudioConfiguration> audioConfiguration;
-    muse::GlobalInject<playback::IPlaybackConfiguration> playbackConfiguration;
-
-    muse::ContextInject<audio::IAudioDevicesProvider> audioDevicesProvider { this };
->>>>>>> upstream/master:src/preferences/qml/Audacity/Preferences/playbackpreferencesmodel.h
 
 public:
     explicit PlaybackPreferencesModel(QObject* parent = nullptr);

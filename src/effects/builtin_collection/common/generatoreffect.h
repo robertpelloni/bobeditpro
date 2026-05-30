@@ -10,12 +10,6 @@ struct EffectSettings;
 namespace au::effects {
 class GeneratorEffect
 {
-<<<<<<< HEAD:src/effects/builtin/common/generatoreffect.h
-    muse::Inject<au::context::IGlobalContext> globalContext;
-    muse::Inject<au::playback::IPlayback> playback;
-
-=======
->>>>>>> upstream/master:src/effects/builtin_collection/common/generatoreffect.h
 public:
     GeneratorEffect(const double& t0, double& t1);
 

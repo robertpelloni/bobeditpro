@@ -48,11 +48,7 @@ inline QVariantMap buildItem(const QString& title, const QString& uri, const boo
 }
 
 MainToolBarModel::MainToolBarModel(QObject* parent)
-<<<<<<< HEAD:src/appshell/view/internal/maintoolbarmodel.cpp
     : QAbstractListModel(parent)
-=======
-    : QAbstractListModel(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
->>>>>>> upstream/master:src/appshell/qml/Audacity/AppShell/maintoolbarmodel.cpp
 {
 }
 

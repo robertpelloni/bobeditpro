@@ -6,11 +6,7 @@ using namespace au::appshell;
 using namespace muse;
 
 WorkspaceLayoutPageModel::WorkspaceLayoutPageModel(QObject* parent)
-<<<<<<< HEAD:src/appshell/view/firstlaunchsetup/workspacelayoutpagemodel.cpp
     : QObject(parent)
-=======
-    : QObject(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
->>>>>>> upstream/master:src/appshell/qml/Audacity/AppShell/FirstLaunchSetup/workspacelayoutpagemodel.cpp
 {
 }
 

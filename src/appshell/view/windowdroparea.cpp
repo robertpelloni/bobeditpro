@@ -27,11 +27,7 @@
 using namespace au::appshell;
 
 WindowDropArea::WindowDropArea(QQuickItem* parent)
-<<<<<<< HEAD:src/appshell/view/windowdroparea.cpp
     : QQuickItem(parent)
-=======
-    : QQuickItem(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
->>>>>>> upstream/master:src/appshell/qml/Audacity/AppShell/windowdroparea.cpp
 {
     setFlag(ItemAcceptsDrops, true);
 }

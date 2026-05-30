@@ -31,11 +31,7 @@ using namespace au::appshell;
 using namespace muse::ui;
 
 PreferencesModel::PreferencesModel(QObject* parent)
-<<<<<<< HEAD:src/appshell/view/preferences/preferencesmodel.cpp
     : QAbstractItemModel(parent)
-=======
-    : QAbstractItemModel(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
->>>>>>> upstream/master:src/preferences/qml/Audacity/Preferences/preferencesmodel.cpp
 {
 }
 
@@ -175,13 +171,8 @@ void PreferencesModel::load(const QString& currentPageId)
                                                        "Spectral display"), IconCode::Code::SPECTROGRAM,
                  "Preferences/SpectrogramPreferencesPage.qml"),
 
-<<<<<<< HEAD:src/appshell/view/preferences/preferencesmodel.cpp
         makeItem("editing", QT_TRANSLATE_NOOP("appshell/preferences",
                                               "Editing"), IconCode::Code::EDIT, "Preferences/EditPreferencesPage.qml"),
-=======
-        makeItem("music", QT_TRANSLATE_NOOP("preferences", "Music"), IconCode::Code::METRONOME,
-                 "Preferences/MusicPreferencesPage.qml"),
->>>>>>> upstream/master:src/preferences/qml/Audacity/Preferences/preferencesmodel.cpp
 
         makeItem("plugin", QT_TRANSLATE_NOOP("appshell/preferences",
                                              "Plugins"), IconCode::Code::PLUGIN, "Preferences/PluginPreferencesPage.qml"),

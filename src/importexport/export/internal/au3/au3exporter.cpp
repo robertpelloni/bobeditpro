@@ -159,15 +159,6 @@ muse::Ret Au3Exporter::exportData(std::string filename)
                                                                                                                               secs_t>(
                   selectionController()->leftMostSelectedClipStartTime());
         m_t1
-<<<<<<< HEAD
-            = selectionController()->timeSelectionIsNotEmpty() ? selectionController()->dataSelectedEndTime() : static_cast<trackedit::
-                                                                                                                            secs_t>(
-                  selectionController()->rightMostSelectedClipEndTime());
-    } else if (exportConfiguration()->processType() == ExportProcessType::AUDIO_IN_LOOP_REGION) {
-              : selectionController()->rightMostSelectedClipEndTime().value_or(0.0);
-        m_selectedOnly = true;
-    } else if (processType == ExportProcessType::AUDIO_IN_LOOP_REGION) {
->>>>>>> upstream/master
         auto region = playbackController()->loopRegion();
         m_t0 = region.start;
         m_t1 = region.end;

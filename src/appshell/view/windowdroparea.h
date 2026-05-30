@@ -29,17 +29,9 @@
 #include "iapplicationactioncontroller.h"
 
 namespace au::appshell {
-<<<<<<< HEAD:src/appshell/view/windowdroparea.h
 class WindowDropArea : public QQuickItem
 {
     INJECT(IApplicationActionController, applicationActionController)
-=======
-class WindowDropArea : public QQuickItem, public muse::Contextable
-{
-    Q_OBJECT
-    QML_ELEMENT
-    muse::ContextInject<IApplicationActionController> applicationActionController { this };
->>>>>>> upstream/master:src/appshell/qml/Audacity/AppShell/windowdroparea.h
 public:
     explicit WindowDropArea(QQuickItem* parent = nullptr);
 

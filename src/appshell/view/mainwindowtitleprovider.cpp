@@ -26,11 +26,7 @@ using namespace au::appshell;
 using namespace au::project;
 
 MainWindowTitleProvider::MainWindowTitleProvider(QObject* parent)
-<<<<<<< HEAD:src/appshell/view/mainwindowtitleprovider.cpp
     : QObject(parent)
-=======
-    : QObject(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
->>>>>>> upstream/master:src/appshell/qml/Audacity/AppShell/mainwindowtitleprovider.cpp
 {
 }
 

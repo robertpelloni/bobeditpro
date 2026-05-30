@@ -30,11 +30,7 @@
 #include "ui/iuiconfiguration.h"
 
 namespace au::appshell {
-<<<<<<< HEAD:src/appshell/view/preferences/commonaudioapiconfigurationmodel.h
 class CommonAudioApiConfigurationModel : public QObject, public muse::async::Asyncable
-=======
-class CommonAudioApiConfigurationModel : public QObject, public muse::async::Asyncable, public muse::Contextable
->>>>>>> upstream/master:src/preferences/qml/Audacity/Preferences/commonaudioapiconfigurationmodel.h
 {
     Q_OBJECT
 
@@ -62,14 +58,8 @@ class CommonAudioApiConfigurationModel : public QObject, public muse::async::Asy
 
     Q_PROPERTY(double longestDeviceNameLength READ longestDeviceNameLength NOTIFY longestDeviceNameLengthChanged)
 
-<<<<<<< HEAD:src/appshell/view/preferences/commonaudioapiconfigurationmodel.h
     muse::Inject<audio::IAudioDevicesProvider> audioDevicesProvider;
     muse::Inject<muse::ui::IUiConfiguration> uiConfiguration;
-=======
-    muse::GlobalInject<muse::ui::IUiConfiguration> uiConfiguration;
-
-    muse::ContextInject<audio::IAudioDevicesProvider> audioDevicesProvider { this };
->>>>>>> upstream/master:src/preferences/qml/Audacity/Preferences/commonaudioapiconfigurationmodel.h
 
 public:
     explicit CommonAudioApiConfigurationModel(QObject* parent = nullptr);

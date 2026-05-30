@@ -11,21 +11,13 @@
 class CompressorInstance;
 
 namespace au::effects {
-<<<<<<< HEAD:src/effects/builtin/dynamics/timeline/abstractdynamicseffectinstancemodel.h
 class AbstractDynamicsEffectInstanceModel : public QObject
-=======
-class AbstractDynamicsEffectInstanceModel : public QObject, public muse::Contextable
->>>>>>> upstream/master:src/effects/builtin_collection/dynamics/timeline/abstractdynamicseffectinstancemodel.h
 {
     Q_OBJECT
 
     Q_PROPERTY(int instanceId READ instanceId WRITE setInstanceId NOTIFY instanceIdChanged FINAL)
 
-<<<<<<< HEAD:src/effects/builtin/dynamics/timeline/abstractdynamicseffectinstancemodel.h
     muse::Inject<IEffectInstancesRegister> instancesRegister;
-=======
-    muse::ContextInject<IEffectInstancesRegister> instancesRegister{ this };
->>>>>>> upstream/master:src/effects/builtin_collection/dynamics/timeline/abstractdynamicseffectinstancemodel.h
 
 public:
     AbstractDynamicsEffectInstanceModel(QObject* parent = nullptr);

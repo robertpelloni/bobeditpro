@@ -32,22 +32,12 @@
 #include "context/iglobalcontext.h"
 
 namespace au::appshell {
-<<<<<<< HEAD:src/appshell/view/internal/maintoolbarmodel.h
 class MainToolBarModel : public QAbstractListModel, public muse::async::Asyncable
-=======
-class MainToolBarModel : public QAbstractListModel, public muse::async::Asyncable, public muse::Contextable
->>>>>>> upstream/master:src/appshell/qml/Audacity/AppShell/maintoolbarmodel.h
 {
     Q_OBJECT
 
-<<<<<<< HEAD:src/appshell/view/internal/maintoolbarmodel.h
     INJECT(au::context::IGlobalContext, context)
     INJECT(muse::IGlobalConfiguration, globalConfiguration)
-=======
-    muse::GlobalInject<muse::IGlobalConfiguration> globalConfiguration;
-
-    muse::ContextInject<au::context::IGlobalContext> context { this };
->>>>>>> upstream/master:src/appshell/qml/Audacity/AppShell/maintoolbarmodel.h
 
 public:
     explicit MainToolBarModel(QObject* parent = nullptr);

@@ -35,22 +35,12 @@
 class QSvgRenderer;
 
 namespace au::appshell {
-<<<<<<< HEAD:src/appshell/view/internal/splashscreen/loadingscreenview.h
 class LoadingScreenView : public QWidget
 {
     Q_OBJECT
 
     muse::Inject<muse::ui::IUiConfiguration> uiConfiguration;
     muse::Inject<muse::IApplication> application;
-=======
-class LoadingScreenView : public QWidget, public muse::Contextable
-{
-    Q_OBJECT
-
-    muse::GlobalInject<muse::ui::IUiConfiguration> uiConfiguration;
-
-    muse::GlobalInject<muse::IApplication> application;
->>>>>>> upstream/master:src/appshell/internal/splashscreen/loadingscreenview.h
 //! TODO AU4
 //    INJECT(languages::ILanguagesService, languagesService)
 

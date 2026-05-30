@@ -31,19 +31,11 @@
 #include "context/iglobalcontext.h"
 
 namespace au::appshell {
-<<<<<<< HEAD:src/appshell/view/mainwindowtitleprovider.h
 class MainWindowTitleProvider : public QObject, public muse::async::Asyncable
-=======
-class MainWindowTitleProvider : public QObject, public muse::async::Asyncable, public muse::Contextable
->>>>>>> upstream/master:src/appshell/qml/Audacity/AppShell/mainwindowtitleprovider.h
 {
     Q_OBJECT
 
-<<<<<<< HEAD:src/appshell/view/mainwindowtitleprovider.h
     muse::Inject<au::context::IGlobalContext> context;
-=======
-    muse::ContextInject<au::context::IGlobalContext> context { this };
->>>>>>> upstream/master:src/appshell/qml/Audacity/AppShell/mainwindowtitleprovider.h
 
     Q_PROPERTY(QString title READ title NOTIFY titleChanged)
     Q_PROPERTY(QString filePath READ filePath NOTIFY filePathChanged)

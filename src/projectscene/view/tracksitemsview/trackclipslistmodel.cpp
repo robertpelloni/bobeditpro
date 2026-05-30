@@ -410,19 +410,6 @@ bool TrackClipsListModel::moveSelectedClips(const ClipKey& key, bool completed)
     }, completed);
 
     if (vs->moveInitiated()) {
-<<<<<<< HEAD
-        trackeditInteraction()->moveClips(moveOffset.timeOffset, moveOffset.trackOffset, completed, clipsMovedToOtherTrack);
-            trackeditInteraction()->moveRangeSelection(moveOffset.timeOffset, completed);
-        } else {
-            ClipKeyList selectedClips = selectionController()->selectedClipsInTrackOrder();
-            muse::RetVal<ClipKeyList> result = trackeditInteraction()->moveClips(selectedClips, moveOffset.timeOffset,
-                                                                                 moveOffset.trackOffset,
-                                                                                 completed, clipsMovedToOtherTrack);
-            if (result.ret) {
-                selectionController()->setSelectedClips(result.val, completed);
-            }
-        }
->>>>>>> upstream/master
     }
 
     // Update key if clip moved to another track

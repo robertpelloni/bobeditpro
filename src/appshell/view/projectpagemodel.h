@@ -15,7 +15,6 @@
 #include "context/iglobalcontext.h"
 #include "playback/iplaybackconfiguration.h"
 
-<<<<<<< HEAD:src/appshell/view/projectpagemodel.h
 #include "iappshellconfiguration.h"
 
 //! TODO AU4
@@ -23,16 +22,9 @@
 
 namespace au::appshell {
 class ProjectPageModel : public QObject, public muse::async::Asyncable, public muse::actions::Actionable
-=======
-#include <QtQml/qqmlregistration.h>
-
-namespace au::appshell {
-class ProjectPageModel : public QObject, public muse::async::Asyncable, public muse::actions::Actionable, public muse::Contextable
->>>>>>> upstream/master:src/appshell/qml/Audacity/AppShell/projectpagemodel.h
 {
     Q_OBJECT
 
-<<<<<<< HEAD:src/appshell/view/projectpagemodel.h
     muse::Inject<muse::actions::IActionsDispatcher> dispatcher;
     muse::Inject<au::context::IGlobalContext> globalContext;
     muse::Inject<muse::dock::IDockWindowProvider> dockWindowProvider;
@@ -45,15 +37,6 @@ class ProjectPageModel : public QObject, public muse::async::Asyncable, public m
 
     Q_PROPERTY(bool isNavigatorVisible READ isNavigatorVisible NOTIFY isNavigatorVisibleChanged)
     Q_PROPERTY(bool isBraillePanelVisible READ isBraillePanelVisible NOTIFY isBraillePanelVisibleChanged)
-=======
-    muse::GlobalInject<muse::ui::IUiConfiguration> uiConfiguration;
-    muse::GlobalInject<playback::IPlaybackConfiguration> playbackConfiguration;
-
-    muse::ContextInject<muse::actions::IActionsDispatcher> dispatcher { this };
-    muse::ContextInject<au::context::IGlobalContext> globalContext { this };
-    muse::ContextInject<muse::dock::IDockWindowProvider> dockWindowProvider { this };
-    muse::ContextInject<muse::ui::IUiState> uiState { this };
->>>>>>> upstream/master:src/appshell/qml/Audacity/AppShell/projectpagemodel.h
 
 public:
     explicit ProjectPageModel(QObject* parent = nullptr);

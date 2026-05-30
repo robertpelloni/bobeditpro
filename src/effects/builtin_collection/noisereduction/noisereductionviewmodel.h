@@ -5,13 +5,7 @@
 
 #include "../common/params.h"
 
-<<<<<<< HEAD:src/effects/builtin/noisereduction/noisereductionviewmodel.h
 #include "global/iinteractive.h"
-=======
-#include "effects/builtin/view/builtineffectmodel.h"
-
-#include "framework/interactive/iinteractive.h"
->>>>>>> upstream/master:src/effects/builtin_collection/noisereduction/noisereductionviewmodel.h
 
 namespace au::effects {
 class NoiseReductionEffect;
@@ -36,11 +30,7 @@ class NoiseReductionViewModel : public BuiltinEffectModel
 
     Q_PROPERTY(int reductionMode READ reductionMode WRITE setReductionMode NOTIFY reductionModeChanged FINAL)
 
-<<<<<<< HEAD:src/effects/builtin/noisereduction/noisereductionviewmodel.h
     muse::Inject<muse::IInteractive> interactive;
-=======
-    muse::ContextInject<muse::IInteractive> interactive{ this };
->>>>>>> upstream/master:src/effects/builtin_collection/noisereduction/noisereductionviewmodel.h
 
 public:
     NoiseReductionViewModel(QObject* parent, int instanceId);

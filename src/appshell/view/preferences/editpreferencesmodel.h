@@ -14,26 +14,14 @@
 #include "trackedit/itrackeditconfiguration.h"
 
 namespace au::appshell {
-<<<<<<< HEAD:src/appshell/view/preferences/editpreferencesmodel.h
 class EditPreferencesModel : public QObject, public muse::async::Asyncable
-=======
-class EditPreferencesModel : public QObject, public muse::async::Asyncable, public muse::Contextable
->>>>>>> upstream/master:src/preferences/qml/Audacity/Preferences/editpreferencesmodel.h
 {
     Q_OBJECT
 
-<<<<<<< HEAD:src/appshell/view/preferences/editpreferencesmodel.h
     muse::Inject<au::trackedit::ITrackeditConfiguration> trackeditConfiguration;
     muse::Inject<au::projectscene::IProjectSceneConfiguration> projectsceneConfiguration;
     muse::Inject<muse::workspace::IWorkspaceManager> workspacesManager;
     muse::Inject<au::effects::IEffectsConfiguration> effectsConfiguration;
-=======
-    muse::GlobalInject<au::trackedit::ITrackeditConfiguration> trackeditConfiguration;
-    muse::GlobalInject<au::projectscene::IProjectSceneConfiguration> projectsceneConfiguration;
-    muse::GlobalInject<au::effects::IEffectsConfiguration> effectsConfiguration;
-
-    muse::ContextInject<muse::workspace::IWorkspaceManager> workspacesManager { this };
->>>>>>> upstream/master:src/preferences/qml/Audacity/Preferences/editpreferencesmodel.h
 
     Q_PROPERTY(bool applyEffectToAllAudio READ applyEffectToAllAudio NOTIFY applyEffectToAllAudioChanged)
     Q_PROPERTY(

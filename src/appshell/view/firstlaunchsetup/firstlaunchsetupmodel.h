@@ -24,25 +24,14 @@
 
 #include <QObject>
 
-<<<<<<< HEAD:src/appshell/view/firstlaunchsetup/firstlaunchsetupmodel.h
 #include "global/async/asyncable.h"
-=======
-#include "framework/global/async/asyncable.h"
-#include "framework/global/modularity/ioc.h"
-#include "framework/interactive/iinteractive.h"
-#include "au3cloud/iau3audiocomservice.h"
->>>>>>> upstream/master:src/appshell/qml/Audacity/AppShell/FirstLaunchSetup/firstlaunchsetupmodel.h
 
 #include "modularity/ioc.h"
 #include "iappshellconfiguration.h"
 #include "iinteractive.h"
 
 namespace au::appshell {
-<<<<<<< HEAD:src/appshell/view/firstlaunchsetup/firstlaunchsetupmodel.h
 class FirstLaunchSetupModel : public QObject, public muse::async::Asyncable
-=======
-class FirstLaunchSetupModel : public QObject, public muse::async::Asyncable, public muse::Contextable
->>>>>>> upstream/master:src/appshell/qml/Audacity/AppShell/FirstLaunchSetup/firstlaunchsetupmodel.h
 {
     Q_OBJECT
 
@@ -58,15 +47,8 @@ class FirstLaunchSetupModel : public QObject, public muse::async::Asyncable, pub
     Q_PROPERTY(QString nextButtonText READ nextButtonText CONSTANT)
     Q_PROPERTY(QString doneButtonText READ doneButtonText CONSTANT)
 
-<<<<<<< HEAD:src/appshell/view/firstlaunchsetup/firstlaunchsetupmodel.h
     INJECT(IAppShellConfiguration, configuration)
     INJECT(muse::IInteractive, interactive)
-=======
-    muse::GlobalInject<IAppShellConfiguration> configuration;
-
-    muse::ContextInject<muse::IInteractive> interactive { this };
-    muse::ContextInject<au::au3cloud::IAu3AudioComService> au3CloudService { this };
->>>>>>> upstream/master:src/appshell/qml/Audacity/AppShell/FirstLaunchSetup/firstlaunchsetupmodel.h
 
 public:
     explicit FirstLaunchSetupModel(QObject* parent = nullptr);

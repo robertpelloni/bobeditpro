@@ -45,11 +45,7 @@ QString channelName(int channelNumber)
 }
 
 CommonAudioApiConfigurationModel::CommonAudioApiConfigurationModel(QObject* parent)
-<<<<<<< HEAD:src/appshell/view/preferences/commonaudioapiconfigurationmodel.cpp
     : QObject(parent)
-=======
-    : QObject(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
->>>>>>> upstream/master:src/preferences/qml/Audacity/Preferences/commonaudioapiconfigurationmodel.cpp
 {
 }
 

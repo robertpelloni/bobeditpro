@@ -8,11 +8,7 @@
 
 namespace au::appshell {
 EditPreferencesModel::EditPreferencesModel(QObject* parent)
-<<<<<<< HEAD:src/appshell/view/preferences/editpreferencesmodel.cpp
     : QObject(parent)
-=======
-    : QObject(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
->>>>>>> upstream/master:src/preferences/qml/Audacity/Preferences/editpreferencesmodel.cpp
 {
 }
 

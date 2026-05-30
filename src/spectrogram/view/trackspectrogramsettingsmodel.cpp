@@ -40,15 +40,10 @@ TrackSpectrogramSettingsModel::TrackSpectrogramSettingsModel(QObject* parent)
 
 void TrackSpectrogramSettingsModel::aboutToDestroy()
 {
-<<<<<<< HEAD:src/trackedit/view/trackspectrogramsettingsmodel.cpp
     if (m_initialTrackConfig) {
         trackSpectrogramConfigurationProvider()->copyConfiguration(*m_initialTrackConfig, *m_trackConfig);
         m_trackConfig->setUseGlobalSettings(m_initialTrackConfig->useGlobalSettings());
         sendRepaintRequest();
-=======
-    if (!m_initialTrackConfig) {
-        return;
->>>>>>> upstream/master:src/spectrogram/view/trackspectrogramsettingsmodel.cpp
     }
     const auto config = spectrogramService()->trackSpectrogramConfiguration(m_trackId);
     if (!config) {
@@ -61,13 +56,8 @@ void TrackSpectrogramSettingsModel::aboutToDestroy()
 
 void TrackSpectrogramSettingsModel::componentComplete()
 {
-<<<<<<< HEAD:src/trackedit/view/trackspectrogramsettingsmodel.cpp
     m_trackConfig = trackSpectrogramConfigurationProvider()->trackSpectrogramConfiguration(m_trackId);
     IF_ASSERT_FAILED(m_trackConfig) {
-=======
-    m_trackConfig = spectrogramService()->trackSpectrogramConfiguration(m_trackId);
-    if (!m_trackConfig) {
->>>>>>> upstream/master:src/spectrogram/view/trackspectrogramsettingsmodel.cpp
         return;
     }
 

@@ -33,24 +33,13 @@
 #include "preferencepageitem.h"
 
 namespace au::appshell {
-<<<<<<< HEAD:src/appshell/view/preferences/preferencesmodel.h
 class PreferencesModel : public QAbstractItemModel
-=======
-class PreferencesModel : public QAbstractItemModel, public muse::Contextable
->>>>>>> upstream/master:src/preferences/qml/Audacity/Preferences/preferencesmodel.h
 {
     Q_OBJECT
 
-<<<<<<< HEAD:src/appshell/view/preferences/preferencesmodel.h
     INJECT(muse::actions::IActionsDispatcher, dispatcher)
     INJECT(IAppShellConfiguration, configuration)
     INJECT(muse::ui::IUiActionsRegister, actionsRegister)
-=======
-    muse::GlobalInject<IAppShellConfiguration> configuration;
-
-    muse::ContextInject<muse::actions::IActionsDispatcher> dispatcher { this };
-    muse::ContextInject<muse::ui::IUiActionsRegister> actionsRegister { this };
->>>>>>> upstream/master:src/preferences/qml/Audacity/Preferences/preferencesmodel.h
 
     Q_PROPERTY(QString currentPageId READ currentPageId WRITE setCurrentPageId NOTIFY currentPageIdChanged)
 

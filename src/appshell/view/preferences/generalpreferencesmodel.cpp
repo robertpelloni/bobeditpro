@@ -32,11 +32,7 @@ using namespace au::appshell;
 using namespace muse::languages;
 
 GeneralPreferencesModel::GeneralPreferencesModel(QObject* parent)
-<<<<<<< HEAD:src/appshell/view/preferences/generalpreferencesmodel.cpp
     : QObject(parent)
-=======
-    : QObject(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
->>>>>>> upstream/master:src/preferences/qml/Audacity/Preferences/generalpreferencesmodel.cpp
 {
 }
 

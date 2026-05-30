@@ -9,11 +9,7 @@
 
 namespace au::effects {
 AbstractDynamicsEffectInstanceModel::AbstractDynamicsEffectInstanceModel(QObject* parent)
-<<<<<<< HEAD:src/effects/builtin/dynamics/timeline/abstractdynamicseffectinstancemodel.cpp
     : QObject{parent}
-=======
-    : QObject{parent}, muse::Contextable(muse::iocCtxForQmlObject(this))
->>>>>>> upstream/master:src/effects/builtin_collection/dynamics/timeline/abstractdynamicseffectinstancemodel.cpp
 {
 }
 

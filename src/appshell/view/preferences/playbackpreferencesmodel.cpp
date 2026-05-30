@@ -10,11 +10,7 @@ using namespace au::appshell;
 using namespace muse::audio;
 
 PlaybackPreferencesModel::PlaybackPreferencesModel(QObject* parent)
-<<<<<<< HEAD:src/appshell/view/preferences/playbackpreferencesmodel.cpp
     : QObject(parent)
-=======
-    : QObject(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
->>>>>>> upstream/master:src/preferences/qml/Audacity/Preferences/playbackpreferencesmodel.cpp
 {
 }
 

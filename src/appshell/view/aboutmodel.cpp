@@ -261,11 +261,7 @@ QVariantMap makeSection(const char* title, QString rawCredit)
 }
 
 AboutModel::AboutModel(QObject* parent)
-<<<<<<< HEAD:src/appshell/view/aboutmodel.cpp
     : QObject(parent)
-=======
-    : QObject(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
->>>>>>> upstream/master:src/appshell/qml/Audacity/AppShell/aboutmodel.cpp
 {
 }
 

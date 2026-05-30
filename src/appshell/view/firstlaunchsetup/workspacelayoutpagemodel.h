@@ -30,11 +30,7 @@ struct WorkspaceInfo {
     }
 };
 
-<<<<<<< HEAD:src/appshell/view/firstlaunchsetup/workspacelayoutpagemodel.h
 class WorkspaceLayoutPageModel : public QObject, public muse::async::Asyncable
-=======
-class WorkspaceLayoutPageModel : public QObject, public muse::async::Asyncable, public muse::Contextable
->>>>>>> upstream/master:src/appshell/qml/Audacity/AppShell/FirstLaunchSetup/workspacelayoutpagemodel.h
 {
     Q_OBJECT
 
@@ -55,11 +51,7 @@ class WorkspaceLayoutPageModel : public QObject, public muse::async::Asyncable, 
     muse::Inject<muse::ui::IUiConfiguration> m_uiConfiguration;
 
 #ifdef MUSE_MODULE_WORKSPACE
-<<<<<<< HEAD:src/appshell/view/firstlaunchsetup/workspacelayoutpagemodel.h
     muse::Inject<muse::workspace::IWorkspaceManager> m_workspaceManager;
-=======
-    muse::ContextInject<muse::workspace::IWorkspaceManager> m_workspaceManager { this };
->>>>>>> upstream/master:src/appshell/qml/Audacity/AppShell/FirstLaunchSetup/workspacelayoutpagemodel.h
 #endif
 
 public:

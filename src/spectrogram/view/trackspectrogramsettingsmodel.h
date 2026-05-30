@@ -5,12 +5,8 @@
 
 #include "spectrogram/view/abstractspectrogramsettingsmodel.h"
 #include "spectrogram/iglobalspectrogramconfiguration.h"
-<<<<<<< HEAD:src/trackedit/view/trackspectrogramsettingsmodel.h
 #include "spectrogram/itrackspectrogramconfigurationprovider.h"
 #include "context/iglobalcontext.h"
-=======
-#include "spectrogram/ispectrogramservice.h"
->>>>>>> upstream/master:src/spectrogram/view/trackspectrogramsettingsmodel.h
 
 #include "framework/global/async/asyncable.h"
 #include "framework/global/modularity/ioc.h"
@@ -25,15 +21,9 @@ class TrackSpectrogramSettingsModel : public AbstractSpectrogramSettingsModel,  
     Q_PROPERTY(int trackId READ trackId WRITE setTrackId NOTIFY trackIdChanged)
     Q_PROPERTY(bool useGlobalSettings READ useGlobalSettings WRITE setUseGlobalSettings NOTIFY useGlobalSettingsChanged)
 
-<<<<<<< HEAD:src/trackedit/view/trackspectrogramsettingsmodel.h
     muse::Inject<spectrogram::IGlobalSpectrogramConfiguration> globalSpectrogramConfiguration;
     muse::Inject<au::context::IGlobalContext> globalContext;
     muse::Inject<spectrogram::ITrackSpectrogramConfigurationProvider> trackSpectrogramConfigurationProvider;
-=======
-    muse::GlobalInject<IGlobalSpectrogramConfiguration> globalSpectrogramConfiguration;
-
-    muse::ContextInject<ISpectrogramService> spectrogramService { this };
->>>>>>> upstream/master:src/spectrogram/view/trackspectrogramsettingsmodel.h
 
 public:
     TrackSpectrogramSettingsModel(QObject* parent = nullptr);

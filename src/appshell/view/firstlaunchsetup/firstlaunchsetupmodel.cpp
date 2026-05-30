@@ -36,21 +36,12 @@ using namespace muse;
 using namespace au::appshell;
 
 FirstLaunchSetupModel::FirstLaunchSetupModel(QObject* parent)
-<<<<<<< HEAD:src/appshell/view/firstlaunchsetup/firstlaunchsetupmodel.cpp
     : QObject(parent)
 {
     m_pages = {
         Page { "ThemesPage.qml", "audacity://project" },
         Page { "ClipVisualizationPage.qml", "audacity://project" },
         Page { "WorkspaceLayoutPage.qml", "audacity://project" }
-=======
-    : QObject(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
-{
-    m_pages = {
-        Page { THEMES_PAGE, "audacity://project" },
-        Page { CLIP_VISUALIZATION_PAGE, "audacity://project" },
-        Page { WORKSPACE_LAYOUT_PAGE, "audacity://project" },
->>>>>>> upstream/master:src/appshell/qml/Audacity/AppShell/FirstLaunchSetup/firstlaunchsetupmodel.cpp
     };
 }
 
@@ -136,24 +127,12 @@ QString FirstLaunchSetupModel::backButtonText()
 
 QString FirstLaunchSetupModel::nextButtonText()
 {
-<<<<<<< HEAD:src/appshell/view/firstlaunchsetup/firstlaunchsetupmodel.cpp
     return muse::qtrc("global", "Next");
 }
 
 QString FirstLaunchSetupModel::doneButtonText()
 {
     return muse::qtrc("appshell/gettingstarted", "Done");
-=======
-    if (m_currentPageIndex < 0 || m_currentPageIndex >= m_pages.size()) {
-        return "";
-    }
-
-    if (m_pages.at(m_currentPageIndex).m_url.contains(SIGNIN_AUDIO_COM_PAGE)) {
-        return muse::qtrc("global", "Skip");
-    }
-
-    return !canFinish() ? muse::qtrc("global", "Next") : muse::qtrc("appshell/gettingstarted", "Accept & continue");
->>>>>>> upstream/master:src/appshell/qml/Audacity/AppShell/FirstLaunchSetup/firstlaunchsetupmodel.cpp
 }
 
 QString FirstLaunchSetupModel::formatPageProgress(int current, int total) const

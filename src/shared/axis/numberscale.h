@@ -34,14 +34,7 @@ public:
         : mType(nstNone), mValue0(0), mValue1(1)
     {}
 
-<<<<<<< HEAD:au3/libraries/au3-screen-geometry/NumberScale.h
     NumberScale(NumberScaleType type, float value0, float value1)
-=======
-    NumberScale(SpectrogramScale type, double value0, double value1)
-        : NumberScale(type, static_cast<float>(value0), static_cast<float>(value1)) {}
-
-    NumberScale(SpectrogramScale type, float value0, float value1)
->>>>>>> upstream/master:src/spectrogram/internal/numberscale.h
         : mType(type)
     {
         switch (mType) {
