@@ -16,7 +16,7 @@ class PlaybackMeterController : public IPlaybackMeterController, public muse::as
     muse::Inject<IPlaybackConfiguration> configuration;
 
 public:
-    PlaybackMeterController();
+    void init();
 
     double stepToPosition(double sample) const override;
     double sampleToPosition(double sample) const override;

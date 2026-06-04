@@ -2,6 +2,7 @@
 
 #include "ui/qml/Muse/Ui/navigationsection.h"
 #include "ui/qml/Muse/Ui/navigationpanel.h"
+#include "ui/qml/Muse/Ui/navigationcontrol.h"
 #include "global/async/asyncable.h"
 
 #include "global/modularity/ioc.h"
@@ -43,6 +44,7 @@ private:
     void addPanels(trackedit::TrackId trackId, int pos);
     void resetPanelOrder();
     void addDefaultNavigation();
+    void removeDefaultNavigation();
     void handleArrowKeyFallback(muse::ui::NavigationEvent* event);
 
     muse::ui::NavigationControl* m_default_control = nullptr;
@@ -50,6 +52,9 @@ private:
     muse::ui::NavigationSection* m_default_section = nullptr;
 
     muse::ui::INavigationSection* m_section = nullptr;
+
+    muse::ui::NavigationPanel* m_defaultPanel = nullptr;
+    muse::ui::NavigationControl* m_defaultControl = nullptr;
 
     QList<muse::ui::NavigationPanel*> m_trackItemPanels;
     QList<muse::ui::NavigationPanel*> m_clipItemPanels;
