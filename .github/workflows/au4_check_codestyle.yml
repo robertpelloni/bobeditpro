@@ -13,7 +13,7 @@ jobs:
 
     - name: Fetch Muse CI scripts
       run: |
-        cmake -P ./buildscripts/ci/checkcodestyle/ci_fetch.cmake
+        git clone https://github.com/musescore/muse_framework.git ./muse
 
     - name: Test coding style
       run: |
