@@ -18,10 +18,10 @@ Audacity 4 is organized as a monorepo containing the core application, modular l
     *   `projectscene/`: The main timeline view and track management.
     *   `trackedit/`: Editing logic and tools.
     *   `au3wrap/`: Bridge between `au3` libraries and the application.
-*   `muse_framework/`: **UI Framework.** A submodule containing the QML-based UI toolkit (`Muse.Ui`, `Muse.UiComponents`).
+*   `muse/`: **UI Framework.** A submodule containing the QML-based UI toolkit (`Muse.Ui`, `Muse.UiComponents`).
 
 ## Submodules
-*   **muse_framework:** `https://github.com/musescore/framework_tmp.git` (Specific commit/branch as per `.gitmodules`).
+*   **muse_framework:** `https://github.com/musescore/muse_framework.git` (Specific commit/branch as per `.gitmodules`).
 
 ## Build System
 *   **CMake:** The primary build system.
