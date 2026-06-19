@@ -3,4 +3,4 @@
 	url = https://github.com/musescore/framework_tmp.git
 [submodule "bobui"]
 	path = bobui
-	url = https://github.com/robertpelloni/bobui.git
+	url = https://github.com/robertpelloni/bqt.git
