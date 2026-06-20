@@ -22,6 +22,8 @@
 
 #include "commonaudioapiconfigurationmodel.h"
 
+#include <QFontMetrics>
+
 #include "containers.h"
 #include "log.h"
 #include "types/translatablestring.h"
@@ -37,15 +39,17 @@ QString toSampleRateName(uint64_t sampleRate)
 QString channelName(int channelNumber)
 {
     return channelNumber == 1
-           ? muse::qtrc("appshell/preferences", "%1 (Mono) Recording channel").arg(channelNumber)
+           //: %1 is the recording channel number
+           ? muse::qtrc("preferences", "%1 (Mono) Recording channel").arg(channelNumber)
            : channelNumber == 2
-           ? muse::qtrc("appshell/preferences", "%1 (Stereo) Recording channels").arg(channelNumber)
+           //: %1 is the recording channel number
+           ? muse::qtrc("preferences", "%1 (Stereo) Recording channels").arg(channelNumber)
            : QString::number(channelNumber);
 }
 }
 
 CommonAudioApiConfigurationModel::CommonAudioApiConfigurationModel(QObject* parent)
-    : QObject(parent)
+    : QObject(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
 {
 }
 
@@ -67,6 +71,7 @@ void CommonAudioApiConfigurationModel::load()
     audioDevicesProvider()->inputDeviceChanged().onNotify(this, [this]() { emit currentInputDeviceIdChanged(); });
     audioDevicesProvider()->inputChannelsAvailableChanged().onNotify(this, [this](){ emit inputChannelsListChanged(); });
     audioDevicesProvider()->inputChannelsChanged().onNotify(this, [this](){ emit currentInputChannelsSelectedChanged(); });
+    audioDevicesProvider()->automaticCompensationEnabledChanged().onNotify(this, [this](){ emit automaticCompensationEnabledChanged(); });
     audioDevicesProvider()->bufferLengthChanged().onNotify(this, [this](){ emit bufferLengthChanged(); });
     audioDevicesProvider()->latencyCompensationChanged().onNotify(this, [this](){ emit latencyCompensationChanged(); });
     audioDevicesProvider()->defaultSampleRateChanged().onNotify(this, [this](){
@@ -167,6 +172,20 @@ void CommonAudioApiConfigurationModel::bufferLengthSelected(const QString& buffe
     }
 
     audioDevicesProvider()->setBufferLength(bufferLengthStr.toDouble());
+}
+
+bool CommonAudioApiConfigurationModel::automaticCompensationEnabled() const
+{
+    return audioDevicesProvider()->automaticCompensationEnabled();
+}
+
+void CommonAudioApiConfigurationModel::setAutomaticCompensationEnabled(bool enabled)
+{
+    if (enabled == automaticCompensationEnabled()) {
+        return;
+    }
+
+    audioDevicesProvider()->setAutomaticCompensationEnabled(enabled);
 }
 
 double CommonAudioApiConfigurationModel::latencyCompensation() const

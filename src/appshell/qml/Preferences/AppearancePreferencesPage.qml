@@ -22,10 +22,10 @@
 import QtQuick 2.15
 
 import Muse.Ui 1.0
-import Muse.UiComponents 1.0
-import Audacity.Preferences 1.0
+import Muse.UiComponents
 
-import "internal"
+import Audacity.AppShell
+import Audacity.Preferences
 
 PreferencesPage {
     id: root
@@ -58,19 +58,19 @@ PreferencesPage {
             navigation.section: root.navigationSection
             navigation.order: root.navigationOrderStart
 
-            onThemeChangeRequested: function(newThemeCode) {
+            onThemeChangeRequested: function (newThemeCode) {
                 appearanceModel.currentThemeCode = newThemeCode
             }
 
-            onHighContrastChangeRequested: function(enabled) {
+            onHighContrastChangeRequested: function (enabled) {
                 appearanceModel.highContrastEnabled = enabled
             }
 
-            onSetFollowSystemThemeRequested: function(enabled) {
+            onSetFollowSystemThemeRequested: function (enabled) {
                 appearanceModel.isFollowSystemTheme = enabled
             }
 
-            onAccentColorChangeRequested: function(newColorIndex) {
+            onAccentColorChangeRequested: function (newColorIndex) {
                 appearanceModel.currentAccentColorIndex = newColorIndex
             }
 
@@ -80,7 +80,7 @@ PreferencesPage {
                 }
             }
 
-            onEnsureContentVisibleRequested: function(contentRect) {
+            onEnsureContentVisibleRequested: function (contentRect) {
                 root.ensureContentVisibleRequested(contentRect)
             }
         }
@@ -99,7 +99,7 @@ PreferencesPage {
             navigation.section: root.navigationSection
             navigation.order: root.navigationOrderStart + 1
 
-            onColorChangeRequested: function(newColor, propertyType) {
+            onColorChangeRequested: function (newColor, propertyType) {
                 appearanceModel.setNewColor(newColor, propertyType)
             }
 
@@ -118,7 +118,7 @@ PreferencesPage {
             navigation.section: root.navigationSection
             navigation.order: root.navigationOrderStart + 2
 
-            onClipStyleChangeRequested: function(clipStyle) {
+            onClipStyleChangeRequested: function (clipStyle) {
                 appearanceModel.setClipStyle(clipStyle)
             }
 
@@ -129,30 +129,29 @@ PreferencesPage {
             }
         }
 
-        //! NOTE: hide font settings for now
-        // SeparatorLine {}
+        SeparatorLine {}
 
-        // UiFontSection {
-        //     allFonts: appearanceModel.allFonts()
-        //     currentFontIndex: appearanceModel.currentFontIndex
-        //     bodyTextSize: appearanceModel.bodyTextSize
+        UiFontSection {
+            allFonts: appearanceModel.allFonts()
+            currentFontIndex: appearanceModel.currentFontIndex
+            bodyTextSize: appearanceModel.bodyTextSize
 
-        //     navigation.section: root.navigationSection
-        //     navigation.order: root.navigationOrderStart + 4
+            navigation.section: root.navigationSection
+            navigation.order: root.navigationOrderStart + 4
 
-        //     onFontChangeRequested: function(newFontIndex) {
-        //         appearanceModel.currentFontIndex = newFontIndex
-        //     }
+            onFontChangeRequested: function (newFontIndex) {
+                appearanceModel.currentFontIndex = newFontIndex
+            }
 
-        //     onBodyTextSizeChangeRequested: function(newBodyTextSize) {
-        //         appearanceModel.bodyTextSize = newBodyTextSize
-        //     }
+            onBodyTextSizeChangeRequested: function (newBodyTextSize) {
+                appearanceModel.bodyTextSize = newBodyTextSize
+            }
 
-        //     onFocusChanged: {
-        //         if (activeFocus) {
-        //             root.ensureContentVisibleRequested(Qt.rect(x, y, width, height))
-        //         }
-        //     }
-        // }
+            onFocusChanged: {
+                if (activeFocus) {
+                    root.ensureContentVisibleRequested(Qt.rect(x, y, width, height))
+                }
+            }
+        }
     }
 }

@@ -48,7 +48,7 @@ PreferencesPage {
             navigation.section: root.navigationSection
             navigation.order: root.navigationOrderStart + 1
 
-            onNeedCheckForNewAppVersionChangeRequested: function(check) {
+            onNeedCheckForNewAppVersionChangeRequested: function (check) {
                 updateModel.needCheckForNewAppVersion = check
             }
 

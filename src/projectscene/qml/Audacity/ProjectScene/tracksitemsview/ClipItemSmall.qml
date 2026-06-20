@@ -1,7 +1,6 @@
 import QtQuick
 
 Rectangle {
-
     id: root
 
 <<<<<<< HEAD
@@ -31,5 +30,4 @@ Rectangle {
 
         visible: !root.collapsed
     }
-
 }

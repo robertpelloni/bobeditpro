@@ -5,18 +5,18 @@
 #include <QCoreApplication>
 
 #include "progressdialog.h"
-#include "wxtypes_convert.h"
 
-ProgressDialog::ProgressDialog(const std::string& title)
-    : m_progressTitle{title}
+namespace au::au3 {
+ProgressDialog::ProgressDialog(const muse::modularity::ContextPtr& ctx, const std::string& title)
+    : muse::Contextable(ctx), m_progressTitle{title}
 {
     // Of course, the least number of increments to yield a smooth animation depends on the width of the progress bar,
     // yet 300 increments should be enough to provide a smooth animation in most cases.
     m_progress.setMaxNumIncrements(200);
 }
 
-ProgressDialog::ProgressDialog(const TranslatableString& title)
-    : ProgressDialog{au::au3::wxToStdString(title.Translation())}
+ProgressDialog::ProgressDialog(const muse::modularity::ContextPtr& ctx, const ::TranslatableString& title)
+    : ProgressDialog{ctx, title.translated().toStdString()}
 {
 }
 
@@ -32,9 +32,9 @@ void ProgressDialog::Reinit()
     m_lastEventPump = {};
 }
 
-void ProgressDialog::SetDialogTitle(const TranslatableString& title)
+void ProgressDialog::SetDialogTitle(const ::TranslatableString& title)
 {
-    m_progressTitle = au::au3::wxToStdString(title.Translation());
+    m_progressTitle = title.translated().toStdString();
 }
 
 void ProgressDialog::start()
@@ -54,12 +54,12 @@ void ProgressDialog::start()
     m_progress.start();
 }
 
-ProgressResult ProgressDialog::Poll(unsigned long long numerator, unsigned long long denominator, const TranslatableString& message)
+ProgressResult ProgressDialog::Poll(unsigned long long numerator, unsigned long long denominator, const ::TranslatableString& message)
 {
     start();
 
     if (!message.empty()) {
-        m_progressMessage = au::au3::wxToStdString(message.Translation());
+        m_progressMessage = message.translated().toStdString();
     }
 
     // Push the new fraction/message into muse::Progress unconditionally.
@@ -79,8 +79,8 @@ ProgressResult ProgressDialog::Poll(unsigned long long numerator, unsigned long 
     return ProgressResult::Success;
 }
 
-void ProgressDialog::SetMessage(const TranslatableString& message)
+void ProgressDialog::SetMessage(const ::TranslatableString& message)
 {
-    m_progressMessage = au::au3::wxToStdString(message.Translation());
+    m_progressMessage = message.translated().toStdString();
 }
 }

@@ -23,19 +23,19 @@
 import QtQuick 2.15
 
 import Muse.Ui 1.0
-import Muse.UiComponents 1.0
+import Muse.UiComponents
 import Muse.GraphicalEffects
 
 import Audacity.UiComponents 1.0
+import Audacity.AppShell
+import Audacity.Preferences
 import Audacity.ProjectScene
 import Audacity.TrackEdit
-
-import "../../shared/internal"
 
 BaseSection {
     id: root
 
-    title: qsTrc("appshell/preferences", "Clip style")
+    title: qsTrc("preferences", "Clip style")
 
     property int imgWidth: 196
     property int imgHeight: 88
@@ -66,7 +66,7 @@ BaseSection {
             }
 
             RoundedRadioButton {
-                text: qsTrc("appshell/preferences", "Colorful")
+                text: qsTrc("preferences", "Colorful")
 
                 checked: root.currentClipStyle == ClipStyle.COLORFUL
 
@@ -97,7 +97,7 @@ BaseSection {
             }
 
             RoundedRadioButton {
-                text: qsTrc("appshell/preferences", "Classic")
+                text: qsTrc("preferences", "Classic")
 
                 checked: root.currentClipStyle == ClipStyle.CLASSIC
 
@@ -112,4 +112,3 @@ BaseSection {
         }
     }
 }
-

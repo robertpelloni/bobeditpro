@@ -43,11 +43,14 @@ StyledTableView {
 
     model: tableViewModel
 
-    sourceComponentCallback: function(type) {
-        switch(type) {
-        case LabelsTableViewCellType.Track: return trackComp
-        case LabelsTableViewCellType.Timecode: return timecodeComp
-        case LabelsTableViewCellType.Frequency: return frequencyComp
+    sourceComponentCallback: function (type) {
+        switch (type) {
+        case LabelsTableViewCellType.Track:
+            return trackComp
+        case LabelsTableViewCellType.Timecode:
+            return timecodeComp
+        case LabelsTableViewCellType.Frequency:
+            return frequencyComp
         }
 
         return null
@@ -71,7 +74,7 @@ StyledTableView {
             property string accessibleName: current
 
             signal changed(string stub)
-            signal editingFinished()
+            signal editingFinished
 
             model: Boolean(itemData) ? itemData.availableTracks : null
             current: val
@@ -82,7 +85,7 @@ StyledTableView {
             navigation.order: navigationRow
             navigation.column: navigationColumnStart
 
-            onHandleMenuItem: function(itemId) {
+            onHandleMenuItem: function (itemId) {
                 Qt.callLater(tableViewModel.handleTrackMenuItem, row, column, itemId)
             }
 
@@ -105,10 +108,14 @@ StyledTableView {
             property int row
             property int column
 
+            property NavigationPanel navigationPanel
+            property int navigationRow
+            property int navigationColumnStart
+
             property string accessibleName: val
 
             signal changed(double value)
-            signal editingFinished()
+            signal editingFinished
 
             height: 24
 
@@ -122,16 +129,26 @@ StyledTableView {
             upperTimeSignature: Boolean(itemData) ? itemData.upperTimeSignature : -1
             lowerTimeSignature: Boolean(itemData) ? itemData.lowerTimeSignature : -1
 
-            // navigation.panel: navigationPanel
-            // navigation.row: navigationRow
-            // navigation.column: navigationColumnStart
+            navigation.panel: navigationPanel
+            navigation.enabled: root.currentEditedCell === item
+            navigation.row: navigationRow
+            navigation.column: navigationColumnStart
 
-            onValueChangeRequested: function(newValue) {
+            navigation.onActiveChanged: function (active) {
+                if (active) {
+                    navigation.triggered()
+                }
+            }
+
+            onValueChangeRequested: function (newValue) {
                 item.changed(newValue)
+            }
+
+            onValueEditingFinished: {
+                Qt.callLater(editingFinished)
             }
         }
     }
-
 
     Component {
         id: frequencyComp
@@ -144,10 +161,14 @@ StyledTableView {
             property int row
             property int column
 
+            property NavigationPanel navigationPanel
+            property int navigationRow
+            property int navigationColumnStart
+
             property string accessibleName: val
 
             signal changed(double value)
-            signal editingFinished()
+            signal editingFinished
 
             height: 24
 
@@ -161,12 +182,23 @@ StyledTableView {
             upperTimeSignature: Boolean(itemData) ? itemData.upperTimeSignature : -1
             lowerTimeSignature: Boolean(itemData) ? itemData.lowerTimeSignature : -1
 
-            // navigation.panel: navigationPanel
-            // navigation.row: navigationRow
-            // navigation.column: navigationColumnStart
+            navigation.panel: navigationPanel
+            navigation.enabled: root.currentEditedCell === item
+            navigation.row: navigationRow
+            navigation.column: navigationColumnStart
 
-            onValueChangeRequested: function(newValue) {
+            navigation.onActiveChanged: function (active) {
+                if (active) {
+                    navigation.triggered()
+                }
+            }
+
+            onValueChangeRequested: function (newValue) {
                 item.changed(newValue)
+            }
+
+            onValueEditingFinished: {
+                Qt.callLater(editingFinished)
             }
         }
     }

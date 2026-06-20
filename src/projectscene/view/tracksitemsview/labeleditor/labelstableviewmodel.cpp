@@ -406,7 +406,7 @@ MenuItemList LabelsTableViewModel::makeAvailableTracksList()
 
         ui::UiAction action;
         action.code = SELECT_LABEL_TRACK_CODE;
-        action.title = TranslatableString::untranslatable(String::number(index) + " - " + track.title);
+        action.title = muse::TranslatableString::untranslatable(String::number(index) + " - " + track.title);
         action.checkable = muse::ui::Checkable::Yes;
         item->setAction(action);
 
@@ -427,7 +427,7 @@ MenuItemList LabelsTableViewModel::makeAvailableTracksList()
 
     ui::UiAction action;
     action.code = NEW_LABEL_TRACK_CODE;
-    action.title = TranslatableString("projectscene", "New label track");
+    action.title = muse::TranslatableString("projectscene", "New label track");
     item->setAction(action);
 
     ui::UiActionState state;

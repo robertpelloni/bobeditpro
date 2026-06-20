@@ -47,6 +47,7 @@ PRIVATE
     CURL::libcurl
     threadpool::threadpool
     au3-exceptions-interface
+    au3-strings-interface
     wxBase
 )
 

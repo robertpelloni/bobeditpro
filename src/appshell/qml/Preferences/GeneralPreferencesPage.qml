@@ -37,7 +37,7 @@ PreferencesPage {
     GeneralPreferencesModel {
         id: preferencesModel
 
-        onReceivingUpdateForCurrentLanguage: function(current, total, status) {
+        onReceivingUpdateForCurrentLanguage: function (current, total, status) {
             languagesSection.setUpdateProgress(current, total, status)
         }
     }
@@ -64,7 +64,7 @@ PreferencesPage {
             navigation.section: root.navigationSection
             navigation.order: root.navigationOrderStart + 1
 
-            onLanguageSelected: function(languageCode) {
+            onLanguageSelected: function (languageCode) {
                 preferencesModel.currentLanguageCode = languageCode
             }
 
@@ -88,7 +88,7 @@ PreferencesPage {
             navigation.section: root.navigationSection
             navigation.order: root.navigationOrderStart + 2
 
-            onNumberFormatSelected: function(numberFormatCode) {
+            onNumberFormatSelected: function (numberFormatCode) {
                 preferencesModel.setNumberFormat(numberFormatCode)
             }
 
@@ -99,7 +99,7 @@ PreferencesPage {
             }
         }
 
-        SeparatorLine { }
+        SeparatorLine {}
 
         AutomaticUpdateSection {
             isAppUpdatable: updateModel.isAppUpdatable()
@@ -109,7 +109,7 @@ PreferencesPage {
             navigation.section: root.navigationSection
             navigation.order: root.navigationOrderStart + 3
 
-            onNeedCheckForNewAppVersionChangeRequested: function(check) {
+            onNeedCheckForNewAppVersionChangeRequested: function (check) {
                 updateModel.needCheckForNewAppVersion = check
             }
 
@@ -120,7 +120,7 @@ PreferencesPage {
             }
         }
 
-        SeparatorLine { }
+        SeparatorLine {}
 
         UsageInfoSection {
             sendAnonymousUsageInfo: usageInfoModel.sendAnonymousUsageInfo
@@ -129,7 +129,7 @@ PreferencesPage {
             navigation.section: root.navigationSection
             navigation.order: root.navigationOrderStart + 4
 
-            onSendAnonymousUsageInfoChangeRequested: function(send) {
+            onSendAnonymousUsageInfoChangeRequested: function (send) {
                 usageInfoModel.sendAnonymousUsageInfo = send
             }
 
@@ -140,7 +140,7 @@ PreferencesPage {
             }
         }
 
-        SeparatorLine { }
+        SeparatorLine {}
 
         TemporaryFilesSection {
             id: temporaryFilesSection
@@ -150,7 +150,7 @@ PreferencesPage {
 
             temporaryPath: preferencesModel.temporaryDir
 
-            onTemporaryFilesLocationChanged: function(path) {
+            onTemporaryFilesLocationChanged: function (path) {
                 preferencesModel.setTemporaryDir(path)
             }
 
@@ -169,7 +169,7 @@ PreferencesPage {
 <<<<<<< HEAD:src/appshell/qml/Preferences/GeneralPreferencesPage.qml
 =======
 
-        SeparatorLine { }
+        SeparatorLine {}
 
         FFmpegLibrarySection {
             id: ffmpegLibrarySection

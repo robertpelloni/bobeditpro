@@ -33,9 +33,9 @@ Row {
 
     spacing: 8
 
-    signal showWindowMinimizedRequested()
-    signal toggleWindowMaximizedRequested()
-    signal closeWindowRequested()
+    signal showWindowMinimizedRequested
+    signal toggleWindowMaximizedRequested
+    signal closeWindowRequested
 
     FlatButton {
         id: minimizeButton

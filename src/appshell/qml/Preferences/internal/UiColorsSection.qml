@@ -23,15 +23,15 @@ import QtQuick 2.15
 import QtQuick.Layouts 1.15
 
 import Muse.Ui 1.0
-import Muse.UiComponents 1.0
+import Muse.UiComponents
 
 import Audacity.UiComponents 1.0
-import Audacity.Preferences 1.0
+import Audacity.AppShell
 
 BaseSection {
     id: root
 
-    title: qsTrc("appshell/preferences", "UI colors")
+    title: qsTrc("preferences", "UI colors")
     navigation.direction: NavigationPanel.Both
 
     signal colorChangeRequested(var newColor, var propertyType)
@@ -46,17 +46,26 @@ BaseSection {
 
         Repeater {
             model: [
-<<<<<<< HEAD:src/appshell/qml/Preferences/internal/UiColorsSection.qml
-                { textRole: qsTrc("appshell/preferences", "Accent color:"), colorRole: ui.theme.accentColor, typeRole: AppearancePreferencesModel.AccentColor},
-                { textRole: qsTrc("appshell/preferences", "Text and icons:"), colorRole: ui.theme.fontPrimaryColor, typeRole: AppearancePreferencesModel.TextAndIconsColor},
-                { textRole: qsTrc("appshell/preferences", "Disabled text:"), colorRole: "#000000", typeRole: AppearancePreferencesModel.DisabledColor},
-                { textRole: qsTrc("appshell/preferences", "Border color:"), colorRole: ui.theme.strokeColor, typeRole: AppearancePreferencesModel.BorderColor}
-=======
-                { textRole: qsTrc("preferences", "Accent color"), colorRole: ui.theme.accentColor, typeRole: AppearancePreferencesModel.AccentColor},
-                { textRole: qsTrc("preferences", "Text and icons"), colorRole: ui.theme.fontPrimaryColor, typeRole: AppearancePreferencesModel.TextAndIconsColor},
-                { textRole: qsTrc("preferences", "Disabled text"), colorRole: ui.theme.extra["black_color"], typeRole: AppearancePreferencesModel.DisabledColor},
-                { textRole: qsTrc("preferences", "Border color"), colorRole: ui.theme.strokeColor, typeRole: AppearancePreferencesModel.BorderColor}
->>>>>>> upstream/master:src/preferences/qml/Audacity/Preferences/internal/UiColorsSection.qml
+                {
+                    textRole: qsTrc("preferences", "Accent color"),
+                    colorRole: ui.theme.accentColor,
+                    typeRole: AppearancePreferencesModel.AccentColor
+                },
+                {
+                    textRole: qsTrc("preferences", "Text and icons"),
+                    colorRole: ui.theme.fontPrimaryColor,
+                    typeRole: AppearancePreferencesModel.TextAndIconsColor
+                },
+                {
+                    textRole: qsTrc("preferences", "Disabled text"),
+                    colorRole: ui.theme.extra["black_color"],
+                    typeRole: AppearancePreferencesModel.DisabledColor
+                },
+                {
+                    textRole: qsTrc("preferences", "Border color"),
+                    colorRole: ui.theme.strokeColor,
+                    typeRole: AppearancePreferencesModel.BorderColor
+                }
             ]
 
             delegate: Row {
@@ -81,7 +90,7 @@ BaseSection {
                     navigation.column: index % grid.columns
                     navigation.accessible.name: titleLabel.text
 
-                    onNewColorSelected: function(newColor) {
+                    onNewColorSelected: function (newColor) {
                         root.colorChangeRequested(newColor, modelData.typeRole)
                     }
                 }

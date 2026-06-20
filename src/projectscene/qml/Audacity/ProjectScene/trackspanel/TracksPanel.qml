@@ -53,6 +53,11 @@ Item {
         property string currentItemNavigationName: ""
     }
 
+    Rectangle {
+        anchors.fill: parent
+        color: ui.theme.backgroundSecondaryColor
+    }
+
     RowLayout {
 
         anchors.fill: parent

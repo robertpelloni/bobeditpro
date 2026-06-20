@@ -865,7 +865,7 @@ double TrackList::GetEndTime() const
 auto Track::ClassTypeInfo() -> const TypeInfo&
 {
     static Track::TypeInfo info{
-        { "generic", "generic", XO("Generic Track") }, false };
+        { "generic", "generic", TranslatableString("track", "Generic Track") }, false };
     return info;
 }
 

@@ -5,14 +5,19 @@
 #define AU_RECORD_RECORDCONTROLLER_H
 
 #include "framework/global/async/asyncable.h"
-#include "framework/actions/actionable.h"
+#include "framework/global/modularity/ioc.h"
 
-#include "modularity/ioc.h"
-#include "context/iglobalcontext.h"
+#include "framework/actions/actionable.h"
 #include "framework/actions/iactionsdispatcher.h"
-#include "framework/global/iinteractive.h"
+#include "framework/interactive/iinteractive.h"
+
+#include "context/iglobalcontext.h"
 #include "playback/iplaybackcontroller.h"
 #include "trackedit/iselectioncontroller.h"
+#include "trackedit/itracksinteraction.h"
+#include "trackedit/itrackeditinteraction.h"
+#include "trackedit/internal/itracknavigationcontroller.h"
+#include "audio/iaudiodevicesprovider.h"
 #include "record/irecordconfiguration.h"
 
 #include "record/irecord.h"
@@ -21,14 +26,23 @@
 namespace au::record {
 class RecordController : public IRecordController, public muse::actions::Actionable, public muse::async::Asyncable, public muse::Contextable
 {
-    muse::Inject<muse::actions::IActionsDispatcher> dispatcher;
-    muse::Inject<au::context::IGlobalContext> globalContext;
-    muse::Inject<muse::IInteractive> interactive;
-    muse::Inject<IRecord> record;
-    muse::Inject<playback::IPlaybackController> playbackController;
-    muse::Inject<record::IRecordConfiguration> configuration;
+    muse::GlobalInject<record::IRecordConfiguration> configuration;
+
+    muse::ContextInject<muse::actions::IActionsDispatcher> dispatcher{ this };
+    muse::ContextInject<au::context::IGlobalContext> globalContext{ this };
+    muse::ContextInject<muse::IInteractive> interactive{ this };
+    muse::ContextInject<IRecord> record{ this };
+    muse::ContextInject<playback::IPlaybackController> playbackController{ this };
+    muse::ContextInject<trackedit::ISelectionController> selectionController{ this };
+    muse::ContextInject<trackedit::ITracksInteraction> tracksInteraction{ this };
+    muse::ContextInject<trackedit::ITrackeditInteraction> trackeditInteraction{ this };
+    muse::ContextInject<trackedit::ITrackNavigationController> trackNavigationController{ this };
+    muse::ContextInject<audio::IAudioDevicesProvider> audioDevicesProvider{ this };
 
 public:
+    RecordController(const muse::modularity::ContextPtr& ctx)
+        : muse::Contextable(ctx) {}
+
     void init();
     void deinit();
 
@@ -64,7 +78,9 @@ private:
     void onProjectChanged();
 
     void toggleRecord();
+    void recordOnNewTrack();
     void start();
+    void startWithNewTrack();
     void pause();
     void stop();
     void leadInRecording();

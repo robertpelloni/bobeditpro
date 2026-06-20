@@ -898,6 +898,11 @@ std::set<muse::secs_t> ProjectViewState::itemsBoundaries() const
     return m_itemsBoundaries;
 }
 
+void ProjectViewState::setEditedItem(const trackedit::TrackItemKey& key)
+{
+    m_editedItemKey = key;
+}
+
 void ProjectViewState::updateItemsBoundaries(bool excludeCurrentSelection, const trackedit::TrackItemKey& itemKeyToOmit)
 {
     auto prj = globalContext()->currentTrackeditProject();
@@ -909,10 +914,16 @@ void ProjectViewState::updateItemsBoundaries(bool excludeCurrentSelection, const
     const auto& selectedClips = selectionController()->selectedClips();
     const auto& selectedLabels = selectionController()->selectedLabels();
 
-    if (selectedClips.empty() && selectedLabels.empty()) {
-        setItemsBoundaries({});
-        return;
-    }
+    // An item being dragged must never snap to its own edges. The drag may rebuild the
+    // boundary set mid-flight (e.g. label moves emit trackChanged every frame, which calls
+    // updateItemsBoundaries(false)), so relying on the one-shot itemKeyToOmit argument is not
+    // enough; m_editedItemKey persists the exclusion for the whole edit.
+    const auto isEditedItem = [this, &itemKeyToOmit](const trackedit::TrackItemKey& key) {
+        if (itemKeyToOmit.isValid() && key == itemKeyToOmit) {
+            return true;
+        }
+        return m_editedItemKey.isValid() && key == m_editedItemKey;
+    };
 
     for (const auto& trackId : prj->trackIdList()) {
         // Add clips boundaries
@@ -921,7 +932,7 @@ void ProjectViewState::updateItemsBoundaries(bool excludeCurrentSelection, const
                 continue;
             }
 
-            if (itemKeyToOmit.isValid() && clip.key == itemKeyToOmit) {
+            if (isEditedItem(clip.key)) {
                 continue;
             }
 
@@ -931,6 +942,14 @@ void ProjectViewState::updateItemsBoundaries(bool excludeCurrentSelection, const
 
         // Add labels boundaries
         for (const auto& label : prj->labelList(trackId)) {
+            if (excludeCurrentSelection && muse::contains(selectedLabels, label.key)) {
+                continue;
+            }
+
+            if (isEditedItem(label.key)) {
+                continue;
+            }
+
             boundaries.insert(label.startTime);
             boundaries.insert(label.endTime);
         }

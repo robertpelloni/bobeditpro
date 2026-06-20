@@ -36,6 +36,7 @@ set( LIBRARIES
    au3-effects-interface
    au3-files-interface
    PRIVATE
+   au3-strings-interface
    wxBase
    vst_sdk_3
 )

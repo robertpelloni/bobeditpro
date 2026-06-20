@@ -267,11 +267,11 @@ AudioIO::AudioIO()
     PaError err = Pa_Initialize();
 
     if (err != paNoError) {
-        auto errStr = XO("Could not find any audio devices.\n");
-        errStr += XO("You will not be able to play or record audio.\n\n");
+        auto errStr = TranslatableString("audio-io", "Could not find any audio devices.\n");
+        errStr += TranslatableString("audio-io", "You will not be able to play or record audio.\n\n");
         wxString paErrStr = LAT1CTOWX(Pa_GetErrorText(err));
         if (!paErrStr.empty()) {
-            errStr += XO("Error: %s").Format(paErrStr);
+            errStr += TranslatableString("audio-io", "Error: %1").arg(paErrStr);
         }
         // XXX: we are in libaudacity, popping up dialogs not allowed!  A
         // long-term solution will probably involve exceptions
@@ -279,7 +279,7 @@ AudioIO::AudioIO()
         ShowMessageBox(
             errStr,
             MessageBoxOptions {}
-            .Caption(XO("Error Initializing Audio"))
+            .Caption(TranslatableString("audio-io", "Error Initializing Audio"))
             .IconStyle(Icon::Error)
             .ButtonStyle(Button::Ok));
 
@@ -386,20 +386,20 @@ void AudioIO::SetMixer(int inputSource, float recordVolume,
 {
     SetMixerOutputVol(playbackVolume);
     AudioIOPlaybackVolume.Write(playbackVolume);
+    SetSoftwareRecordGain(recordVolume);
 
 #if defined(USE_PORTMIXER)
-    PxMixer* mixer = mPortMixer;
-    if (!mixer) {
-        return;
+    if (PxMixer* mixer = mPortMixer) {
+        AudioIoCallback::SetMixer(inputSource);
+
+        if (mInputMixerWorks) {
+            float oldRecordVolume = Px_GetInputVolume(mixer);
+            if (oldRecordVolume != recordVolume) {
+                Px_SetInputVolume(mixer, recordVolume);
+            }
+            return;
+        }
     }
-
-    float oldRecordVolume = Px_GetInputVolume(mixer);
-
-    AudioIoCallback::SetMixer(inputSource);
-    if (oldRecordVolume != recordVolume) {
-        Px_SetInputVolume(mixer, recordVolume);
-    }
-
 #endif
 }
 
@@ -418,7 +418,7 @@ void AudioIO::GetMixer(int* recordDevice, float* recordVolume,
         if (mInputMixerWorks) {
             *recordVolume = Px_GetInputVolume(mixer);
         } else {
-            *recordVolume = 1.0f;
+            *recordVolume = GetSoftwareRecordGain();
         }
 
         return;
@@ -426,8 +426,9 @@ void AudioIO::GetMixer(int* recordDevice, float* recordVolume,
 
 #endif
 
+    // Recording level is emulated in software
     *recordDevice = 0;
-    *recordVolume = 1.0f;
+    *recordVolume = GetSoftwareRecordGain();
 }
 
 bool AudioIO::InputMixerWorks()
@@ -751,7 +752,7 @@ bool AudioIO::StartPortAudioStream(const AudioIOStartStreamOptions& options,
 #if (defined(__WXMAC__) || defined(__WXMSW__)) && wxCHECK_VERSION(3, 1, 0)
     // Don't want the system to sleep while audio I/O is active
     if (mPortStreamV19 != NULL && mLastPaError == paNoError) {
-        wxPowerResource::Acquire(wxPOWER_RESOURCE_SCREEN, _("Audacity Audio"));
+        wxPowerResource::Acquire(wxPOWER_RESOURCE_SCREEN, wxString::FromUTF8(au3::trc("audio-io", "Audacity Audio").c_str()));
     }
 #endif
 
@@ -868,10 +869,10 @@ void AudioIO::StartMonitoring(const AudioIOStartStreamOptions& options)
     const auto pOwningProject = mOwningProject.lock();
     if (!success) {
         using namespace BasicUI;
-        const auto msg = XO("Error opening recording device.\nError code: %s")
+        const auto msg = TranslatableString("audio-io", "Error opening recording device.\nError code: %1")
                          .Format(Get()->LastPaErrorString());
         ShowErrorDialog(*ProjectFramePlacement(pOwningProject.get()),
-                        XO("Error"), msg, wxT("Error_opening_sound_device"),
+                        TranslatableString("audio-io", "Error"), msg, wxT("Error_opening_sound_device"),
                         ErrorDialogOptions { ErrorDialogType::ModalErrorReport });
         return;
     }
@@ -1197,7 +1198,7 @@ int AudioIO::StartStream(const TransportSequences& sequences,
             StartStreamCleanup();
             // PRL: PortAudio error messages are sadly not internationalized
             BasicUI::ShowMessageBox(
-                Verbatim(LAT1CTOWX(Pa_GetErrorText(err))));
+                TranslatableString::untranslatable(LAT1CTOWX(Pa_GetErrorText(err))));
             return 0;
         }
     }
@@ -1465,7 +1466,7 @@ bool AudioIO::AllocateBuffers(
                 // In the extraordinarily rare case that we can't even afford
                 // 100 samples, just give up.
                 if (captureBufferSize < 100) {
-                    BasicUI::ShowMessageBox(XO("Out of memory!"));
+                    BasicUI::ShowMessageBox(TranslatableString("audio-io", "Out of memory!"));
                     return false;
                 }
 
@@ -1500,7 +1501,7 @@ bool AudioIO::AllocateBuffers(
             auto playbackBufferSize
                 =(size_t)lrint(mRate * mPlaybackRingBufferSecs.count());
             if (playbackBufferSize < 100 || mPlaybackSamplesToCopy < 100) {
-                BasicUI::ShowMessageBox(XO("Out of memory!"));
+                BasicUI::ShowMessageBox(TranslatableString("audio-io", "Out of memory!"));
                 return false;
             }
         }
@@ -3010,6 +3011,33 @@ void AudioIoCallback::UpdateTimePosition(unsigned long framesPerBuffer)
         mPlaybackSchedule.mTimeQueue.Consumer(framesPerBuffer, mRate));
 }
 
+constSamplePtr AudioIoCallback::ApplyRecordGain(
+    constSamplePtr inputBuffer, float gain, size_t numSamples, samplePtr scratch)
+{
+    switch (mCaptureFormat) {
+    case floatSample: {
+        auto src = reinterpret_cast<const float*>(inputBuffer);
+        auto dst = reinterpret_cast<float*>(scratch);
+        for (size_t i = 0; i < numSamples; ++i) {
+            dst[i] = src[i] * gain;
+        }
+        return scratch;
+    }
+    case int16Sample: {
+        auto src = reinterpret_cast<const short*>(inputBuffer);
+        auto dst = reinterpret_cast<short*>(scratch);
+        for (size_t i = 0; i < numSamples; ++i) {
+            dst[i] = static_cast<short>(std::clamp(src[i] * gain, -32768.0f, 32767.0f));
+        }
+        return scratch;
+    }
+    case int24Sample:
+        break;
+    }
+
+    return inputBuffer;
+}
+
 // return true, IFF we have fully handled the callback.
 //
 // Copy from PortAudio input buffers to our intermediate recording buffers.
@@ -3426,6 +3454,15 @@ int AudioIoCallback::AudioCallback(
 
     if (inputBuffer && numCaptureChannels) {
         float* inputSamples;
+
+        if (!mInputMixerWorks) {
+            const float gain = GetSoftwareRecordGain();
+            if (gain != 1.0f) {
+                const size_t numSamples = framesPerBuffer * numCaptureChannels;
+                const auto scratch = stackAllocate(char, numSamples * SAMPLE_SIZE(mCaptureFormat));
+                inputBuffer = ApplyRecordGain(inputBuffer, gain, numSamples, scratch);
+            }
+        }
 
         if (mCaptureFormat == floatSample) {
             inputSamples = (float*)inputBuffer;

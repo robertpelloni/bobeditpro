@@ -6,7 +6,7 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 
 import Muse.Ui 1.0
-import Muse.UiComponents 1.0
+import Muse.UiComponents
 
 import Audacity.UiComponents 1.0
 
@@ -22,9 +22,6 @@ RowLayout {
     property color textColor: ui.theme.fontSecondaryColor
     property color backgroundColor: ui.theme.backgroundQuarternaryColor
 
-<<<<<<< HEAD
-    signal valueChangeRequested(var newValue)
-=======
     property NavigationControl navigation: NavigationControl {
         property bool triggerLocked: false
 
@@ -54,7 +51,6 @@ RowLayout {
 
     signal valueChangeRequested(var newValue)
     signal valueEditingFinished
->>>>>>> upstream/master
 
     height: 28
 
@@ -69,6 +65,22 @@ RowLayout {
         function onValueChanged() {
             root.valueChangeRequested(value)
         }
+
+        function onEditingFinished() {
+            root.navigation.triggerLocked = true
+            root.navigation.requestActive()
+            root.navigation.triggerLocked = false
+
+            prv.isFieldsNavigationEnabled = false
+
+            root.valueEditingFinished()
+        }
+    }
+
+    QtObject {
+        id: prv
+
+        property bool isFieldsNavigationEnabled: false
     }
 
     RoundedRectangle {
@@ -100,6 +112,8 @@ RowLayout {
                 spacing: 0
 
                 Repeater {
+                    id: repeater
+
                     model: root.model
 
                     delegate: NumericField {
@@ -107,13 +121,12 @@ RowLayout {
                         value: symbol
 
                         isSelected: model.index === root.model.currentEditedFieldIndex
+
                         isEditable: editable
 
                         color: root.textColor
                         enabled: root.enabled
 
-<<<<<<< HEAD
-=======
                         navigation.panel: root.navigation.panel
                         navigation.enabled: prv.isFieldsNavigationEnabled
                         navigation.row: root.navigation.row
@@ -134,22 +147,17 @@ RowLayout {
                             }
                         }
 
->>>>>>> upstream/master
                         onClicked: {
                             root.model.currentEditedFieldIndex = model.index
                         }
                     }
                 }
             }
-<<<<<<< HEAD
-=======
-
         }
 
         NavigationFocusBorder {
             navigationCtrl: root.navigation
             drawOutsideParent: false
->>>>>>> upstream/master
         }
     }
 
@@ -166,15 +174,11 @@ RowLayout {
         iconColor: root.textColor
         visible: root.showMenu
 
-<<<<<<< HEAD
-        onHandleMenuItem: function(itemId) {
-=======
         navigation.panel: root.navigation.panel
         navigation.row: root.navigation.row
         navigation.column: root.navigation.column + 1 + repeater.count + 1
 
         onHandleMenuItem: function (itemId) {
->>>>>>> upstream/master
             root.model.currentFormat = parseInt(itemId)
         }
     }

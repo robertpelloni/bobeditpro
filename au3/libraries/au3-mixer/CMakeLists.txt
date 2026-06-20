@@ -49,6 +49,7 @@ set( LIBRARIES
    au3-audio-graph-interface
    au3-playable-track-interface
    au3-xml-interface
+   au3-strings-interface
    wxBase
 )
 audacity_library( ${TARGET} "${SOURCES}" "${LIBRARIES}"

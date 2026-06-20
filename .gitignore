@@ -218,6 +218,13 @@ MuseScorePortable
 *.user
 /share/locale/*placeholder.ts
 /share/locale/*.qm
+# Derived from share/nyquist-plug-ins/*.ny by extract_nyquist_strings.py
+# (run via run_lupdate.sh). Never hand-edit; never commit.
+/tools/translations/nyquist_strings.cpp.generated
+# Diagnostic outputs from the au3->au4 migration pipeline.
+/share/locale/po_import_collisions.*.txt
+/share/locale/po_reuse_collisions.*.txt
+/tools/translations/au4_scan_paths.txt
 /share/instruments/tsv
 Doc
 DocLib
@@ -273,4 +280,12 @@ CMakeUserPresets.json
 muse_framework/
 
 # Jules AI session logs (auto-generated, not needed in repo)
-.jules/sessions/
+
+# IMPORTANT: Do NOT add any of the following to .gitignore
+# - Databases (*.db, *.sqlite, etc.)
+# - Session/conversation files (*-session.json, sessions/)
+# - .tormentnexus/ (AI sessions, memory, handoffs, db)
+# - .jules/ (Jules AI conversations and state)
+# These contain critical development history and must be tracked.
+# Only ignore system logs (*.log), build artifacts, and caches.
+

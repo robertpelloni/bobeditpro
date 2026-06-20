@@ -54,7 +54,7 @@ PreferencesPage {
             navigation.section: root.navigationSection
             navigation.order: root.navigationOrderStart
 
-            onCurrentAudioApiIndexChangeRequested: function(newIndex) {
+            onCurrentAudioApiIndexChangeRequested: function (newIndex) {
                 apiModel.currentAudioApiIndex = newIndex
             }
 
@@ -102,16 +102,16 @@ PreferencesPage {
         SeparatorLine {}
 
         MeterDbRangeSection {
-           id: meterDbRangeSection
+            id: meterDbRangeSection
 
-           navigation.section: root.navigationSection
-           navigation.order: root.navigationOrderStart + 3
+            navigation.section: root.navigationSection
+            navigation.order: root.navigationOrderStart + 3
 
-           onFocusChanged: {
-               if (activeFocus) {
-                   root.ensureContentVisibleRequested(Qt.rect(x, y, width, height))
-               }
-           }
+            onFocusChanged: {
+                if (activeFocus) {
+                    root.ensureContentVisibleRequested(Qt.rect(x, y, width, height))
+                }
+            }
         }
     }
 }

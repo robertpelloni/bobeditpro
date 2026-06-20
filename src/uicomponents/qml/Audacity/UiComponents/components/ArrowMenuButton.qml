@@ -10,7 +10,7 @@ MenuButton {
     id: menuBtn
 
     property color backgroundColor: ui.theme.backgroundQuarternaryColor
-    property Border border: Border{}
+    property Border border: Border {}
 
     icon: IconCode.SMALL_ARROW_DOWN
     iconColor: ui.theme.fontSecondaryColor
@@ -36,7 +36,6 @@ MenuButton {
                     opacity: ui.theme.buttonOpacityHit
                 }
             },
-
             State {
                 name: "HOVERED"
                 when: menuBtn.mouseArea.containsMouse && !menuBtn.mouseArea.pressed

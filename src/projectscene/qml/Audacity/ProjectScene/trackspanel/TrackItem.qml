@@ -21,13 +21,19 @@ ListItemBlank {
     property bool isFocused: false
 
     property alias headerTrailingControlsComponent: headerTrailingControls.sourceComponent
+    property int headerTrailingControlsNavigationStart: collapsed ? title.navigation.order + 1 : extraControlsNavigationEnd + 1
+    property int headerTrailingControlsNavigationEnd: 0
+
     property alias extraControlsComponent: extraControlsLoader.sourceComponent
+    property int extraControlsNavigationStart: menuButton.navigation.order + 1
+    property int extraControlsNavigationEnd: 0
+
     property alias rightSideContainerComponent: rightSideContainer.sourceComponent
 
     property alias bottomSeparatorHeight: bottomSeparator.height
 
-    signal interactionStarted()
-    signal interactionEnded()
+    signal interactionStarted
+    signal interactionEnded
     signal selectionRequested(bool exclusive)
 
     signal mousePressed(var item, double x, double y)
@@ -48,8 +54,7 @@ ListItemBlank {
 
     mouseArea.onDoubleClicked: {
         let titlePos = root.mapFromItem(title, 0, 0)
-        if (mouseArea.mouseX >= titlePos.x && mouseArea.mouseX <= titlePos.x + title.width &&
-            mouseArea.mouseY >= titlePos.y && mouseArea.mouseY <= titlePos.y + title.height) {
+        if (mouseArea.mouseX >= titlePos.x && mouseArea.mouseX <= titlePos.x + title.width && mouseArea.mouseY >= titlePos.y && mouseArea.mouseY <= titlePos.y + title.height) {
             title.edit()
         }
     }
@@ -61,16 +66,18 @@ ListItemBlank {
     focusBorder.anchors.rightMargin: 24 + separatorLine.width
     focusBorder.anchors.bottomMargin: 2
 
-    background.color: (root.isSelected || hoverHandler.hovered) ?
-                   ui.theme.backgroundPrimaryColor : ui.theme.backgroundSecondaryColor
+    background.color: root.isSelected ? ui.theme.extra["track_header_active_color"] : (hoverHandler.hovered ? ui.theme.extra["track_header_hover_color"] : ui.theme.extra["track_header_color"])
 
-    background.opacity: (!root.isSelected || hoverHandler.hovered) ? 0.7 : 1
+    background.anchors.leftMargin: spacer.width
+    background.anchors.rightMargin: -background.radius
+    background.anchors.bottomMargin: bottomSeparator.thickness
+    background.radius: 4
 
-    signal renameTrackRequested()
-    signal duplicateRequested()
-    signal deleteRequested()
+    signal renameTrackRequested
+    signal duplicateRequested
+    signal deleteRequested
 
-    signal openEffectsRequested()
+    signal openEffectsRequested
 
     property TrackViewStateModel trackViewState: TrackViewStateModel {
         trackId: root.item ? root.item.trackId : -1
@@ -94,7 +101,7 @@ ListItemBlank {
     ContextMenuLoader {
         id: contextMenuLoader
 
-        onHandleMenuItem: function(itemId) {
+        onHandleMenuItem: function (itemId) {
             contextMenuModel.handleMenuItem(itemId)
         }
     }
@@ -103,7 +110,7 @@ ListItemBlank {
         anchors.fill: parent
         acceptedButtons: Qt.RightButton
 
-        onClicked: function(e) {
+        onClicked: function (e) {
             if (!isSelected) {
                 root.selectionRequested(true)
             }
@@ -151,29 +158,39 @@ ListItemBlank {
 
                     text: Boolean(root.item) ? root.item.title : ""
 
-                    onTextEdited: function(text) {
+                    navigation.panel: root.navigation.panel
+                    navigation.order: root.navigation.order + 1
+
+                    onTextEdited: function (text) {
                         if (Boolean(root.item)) {
                             root.item.title = text
                         }
                     }
                 }
 
-                Loader { id: headerTrailingControls }
+                Loader {
+                    id: headerTrailingControls
+                }
 
                 MenuButton {
+                    id: menuButton
+
                     menuModel: contextMenuModel
+
+                    navigation.panel: root.navigation.panel
+                    navigation.order: root.collapsed ? root.headerTrailingControlsNavigationEnd + 1 : title.navigation.order + 1
 
                     onClicked: {
                         root.selectionRequested(true)
                     }
 
-                    onHandleMenuItem: function(itemId) {
+                    onHandleMenuItem: function (itemId) {
                         contextMenuModel.handleMenuItem(itemId)
                     }
                 }
             }
 
-            Loader { 
+            Loader {
                 id: extraControlsLoader
                 Layout.fillWidth: true
                 Layout.preferredHeight: implicitHeight
@@ -185,6 +202,7 @@ ListItemBlank {
             anchors.right: rightSideContainer.left
             anchors.bottomMargin: bottomSeparator.thickness
             orientation: Qt.Vertical
+            color: ui.theme.extra["track_header_separator_color"]
         }
 
         Loader {
@@ -192,9 +210,9 @@ ListItemBlank {
 
             anchors.right: parent.right
             anchors.top: parent.top
-            anchors.topMargin: 5
+            anchors.topMargin: 6
             anchors.bottom: parent.bottom
-            anchors.bottomMargin: 5
+            anchors.bottomMargin: 6
 
             width: 24
         }
@@ -204,7 +222,7 @@ ListItemBlank {
         anchors.fill: parent
         MouseArea {
             anchors.fill: parent
-            onPressed: function(e) {
+            onPressed: function (e) {
                 // Pass the event forward to allow
                 // child elements to handle the input
                 e.accepted = false
@@ -216,7 +234,7 @@ ListItemBlank {
         }
 
         HoverHandler {
-            id:hoverHandler
+            id: hoverHandler
         }
     }
 
@@ -234,7 +252,7 @@ ListItemBlank {
             root.interactionStarted()
         }
 
-        onPositionChanged: function(mouse) {
+        onPositionChanged: function (mouse) {
             const resizeVerticalMargin = 10
             mouse.accepted = true
 
@@ -251,21 +269,6 @@ ListItemBlank {
         onReleased: {
             root.interactionEnded()
         }
-    }
-
-    Rectangle {
-        id: trackHeaderBorder
-
-        anchors.fill: parent
-        anchors.rightMargin: -radius
-        anchors.leftMargin: spacer.width
-        anchors.bottomMargin: bottomSeparator.thickness
-
-        color: "transparent"
-        border.width: 1
-        border.color: ui.theme.strokeColor
-
-        radius: 4
     }
 
     SeparatorLine {
@@ -291,7 +294,7 @@ ListItemBlank {
 
         color: "transparent"
 
-        border.color: "#7EB1FF"
+        border.color: ui.theme.extra["focus_state_color"]
         border.width: 2
 
         radius: 6

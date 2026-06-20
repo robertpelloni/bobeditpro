@@ -28,7 +28,7 @@ namespace au::projectscene {
 using Direction = DirectionType::Direction;
 
 class SnapTimeFormatter;
-class TimelineContext : public QObject, public muse::async::Asyncable, public muse::actions::Actionable
+class TimelineContext : public QObject, public muse::async::Asyncable, public muse::actions::Actionable, public muse::Contextable
 {
     Q_OBJECT
 
@@ -58,18 +58,30 @@ class TimelineContext : public QObject, public muse::async::Asyncable, public mu
     Q_PROPERTY(qreal verticalScrollbarSize READ verticalScrollbarSize NOTIFY verticalScrollChanged)
 
     Q_PROPERTY(bool playbackOnRulerClickEnabled READ playbackOnRulerClickEnabled NOTIFY playbackOnRulerClickEnabledChanged FINAL)
+    Q_PROPERTY(
+        bool updateDisplayWhilePlayingEnabled READ updateDisplayWhilePlayingEnabled NOTIFY updateDisplayWhilePlayingEnabledChanged FINAL)
+    Q_PROPERTY(bool pinnedPlayHeadEnabled READ pinnedPlayHeadEnabled NOTIFY pinnedPlayHeadEnabledChanged FINAL)
+    Q_PROPERTY(double lastPlaybackSeekPosition READ lastPlaybackSeekPosition NOTIFY lastPlaybackSeekPositionChanged FINAL)
 
-    muse::Inject<muse::actions::IActionsDispatcher> dispatcher;
-    muse::Inject<context::IGlobalContext> globalContext;
-    muse::Inject<trackedit::ISelectionController> selectionController;
-    muse::Inject<IProjectSceneConfiguration> configuration;
-    muse::Inject<playback::IPlayback> playback;
+    Q_PROPERTY(double invalidGuidelineTime READ invalidGuidelineTime CONSTANT FINAL)
+
+    muse::GlobalInject<IProjectSceneConfiguration> configuration;
+
+    muse::ContextInject<muse::actions::IActionsDispatcher> dispatcher{ this };
+    muse::ContextInject<context::IGlobalContext> globalContext{ this };
+    muse::ContextInject<trackedit::ISelectionController> selectionController{ this };
+    muse::ContextInject<trackedit::IProjectHistory> projectHistory{ this };
+    muse::ContextInject<playback::IPlayback> playback{ this };
+    muse::ContextInject<playback::IPlaybackController> playbackController{ this };
 
 public:
 
     static constexpr int ANIMATION_DURATION_MS = 500;
+    static constexpr double INVALID_GUIDELINE_TIME = -1.0;
 
     TimelineContext(QObject* parent = nullptr);
+
+    double invalidGuidelineTime() const { return INVALID_GUIDELINE_TIME; }
 
     double frameStartTime() const;
     void setFrameStartTime(double newFrameStartTime);
@@ -112,6 +124,8 @@ public:
     Q_INVOKABLE void scrollHorizontal(qreal newPos);
     Q_INVOKABLE void scrollVertical(qreal newPos);
 
+    void centerViewOnPlayhead(const muse::actions::ActionData& args);
+    void centerOnTime(double secs);
     Q_INVOKABLE void insureVisible(double posSec);
     Q_INVOKABLE void animatedInsureVisible(double posSec);
     Q_INVOKABLE void startAutoScroll(double posSec);
@@ -123,7 +137,9 @@ public:
     double applySnapToTime(double time) const;
     double applySnapToItem(double time) const;
     Q_INVOKABLE double applyDetectedSnap(double time) const;
+
     Q_INVOKABLE double findGuideline(double time) const;
+    Q_INVOKABLE bool isGuidelineValid(double guidelineTime) const;
 
     Q_INVOKABLE void updateMousePositionTime(double mouseX);
     Q_INVOKABLE double mousePositionTime() const;
@@ -146,6 +162,9 @@ public:
     Q_INVOKABLE void updateSelectedItemTime();
 
     bool playbackOnRulerClickEnabled() const;
+    bool updateDisplayWhilePlayingEnabled() const;
+    bool pinnedPlayHeadEnabled() const;
+    double lastPlaybackSeekPosition() const;
 
 signals:
 
@@ -176,6 +195,12 @@ signals:
     void verticalScrollChanged();
 
     void playbackOnRulerClickEnabledChanged();
+
+    void updateDisplayWhilePlayingEnabledChanged();
+    void pinnedPlayHeadEnabledChanged();
+    void lastPlaybackSeekPositionChanged();
+
+    void userHorizontalScrolled();
 
 private:
     trackedit::ITrackeditProjectPtr trackEditProject() const;
@@ -225,6 +250,8 @@ private:
     void saveViewState() const;
 
     context::IPlaybackStatePtr playbackState() const;
+
+    friend struct SnapTestAccess;
 
     double m_frameWidth = 0.0;
     double m_frameHeight = 0.0;

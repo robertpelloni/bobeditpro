@@ -65,6 +65,120 @@ enum class EffectUIMode {
     FallbackUI = 1,   // Use Audacity's fallback UI
 };
 
+// Parameter types for auto-generated UI
+enum class ParameterType {
+    Unknown = -1,
+    Toggle,        // Boolean on/off
+    Dropdown,      // Enumerated list of choices
+    Slider,        // Continuous value with range
+    Numeric,       // Numeric input field
+    ReadOnly,      // Display-only (meter, status, informational text)
+    Time,          // Time value with timecode formatting
+    File,          // File path with file picker
+    Text,          // Text input field (free-form string)
+};
+
+// Parameter metadata for auto-generated UI
+// Values are stored in "Full Range" (display) representation, e.g., -60 to +6 for dB.
+// Use getNormalizedValue() to convert to normalized [0,1] for plugin API calls.
+struct ParameterInfo {
+    muse::String id;              // Unique parameter identifier
+    muse::String name;            // Display name
+    muse::String description;     // Optional description
+    muse::String units;           // Unit string (dB, Hz, %, etc.)
+    muse::String group;           // Parameter group/category
+
+    ParameterType type = ParameterType::Unknown;
+
+    // Value range in "Full Range" (display) values, e.g., -60 to +6 for dB, 20 to 20000 for Hz
+    // For plugins that don't implement proper conversions, these will be 0.0 to 1.0.
+    double minValue = 0.0;
+    double maxValue = 0.0;
+    double defaultValue = 0.0;
+    double currentValue = 0.0;
+
+    // Formatted value string from plugin (e.g., "440 Hz", "3.5 dB", "-12.0 dB")
+    muse::String currentValueString;
+
+    // For discrete parameters
+    int stepCount = 0;            // 0=continuous, 1=toggle, >1=discrete steps
+    double stepSize = 0.0;        // Step increment for discrete values
+
+    // For dropdown/enumeration parameters
+    std::vector<muse::String> enumValues;  // List of choice labels
+    std::vector<double> enumIndices;       // Corresponding normalized values
+
+    // For file parameters
+    std::vector<muse::String> fileFilters;  // File type filters (e.g., "Nyquist Plug-in (*.ny *.NY)")
+    bool isFileSave = false;                // true for save dialog, false for open dialog
+    bool isFileMultiple = false;            // true to allow multiple file selection
+
+    // Flags
+    bool isReadOnly = false;
+    bool isHidden = false;
+    bool isLogarithmic = false;
+    bool isInteger = false;
+    bool canAutomate = true;
+
+    // -1 means "auto-derive from stepSize / isInteger". Effects can override
+    // for cases where display precision and stepSize differ (e.g. sliding-stretch).
+    int numDecimalsOverride = -1;
+
+    //! Upper bound on displayed fractional digits, applied by the auto-derive
+    //! path in numDecimals(). Overrides set elsewhere should clamp to this too.
+    static constexpr int maxNumDecimals = 6;
+
+    bool isValid() const { return !id.empty(); }
+
+    //! Number of decimals to display for numeric input.
+    //! Honors `numDecimalsOverride` if set; otherwise derives from `stepSize`.
+    int numDecimals() const
+    {
+        if (numDecimalsOverride >= 0) {
+            return numDecimalsOverride;
+        }
+        if (isInteger) {
+            return 0;
+        }
+        if (!(stepSize > 0)) {
+            return 2;
+        }
+        int n = 0;
+        double s = stepSize;
+        while (n < maxNumDecimals && std::abs(s - std::round(s)) > 1e-9 * std::max(1.0, std::abs(s))) {
+            s *= 10.0;
+            ++n;
+        }
+        return n;
+    }
+
+    //! Convert current "Full Range" value to normalized [0,1] for plugin API calls
+    double getNormalizedValue() const
+    {
+        if (maxValue == minValue) {
+            return 0.0; // Avoid division by zero
+        }
+        return (currentValue - minValue) / (maxValue - minValue);
+    }
+
+    //! Convert a "Full Range" value to normalized [0,1]
+    double toNormalized(double fullRangeValue) const
+    {
+        if (maxValue == minValue) {
+            return 0.0;
+        }
+        return (fullRangeValue - minValue) / (maxValue - minValue);
+    }
+
+    //! Convert a normalized [0,1] value to "Full Range"
+    double toFullRange(double normalizedValue) const
+    {
+        return minValue + normalizedValue * (maxValue - minValue);
+    }
+};
+
+using ParameterInfoList = std::vector<ParameterInfo>;
+
 class EffectFamilies
 {
     Q_GADGET

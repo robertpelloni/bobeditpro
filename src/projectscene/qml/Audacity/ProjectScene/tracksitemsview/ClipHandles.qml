@@ -13,6 +13,13 @@ Item {
     property bool handlesVisible: false
     property bool altPressed: false
 
+    property bool collapsed: false
+    property int clipHeight: 114
+    property int headerHeight: 20
+    readonly property int handleMinH: 22
+    readonly property int handleMaxH: 32
+    readonly property int handleHeight: Math.min(handleMaxH, Math.max(handleMinH, collapsed ? Math.round(clipHeight / 2) : Math.round((clipHeight - headerHeight) / 2)))
+
     property int animationDuration: 100
 
     property bool debugRectsVisible: false
@@ -40,13 +47,13 @@ Item {
     signal stretchRightRequested(bool completed, int action)
 
     //! NOTE: auto-scroll for trimming is triggered from trackclipslistmodel
-    signal stopAutoScroll()
+    signal stopAutoScroll
 
     Item {
         id: leftTrimHandle
 
         x: -24
-        height: 32
+        height: root.handleHeight
         width: 36
 
         visible: handlesVisible
@@ -67,17 +74,11 @@ Item {
             anchors.left: leftTrimHandle.left
             anchors.leftMargin: 2
 
-<<<<<<< HEAD
-            iconCode: IconCode.SMALL_ARROW_LEFT
-            font.pixelSize: 30
-            color: "black"
-=======
             iconCode: IconCode.TRIM_HANDLE_LEFT
             font.pixelSize: 17
             color: ui.theme.extra["black_color"]
->>>>>>> upstream/master
             style: Text.Outline
-            styleColor: "white"
+            styleColor: ui.theme.extra["white_color"]
 
             Rectangle {
                 height: 12
@@ -157,9 +158,7 @@ Item {
             cursorShape: Qt.BlankCursor
 
             function updateCustomCursor() {
-                var src = root.altPressed
-                    ? ":/images/customCursorShapes/ClipStretchLeft.png"
-                    : ":/images/customCursorShapes/ClipTrimLeft.png"
+                var src = root.altPressed ? ":/images/customCursorShapes/ClipStretchLeft.png" : ":/images/customCursorShapes/ClipTrimLeft.png"
                 CustomCursorProvider.setCursorShape(leftTrimMa, src)
             }
 
@@ -167,7 +166,9 @@ Item {
 
             Connections {
                 target: root
-                function onAltPressedChanged() { leftTrimMa.updateCustomCursor() }
+                function onAltPressedChanged() {
+                    leftTrimMa.updateCustomCursor()
+                }
             }
 
             onPressed: function (e) {
@@ -210,7 +211,7 @@ Item {
         id: rightTrimHandle
 
         x: parent.width - 12
-        height: 32
+        height: root.handleHeight
         width: 36
 
         visible: handlesVisible
@@ -231,17 +232,11 @@ Item {
             anchors.right: rightTrimHandle.right
             anchors.rightMargin: 2
 
-<<<<<<< HEAD
-            iconCode: IconCode.SMALL_ARROW_RIGHT
-            font.pixelSize: 30
-            color: "black"
-=======
             iconCode: IconCode.TRIM_HANDLE_RIGHT
             font.pixelSize: 17
             color: ui.theme.extra["black_color"]
->>>>>>> upstream/master
             style: Text.Outline
-            styleColor: "white"
+            styleColor: ui.theme.extra["white_color"]
 
             Rectangle {
                 height: 12
@@ -321,9 +316,7 @@ Item {
             cursorShape: Qt.BlankCursor
 
             function updateCustomCursor() {
-                var src = root.altPressed
-                    ? ":/images/customCursorShapes/ClipStretchRight.png"
-                    : ":/images/customCursorShapes/ClipTrimRight.png"
+                var src = root.altPressed ? ":/images/customCursorShapes/ClipStretchRight.png" : ":/images/customCursorShapes/ClipTrimRight.png"
                 CustomCursorProvider.setCursorShape(rightTrimMa, src)
             }
 
@@ -331,7 +324,9 @@ Item {
 
             Connections {
                 target: root
-                function onAltPressedChanged() { rightTrimMa.updateCustomCursor() }
+                function onAltPressedChanged() {
+                    rightTrimMa.updateCustomCursor()
+                }
             }
 
             onPressed: function (e) {
@@ -375,7 +370,7 @@ Item {
 
         x: -24
         y: leftTrimHandle.height
-        height: 32
+        height: root.handleHeight
         width: 36
 
         visible: handlesVisible
@@ -400,7 +395,7 @@ Item {
             anchors.left: leftTimecode.left
             anchors.leftMargin: 4
 
-            color: "black"
+            color: ui.theme.extra["black_color"]
 
             StyledIconLabel {
                 id: leftClockIcon
@@ -409,7 +404,7 @@ Item {
 
                 iconCode: IconCode.CLOCK
                 font.pixelSize: 14
-                color: "white"
+                color: ui.theme.extra["white_color"]
 
                 Rectangle {
                     height: 12
@@ -539,7 +534,7 @@ Item {
 
         x: parent.width - 12
         y: rightTrimHandle.height
-        height: 32
+        height: root.handleHeight
         width: 36
 
         visible: handlesVisible
@@ -563,7 +558,7 @@ Item {
             anchors.right: rightTimecode.right
             anchors.rightMargin: 4
 
-            color: "black"
+            color: ui.theme.extra["black_color"]
 
             StyledIconLabel {
                 id: rightClockIcon
@@ -571,7 +566,7 @@ Item {
                 anchors.centerIn: parent
                 iconCode: IconCode.CLOCK
                 font.pixelSize: 14
-                color: "white"
+                color: ui.theme.extra["white_color"]
 
                 Rectangle {
                     height: 12

@@ -17,6 +17,22 @@ DropArea {
 
     signal setGuidelineRequested(var pos, bool visibility)
 
+    signal externalDropAreaEntered(var drop)
+    signal externalDropAreaExited
+    signal externalDropAreaDropped(var drop)
+
+    onExternalDropAreaEntered: drop => {
+        handleOnEntered(drop, true)
+    }
+
+    onExternalDropAreaExited: {
+        clearPreviewClipsTimer.start()
+    }
+
+    onExternalDropAreaDropped: drop => {
+        handleOnDropped(drop, true)
+    }
+
     QtObject {
         id: prv
 
@@ -39,6 +55,24 @@ DropArea {
     }
 
     onEntered: drop => {
+        handleOnEntered(drop, false)
+    }
+
+    onExited: {
+        clearPreviewClipsTimer.start()
+    }
+
+    onPositionChanged:
+    // NOTE! Qt does not reliably send onPositionChanged for external drags
+    // it is expected that Qt may trigger entered/exited signals alternately
+    // instead of positionChanged
+    {}
+
+    onDropped: drop => {
+        handleOnDropped(drop, false)
+    }
+
+    function handleOnEntered(drop, externalDrop) {
         clearPreviewClipsTimer.stop()
 
         let urls = drop.urls
@@ -47,41 +81,45 @@ DropArea {
             // NOTE: working with urls list from DropArea
             // is expensive so avoid it otherwise the preview clip
             // move will be laggy
-            dropController.probeAudioFilesLength(urls)
+            dropController.probeAudioFiles(urls)
             prv.lastProbedUrls = urls
         }
 
-        var trackId = tracksViewState.trackAtPosition(drop.x, drop.y)
-        dropController.prepareConditionalTracks(trackId, urls.length)
-        dropController.removeDragAddedTracks(trackId, urls.length)
+        let dropX = 0
+        let dropY = drop.y
+        if (!externalDrop) {
+            dropX = drop.x
+            dropY -= root.timeline.height
+        }
 
-        let tracksIds = dropController.draggedTracksIds(trackId, urls.length)
+        var trackId = tracksViewState.trackAtPosition(dropX, dropY)
+        let trackCount = dropController.requiredTracksCount()
+        dropController.prepareConditionalTracks(trackId, trackCount)
+        dropController.removeDragAddedTracks(trackId, trackCount)
+
+        let tracksIds = dropController.draggedTracksIds(trackId, trackCount)
         tracksItemsView.clearPreviewImportClip(tracksIds /* tracks not to clear */)
-        const durations  = dropController.lastProbedDurations();
-        const titles     = dropController.lastProbedFileNames();
+        const durations = dropController.lastProbedDurations()
+        const titles = dropController.lastProbedFileNames()
 
-        tracksItemsView.previewImportClipRequested(tracksIds, drop.x, durations, titles);
+        tracksItemsView.previewImportClipRequested(tracksIds, dropX, durations, titles)
 
-        root.setGuidelineRequested(drop.x, true)
+        root.setGuidelineRequested(dropX, true)
     }
 
-    onExited: {
-        clearPreviewClipsTimer.start()
-    }
+    function handleOnDropped(drop, externalDrop) {
+        let dropX = 0
+        let dropY = drop.y
+        if (!externalDrop) {
+            dropX = drop.x
+            dropY -= root.timeline.height
+        }
 
-    onPositionChanged: {
-        // NOTE! Qt does not reliably send onPositionChanged for external drags
-        // it is expected that Qt may trigger entered/exited signals alternately
-        // instead of positionChanged
-    }
-
-    onDropped: drop => {
-        // Forces conversion to a compatible array
-        let urls = drop.urls.concat([]);
-
-        let trackId = tracksViewState.trackAtPosition(drop.x, drop.y)
-        let tracksIds = dropController.draggedTracksIds(trackId, urls.length)
-        dropController.handleDroppedFiles(tracksIds, timeline.context.positionToTime(drop.x), urls)
+        let trackId = tracksViewState.trackAtPosition(dropX, dropY)
+        let trackCount = dropController.requiredTracksCount()
+        let tracksIds = dropController.draggedTracksIds(trackId, trackCount);
+        // by this time, url list is already inside dropController
+        dropController.handleDroppedFiles(tracksIds, timeline.context.positionToTime(dropX))
 
         dropController.endImportDrag()
         drop.acceptProposedAction()

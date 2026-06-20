@@ -1,10 +1,11 @@
 import QtQuick
 
 import Muse.UiComponents
+
 import Audacity.UiComponents
+import Audacity.ProjectScene
 
 Rectangle {
-
     id: root
 
     property color clipColor: null
@@ -13,11 +14,24 @@ Rectangle {
     property alias title: titleLabel.text
     property real desiredWidth: -1
 
+    property int currentClipStyle: ClipStyle.COLORFUL
+    property color classicThemeBackground: ui.theme.extra["classic_clip_background_color"]
+    property color classicThemeHeader: ui.theme.extra["classic_clip_header_color"]
+
+    readonly property color whiteOverlay: ui.blendColors("transparent", ui.theme.extra["white_color"], 0.3)
+    readonly property color transparentWhite: ui.colorWithAlphaF(ui.theme.extra["white_color"], 0)
+    property color classicThemeGradient: ui.blendColors(root.whiteOverlay, ui.blendColors("transparent", root.classicThemeBackground, 0.4), 0.5)
+    property color colorfulThemeGradient: ui.blendColors(root.whiteOverlay, ui.blendColors("transparent", root.clipColor, 0.4), 0.5)
+
+    readonly property color colorfulHeaderColor: ui.blendColors(ui.theme.extra["white_color"], root.clipColor, 0.3)
+    readonly property color classicHeaderColor: ui.blendColors(ui.theme.extra["white_color"], root.classicThemeHeader, 0.3)
+    readonly property color headerColor: root.currentClipStyle == ClipStyle.COLORFUL ? root.colorfulHeaderColor : root.classicHeaderColor
+
     width: desiredWidth <= 0 ? titleLabel.implicitWidth + 20 : desiredWidth
 
     radius: 4
     border.width: 1
-    border.color: "black"
+    border.color: ui.theme.extra["black_color"]
 
     color: "transparent"
 
@@ -28,8 +42,8 @@ Rectangle {
         anchors.margins: 1
         color: "transparent"
 
-        border.width:  1
-        border.color: "white"
+        border.width: 1
+        border.color: ui.theme.extra["white_color"]
         radius: 4
 
         Rectangle {
@@ -37,7 +51,7 @@ Rectangle {
 
             anchors.fill: parent
             anchors.margins: 1
-            color: "white"
+            color: ui.theme.extra["white_color"]
             opacity: 0.3
 
             radius: 4
@@ -48,7 +62,7 @@ Rectangle {
 
             anchors.fill: parent
             anchors.margins: 1
-            color: root.clipColor
+            color: root.currentClipStyle == ClipStyle.COLORFUL ? root.clipColor : root.classicThemeBackground
             opacity: 0.4
 
             radius: 4
@@ -67,9 +81,18 @@ Rectangle {
 
             gradient: Gradient {
                 orientation: Qt.Horizontal
-                GradientStop { position: 0.0; color: "#00FFFFFF" }
-                GradientStop { position: 0.4; color: ui.blendColors(ui.blendColors("transparent", "white", 0.3), ui.blendColors("transparent", root.clipColor, 0.4), 0.5)}
-                GradientStop { position: 1.0; color: "#00FFFFFF" }
+                GradientStop {
+                    position: 0.0
+                    color: root.transparentWhite
+                }
+                GradientStop {
+                    position: 0.4
+                    color: root.currentClipStyle == ClipStyle.COLORFUL ? colorfulThemeGradient : classicThemeGradient
+                }
+                GradientStop {
+                    position: 1.0
+                    color: root.transparentWhite
+                }
             }
         }
 
@@ -86,12 +109,20 @@ Rectangle {
 
             gradient: Gradient {
                 orientation: Qt.Horizontal
-                GradientStop { position: 0.0; color: "#00FFFFFF" }
-                GradientStop { position: 0.4; color: "#FFFFFFFF" }
-                GradientStop { position: 1.0; color: "#00FFFFFF" }
+                GradientStop {
+                    position: 0.0
+                    color: root.transparentWhite
+                }
+                GradientStop {
+                    position: 0.4
+                    color: ui.theme.extra["white_color"]
+                }
+                GradientStop {
+                    position: 1.0
+                    color: root.transparentWhite
+                }
             }
         }
-
     }
 
     RoundedRectangle {
@@ -108,7 +139,7 @@ Rectangle {
 
         height: 20
 
-        color: ui.blendColors("white", root.clipColor, 0.3)
+        color: root.headerColor
 
         visible: !root.collapsed
 
@@ -120,7 +151,9 @@ Rectangle {
             anchors.rightMargin: 8
             horizontalAlignment: Qt.AlignLeft
 
-            color: "black"
+            color: ui.theme.extra["black_color"]
+
+            visible: header.width > 10
         }
 
         Rectangle {
@@ -134,9 +167,18 @@ Rectangle {
 
             gradient: Gradient {
                 orientation: Qt.Horizontal
-                GradientStop { position: 0.0; color: "#00FFFFFF" }
-                GradientStop { position: 0.4; color: ui.blendColors("white", root.clipColor, 0.3) }
-                GradientStop { position: 1.0; color: "#00FFFFFF" }
+                GradientStop {
+                    position: 0.0
+                    color: root.transparentWhite
+                }
+                GradientStop {
+                    position: 0.4
+                    color: root.headerColor
+                }
+                GradientStop {
+                    position: 1.0
+                    color: root.transparentWhite
+                }
             }
         }
     }

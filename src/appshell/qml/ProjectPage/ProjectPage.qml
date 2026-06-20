@@ -28,7 +28,6 @@ import Muse.Dock
 
 import Audacity.AppShell
 import Audacity.ProjectScene
-import Audacity.ProjectScene.mixer
 import Audacity.Playback
 import Audacity.TrackEdit
 
@@ -42,12 +41,15 @@ DockPage {
 
     property ProjectPageModel pageModel: ProjectPageModel {}
 
+    signal externalDropAreaEntered(var drop)
+    signal externalDropAreaExited
+    signal externalDropAreaDropped(var drop)
+
     TrackNavigationModel {
         id: tracksNavModel
 
         Component.onCompleted: {
-            var section = root.navigationPanelSec(tracksPanel.location)
-            tracksNavModel.init(section)
+            tracksNavModel.init(keynavCentralPanelSec)
         }
     }
 
@@ -87,10 +89,16 @@ DockPage {
         order: keynavTopPanelSec.order + 1
     }
 
+    property NavigationSection keynavCentralPanelSec: NavigationSection {
+        name: "TrackViewSection"
+        enabled: root.visible
+        order: keynavLeftPanelSec.order + 1
+    }
+
     property NavigationSection keynavRightPanelSec: NavigationSection {
         name: "NavigationRightPanel"
         enabled: root.visible
-        order: keynavLeftPanelSec.order + 1
+        order: keynavCentralPanelSec.order + 1
     }
 
     property NavigationSection keynavBottomPanelSec: NavigationSection {
@@ -340,8 +348,24 @@ DockPage {
                         tracksPanel.showEffectsSection = showEffectsSection
                     }
 
-                    onPanelActive: function (index) {
-                        tracksNavModel.moveFocusTo(index)
+                    onPanelActive: function (trackId) {
+                        tracksNavModel.moveFocusTo(trackId)
+                    }
+
+                    DropArea {
+                        anchors.fill: parent
+
+                        onEntered: function (drop) {
+                            root.externalDropAreaEntered(drop)
+                        }
+
+                        onExited: {
+                            root.externalDropAreaExited()
+                        }
+
+                        onDropped: function (drop) {
+                            root.externalDropAreaDropped(drop)
+                        }
                     }
 
                     Connections {
@@ -355,30 +379,6 @@ DockPage {
                             tracksPanelContent.showEffectsSection = tracksPanel.showEffectsSection
                         }
                     }
-                }
-            }
-        },
-        DockPanel {
-            objectName: pageModel.mixerPanelName()
-            title: qsTrc("appshell", "Mixer")
-
-            closable: true
-            floatable: true
-
-            width: 600
-            minimumWidth: 200
-            maximumWidth: 1000
-
-            groupName: root.horizontalPanelsGroup
-            location: Location.Bottom
-
-            visible: false // Hidden by default
-
-            dropDestinations: root.horizontalPanelDropDestinations
-
-            MixerBoard {
-                mixerModel: MixerBoardModel {
-                    Component.onCompleted: load()
                 }
             }
         },
@@ -427,7 +427,25 @@ DockPage {
     ]
 
     central: TracksItemsView {
-        navPanels: tracksNavModel.clipItemPanels
+        id: tracksItemsView
+
+        navPanels: tracksNavModel.viewItemPanels
+
+        Connections {
+            target: root
+
+            function onExternalDropAreaEntered(drop) {
+                tracksItemsView.externalDropAreaEntered(drop)
+            }
+
+            function onExternalDropAreaExited() {
+                tracksItemsView.externalDropAreaExited()
+            }
+
+            function onExternalDropAreaDropped(drop) {
+                tracksItemsView.externalDropAreaDropped(drop)
+            }
+        }
     }
 
     statusBar: DockStatusBar {
@@ -439,6 +457,10 @@ DockPage {
         minimumHeight: thickness
         maximumHeight: thickness
 
-        ProjectStatusBar {}
+        navigationSection: content.navigationSection
+
+        ProjectStatusBar {
+            id: content
+        }
     }
 }

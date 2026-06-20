@@ -65,7 +65,7 @@ Item {
 >>>>>>> upstream/master
 
     signal handleTimeGuideline(real x, bool completed)
-    signal triggerItemGuideline(real x, bool completed)
+    signal updateItemGuideline(real time)
     signal itemDragEditCanceled
 
     signal initRequired()
@@ -82,6 +82,14 @@ Item {
         trackViewState.init()
 
         root.initRequired()
+    }
+
+    function clearItemGuideline() {
+        if (!root.context) {
+            return
+        }
+
+        root.updateItemGuideline(root.context.invalidGuidelineTime)
     }
 
     Loader {

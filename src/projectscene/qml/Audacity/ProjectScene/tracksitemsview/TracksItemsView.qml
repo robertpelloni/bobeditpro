@@ -65,6 +65,14 @@ Rectangle {
                 tracksClipsView.cancelClipDragEditRequested(root.hoveredClipKey)
             }
         }
+
+        function setGuidelinePosition(time) {
+            root.guidelinePos = timeline.context.timeToPosition(time)
+        }
+
+        function updateGuidelineVisibility() {
+            root.guidelineVisible = root.guidelinePos >= 0
+        }
     }
 
     PlaybackStateModel {
@@ -545,7 +553,7 @@ Rectangle {
                             selectionController.resetSelectedItems()
                             itemsSelection.visible = true
                         }
-                        handleGuideline(e.x, false)
+                        snapGuidelineToPosition(e.x)
 
                         splitToolController.mouseDown(e.x)
                         lastItemClickKey = null
@@ -576,7 +584,7 @@ Rectangle {
                     selectionController.onPositionChanged(e.x, e.y)
                     let trackId = tracksViewState.trackAtPosition(e.x, e.y)
 
-                    handleGuideline(e.x, false)
+                    snapGuidelineToPosition(e.x)
                 }
             }
 
@@ -605,7 +613,7 @@ Rectangle {
                         selectionController.onReleased(e.x, e.y)
                         itemsSelection.visible = false
                     }
-                    handleGuideline(e.x, true)
+                    hideGuideline()
                     if (e.modifiers & (Qt.ControlModifier | Qt.ShiftModifier)) {
                         playCursorController.seekToX(timeline.context.selectionStartPosition)
                     }
@@ -646,6 +654,34 @@ Rectangle {
                     playCursorController.setPlaybackRegion(timeline.context.selectedItemStartPosition, timeline.context.selectedItemEndPosition)
                 }
                 itemsSelection.visible = false
+            }
+        }
+
+        // Drives the snap guideline while hovering empty project space below the last track.
+        HoverHandler {
+            id: emptyAreaGuidelineHandler
+
+            enabled: root.interactionState !== TracksItemsView.State.DraggingItem
+
+            onPointChanged: {
+                if (!hovered) {
+                    return
+                }
+
+                let pos = point.position
+                if (tracksViewState.trackAtPosition(pos.x, pos.y) !== -1) {
+                    // Over a track: let the track container own the guideline.
+                    return
+                }
+
+                timeline.updateCursorPosition(pos.x, pos.y)
+                root.snapGuidelineToPosition(pos.x)
+            }
+
+            onHoveredChanged: {
+                if (!hovered) {
+                    root.hideGuideline()
+                }
             }
         }
 
@@ -951,13 +987,12 @@ Rectangle {
                                 })
                             }
 
-                            onTriggerItemGuideline: function (time, completed) {
-                                root.guidelinePos = timeline.context.timeToPosition(time)
-                                root.guidelineVisible = root.guidelinePos >= 0 && !completed
+                            onUpdateItemGuideline: function (time) {
+                                root.updateGuidelineAtTime(time)
                             }
 
                             onHandleTimeGuideline: function (x) {
-                                root.handleGuideline(x)
+                                root.snapGuidelineToPosition(x)
                             }
 
                             function calculateVerticalScrollDelta(viewTop, viewBottom, clipTop, clipBottom, padding = 10) {
@@ -1097,13 +1132,12 @@ Rectangle {
                                 tracksItemsView.moveActive = !completed
                             }
 
-                            onTriggerItemGuideline: function (time, completed) {
-                                root.guidelinePos = timeline.context.timeToPosition(time)
-                                root.guidelineVisible = root.guidelinePos >= 0 && !completed
+                            onUpdateItemGuideline: function (time) {
+                                root.updateGuidelineAtTime(time)
                             }
 
                             onHandleTimeGuideline: function (x) {
-                                root.handleGuideline(x)
+                                root.snapGuidelineToPosition(x)
                             }
                         }
                     }
@@ -1242,17 +1276,17 @@ Rectangle {
         }
     }
 
-    function handleGuideline(x, completed) {
-        let time = timeline.context.positionToTime(x)
-        time = timeline.context.applyDetectedSnap(time)
-        let guidelineTimePos = timeline.context.findGuideline(time)
+    function snapGuidelineToPosition(x) {
+        let time = timeline.context.applyDetectedSnap(timeline.context.positionToTime(x))
+        root.updateGuidelineAtTime(timeline.context.findGuideline(time))
+    }
 
-        if (guidelineTimePos !== -1) {
-            root.guidelinePos = timeline.context.timeToPosition(guidelineTimePos)
+    function updateGuidelineAtTime(time) {
+        prv.setGuidelinePosition(time)
+        prv.updateGuidelineVisibility()
+    }
 
-            root.guidelineVisible = root.guidelinePos >= 0 ? !completed : false
-        } else {
-            root.guidelineVisible = false
-        }
+    function hideGuideline() {
+        root.guidelineVisible = false
     }
 }

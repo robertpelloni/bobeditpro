@@ -8,32 +8,33 @@
 
 #include "au3-basic-ui/BasicUI.h" // For ProgressResult
 
-#include "framework/global/iinteractive.h"
 #include "framework/global/modularity/ioc.h"
 #include "framework/global/async/asyncable.h"
+#include "framework/interactive/iinteractive.h"
 
 using ProgressResult = BasicUI::ProgressResult;
 
-class ProgressDialog : public BasicUI::ProgressDialog, public muse::async::Asyncable
+namespace au::au3 {
+class ProgressDialog : public BasicUI::ProgressDialog, public muse::async::Asyncable, public muse::Contextable
 {
-    muse::Inject<muse::IInteractive> interactive;
+    muse::ContextInject<muse::IInteractive> interactive { this };
 
 public:
-    ProgressDialog(const TranslatableString& title = {});
-    ProgressDialog(const std::string& title);
+    ProgressDialog(const muse::modularity::ContextPtr& ctx, const ::TranslatableString& title = {});
+    ProgressDialog(const muse::modularity::ContextPtr& ctx, const std::string& title);
 
 public:
     virtual ~ProgressDialog();
 
     void Reinit() override;
 
-    void SetDialogTitle(const TranslatableString& title) override;
+    void SetDialogTitle(const ::TranslatableString& title) override;
 
 public:
     ProgressResult Poll(
-        unsigned long long numerator, unsigned long long denominator, const TranslatableString& message = {}) override;
+        unsigned long long numerator, unsigned long long denominator, const ::TranslatableString& message = {}) override;
 
-    void SetMessage(const TranslatableString& message) override;
+    void SetMessage(const ::TranslatableString& message) override;
 
     bool cancelled() const
     {

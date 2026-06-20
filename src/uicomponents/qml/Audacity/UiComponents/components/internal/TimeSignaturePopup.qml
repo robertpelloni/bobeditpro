@@ -28,7 +28,17 @@ StyledPopupView {
 
         spacing: 8
 
+        NavigationPanel {
+            id: navPanel
+            name: "TimeSignaturePopup"
+            enabled: root.isOpened
+            direction: NavigationPanel.Horizontal
+            section: root.navigationSection
+        }
+
         StyledTextLabel {
+            id: titleLabel
+
             Layout.fillWidth: true
 
             text: qsTrc("playback", "Time signature")
@@ -50,7 +60,11 @@ StyledPopupView {
                 maxValue: 128
                 minValue: 1
 
-                onValueEdited: function(newValue) {
+                navigation.panel: navPanel
+                navigation.order: 1
+                navigation.accessible.name: titleLabel.text + " : " + currentValue
+
+                onValueEdited: function (newValue) {
                     root.upperChangeRequested(newValue)
                 }
             }
@@ -71,15 +85,36 @@ StyledPopupView {
                 currentIndex: timeComboBox.indexOfValue(root.lower)
 
                 model: [
-                    { "text": "2", "value": 2 },
-                    { "text": "4", "value": 4 },
-                    { "text": "8", "value": 8 },
-                    { "text": "16", "value": 16 },
-                    { "text": "32", "value": 32 },
-                    { "text": "64", "value": 64 }
+                    {
+                        "text": "2",
+                        "value": 2
+                    },
+                    {
+                        "text": "4",
+                        "value": 4
+                    },
+                    {
+                        "text": "8",
+                        "value": 8
+                    },
+                    {
+                        "text": "16",
+                        "value": 16
+                    },
+                    {
+                        "text": "32",
+                        "value": 32
+                    },
+                    {
+                        "text": "64",
+                        "value": 64
+                    }
                 ]
 
-                onActivated: function(index, value) {
+                navigation.panel: navPanel
+                navigation.order: 2
+
+                onActivated: function (index, value) {
                     root.lowerChangeRequested(value)
                 }
             }

@@ -32,7 +32,7 @@ using namespace au::appshell;
 using namespace muse::languages;
 
 GeneralPreferencesModel::GeneralPreferencesModel(QObject* parent)
-    : QObject(parent)
+    : QObject(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
 {
 }
 
@@ -64,7 +64,8 @@ void GeneralPreferencesModel::checkUpdateForCurrentLanguage()
 
     m_languageUpdateProgress.finished().onReceive(this, [this, languageCode](const muse::ProgressResult& res) {
         if (res.ret.code() == static_cast<int>(Err::AlreadyUpToDate)) {
-            QString msg = muse::qtrc("appshell/preferences", "Your version of %1 is up to date.")
+            //: %1 is the name of the language whose translation files are up to date
+            QString msg = muse::qtrc("preferences", "Your version of “%1” is up to date.")
                           .arg(languagesService()->language(languageCode).name);
             interactive()->info(msg.toStdString(), std::string());
         }
@@ -97,7 +98,7 @@ QVariantList GeneralPreferencesModel::languages() const
 
     QVariantMap systemLanguageObj;
     systemLanguageObj["code"] = SYSTEM_LANGUAGE_CODE;
-    systemLanguageObj["name"] = muse::qtrc("appshell/preferences", "System default");
+    systemLanguageObj["name"] = muse::qtrc("preferences", "System default");
     result.prepend(systemLanguageObj);
 
     return result;
@@ -180,7 +181,7 @@ QString GeneralPreferencesModel::availableSpace() const
     QString path = projectConfiguration()->temporaryDir().toQString();
     QStorageInfo storage(path);
 
-    QString msg = muse::qtrc("appshell/preferences", "%1 GB")
+    QString msg = muse::qtrc("preferences", "%1 GB")
                   .arg(QString::number(storage.bytesAvailable() / (1024 * 1024 * 1024)));
 
     return msg;
@@ -200,8 +201,8 @@ void GeneralPreferencesModel::setTemporaryDir(const QString& path)
     auto newPath = muse::io::path_t(path);
     projectConfiguration()->setTemporaryDir(newPath);
 
-    QString title = muse::qtrc("appshell/preferences", "Temp directory update");
-    QString msg = muse::qtrc("appshell/preferences", "Changes to temporary directory will not take effect until Audacity is restarted");
+    QString title = muse::qtrc("preferences", "Temp directory update");
+    QString msg = muse::qtrc("preferences", "Changes to temporary directory will not take effect until Audacity is restarted");
     interactive()->info(title.toStdString(), msg.toStdString());
 }
 

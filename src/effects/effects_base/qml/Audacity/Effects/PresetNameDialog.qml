@@ -20,7 +20,8 @@ StyledDialogView {
     readonly property string trimmedName: input.currentText.trim()
     readonly property string invalidReason: {
         if (/[\/\\]/.test(trimmedName)) {
-            return qsTrc("effects", "Preset name cannot contain / or \\")
+            //: %1 is a forward slash, %2 is a backslash; neither character is allowed in a preset name.
+            return qsTrc("effects", "Preset name cannot contain %1 or %2").arg("/").arg("\\")
         }
         return ""
     }
@@ -85,7 +86,9 @@ StyledDialogView {
 
         text: root.invalidReason
         color: ui.theme.extra["error_text_color"]
-        font: Qt.font(Object.assign({}, ui.theme.bodyFont, { pointSize: ui.theme.bodyFont.pointSize - 1 }))
+        font: Qt.font(Object.assign({}, ui.theme.bodyFont, {
+            pointSize: ui.theme.bodyFont.pointSize - 1
+        }))
     }
 
     ButtonBox {

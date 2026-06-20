@@ -40,6 +40,10 @@ endif()
 add_subdirectory(context)
 add_subdirectory(project)
 
+if (AU_BUILD_USAGEINFO_MODULE)
+    add_subdirectory(usageinfo)
+endif()
+
 if (AU_BUILD_PROJECTSCENE_MODULE)
    add_subdirectory(projectscene)
 endif()

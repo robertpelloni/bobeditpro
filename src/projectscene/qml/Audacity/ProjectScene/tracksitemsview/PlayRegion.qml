@@ -44,7 +44,6 @@ Rectangle {
         }
     }
 
-
     PlayRegionModel {
         id: playRegionModel
     }

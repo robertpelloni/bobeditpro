@@ -49,7 +49,6 @@ Rectangle {
         spacing: 16
         columns: 2
 
-
         FlatButton {
             width: 200
             navigation.panel: navPanel

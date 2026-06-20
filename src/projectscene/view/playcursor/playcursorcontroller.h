@@ -22,6 +22,7 @@
 #pragma once
 
 #include <QObject>
+#include <QTimer>
 
 #include "global/async/asyncable.h"
 
@@ -33,7 +34,7 @@
 #include "../timeline/timelinecontext.h"
 
 namespace au::projectscene {
-class PlayCursorController : public QObject, public muse::async::Asyncable
+class PlayCursorController : public QObject, public muse::async::Asyncable, public muse::Contextable
 {
     Q_OBJECT
 
@@ -41,8 +42,9 @@ class PlayCursorController : public QObject, public muse::async::Asyncable
 
     Q_PROPERTY(double positionX READ positionX NOTIFY positionXChanged FINAL)
 
-    muse::Inject<context::IGlobalContext> globalContext;
-    muse::Inject<muse::actions::IActionsDispatcher> dispatcher;
+    muse::ContextInject<context::IGlobalContext> globalContext{ this };
+    muse::ContextInject<record::IRecordController> recordController{ this };
+    muse::ContextInject<muse::actions::IActionsDispatcher> dispatcher{ this };
 
 public:
     PlayCursorController(QObject* parent = nullptr);
@@ -64,11 +66,20 @@ private slots:
 
 private:
     context::IPlaybackStatePtr playbackState() const;
-    projectscene::IProjectViewStatePtr projectViewState() const;
 
     void updatePositionX(muse::secs_t secs);
+    void ensureCursorAtCenter(muse::secs_t secs) const;
+
+    void onUserHorizontalScroll();
+    void onScrollSuppressionTimeout();
+    void clearScrollSuppression();
 
     TimelineContext* m_context = nullptr;
     double m_positionX = 0.0;
+
+    QTimer m_scrollSuppressionTimer;
+    bool m_viewUpdatesSuppressed = false;
+
+    friend struct SnapTestAccess;
 };
 }

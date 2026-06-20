@@ -30,9 +30,15 @@ using namespace muse::actions;
 static const ActionQuery PLAYBACK_SEEK_QUERY("action://playback/seek");
 static const ActionQuery PLAYBACK_CHANGE_PLAY_REGION_QUERY("action://playback/play-region-change");
 
+static constexpr int SCROLL_SUPPRESSION_TIMEOUT_MS = 3000;
+static constexpr double ANIMATION_DURATION_SEC = TimelineContext::ANIMATION_DURATION_MS / 1000.0;
+
 PlayCursorController::PlayCursorController(QObject* parent)
-    : QObject(parent)
+    : QObject(parent), muse::Contextable(muse::iocCtxForQmlObject(this))
 {
+    m_scrollSuppressionTimer.setSingleShot(true);
+    m_scrollSuppressionTimer.setInterval(SCROLL_SUPPRESSION_TIMEOUT_MS);
+    connect(&m_scrollSuppressionTimer, &QTimer::timeout, this, &PlayCursorController::onScrollSuppressionTimeout);
 }
 
 void PlayCursorController::init()
@@ -41,8 +47,10 @@ void PlayCursorController::init()
         updatePositionX(secs);
     });
 
-    globalContext()->recordPositionChanged().onReceive(this, [this](muse::secs_t secs){
-        updatePositionX(secs);
+    playbackState()->playbackStatusChanged().onReceive(this, [this](playback::PlaybackStatus status) {
+        if (status == playback::PlaybackStatus::Running) {
+            clearScrollSuppression(); // so that the cursor is immediately updated when playback starts
+        }
     });
 }
 
@@ -53,10 +61,7 @@ void PlayCursorController::seekToX(double x, bool triggerPlay)
         return;
     }
 
-    const IProjectViewStatePtr viewState = projectViewState();
-    const bool snapEnabled = viewState ? viewState->isSnapEnabled() : false;
-
-    const double secs = m_context->positionToTime(x, snapEnabled);
+    const double secs = m_context->positionToTime(x, /*withSnap*/ true);
     muse::actions::ActionQuery q(PLAYBACK_SEEK_QUERY);
     q.addParam("triggerPlay", muse::Val(triggerPlay));
     if (muse::RealIsEqualOrMore(secs, 0.0)) {
@@ -70,11 +75,8 @@ void PlayCursorController::seekToX(double x, bool triggerPlay)
 
 void PlayCursorController::setPlaybackRegion(double x1, double x2)
 {
-    const IProjectViewStatePtr viewState = projectViewState();
-    const bool snapEnabled = viewState ? viewState->isSnapEnabled() : false;
-
-    const double start = std::max(0.0, m_context->positionToTime(x1, snapEnabled));
-    const double end = std::max(0.0, m_context->positionToTime(x2, snapEnabled));
+    const double start = std::max(0.0, m_context->positionToTime(x1, /*withSnap*/ true));
+    const double end = std::max(0.0, m_context->positionToTime(x2, /*withSnap*/ true));
 
     muse::actions::ActionQuery q(PLAYBACK_CHANGE_PLAY_REGION_QUERY);
     q.addParam("start", muse::Val(start));
@@ -87,19 +89,47 @@ au::context::IPlaybackStatePtr PlayCursorController::playbackState() const
     return globalContext()->playbackState();
 }
 
-IProjectViewStatePtr PlayCursorController::projectViewState() const
-{
-    project::IAudacityProjectPtr project = globalContext()->currentProject();
-    return project ? project->viewState() : nullptr;
-}
-
 void PlayCursorController::updatePositionX(muse::secs_t secs)
 {
     if (m_positionX == m_context->timeToPosition(secs)) {
         return;
     }
 
-    m_context->insureVisible(secs);
+    const bool isPlayingOrRecording = playbackState()->isPlaying() || globalContext()->isRecording();
+
+    if (isPlayingOrRecording) {
+        const bool updateDisplayWhilePlaying = m_context->updateDisplayWhilePlayingEnabled();
+        const bool pinnedPlayHead = m_context->pinnedPlayHeadEnabled();
+
+        if (updateDisplayWhilePlaying && !m_viewUpdatesSuppressed && !m_context->isAnimating()) {
+            const double halfFrameDuration = (m_context->frameEndTime() - m_context->frameStartTime()) * 0.5;
+            const bool zoomTooClose = halfFrameDuration < ANIMATION_DURATION_SEC;
+
+            if (pinnedPlayHead) {
+                if (secs < m_context->frameStartTime() || secs > m_context->frameEndTime()) {
+                    if (zoomTooClose) {
+                        ensureCursorAtCenter(secs);
+                    } else {
+                        double predictedSecs = secs + ANIMATION_DURATION_SEC;
+                        m_context->animatedCenterOnTime(predictedSecs);
+                    }
+                } else {
+                    ensureCursorAtCenter(secs);
+                }
+            } else {
+                double predictedSecs = secs + ANIMATION_DURATION_SEC;
+                if (predictedSecs < m_context->frameStartTime() || predictedSecs > m_context->frameEndTime()) {
+                    if (zoomTooClose) {
+                        m_context->insureVisible(secs);
+                    } else {
+                        m_context->animatedInsureVisible(predictedSecs);
+                    }
+                }
+            }
+        }
+    } else {
+        m_context->insureVisible(secs);
+    }
 
     m_positionX = m_context->timeToPosition(secs);
     emit positionXChanged();
@@ -139,7 +169,40 @@ void PlayCursorController::setTimelineContext(TimelineContext* newContext)
 
     if (m_context) {
         connect(m_context, &TimelineContext::frameTimeChanged, this, &PlayCursorController::onFrameTimeChanged);
+        connect(m_context, &TimelineContext::userHorizontalScrolled, this, &PlayCursorController::onUserHorizontalScroll);
+        connect(m_context, &TimelineContext::updateDisplayWhilePlayingEnabledChanged, this, [this]() {
+            if (m_context->updateDisplayWhilePlayingEnabled()) {
+                clearScrollSuppression();
+            }
+        });
     }
 
     emit timelineContextChanged();
+}
+
+void PlayCursorController::ensureCursorAtCenter(muse::secs_t secs) const
+{
+    m_context->centerOnTime(secs);
+}
+
+void PlayCursorController::onUserHorizontalScroll()
+{
+    const bool isPlayingOrRecording = playbackState()->isPlaying() || globalContext()->isRecording();
+    if (!isPlayingOrRecording || !m_context->updateDisplayWhilePlayingEnabled()) {
+        return;
+    }
+
+    m_viewUpdatesSuppressed = true;
+    m_scrollSuppressionTimer.start();
+}
+
+void PlayCursorController::onScrollSuppressionTimeout()
+{
+    m_viewUpdatesSuppressed = false;
+}
+
+void PlayCursorController::clearScrollSuppression()
+{
+    m_scrollSuppressionTimer.stop();
+    m_viewUpdatesSuppressed = false;
 }

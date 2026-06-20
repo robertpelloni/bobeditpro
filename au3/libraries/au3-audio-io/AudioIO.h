@@ -204,6 +204,8 @@ public:
 
     bool FillOutputBuffers(
         float* outputFloats, unsigned long framesPerBuffer, float* outputMeterFloats);
+    constSamplePtr ApplyRecordGain(
+        constSamplePtr inputBuffer, float gain, size_t numSamples, samplePtr scratch);
     void DrainInputBuffers(
         constSamplePtr inputBuffer, unsigned long framesPerBuffer, const PaStreamCallbackFlags statusFlags, float* tempFloats);
     void UpdateTimePosition(
@@ -268,6 +270,7 @@ public:
     std::vector<std::unique_ptr<Mixer> > mPlaybackMixers;
 
     std::atomic<float> mMixerOutputVol{ 1.0 };
+    std::atomic<float> mSoftwareRecordGain{ 1.0 };
     static int mNextStreamToken;
     double mFactor;
     unsigned long mMaxFramesOutput;      // The actual number of frames output.
@@ -336,6 +339,16 @@ protected:
     void SetMixerOutputVol(float value)
     {
         mMixerOutputVol.store(value, std::memory_order_relaxed);
+    }
+
+    float GetSoftwareRecordGain()
+    {
+        return mSoftwareRecordGain.load(std::memory_order_relaxed);
+    }
+
+    void SetSoftwareRecordGain(float value)
+    {
+        mSoftwareRecordGain.store(value, std::memory_order_relaxed);
     }
 
     /*! Pointer is read by a worker thread but unchanging during playback.

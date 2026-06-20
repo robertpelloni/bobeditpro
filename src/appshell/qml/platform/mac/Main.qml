@@ -34,7 +34,7 @@ AppWindow {
     }
 
     Component.onCompleted: {
-        menuBar.load();
+        menuBar.load()
         window.init()
     }
 
