@@ -149,6 +149,7 @@ bool au::importexport::Au3Importer::import(const muse::io::path_t& filePath)
         if (!success) {
             return false;
         }
+    } // ImportProgress (and its dialog) destroyed here, before tempo detection
 
     const auto projectTempo = ProjectTimeSignature::Get(*project).GetTempo();
     for (auto track : newTracks) {
@@ -206,6 +207,7 @@ bool au::importexport::Au3Importer::importIntoTrack(const muse::io::path_t& file
     if (!ok || tmpTracks.empty()) {
         return false;
     }
+    } // ImportProgress (and its dialog) destroyed here, before tempo detection
 
     std::vector<ITrackDataPtr> importedData;
     std::vector<WaveTrack*> importedWaveTracks;
