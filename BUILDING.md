@@ -13,9 +13,7 @@
   * Qt 5 Compatibility Module
   * Qt Network Authorization
   * Qt Shader Tools
-  * Qt WebSockets
-  * Qt Graphs
-  * Qt Quick 3D
+  * Qt State Machines
 
 NB: Bear in mind that, by default, only the latest version of Qt is available for installation. To view older versions, click 'Show > Archive' in the top-right corner of the Qt Online Installer, next to the search bar.
 

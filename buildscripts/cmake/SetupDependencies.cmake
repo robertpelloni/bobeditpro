@@ -79,6 +79,8 @@ populate(ogg "ogg/1.3.5")
 populate(opus "opus/1.5.2")
 populate(opusfile "opusfile/0.12")
 
+<<<<<<< HEAD
+=======
 if (NOT OS_IS_WIN)
     populate(openssl "openssl/1.1.1t")
 endif()
@@ -87,6 +89,7 @@ if (AU_USE_LIBCURL)
     populate(libcurl "libcurl/8.17.0")
 endif()
 
+>>>>>>> upstream/master
 if (NOT OS_IS_LIN)
     populate(zlib "zlib/1.2.13")
 endif()

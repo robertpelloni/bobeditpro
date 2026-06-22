@@ -52,7 +52,10 @@ void BuiltinEffectModel::modifySettings(const std::function<void(EffectSettings&
         --m_selfNotificationDepth;
     };
     instancesRegister()->notifyAboutSettingsChanged(m_instanceId);
+}
+
 void BuiltinEffectModel::doStopPreview()
+{
     executionScenario()->stopPreview();
 }
 

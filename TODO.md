@@ -1,6 +1,6 @@
 # TODO
 
-1. Remove `msecs_t` alias where marked obsolete (`playbacktypes.h:11`) and replace usages across the codebase.
-2. Implement contextual right-click actions over empty track space (`TracksItemsView.qml:484`).
-3. Create `AudacityStyleMetrics.qml` singleton to handle all dimension variables.
-4. Abstract audio clock interfaces into `au::time::math`.
+1.  **Extract `effectsSectionWidth`** in `src/projectscene/qml/Audacity/ProjectScene/trackspanel/TracksPanel.qml` to a reusable QML constant (High Priority).
+2.  Fix Qt6 dependency failures on CI and update `BUILDING.md` / `DEPLOY.md` to cleanly outline the local setup commands for Qt6 in a Dockerized environment.
+3.  Fix multi-channel drag and drop import (`au3importer.cpp:190`).
+4.  Remove `msecs_t` alias where marked obsolete (`playbacktypes.h:11`).

@@ -1,15 +1,5 @@
 # Changelog
 
-## [3.7.5] - 2026-06-18
-### Changed
-- Replaced Qt6 modules in documentation and CI configuration.
-
-### Fixed
-- Fixed multi-channel drag and drop import bug.
-
-### Documentation
-- Updated `TODO.md` and `ROADMAP.md` based on gap analysis.
-
 ## [3.7.4] - 2024-05-22
 ### Added
 - **Mixer View (WIP):** Scaffolding for a dedicated Mixer Board view.

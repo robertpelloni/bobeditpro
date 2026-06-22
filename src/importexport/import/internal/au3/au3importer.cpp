@@ -149,7 +149,6 @@ bool au::importexport::Au3Importer::import(const muse::io::path_t& filePath)
         if (!success) {
             return false;
         }
-    } // ImportProgress (and its dialog) destroyed here, before tempo detection
 
     const auto projectTempo = ProjectTimeSignature::Get(*project).GetTempo();
     for (auto track : newTracks) {
@@ -204,15 +203,17 @@ bool au::importexport::Au3Importer::importIntoTrack(const muse::io::path_t& file
         errorMessage
         );
 
-        if (!ok || tmpTracks.empty()) {
-            return false;
-        }
-    } // ImportProgress (and its dialog) destroyed here, before tempo detection
+    if (!ok || tmpTracks.empty()) {
+        return false;
+    }
 
     std::vector<ITrackDataPtr> importedData;
     std::vector<WaveTrack*> importedWaveTracks;
     for (auto& holder : tmpTracks) {
         importedData.push_back(std::make_shared<Au3TrackData>(holder));
+        // TODO: implement multi-channel, multi-file drag&drop import
+        // for now, simply import first of the streams
+        break;
     }
 
     WaveTrack* dstWaveTrack = DomAccessor::findWaveTrack(*project, ::TrackId(dstTrackId));
@@ -229,10 +230,6 @@ bool au::importexport::Au3Importer::importIntoTrack(const muse::io::path_t& file
 }
 
 void au::importexport::Au3Importer::addImportedTracks(const muse::io::path_t& fileName, TrackHolders&& newTracks)
-{
-    addImportedTracks(fileName, std::move(newTracks), nullptr);
-}
-
 bool au::importexport::Au3Importer::importFromSystemClipboard(
     const std::vector<muse::io::path_t>& filePaths, muse::secs_t startTime)
 {

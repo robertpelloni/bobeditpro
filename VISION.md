@@ -15,6 +15,3 @@
 - **QML Frontend:** Modern, fluid interface.
 
 **"Don't Stop."**
-
-## Future Languages
-*   Consider Rust for Audio Processing to ensure memory safety in audio buffers.
