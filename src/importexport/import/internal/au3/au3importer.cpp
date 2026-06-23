@@ -204,10 +204,11 @@ bool au::importexport::Au3Importer::importIntoTrack(const muse::io::path_t& file
         errorMessage
         );
 
+    } // ImportProgress (and its dialog) destroyed here, before tempo detection
+
     if (!ok || tmpTracks.empty()) {
         return false;
     }
-    } // ImportProgress (and its dialog) destroyed here, before tempo detection
 
     std::vector<ITrackDataPtr> importedData;
     std::vector<WaveTrack*> importedWaveTracks;
