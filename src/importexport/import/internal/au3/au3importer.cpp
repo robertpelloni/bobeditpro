@@ -191,24 +191,25 @@ bool au::importexport::Au3Importer::importIntoTrack(const muse::io::path_t& file
     auto newTags = oldTags->Duplicate();
     Tags::Set(*project, newTags);
     std::optional<LibFileFormats::AcidizerTags> acidTags;
-    TranslatableString errorMessage;
+    {
+        ImportProgress importProgress(*project);
+        TranslatableString errorMessage;
 
-    const bool ok = Importer::Get().Import(
-        *project,
-        wxFromString(filePath.toString()),
-        &importProgressListener,
-        &WaveTrackFactory::Get(*project),
-        tmpTracks,
-        newTags.get(),
-        acidTags,
-        errorMessage
-        );
+        const bool ok = Importer::Get().Import(
+            *project,
+            wxFromString(filePath.toString()),
+            &importProgress,
+            &WaveTrackFactory::Get(*project),
+            tmpTracks,
+            newTags.get(),
+            acidTags,
+            errorMessage
+            );
 
+        if (!ok || tmpTracks.empty()) {
+            return false;
+        }
     } // ImportProgress (and its dialog) destroyed here, before tempo detection
-
-    if (!ok || tmpTracks.empty()) {
-        return false;
-    }
 
     std::vector<ITrackDataPtr> importedData;
     std::vector<WaveTrack*> importedWaveTracks;
