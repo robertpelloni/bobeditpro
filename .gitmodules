@@ -1,5 +1,5 @@
 [submodule "muse_framework"]
-	path = muse_framework
+	path = muse
 	url = https://github.com/musescore/muse_framework.git
 [submodule "bobui"]
 	path = bobui
