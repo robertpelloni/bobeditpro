@@ -54,9 +54,9 @@ Item {
         Rectangle {
             anchors.fill: parent
 
-            color: "transparent"
+            color: TracksItemsViewConstants.transparentColor
             border.width: 1
-            border.color: "blue"
+            border.color: TracksItemsViewConstants.handleBorderBlue
 
             visible: debugRectsVisible
         }
@@ -67,17 +67,11 @@ Item {
             anchors.left: leftTrimHandle.left
             anchors.leftMargin: 2
 
-<<<<<<< HEAD
-            iconCode: IconCode.SMALL_ARROW_LEFT
-            font.pixelSize: 30
-            color: "black"
-=======
             iconCode: IconCode.TRIM_HANDLE_LEFT
-            font.pixelSize: 17
+            font.pixelSize: TracksItemsViewConstants.clipHandlesSmallIconSize
             color: ui.theme.extra["black_color"]
->>>>>>> upstream/master
             style: Text.Outline
-            styleColor: "white"
+            styleColor: TracksItemsViewConstants.handleWhite
 
             Rectangle {
                 height: 12
@@ -85,8 +79,8 @@ Item {
                 anchors.verticalCenter: leftArrow.verticalCenter
                 anchors.horizontalCenter: leftArrow.horizontalCenter
 
-                color: "transparent"
-                border.color: "red"
+                color: TracksItemsViewConstants.transparentColor
+                border.color: TracksItemsViewConstants.handleBorderRed
                 border.width: 1
 
                 visible: debugRectsVisible
@@ -218,9 +212,9 @@ Item {
         Rectangle {
             anchors.fill: parent
 
-            color: "transparent"
+            color: TracksItemsViewConstants.transparentColor
             border.width: 1
-            border.color: "blue"
+            border.color: TracksItemsViewConstants.handleBorderBlue
 
             visible: debugRectsVisible
         }
@@ -231,26 +225,20 @@ Item {
             anchors.right: rightTrimHandle.right
             anchors.rightMargin: 2
 
-<<<<<<< HEAD
-            iconCode: IconCode.SMALL_ARROW_RIGHT
-            font.pixelSize: 30
-            color: "black"
-=======
             iconCode: IconCode.TRIM_HANDLE_RIGHT
-            font.pixelSize: 17
+            font.pixelSize: TracksItemsViewConstants.clipHandlesSmallIconSize
             color: ui.theme.extra["black_color"]
->>>>>>> upstream/master
             style: Text.Outline
-            styleColor: "white"
+            styleColor: TracksItemsViewConstants.handleWhite
 
             Rectangle {
                 height: 12
                 width: 12
                 anchors.verticalCenter: rightArrow.verticalCenter
                 anchors.horizontalCenter: rightArrow.horizontalCenter
-                color: "transparent"
+                color: TracksItemsViewConstants.transparentColor
 
-                border.color: "red"
+                border.color: TracksItemsViewConstants.handleBorderRed
                 border.width: 1
 
                 visible: debugRectsVisible
@@ -383,9 +371,9 @@ Item {
         Rectangle {
             anchors.fill: parent
 
-            color: "transparent"
+            color: TracksItemsViewConstants.transparentColor
             border.width: 1
-            border.color: "blue"
+            border.color: TracksItemsViewConstants.handleBorderBlue
 
             visible: debugRectsVisible
         }
@@ -400,7 +388,7 @@ Item {
             anchors.left: leftTimecode.left
             anchors.leftMargin: 4
 
-            color: "black"
+            color: TracksItemsViewConstants.handleBlack
 
             StyledIconLabel {
                 id: leftClockIcon
@@ -408,17 +396,17 @@ Item {
                 anchors.centerIn: parent
 
                 iconCode: IconCode.CLOCK
-                font.pixelSize: 14
-                color: "white"
+                font.pixelSize: TracksItemsViewConstants.clipHandlesClockIconSize
+                color: TracksItemsViewConstants.handleWhite
 
                 Rectangle {
                     height: 12
                     width: 12
                     anchors.verticalCenter: leftClockIcon.verticalCenter
                     anchors.horizontalCenter: leftClockIcon.horizontalCenter
-                    color: "transparent"
+                    color: TracksItemsViewConstants.transparentColor
 
-                    border.color: "red"
+                    border.color: TracksItemsViewConstants.handleBorderRed
                     border.width: 1
 
                     visible: debugRectsVisible
@@ -478,7 +466,7 @@ Item {
                 y: -9
                 height: 30
                 width: 30
-                color: "transparent"
+                color: TracksItemsViewConstants.transparentColor
 
                 NavigationFocusBorder {
                     navigationCtrl: leftStretchNavCtrl
@@ -547,9 +535,9 @@ Item {
         Rectangle {
             anchors.fill: parent
 
-            color: "transparent"
+            color: TracksItemsViewConstants.transparentColor
             border.width: 1
-            border.color: "blue"
+            border.color: TracksItemsViewConstants.handleBorderBlue
             visible: debugRectsVisible
         }
 
@@ -563,24 +551,24 @@ Item {
             anchors.right: rightTimecode.right
             anchors.rightMargin: 4
 
-            color: "black"
+            color: TracksItemsViewConstants.handleBlack
 
             StyledIconLabel {
                 id: rightClockIcon
 
                 anchors.centerIn: parent
                 iconCode: IconCode.CLOCK
-                font.pixelSize: 14
-                color: "white"
+                font.pixelSize: TracksItemsViewConstants.clipHandlesClockIconSize
+                color: TracksItemsViewConstants.handleWhite
 
                 Rectangle {
                     height: 12
                     width: 12
                     anchors.verticalCenter: rightClockIcon.verticalCenter
                     anchors.horizontalCenter: rightClockIcon.horizontalCenter
-                    color: "transparent"
+                    color: TracksItemsViewConstants.transparentColor
 
-                    border.color: "red"
+                    border.color: TracksItemsViewConstants.handleBorderRed
                     border.width: 1
                     visible: debugRectsVisible
                 }
@@ -638,7 +626,7 @@ Item {
                     y: -8
                     height: 30
                     width: 30
-                    color: "transparent"
+                    color: TracksItemsViewConstants.transparentColor
 
                     NavigationFocusBorder {
                         navigationCtrl: rightStretchNavCtrl
@@ -706,7 +694,7 @@ Item {
             when: leftTrimMa.containsMouse
             PropertyChanges {
                 target: leftArrow
-                font.pixelSize: 22
+                font.pixelSize: TracksItemsViewConstants.clipHandlesHeaderIconSize
             }
             PropertyChanges {
                 target: leftArrow
@@ -718,7 +706,7 @@ Item {
             when: rightTrimMa.containsMouse
             PropertyChanges {
                 target: rightArrow
-                font.pixelSize: 22
+                font.pixelSize: TracksItemsViewConstants.clipHandlesHeaderIconSize
             }
             PropertyChanges {
                 target: rightArrow
@@ -730,7 +718,7 @@ Item {
             when: leftTimeMa.containsMouse
             PropertyChanges {
                 target: leftClockIcon
-                font.pixelSize: 18
+                font.pixelSize: TracksItemsViewConstants.clipHandlesHeaderSmallIconSize
             }
             PropertyChanges {
                 target: leftClock
@@ -742,7 +730,7 @@ Item {
             when: rightTimeMa.containsMouse
             PropertyChanges {
                 target: rightClockIcon
-                font.pixelSize: 18
+                font.pixelSize: TracksItemsViewConstants.clipHandlesHeaderSmallIconSize
             }
             PropertyChanges {
                 target: rightClock

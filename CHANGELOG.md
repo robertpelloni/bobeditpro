@@ -1,5 +1,11 @@
 # Changelog
 
+
+## [3.7.6] - 2026-06-23
+### Added
+- **UI Architecture:** Established QML Singleton pattern (`TracksItemsViewConstants.qml`) for centralized UI styling.
+- **Refactoring:** Replaced hardcoded magic values in `ClipHandles.qml`, `ClipPreview.qml`, `ClipItemPropertyButton.qml`, and `PlayCursorHead.qml` with singleton references.
+
 ## [3.7.4] - 2024-05-22
 ### Added
 - **Mixer View (WIP):** Scaffolding for a dedicated Mixer Board view.

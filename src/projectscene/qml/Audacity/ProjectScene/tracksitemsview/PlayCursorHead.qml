@@ -11,7 +11,7 @@ StyledIconLabel {
 
     iconCode: IconCode.PLAYHEAD_FILLED
 
-    font.pixelSize: 17
+    font.pixelSize: TracksItemsViewConstants.playCursorHeadOuterPixelSize
     color: "black"
 
     StyledIconLabel {
@@ -23,7 +23,7 @@ StyledIconLabel {
 
         iconCode: IconCode.PLAYHEAD_FILLED
 
-        font.pixelSize: 15
+        font.pixelSize: TracksItemsViewConstants.playCursorHeadInnerPixelSize
         color: "white"
     }
 

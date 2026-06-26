@@ -31,7 +31,7 @@ Item {
         anchors.bottom: parent.bottom
 
         visible: isDataSelected
-        color: "transparent"
+        color: TracksItemsViewConstants.itemsSelectionColor
     }
 
     MouseArea {

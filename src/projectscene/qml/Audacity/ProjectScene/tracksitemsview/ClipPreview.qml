@@ -17,19 +17,19 @@ Rectangle {
 
     radius: 4
     border.width: 1
-    border.color: "black"
+    border.color: TracksItemsViewConstants.clipPreviewBorderColor
 
-    color: "transparent"
+    color: TracksItemsViewConstants.clipPreviewTransparent
 
     Rectangle {
         id: borderRect
 
         anchors.fill: parent
         anchors.margins: 1
-        color: "transparent"
+        color: TracksItemsViewConstants.clipPreviewTransparent
 
         border.width:  1
-        border.color: "white"
+        border.color: TracksItemsViewConstants.clipPreviewWhite
         radius: 4
 
         Rectangle {
@@ -37,7 +37,7 @@ Rectangle {
 
             anchors.fill: parent
             anchors.margins: 1
-            color: "white"
+            color: TracksItemsViewConstants.clipPreviewWhite
             opacity: 0.3
 
             radius: 4
