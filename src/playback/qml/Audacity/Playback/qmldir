@@ -12,3 +12,5 @@ PlaybackLevel 1.0 toolbars/PlaybackLevel.qml
 PlaybackMeterPanel 1.0 panels/PlaybackMeterPanel.qml
 
 LoopRegionInOut 1.0 dialogs/LoopRegionInOut.qml
+
+singleton PlaybackConstants 1.0 components/PlaybackConstants.qml

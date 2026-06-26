@@ -52,12 +52,12 @@ Item {
                     id: aLabel
                     text: root.meterModel.sampleToText(modelData)
                     color: ui.theme.fontPrimaryColor
-                    font.pixelSize: 10
+                    font.pixelSize: PlaybackConstants.horizontalVolumePressureRulerFontSize
                 }
             }
         }
     }
     
-    Text { id: leftText; text: "0.00"; font.pixelSize: 10; visible: false }
-    Text { id: rightText; text: "1.00"; font.pixelSize: 10; visible: false }
+    Text { id: leftText; text: "0.00"; font.pixelSize: PlaybackConstants.horizontalVolumePressureRulerFontSize; visible: false }
+    Text { id: rightText; text: "1.00"; font.pixelSize: PlaybackConstants.horizontalVolumePressureRulerFontSize; visible: false }
 }
