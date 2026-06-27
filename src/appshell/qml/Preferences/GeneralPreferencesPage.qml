@@ -166,8 +166,6 @@ PreferencesPage {
 
             availableSpace: preferencesModel.availableSpace
         }
-<<<<<<< HEAD:src/appshell/qml/Preferences/GeneralPreferencesPage.qml
-=======
 
         SeparatorLine { }
 
@@ -183,6 +181,5 @@ PreferencesPage {
                 }
             }
         }
->>>>>>> upstream/master:src/preferences/qml/Audacity/Preferences/GeneralPreferencesPage.qml
     }
 }

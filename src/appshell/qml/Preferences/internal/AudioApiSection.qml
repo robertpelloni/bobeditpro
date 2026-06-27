@@ -42,15 +42,6 @@ BaseSection {
         id: playbackState
     }
 
-<<<<<<< HEAD:src/appshell/qml/Preferences/internal/AudioApiSection.qml
-    // /*
-    //  * TODO: https://github.com/musescore/MuseScore/issues/9807
-    ComboBoxWithTitle {
-        id: apiComboBox
-
-        title: qsTrc("appshell/preferences", "Host")
-        columnWidth: root.columnWidth
-=======
     Component.onCompleted: {
         playbackState.init()
     }
@@ -62,7 +53,6 @@ BaseSection {
         Column {
             width: root.columnWidth
             spacing: root.spacing
->>>>>>> upstream/master:src/preferences/qml/Audacity/Preferences/internal/AudioApiSection.qml
 
             ComboBoxWithTitle {
                 title: qsTrc("preferences", "Host")

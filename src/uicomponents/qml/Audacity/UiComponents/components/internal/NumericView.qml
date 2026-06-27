@@ -22,9 +22,6 @@ RowLayout {
     property color textColor: ui.theme.fontSecondaryColor
     property color backgroundColor: ui.theme.backgroundQuarternaryColor
 
-<<<<<<< HEAD
-    signal valueChangeRequested(var newValue)
-=======
     property NavigationControl navigation: NavigationControl {
         property bool triggerLocked: false
 
@@ -54,7 +51,6 @@ RowLayout {
 
     signal valueChangeRequested(var newValue)
     signal valueEditingFinished
->>>>>>> upstream/master
 
     height: 28
 
@@ -112,8 +108,6 @@ RowLayout {
                         color: root.textColor
                         enabled: root.enabled
 
-<<<<<<< HEAD
-=======
                         navigation.panel: root.navigation.panel
                         navigation.enabled: prv.isFieldsNavigationEnabled
                         navigation.row: root.navigation.row
@@ -134,22 +128,18 @@ RowLayout {
                             }
                         }
 
->>>>>>> upstream/master
                         onClicked: {
                             root.model.currentEditedFieldIndex = model.index
                         }
                     }
                 }
             }
-<<<<<<< HEAD
-=======
 
         }
 
         NavigationFocusBorder {
             navigationCtrl: root.navigation
             drawOutsideParent: false
->>>>>>> upstream/master
         }
     }
 
@@ -166,15 +156,11 @@ RowLayout {
         iconColor: root.textColor
         visible: root.showMenu
 
-<<<<<<< HEAD
-        onHandleMenuItem: function(itemId) {
-=======
         navigation.panel: root.navigation.panel
         navigation.row: root.navigation.row
         navigation.column: root.navigation.column + 1 + repeater.count + 1
 
         onHandleMenuItem: function (itemId) {
->>>>>>> upstream/master
             root.model.currentFormat = parseInt(itemId)
         }
     }

@@ -33,15 +33,15 @@ BuiltinEffectBase {
         Label {
             text: titleText;
             font.bold: true
-            font.pixelSize: 14
-            color: "white"
+            font.pixelSize: BuiltinEffectsConstants.headerFontSize
+            color: BuiltinEffectsConstants.textColorWhite
         }
 
         // Threshold
         Label {
             text: "Threshold: " + thresholdValue.toFixed(1) + " dB"
-            color: "#cccccc"
-            font.pixelSize: 11
+            color: BuiltinEffectsConstants.textColorGray
+            font.pixelSize: BuiltinEffectsConstants.smallLabelFontSize
             ToolTip.visible: thresholdMouse.containsMouse
             ToolTip.text: "Sets the level at which compression begins for the " + titleText + "."
             MouseArea { id: thresholdMouse; anchors.fill: parent; hoverEnabled: true }
@@ -56,8 +56,8 @@ BuiltinEffectBase {
         // Ratio
         Label {
             text: "Ratio: " + ratioValue.toFixed(1) + ":1"
-            color: "#cccccc"
-            font.pixelSize: 11
+            color: BuiltinEffectsConstants.textColorGray
+            font.pixelSize: BuiltinEffectsConstants.smallLabelFontSize
             ToolTip.visible: ratioMouse.containsMouse
             ToolTip.text: "Sets the amount of gain reduction applied when the signal exceeds the threshold."
             MouseArea { id: ratioMouse; anchors.fill: parent; hoverEnabled: true }
@@ -72,8 +72,8 @@ BuiltinEffectBase {
         // Attack
         Label {
             text: "Attack: " + attackValue.toFixed(1) + " ms"
-            color: "#cccccc"
-            font.pixelSize: 11
+            color: BuiltinEffectsConstants.textColorGray
+            font.pixelSize: BuiltinEffectsConstants.smallLabelFontSize
             ToolTip.visible: attackMouse.containsMouse
             ToolTip.text: "How quickly the compressor reacts after the signal exceeds the threshold."
             MouseArea { id: attackMouse; anchors.fill: parent; hoverEnabled: true }
@@ -88,8 +88,8 @@ BuiltinEffectBase {
         // Release
         Label {
             text: "Release: " + releaseValue.toFixed(1) + " ms"
-            color: "#cccccc"
-            font.pixelSize: 11
+            color: BuiltinEffectsConstants.textColorGray
+            font.pixelSize: BuiltinEffectsConstants.smallLabelFontSize
             ToolTip.visible: releaseMouse.containsMouse
             ToolTip.text: "How quickly the compressor stops reducing gain after the signal falls below the threshold."
             MouseArea { id: releaseMouse; anchors.fill: parent; hoverEnabled: true }
@@ -109,9 +109,9 @@ BuiltinEffectBase {
 
         Label {
             text: "Multiband Compressor"
-            font.pixelSize: 20
+            font.pixelSize: BuiltinEffectsConstants.largeIconFontSize
             font.bold: true
-            color: "white"
+            color: BuiltinEffectsConstants.textColorWhite
         }
 
         RowLayout {
@@ -169,7 +169,7 @@ BuiltinEffectBase {
         Rectangle {
             Layout.fillWidth: true
             height: 1
-            color: "#444444"
+            color: BuiltinEffectsConstants.panelBackgroundColor
         }
 
         RowLayout {
@@ -179,8 +179,8 @@ BuiltinEffectBase {
             ColumnLayout {
                 Label {
                     text: "Crossover 1 (Low/Mid): " + (root.model ? root.model.crossover1Freq.toFixed(0) : 200) + " Hz"
-                    color: "#cccccc"
-                    font.pixelSize: 12
+                    color: BuiltinEffectsConstants.textColorGray
+                    font.pixelSize: BuiltinEffectsConstants.labelFontSize
                     ToolTip.visible: c1Mouse.containsMouse
                     ToolTip.text: "Frequency separating the Low and Mid compression bands."
                     MouseArea { id: c1Mouse; anchors.fill: parent; hoverEnabled: true }
@@ -196,8 +196,8 @@ BuiltinEffectBase {
             ColumnLayout {
                 Label {
                     text: "Crossover 2 (Mid/High): " + (root.model ? root.model.crossover2Freq.toFixed(0) : 2000) + " Hz"
-                    color: "#cccccc"
-                    font.pixelSize: 12
+                    color: BuiltinEffectsConstants.textColorGray
+                    font.pixelSize: BuiltinEffectsConstants.labelFontSize
                     ToolTip.visible: c2Mouse.containsMouse
                     ToolTip.text: "Frequency separating the Mid and High compression bands."
                     MouseArea { id: c2Mouse; anchors.fill: parent; hoverEnabled: true }
@@ -213,8 +213,8 @@ BuiltinEffectBase {
             ColumnLayout {
                 Label {
                     text: "Make-up Gain: " + (root.model ? root.model.makeUpGain.toFixed(1) : 0) + " dB"
-                    color: "#cccccc"
-                    font.pixelSize: 12
+                    color: BuiltinEffectsConstants.textColorGray
+                    font.pixelSize: BuiltinEffectsConstants.labelFontSize
                     ToolTip.visible: gainMouse.containsMouse
                     ToolTip.text: "Global gain applied after all compression bands are summed to restore perceived loudness."
                     MouseArea { id: gainMouse; anchors.fill: parent; hoverEnabled: true }

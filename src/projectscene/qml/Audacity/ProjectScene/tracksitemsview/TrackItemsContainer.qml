@@ -29,8 +29,6 @@ Item {
     property bool selectionInProgress: false
     property bool hover: false
 
-<<<<<<< HEAD
-=======
     property bool isLeadInRecordingTrack: false
     property double leadInRecordingStartTime: 0
 
@@ -38,7 +36,6 @@ Item {
     required property bool selectionEditInProgress
     required property bool verticalSelectionEditInProgress
 
->>>>>>> upstream/master
     property alias bottomSeparatorHeight: sep.height
 
     property alias contentItem: contentLoader.item
@@ -58,11 +55,7 @@ Item {
     signal updateMoveActive(bool completed)
 
     signal seekToX(var x)
-<<<<<<< HEAD
-    signal insureVerticallyVisible(var top, var bottom)
-=======
     signal insureVerticallyVisible
->>>>>>> upstream/master
 
     signal handleTimeGuideline(real x, bool completed)
     signal triggerItemGuideline(real x, bool completed)

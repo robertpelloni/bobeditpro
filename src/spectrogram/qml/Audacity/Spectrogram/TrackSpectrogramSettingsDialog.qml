@@ -3,13 +3,8 @@
  */
 import QtQuick
 import Muse.UiComponents
-<<<<<<< HEAD:src/trackedit/qml/Audacity/TrackEdit/TrackSpectrogramSettingsDialog.qml
-import Audacity.TrackEdit
-import Preferences
-=======
 import Audacity.Preferences
 import Audacity.Spectrogram
->>>>>>> upstream/master:src/spectrogram/qml/Audacity/Spectrogram/TrackSpectrogramSettingsDialog.qml
 
 import "."
 

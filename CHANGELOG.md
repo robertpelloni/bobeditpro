@@ -1,6 +1,12 @@
 # Changelog
 
 
+
+## [3.7.7] - 2026-06-26
+### Added
+- **UI Architecture:** Extended QML Singleton pattern to Minimaps, ClipItems, Built-in Effects (`AdaptiveNoiseReduction`, `ParametricEQ`, `SpectralHeal`, `MultibandCompressor`), and Playback UI.
+- **Refactoring:** Replaced hardcoded sizes and colors with `TracksItemsViewConstants.qml`, `BuiltinEffectsConstants.qml`, and `PlaybackConstants.qml`.
+
 ## [3.7.6] - 2026-06-23
 ### Added
 - **UI Architecture:** Established QML Singleton pattern (`TracksItemsViewConstants.qml`) for centralized UI styling.

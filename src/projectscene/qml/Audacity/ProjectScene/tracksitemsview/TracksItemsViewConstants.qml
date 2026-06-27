@@ -42,4 +42,20 @@ QtObject {
     property int zIndexNormal: 0
     property int zIndexForeground: 10
     property int zIndexOverlay: 100
+
+    // Minimap Colors
+    property color minimapBackgroundColor: "#252525"
+    property color minimapBorderColor: "#1A1A1A"
+    property color minimapTrackColor: "#1E1E1E"
+    property color minimapClipColor: "#3A5A7A"
+    property color minimapViewportColor: "#40FFFFFF"
+    property color minimapViewportBorderColor: "#80FFFFFF"
+
+    // ClipItem Colors
+    property color clipItemBorderColor: "#000000"
+    property color clipItemInnerBorderColor: "white"
+    property color clipItemOverlayColor: "#000000"
+
+    // TracksItemsView Colors
+    property color tracksItemsViewSelectionColor: "#ABE7FF"
 }

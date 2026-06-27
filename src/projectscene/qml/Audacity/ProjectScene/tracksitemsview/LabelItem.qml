@@ -78,14 +78,11 @@ Item {
         header.edit()
     }
 
-<<<<<<< HEAD
-=======
     function openContextMenu() {
         root.requestSelected()
         labelContextMenuLoader.show(Qt.point(width - 4, 4), labelContextMenuModel.items)
     }
 
->>>>>>> upstream/master
     // Navigation support
     NavigationControl {
         id: navCtrl
@@ -282,12 +279,8 @@ Item {
             root.requestSingleSelected()
         }
 
-<<<<<<< HEAD
-        onContextMenuOpenRequested: function(x, y) {
-=======
         onContextMenuOpenRequested: function (x, y) {
             root.requestSelected()
->>>>>>> upstream/master
             labelContextMenuLoader.show(Qt.point(x, y), labelContextMenuModel.items)
         }
 

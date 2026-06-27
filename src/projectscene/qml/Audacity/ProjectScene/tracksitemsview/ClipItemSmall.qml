@@ -4,17 +4,13 @@ Rectangle {
 
     id: root
 
-<<<<<<< HEAD
-    property color clipColor: "#677CE4"
-=======
     required property color clipColor
     property color clipSelectedColor: clipColor
->>>>>>> upstream/master
     property bool collapsed: false
 
     //radius: 4
     border.width: 1
-    border.color: "#000000"
+    border.color: TracksItemsViewConstants.clipItemBorderColor
 
     color: ui.blendColors("#ffffff", root.clipColor, 0.9)
 

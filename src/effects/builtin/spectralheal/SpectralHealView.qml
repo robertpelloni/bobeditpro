@@ -18,15 +18,15 @@ BuiltinEffectBase {
 
         Text {
             text: "Spectral Healing Brush"
-            font.pixelSize: 24
-            color: "white"
+            font.pixelSize: BuiltinEffectsConstants.titleFontSize
+            color: BuiltinEffectsConstants.textColorWhite
         }
 
         Row {
             spacing: 20
 
             Column {
-                Text { text: "Center Freq (Hz)"; color: "white" }
+                Text { text: "Center Freq (Hz)"; color: BuiltinEffectsConstants.textColorWhite }
                 TextField {
                     text: root.effectModel ? root.effectModel.centerFreq.toString() : "1000"
                     width: 100
@@ -38,7 +38,7 @@ BuiltinEffectBase {
                 }
             }
             Column {
-                Text { text: "Bandwidth (Hz)"; color: "white" }
+                Text { text: "Bandwidth (Hz)"; color: BuiltinEffectsConstants.textColorWhite }
                 TextField {
                     text: root.effectModel ? root.effectModel.bandwidth.toString() : "200"
                     width: 100
@@ -50,7 +50,7 @@ BuiltinEffectBase {
                 }
             }
             Column {
-                Text { text: "Healing Strength (%)"; color: "white" }
+                Text { text: "Healing Strength (%)"; color: BuiltinEffectsConstants.textColorWhite }
                 TextField {
                     text: root.effectModel ? root.effectModel.healStrength.toString() : "100.0"
                     width: 100
@@ -65,8 +65,8 @@ BuiltinEffectBase {
 
         Text {
             text: "Interpolates spectral energy across masked frequency bands."
-            font.pixelSize: 14
-            color: "gray"
+            font.pixelSize: BuiltinEffectsConstants.headerFontSize
+            color: BuiltinEffectsConstants.textColorGrayLight
         }
     }
 }

@@ -13,8 +13,8 @@ Rectangle {
 
     width: parent.width
     height: 60
-    color: "#252525"
-    border.color: "#1A1A1A"
+    color: TracksItemsViewConstants.minimapBackgroundColor
+    border.color: TracksItemsViewConstants.minimapBorderColor
     border.width: 1
 
     // Mock representation of tracks
@@ -29,12 +29,12 @@ Rectangle {
             Rectangle {
                 width: parent.width
                 height: (root.height - 8 - (3 * 2)) / 4
-                color: "#1E1E1E"
+                color: TracksItemsViewConstants.minimapTrackColor
 
                 // Mock waveform blocks
-                Rectangle { x: 10; width: 50; height: parent.height; color: "#3A5A7A" }
-                Rectangle { x: 100; width: 150; height: parent.height; color: "#3A5A7A" }
-                Rectangle { x: 300; width: 20; height: parent.height; color: "#3A5A7A" }
+                Rectangle { x: 10; width: 50; height: parent.height; color: TracksItemsViewConstants.minimapClipColor }
+                Rectangle { x: 100; width: 150; height: parent.height; color: TracksItemsViewConstants.minimapClipColor }
+                Rectangle { x: 300; width: 20; height: parent.height; color: TracksItemsViewConstants.minimapClipColor }
             }
         }
     }
@@ -45,8 +45,8 @@ Rectangle {
         x: root.width * root.viewportPosition
         width: Math.max(20, root.width * root.viewportWidthScale)
         height: parent.height
-        color: "#40FFFFFF"
-        border.color: "#80FFFFFF"
+        color: TracksItemsViewConstants.minimapViewportColor
+        border.color: TracksItemsViewConstants.minimapViewportBorderColor
         border.width: 1
 
         // Draggable area

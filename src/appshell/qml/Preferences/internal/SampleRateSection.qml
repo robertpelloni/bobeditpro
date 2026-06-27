@@ -108,27 +108,6 @@ BaseSection {
         }
     }
 
-<<<<<<< HEAD:src/appshell/qml/Preferences/internal/SampleRateSection.qml
-    ComboBoxWithTitle {
-        title: qsTrc("appshell/preferences", "Default sample format")
-        columnWidth: root.columnWidth
-
-        enabled: !playbackState.isPlaying
-
-        currentIndex: indexOfValue(apiModel.defaultSampleFormat)
-        model: apiModel.defaultSampleFormatList
-
-        navigation.name: "DefaultSampleFormatBox"
-        navigation.panel: root.navigation
-        navigation.row: 2
-
-        onValueEdited: function(newIndex, newValue) {
-            apiModel.defaultSampleFormatSelected(newValue)
-        }
-    }
-
-=======
->>>>>>> upstream/master:src/preferences/qml/Audacity/Preferences/internal/SampleRateSection.qml
     StyledTextLabel {
         text: qsTrc("preferences", "Default sample rates and formats apply to newly created tracks only. " + "Recording into existing tracks will use the track’s sample rate and format instead.")
         width: root.width

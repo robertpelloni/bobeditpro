@@ -1,12 +1,12 @@
 # Session Handoff
 
 ## Completed in this session:
-- **CI / Build Fixes:** Fixed `.gitmodules` URL for `muse_framework`, path for `ci_fetch.cmake` in `.github/workflows/au4_check_codestyle.yml`, and resolved C++ syntax errors and git merge conflicts in `builtineffectmodel.cpp`, `au3importer.cpp`, `playpositionactioncontroller.h`, and `spectrogramview.h`.
-- **Phase 1 Initiation (UI Centralization):** Introduced `TracksItemsViewConstants.qml` as a Singleton to centralize QML values. Registered it in `qmldir`.
-- **Refactoring:** Replaced hardcoded sizes, colors, z-indexes, and transitions across `ClipHandles.qml`, `ClipPreview.qml`, `ClipItemPropertyButton.qml`, `PlayCursorHead.qml`, `PlaybackSeekLine.qml`, and `ItemsSelection.qml` with properties from `TracksItemsViewConstants`.
-- **Documentation:** Updated `VERSION.md` (to 3.7.6) and `CHANGELOG.md` to reflect these changes.
+- **Phase 1 (UI Centralization):** Introduced `TracksItemsViewConstants.qml`, `BuiltinEffectsConstants.qml`, and `PlaybackConstants.qml` as Singletons to centralize QML values.
+- **Refactoring:** Replaced hardcoded sizes, colors, z-indexes, and transitions across many QML files (e.g., `ClipHandles.qml`, `AdaptiveNoiseReductionView.qml`, `ParametricEQView.qml`, `SpectralHealView.qml`, `MultibandCompressorView.qml`, `VolumeSlider.qml`) with properties from the new Singletons.
+- **Merge Conflicts & Syntax Fixes:** Performed a repository-wide cleanup of lingering Git merge conflict markers (resolving dozens of conflicts across QML, QRC, CFG, and CMake files). Restored missing braces in C++ files (`au3importer.cpp`, `builtineffectmodel.cpp`) to fix build-breaking syntax errors.
+- **Documentation:** Updated `VERSION.md` (to 3.7.7), `CHANGELOG.md`, and added specific Linux Qt 6.9.1 build instructions to `DEPLOY.md`.
 
 ## Next steps (for the next model/session):
-- Expand the QML Singleton pattern to other views (e.g., `src/playback/qml/`, `src/appshell/qml/`).
-- Proceed with updating the UI logic. Continue following the Phase 1 roadmap instructions and ensuring robust UI representation.
+- Expand the QML Singleton pattern to remaining views if any hardcoded values are left (e.g., in `src/appshell/qml/`).
+- Proceed to Phase 3 of the roadmap: Fully wire backend audio processing elements (currently in C++) to the new frontend QML interfaces.
 - Push the local changes to the remote repository.

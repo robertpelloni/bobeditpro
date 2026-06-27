@@ -38,15 +38,11 @@ Row {
 
         enabled: selectionModel.isEnabled
 
-<<<<<<< HEAD
-        onStartValueChangeRequested: function(newValue) {
-=======
         navigationPanel: root.navigationPanel
         startAccessibleName: qsTrc("projectscene", "Selection start")
         endAccessibleName: qsTrc("projectscene", "Selection end")
 
         onStartValueChangeRequested: function (newValue) {
->>>>>>> upstream/master
             selectionModel.startTime = newValue
         }
 

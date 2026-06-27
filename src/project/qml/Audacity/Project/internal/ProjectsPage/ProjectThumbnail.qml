@@ -69,11 +69,7 @@ Item {
 
             Rectangle {
                 anchors.fill: parent
-<<<<<<< HEAD
-                color: "white"
-=======
                 color: ui.theme.backgroundSecondaryColor
->>>>>>> upstream/master
 
                 Image {
                     anchors.centerIn: parent

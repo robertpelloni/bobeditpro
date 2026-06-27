@@ -39,10 +39,6 @@ BaseSection {
         id: playbackState
     }
 
-<<<<<<< HEAD:src/appshell/qml/Preferences/internal/BufferAndLatencySection.qml
-    IncrementalPropertyControlWithTitle {
-        title: qsTrc("appshell/preferences", "Buffer length")
-=======
     Component.onCompleted: {
         playbackState.init()
     }
@@ -50,7 +46,6 @@ BaseSection {
     Row {
         width: parent.width
         spacing: root.spacing
->>>>>>> upstream/master:src/preferences/qml/Audacity/Preferences/internal/BufferAndLatencySection.qml
 
         Column {
             width: root.columnWidth
@@ -65,10 +60,6 @@ BaseSection {
                 columnWidth: root.columnWidth
                 spacing: root.columnSpacing
 
-<<<<<<< HEAD:src/appshell/qml/Preferences/internal/BufferAndLatencySection.qml
-        onValueEdited: function(newValue) {
-            apiModel.bufferLengthSelected(newValue)
-=======
                 //: Abbreviation of "milliseconds"
                 measureUnitsSymbol: qsTrc("global", "ms")
 
@@ -81,13 +72,8 @@ BaseSection {
                     apiModel.bufferLengthSelected(newValue)
                 }
             }
->>>>>>> upstream/master:src/preferences/qml/Audacity/Preferences/internal/BufferAndLatencySection.qml
         }
 
-<<<<<<< HEAD:src/appshell/qml/Preferences/internal/BufferAndLatencySection.qml
-    IncrementalPropertyControlWithTitle {
-        title: qsTrc("appshell/preferences", "Latency compensation")
-=======
         Column {
             width: root.columnWidth
             spacing: root.columnSpacing
@@ -110,36 +96,20 @@ BaseSection {
 
                     enabled: !playbackState.isPlaying && !apiModel.automaticCompensationEnabled
                     implicitWidth: 100
->>>>>>> upstream/master:src/preferences/qml/Audacity/Preferences/internal/BufferAndLatencySection.qml
 
                     //: Abbreviation of "milliseconds"
                     measureUnitsSymbol: qsTrc("global", "ms")
 
-<<<<<<< HEAD:src/appshell/qml/Preferences/internal/BufferAndLatencySection.qml
-        enabled: !playbackState.isPlaying
-
-        columnWidth: root.columnWidth
-        spacing: root.columnSpacing
-=======
                     navigation.name: "LatencyCompensationControl"
                     navigation.panel: root.navigation
                     navigation.row: 1
                     navigation.column: 1
->>>>>>> upstream/master:src/preferences/qml/Audacity/Preferences/internal/BufferAndLatencySection.qml
 
                     onValueEdited: function (newValue) {
                         apiModel.latencyCompensationSelected(newValue)
                     }
                 }
 
-<<<<<<< HEAD:src/appshell/qml/Preferences/internal/BufferAndLatencySection.qml
-        navigation.name: "LatencyCompensationControl"
-        navigation.panel: root.navigation
-        navigation.row: 2
-
-        onValueEdited: function(newValue) {
-            apiModel.latencyCompensationSelected(newValue)
-=======
                 CheckBox {
                     id: automaticCompensationCheckbox
 
@@ -156,7 +126,6 @@ BaseSection {
                     navigation.column: 2
                 }
             }
->>>>>>> upstream/master:src/preferences/qml/Audacity/Preferences/internal/BufferAndLatencySection.qml
         }
     }
 }
