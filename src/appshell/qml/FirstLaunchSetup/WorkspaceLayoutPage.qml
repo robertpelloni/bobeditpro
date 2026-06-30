@@ -48,7 +48,7 @@ DoublePage {
                 delegate: Rectangle {
                     border.color: modelData.selected ? ui.theme.accentColor : ui.theme.strokeColor
                     border.width: 1
-                    color: "transparent"
+                    color: AppShellConstants.transparentColor
                     height: 60
                     radius: 4
                     width: parent.width

@@ -85,3 +85,24 @@ Execute Ctrl+Shift+P and choose "CMake: Configure".
 
 Just **press F5**. It will build and install everything the first time, but afterwards it should be very fast, especially if you're using Ninja `:)`.
 
+
+## Qt6 Dependency Resolution (Phase 2)
+
+To successfully build the application, especially in CI environments, the following Qt 6.10.1 components are strictly required:
+
+*   **Qt 5 Compatibility Module** (`qt5compat`)
+*   **Qt Network Authorization** (`qtnetworkauth`)
+*   **Qt Shader Tools** (`qtshadertools`)
+*   **Qt WebSockets** (`qtwebsockets`)
+*   **Qt Graphs** (`qtgraphs`)
+*   **Qt Quick 3D** (`qtquick3d`)
+
+### Linux Installation (using aqtinstall)
+
+```bash
+pip install aqtinstall
+python -m aqt install-qt linux desktop 6.10.1 gcc_64 -m qt5compat qtnetworkauth qtshadertools qtwebsockets qtgraphs qtquick3d
+export CMAKE_PREFIX_PATH=/path/to/Qt/6.10.1/gcc_64:$CMAKE_PREFIX_PATH
+```
+
+Ensure `CMAKE_PREFIX_PATH` is set so CMake can accurately locate `Qt6Config.cmake` during the configuration phase.

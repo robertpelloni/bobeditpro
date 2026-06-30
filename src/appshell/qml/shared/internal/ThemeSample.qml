@@ -19,6 +19,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+import Audacity.AppShell
 import QtQuick 2.15
 import Muse.UiComponents 1.0
 
@@ -130,7 +131,7 @@ Rectangle {
     Rectangle {
         id: borderRect
         anchors.fill: parent
-        color: "transparent"
+        color: AppShellConstants.transparentColor
         radius: 2
         border.width: 1
         border.color: mouseArea.containsMouse ? root.theme.accentColor : root.theme.strokeColor

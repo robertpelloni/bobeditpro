@@ -107,7 +107,7 @@ StyledDialogView {
 
                     contentItem: StyledIconLabel {
                         iconCode: IconCode.CHEVRON_LEFT
-                        font.pixelSize: 30
+                        font.pixelSize: AppShellConstants.headerFontSize
                     }
 
                     navigation.panel: arrowButtonsPanel
@@ -157,7 +157,7 @@ StyledDialogView {
 
                     contentItem: StyledIconLabel {
                         iconCode: IconCode.CHEVRON_RIGHT
-                        font.pixelSize: 30
+                        font.pixelSize: AppShellConstants.headerFontSize
                     }
 
                     navigation.panel: arrowButtonsPanel

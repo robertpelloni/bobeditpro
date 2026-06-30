@@ -1,13 +1,14 @@
 /*
 * Audacity: A Digital Audio Editor
 */
+import Audacity.AppShell
 import QtQuick 2.7
 import Muse.Ui 1.0
 import Muse.UiComponents 1.0
 
 Rectangle {
 
-    color: "#71C2EF"
+    color: AppShellConstants.devToolsBackground
 
     NavigationSection {
         id: navSec

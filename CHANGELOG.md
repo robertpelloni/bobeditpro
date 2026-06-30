@@ -2,6 +2,17 @@
 
 
 
+
+
+## [3.7.19] - 2026-06-30
+### Added
+- **Build/CI:** Initiated Phase 2 by documenting Qt 6.10.1 module requirements in `BUILDING.md` and adding `.env.example`.
+
+## [3.7.18] - 2026-06-29
+### Added
+- **UI Architecture:** Extended QML Singleton pattern to `AppShellConstants.qml`.
+- **Refactoring:** Replaced hardcoded properties in AppShell DevTools and Setup dialogs with `AppShellConstants`.
+
 ## [3.7.7] - 2026-06-26
 ### Added
 - **UI Architecture:** Extended QML Singleton pattern to Minimaps, ClipItems, Built-in Effects (`AdaptiveNoiseReduction`, `ParametricEQ`, `SpectralHeal`, `MultibandCompressor`), and Playback UI.

@@ -1,6 +1,7 @@
 /*
 * Audacity: A Digital Audio Editor
 */
+import Audacity.AppShell
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import Muse.Ui 1.0
@@ -27,7 +28,7 @@ Rectangle {
             anchors.margins: 8
             verticalAlignment: Text.AlignVCenter
             text: "Last clicked: " + root.lastClickedInfo
-            color: "#000000"
+            color: AppShellConstants.devToolsBlack2
         }
     }
 
@@ -37,7 +38,7 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         height: 64
-        color: "#729fcf"
+        color: AppShellConstants.devToolsLightBlue2
 
         anchors.margins: ui.theme.navCtrlBorderWidth
 
@@ -78,7 +79,7 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         height: 64
-        color: "#ef2929"
+        color: AppShellConstants.devToolsRed
 
         anchors.margins: ui.theme.navCtrlBorderWidth
 
@@ -111,7 +112,7 @@ Rectangle {
         anchors.top: topTools.bottom
         anchors.bottom: parent.bottom
         width: 120
-        color: "#729fcf"
+        color: AppShellConstants.devToolsLightBlue2
 
         anchors.margins: ui.theme.navCtrlBorderWidth
 
@@ -143,7 +144,7 @@ Rectangle {
         anchors.top: topTools.bottom
         anchors.bottom: parent.bottom
         width: 120
-        color: "#8ae234"
+        color: AppShellConstants.devToolsGreen2
 
         anchors.margins: ui.theme.navCtrlBorderWidth
 
@@ -175,7 +176,7 @@ Rectangle {
         anchors.right: rightPanel.left
         anchors.top: topTools.bottom
         anchors.bottom: parent.bottom
-        color: "#ef2929"
+        color: AppShellConstants.devToolsRed
 
         anchors.margins: ui.theme.navCtrlBorderWidth
 

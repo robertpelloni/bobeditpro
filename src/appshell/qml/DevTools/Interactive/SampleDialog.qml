@@ -1,6 +1,7 @@
 /*
 * Audacity: A Digital Audio Editor
 */
+import Audacity.AppShell
 import QtQuick 2.15
 import Muse.Ui 1.0
 import Muse.UiComponents 1.0
@@ -9,7 +10,7 @@ StyledDialogView {
 
     id: root
 
-    property color color: "#444444"
+    property color color: AppShellConstants.devToolsDialogBackground
     property bool isApplyColor: false
 
     contentWidth: 400
