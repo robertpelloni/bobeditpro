@@ -101,7 +101,7 @@ Item {
                 width: parent.width - tick.width
                 height: 1
 
-                color: "#475157"
+                color: TracksItemsViewConstants.rulerDarkGray
 
                 visible: modelData.fullWidthTick
 
@@ -127,8 +127,8 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
 
                     text: rulerModel.sampleToText(modelData.value)
-                    color: "#F9F9FA"
-                    font.pixelSize: 11
+                    color: TracksItemsViewConstants.rulerLightGray
+                    font.pixelSize: TracksItemsViewConstants.rulerFontSize
 
                     font.bold: modelData.bold
 
@@ -147,7 +147,7 @@ Item {
 
                     width: 3
                     height: 1
-                    color: "#F4F5F9"
+                    color: TracksItemsViewConstants.rulerBgGray
 
                     visible: modelData.value < 0
 

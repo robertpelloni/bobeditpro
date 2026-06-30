@@ -1,3 +1,4 @@
+import Audacity.ProjectScene
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -61,7 +62,7 @@ Item {
             Layout.preferredHeight: root.height
 
             color: ui.theme.backgroundPrimaryColor
-            border.color: "transparent"
+            border.color: TracksItemsViewConstants.transparentColor
             border.width: padding
             visible: root.showEffectsSection
 

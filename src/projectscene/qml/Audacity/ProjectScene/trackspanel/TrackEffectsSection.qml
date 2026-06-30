@@ -99,7 +99,7 @@ Rectangle {
                 id: effectList
                 navigationPanel: root.navigationPanel
                 navigationOrderStart: trackEffectsPowerButton.navigation.order + 1
-                color: "transparent"
+                color: TracksItemsViewConstants.transparentColor
                 anchors.fill: parent
                 anchors.leftMargin: 4
                 onTrackEffectsActiveChanged: {

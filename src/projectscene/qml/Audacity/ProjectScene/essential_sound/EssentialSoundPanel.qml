@@ -1,3 +1,4 @@
+import Audacity.ProjectScene
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -8,7 +9,7 @@ Rectangle {
     id: root
     width: 300
     height: parent.height
-    color: "#1E1E1E"
+    color: TracksItemsViewConstants.essentialSoundBg
 
     property var essentialModel: null // Set from C++ backend via context property
 
@@ -19,9 +20,9 @@ Rectangle {
 
         Text {
             text: "Essential Sound"
-            font.pixelSize: 18
+            font.pixelSize: TracksItemsViewConstants.essentialSoundHeaderSize
             font.bold: true
-            color: "white"
+            color: TracksItemsViewConstants.cursorWhite
         }
 
         // Type selection
@@ -37,22 +38,22 @@ Rectangle {
         Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            color: "transparent"
+            color: TracksItemsViewConstants.transparentColor
 
             ColumnLayout {
                 anchors.fill: parent
                 spacing: 10
                 visible: root.essentialModel && root.essentialModel.audioType === "Dialogue"
 
-                Text { text: "Loudness"; color: "#AAAAAA"; font.bold: true }
+                Text { text: "Loudness"; color: TracksItemsViewConstants.essentialSoundTextLight; font.bold: true }
                 Button {
                     text: (root.essentialModel && root.essentialModel.isAutoMatched) ? "Auto-Matched (-23 LUFS)" : "Auto-Match"
                     onClicked: if(root.essentialModel) root.essentialModel.autoMatchLoudness()
                 }
 
-                Text { text: "Repair"; color: "#AAAAAA"; font.bold: true }
+                Text { text: "Repair"; color: TracksItemsViewConstants.essentialSoundTextLight; font.bold: true }
                 RowLayout {
-                    Text { text: "Reduce Reverb"; color: "white"; Layout.preferredWidth: 100 }
+                    Text { text: "Reduce Reverb"; color: TracksItemsViewConstants.cursorWhite; Layout.preferredWidth: 100 }
                     Slider {
                         from: 0.0; to: 10.0;
                         value: root.essentialModel ? root.essentialModel.reverbReduction : 0.0
@@ -60,9 +61,9 @@ Rectangle {
                     }
                 }
 
-                Text { text: "Clarity"; color: "#AAAAAA"; font.bold: true }
+                Text { text: "Clarity"; color: TracksItemsViewConstants.essentialSoundTextLight; font.bold: true }
                 RowLayout {
-                    Text { text: "Dynamics"; color: "white"; Layout.preferredWidth: 100 }
+                    Text { text: "Dynamics"; color: TracksItemsViewConstants.cursorWhite; Layout.preferredWidth: 100 }
                     Slider {
                         from: 0.0; to: 10.0;
                         value: root.essentialModel ? root.essentialModel.dynamics : 0.0
@@ -70,7 +71,7 @@ Rectangle {
                     }
                 }
                 RowLayout {
-                    Text { text: "EQ"; color: "white"; Layout.preferredWidth: 100 }
+                    Text { text: "EQ"; color: TracksItemsViewConstants.cursorWhite; Layout.preferredWidth: 100 }
                     Slider {
                         from: 0.0; to: 10.0;
                         value: root.essentialModel ? root.essentialModel.clarity : 0.0
@@ -84,7 +85,7 @@ Rectangle {
             Text {
                 anchors.centerIn: parent
                 text: "Select a clip to assign a tag."
-                color: "#666666"
+                color: TracksItemsViewConstants.essentialSoundTextDark
                 visible: !root.essentialModel || root.essentialModel.audioType === "None"
             }
         }

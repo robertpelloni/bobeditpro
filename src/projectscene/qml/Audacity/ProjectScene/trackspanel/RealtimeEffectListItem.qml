@@ -58,7 +58,7 @@ ListItemBlank {
     height: 24
     y: index * itemHeight + yOffset
     clip: false // should be true?
-    background.color: "transparent"
+    background.color: TracksItemsViewConstants.transparentColor
     hoverHitColor: "transparent"
 
     navigation.panel: root.navigationPanel

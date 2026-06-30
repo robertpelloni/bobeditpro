@@ -123,7 +123,7 @@ ListItemBlank {
             anchors.bottom: parent.bottom
             width: 9
 
-            color: "transparent"
+            color: TracksItemsViewConstants.transparentColor
         }
 
         ColumnLayout {
@@ -261,7 +261,7 @@ ListItemBlank {
         anchors.leftMargin: spacer.width
         anchors.bottomMargin: bottomSeparator.thickness
 
-        color: "transparent"
+        color: TracksItemsViewConstants.transparentColor
         border.width: 1
         border.color: ui.theme.strokeColor
 
@@ -273,7 +273,7 @@ ListItemBlank {
 
         anchors.bottom: parent.bottom
 
-        color: "transparent"
+        color: TracksItemsViewConstants.transparentColor
 
         thickness: 2
     }
@@ -289,9 +289,9 @@ ListItemBlank {
 
         visible: root.isFocused
 
-        color: "transparent"
+        color: TracksItemsViewConstants.transparentColor
 
-        border.color: "#7EB1FF"
+        border.color: TracksItemsViewConstants.containerBorderColor
         border.width: 2
 
         radius: 6

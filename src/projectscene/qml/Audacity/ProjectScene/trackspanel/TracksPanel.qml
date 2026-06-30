@@ -187,7 +187,7 @@ Item {
                 header: Rectangle {
                     height: 2
                     width: parent.width
-                    color: "transparent"
+                    color: TracksItemsViewConstants.transparentColor
                 }
 
                 footer: Item {

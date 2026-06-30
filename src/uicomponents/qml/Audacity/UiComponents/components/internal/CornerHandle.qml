@@ -1,3 +1,4 @@
+import Audacity.ProjectScene
 import QtQuick
 
 Rectangle {
@@ -14,8 +15,8 @@ Rectangle {
     required property int cornerId
     required property bool allowCursorShapeChange
 
-    color: "white"
-    border.color: "black"
+    color: TracksItemsViewConstants.cursorWhite
+    border.color: TracksItemsViewConstants.handleBlack
     border.width: 1
     width: size
     height: size

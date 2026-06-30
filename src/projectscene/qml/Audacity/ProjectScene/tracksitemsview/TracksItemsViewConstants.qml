@@ -67,4 +67,27 @@ QtObject {
     property color containerSelectionColor: "#ABE7FF"
     property color containerWhite: "#FFFFFF"
     property color containerBorderColor: "#7EB1FF"
+
+    // Ruler and Panel Colors
+    property color rulerDarkGray: "#475157"
+    property color rulerLightGray: "#F9F9FA"
+    property color rulerBgGray: "#F4F5F9"
+    property color essentialSoundBg: "#1E1E1E"
+    property color essentialSoundTextLight: "#AAAAAA"
+    property color essentialSoundTextDark: "#666666"
+
+    // Fonts
+    property int rulerFontSize: 11
+    property int volumeRulerFontSize: 10
+    property int essentialSoundHeaderSize: 18
+
+    // Extended Minimap/Preview Colors
+    property color previewGradientStart: "#00FFFFFF"
+    property color previewGradientMid: "#FFFFFFFF"
+    property color previewBlack: "black"
+    property color minimapTrackHighlight: "#0121C0"
+    property color minimapTrackWhite: "#FFFFFF"
+    property color verticalRulerTransparent: "transparent"
+    property color verticalRulerBlack: "#000000"
+    property color verticalRulerBorder: "#7EB1FF"
 }

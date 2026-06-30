@@ -32,6 +32,11 @@ set(qt_components
     Xml
     Svg
     Core5Compat
+    NetworkAuth
+    StateMachine
+    WebSockets
+    Graphs
+    Quick3D
 )
 
 set(QT_LIBRARIES
@@ -46,6 +51,11 @@ set(QT_LIBRARIES
     Qt::Xml
     Qt::Svg
     Qt::Core5Compat
+    Qt::NetworkAuth
+    Qt::StateMachine
+    Qt::WebSockets
+    Qt::Graphs
+    Qt::Quick3D
 )
 
 if(OS_IS_LIN)

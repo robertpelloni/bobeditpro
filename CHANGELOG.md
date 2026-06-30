@@ -5,6 +5,27 @@
 
 
 
+
+
+
+
+## [3.7.22] - 2026-06-30
+### Fixed
+- **UI Architecture:** Fixed missing QML property mappings and ensured `TracksItemsViewConstants` was fully implemented in `ChannelSpectralSelectionContainer` and `CornerHandle`.
+
+## [3.7.19] - 2026-06-30
+### Fixed
+- **Build:** Added missing Qt6 modules (`NetworkAuth`, `StateMachine`, `WebSockets`, `Graphs`, `Quick3D`) to `SetupBobUi.cmake` to resolve compilation failures in CI.
+
+## [3.7.22] - 2026-06-30
+### Fixed
+- **UI Architecture:** Added missing property declarations (`previewGradientStart`, `minimapTrackHighlight`, `verticalRulerTransparent`, etc.) to `TracksItemsViewConstants.qml` to prevent runtime `ReferenceError` bindings.
+
+## [3.7.21] - 2026-06-30
+### Added
+- **UI Architecture:** Extended QML Singleton pattern to `TracksItemsViewConstants.qml`.
+- **Refactoring:** Replaced hardcoded properties in `WaveformRuler`, `TracksTitleBar`, `TrackItem`, `VolumePressureRuler`, and `EssentialSoundPanel` with constants.
+
 ## [3.7.20] - 2026-06-30
 ### Added
 - **UI Architecture:** Extensively refactored `TracksItemsView` QML files to use `TracksItemsViewConstants.qml` for all dimensions and colors.

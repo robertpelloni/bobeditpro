@@ -19,6 +19,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+import Audacity.ProjectScene
 import QtQuick 2.15
 
 import Muse.Ui 1.0
@@ -40,7 +41,7 @@ Rectangle {
         id: topBackground
 
         anchors.fill: parent
-        color: "transparent"
+        color: TracksItemsViewConstants.transparentColor
     }
 
     Rectangle {
@@ -50,7 +51,7 @@ Rectangle {
 
         visible: root.highlight
 
-        color: "transparent"
+        color: TracksItemsViewConstants.transparentColor
 
         border.color: ui.theme.fontPrimaryColor
         border.width: ui.theme.navCtrlBorderWidth

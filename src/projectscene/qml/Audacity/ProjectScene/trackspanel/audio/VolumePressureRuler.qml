@@ -1,3 +1,4 @@
+import Audacity.ProjectScene
 import QtQuick 2.15
 
 import Muse.Ui 1.0
@@ -73,12 +74,12 @@ Item {
                     id: aLabel
                     text: root.meterModel.sampleToText(modelData)
                     color: ui.theme.fontPrimaryColor
-                    font.pixelSize: 10
+                    font.pixelSize: TracksItemsViewConstants.volumeRulerFontSize
                 }
             }
         }
     }
     
-    Text { id: topText; text: "0"; font.pixelSize: 10; visible: false }
-    Text { id: bottomText; text: "-60"; font.pixelSize: 10; visible: false }
+    Text { id: topText; text: "0"; font.pixelSize: TracksItemsViewConstants.volumeRulerFontSize; visible: false }
+    Text { id: bottomText; text: "-60"; font.pixelSize: TracksItemsViewConstants.volumeRulerFontSize; visible: false }
 }
