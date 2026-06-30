@@ -24,3 +24,5 @@ TrackRulerCustomizePopup 1.0 trackruler/TrackRulerCustomizePopup.qml
 WaveformRuler 1.0 trackruler/WaveformRuler.qml
 SpectrogramTrackRulers 1.0 trackruler/SpectrogramTrackRulers.qml
 singleton TracksItemsViewConstants 1.0 tracksitemsview/TracksItemsViewConstants.qml
+
+singleton GetEffectsConstants 1.0 toolbars/GetEffectsConstants.qml

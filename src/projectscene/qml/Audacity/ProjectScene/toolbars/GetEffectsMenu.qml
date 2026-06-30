@@ -27,17 +27,7 @@ Item {
         }
     }
 
-    QtObject {
-        id: prv
 
-        readonly property int spaceS: 4
-        readonly property int spaceM: 8
-        readonly property int spaceL: 12
-        readonly property int spaceXL: 16
-        readonly property int spaceXXL: 24
-
-        readonly property int tabHeight: 32
-    }
 
     Rectangle {
         id: background
@@ -49,8 +39,8 @@ Item {
         id: listView
 
         anchors.fill: parent
-        anchors.topMargin: prv.spaceM
-        anchors.bottomMargin: prv.spaceM
+        anchors.topMargin: GetEffectsConstants.spaceM
+        anchors.bottomMargin: GetEffectsConstants.spaceM
 
         clip: true
         spacing: 0
@@ -60,11 +50,11 @@ Item {
 
         delegate: PageTabButton {
             width: listView.width
-            height: prv.tabHeight
+            height: GetEffectsConstants.tabHeight
 
             orientation: Qt.Horizontal
-            spacing: prv.spaceM
-            leftPadding: prv.spaceL
+            spacing: GetEffectsConstants.spaceM
+            leftPadding: GetEffectsConstants.spaceL
 
             normalStateFont: ui.theme.bodyFont
             selectedStateFont: ui.theme.bodyBoldFont
