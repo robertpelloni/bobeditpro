@@ -1172,7 +1172,7 @@ Rectangle {
             width: 1
             height: splitToolController.singleTrack ? hoveredTrackHeight : content.height
 
-            color: "#0121C0"
+            color: TracksItemsViewConstants.minimapTrackHighlight
 
             visible: splitToolController.guidelineVisible
         }
@@ -1200,7 +1200,7 @@ Rectangle {
 
         width: 1
 
-        color: "#FFFFFF"
+        color: TracksItemsViewConstants.minimapTrackWhite
         opacity: 0.8
 
         visible: playRegionModel.active
@@ -1216,7 +1216,7 @@ Rectangle {
 
         width: 1
 
-        color: "#FFFFFF"
+        color: TracksItemsViewConstants.minimapTrackWhite
         opacity: 0.8
 
         visible: playRegionModel.active

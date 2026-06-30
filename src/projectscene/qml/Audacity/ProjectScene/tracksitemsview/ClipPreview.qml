@@ -67,9 +67,9 @@ Rectangle {
 
             gradient: Gradient {
                 orientation: Qt.Horizontal
-                GradientStop { position: 0.0; color: "#00FFFFFF" }
+                GradientStop { position: 0.0; color: TracksItemsViewConstants.previewGradientStart }
                 GradientStop { position: 0.4; color: ui.blendColors(ui.blendColors("transparent", "white", 0.3), ui.blendColors("transparent", root.clipColor, 0.4), 0.5)}
-                GradientStop { position: 1.0; color: "#00FFFFFF" }
+                GradientStop { position: 1.0; color: TracksItemsViewConstants.previewGradientStart }
             }
         }
 
@@ -86,9 +86,9 @@ Rectangle {
 
             gradient: Gradient {
                 orientation: Qt.Horizontal
-                GradientStop { position: 0.0; color: "#00FFFFFF" }
-                GradientStop { position: 0.4; color: "#FFFFFFFF" }
-                GradientStop { position: 1.0; color: "#00FFFFFF" }
+                GradientStop { position: 0.0; color: TracksItemsViewConstants.previewGradientStart }
+                GradientStop { position: 0.4; color: TracksItemsViewConstants.previewGradientMid }
+                GradientStop { position: 1.0; color: TracksItemsViewConstants.previewGradientStart }
             }
         }
 
@@ -120,7 +120,7 @@ Rectangle {
             anchors.rightMargin: 8
             horizontalAlignment: Qt.AlignLeft
 
-            color: "black"
+            color: TracksItemsViewConstants.previewBlack
         }
 
         Rectangle {
@@ -134,9 +134,9 @@ Rectangle {
 
             gradient: Gradient {
                 orientation: Qt.Horizontal
-                GradientStop { position: 0.0; color: "#00FFFFFF" }
+                GradientStop { position: 0.0; color: TracksItemsViewConstants.previewGradientStart }
                 GradientStop { position: 0.4; color: ui.blendColors("white", root.clipColor, 0.3) }
-                GradientStop { position: 1.0; color: "#00FFFFFF" }
+                GradientStop { position: 1.0; color: TracksItemsViewConstants.previewGradientStart }
             }
         }
     }

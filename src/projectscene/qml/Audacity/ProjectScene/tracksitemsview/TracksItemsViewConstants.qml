@@ -58,4 +58,13 @@ QtObject {
 
     // TracksItemsView Colors
     property color tracksItemsViewSelectionColor: "#ABE7FF"
+
+    // Cursor Colors
+    property color cursorBlack: "black"
+    property color cursorWhite: "white"
+
+    // Container Colors
+    property color containerSelectionColor: "#ABE7FF"
+    property color containerWhite: "#FFFFFF"
+    property color containerBorderColor: "#7EB1FF"
 }

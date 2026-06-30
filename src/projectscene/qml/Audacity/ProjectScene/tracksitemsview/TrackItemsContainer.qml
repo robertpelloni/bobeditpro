@@ -137,7 +137,7 @@ Item {
         anchors.bottomMargin: sep.thickness
 
         visible: root.isDataSelected
-        color: "#ABE7FF"
+        color: TracksItemsViewConstants.containerSelectionColor
         opacity: 0.3
     }
 
@@ -148,7 +148,7 @@ Item {
         anchors.bottomMargin: sep.thickness
         anchors.leftMargin: (canvas && canvas.anchors && canvas.anchors.leftMargin) ? -canvas.anchors.leftMargin : 0
 
-        color: "#FFFFFF"
+        color: TracksItemsViewConstants.containerWhite
         opacity: 0.10
 
         visible: root.isDataSelected || root.isTrackSelected
@@ -161,7 +161,7 @@ Item {
         anchors.bottomMargin: sep.thickness
         anchors.leftMargin: (canvas && canvas.anchors && canvas.anchors.leftMargin) ? -canvas.anchors.leftMargin : 0
 
-        color: "#FFFFFF"
+        color: TracksItemsViewConstants.containerWhite
         opacity: 0.05
     }
 
@@ -211,16 +211,16 @@ Item {
 
         visible: isTrackFocused
 
-        color: "transparent"
+        color: TracksItemsViewConstants.transparentColor
 
-        border.color: "#7EB1FF"
+        border.color: TracksItemsViewConstants.containerBorderColor
         border.width: 2
     }
 
     SeparatorLine {
         id: sep
 
-        color: "transparent"
+        color: TracksItemsViewConstants.transparentColor
         anchors.bottom: parent.bottom
         thickness: 2
     }

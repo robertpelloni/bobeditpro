@@ -4,6 +4,11 @@
 
 
 
+
+## [3.7.20] - 2026-06-30
+### Added
+- **UI Architecture:** Extensively refactored `TracksItemsView` QML files to use `TracksItemsViewConstants.qml` for all dimensions and colors.
+
 ## [3.7.19] - 2026-06-30
 ### Added
 - **Build/CI:** Initiated Phase 2 by documenting Qt 6.10.1 module requirements in `BUILDING.md` and adding `.env.example`.
