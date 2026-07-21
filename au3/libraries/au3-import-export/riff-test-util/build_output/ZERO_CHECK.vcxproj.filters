@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\hyper\workspace\bobeditpro\au3\libraries\au3-import-export\riff-test-util\build_output\CMakeFiles\7cc8da286a7ab44fc3d59b48f07f3542\generate.stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{82DEAADB-D2C3-342B-8250-2F7301A7BBDC}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
