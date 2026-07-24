@@ -1,2 +1,3 @@
 MixerBoard 1.0 MixerBoard.qml
 MixerChannelStrip 1.0 MixerChannelStrip.qml
+singleton MixerConstants 1.0 MixerConstants.qml

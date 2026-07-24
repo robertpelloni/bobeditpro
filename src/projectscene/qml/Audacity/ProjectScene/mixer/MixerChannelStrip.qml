@@ -31,17 +31,17 @@ Rectangle {
 
     color: ui.theme.backgroundSecondaryColor
     border.color: ui.theme.separatorColor
-    border.width: 1
+    border.width: MixerConstants.channelStripBorderWidth
 
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: 4
-        spacing: 8
+        anchors.margins: MixerConstants.channelStripMargins
+        spacing: MixerConstants.channelStripSpacing
 
         // Track Name
         StyledTextLabel {
             Layout.fillWidth: true
-            Layout.preferredHeight: 24
+            Layout.preferredHeight: MixerConstants.trackNameHeight
             text: root.trackName
             horizontalAlignment: Text.AlignHCenter
             elide: Text.ElideRight
@@ -52,25 +52,32 @@ Rectangle {
         // Sends Section
         ColumnLayout {
             Layout.fillWidth: true
-            spacing: 2
+            spacing: MixerConstants.sendsSectionSpacing
 
             StyledTextLabel {
                 text: "Sends"
                 font.bold: true
-                font.pixelSize: 10
+                font.pixelSize: MixerConstants.sendsHeaderPixelSize
+                ToolTip.visible: sendsHoverArea.containsMouse
+                ToolTip.text: qsTrc("projectscene", "Sends")
+                MouseArea {
+                    id: sendsHoverArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                }
             }
 
             Repeater {
                 model: root.sends
                 delegate: RowLayout {
                     Layout.fillWidth: true
-                    spacing: 4
+                    spacing: MixerConstants.sendsRowSpacing
 
                     StyledTextLabel {
-                        Layout.preferredWidth: 30
+                        Layout.preferredWidth: MixerConstants.sendDestNameWidth
                         text: modelData.destName
                         elide: Text.ElideRight
-                        font.pixelSize: 9
+                        font.pixelSize: MixerConstants.sendDestNamePixelSize
                     }
 
                     Slider {
@@ -78,13 +85,17 @@ Rectangle {
                         from: 0.0
                         to: 1.0
                         value: modelData.amount
+                        ToolTip.visible: hovered
+                        ToolTip.text: qsTrc("projectscene", "Send Level")
                         onMoved: root.sendAmountChangedRequest(modelData.destId, value)
                     }
 
                     Button {
                         text: "x"
-                        Layout.preferredWidth: 20
-                        Layout.preferredHeight: 20
+                        Layout.preferredWidth: MixerConstants.sendRemoveBtnWidth
+                        Layout.preferredHeight: MixerConstants.sendRemoveBtnHeight
+                        ToolTip.visible: hovered
+                        ToolTip.text: qsTrc("projectscene", "Remove Send")
                         onClicked: root.removeSendRequest(modelData.destId)
                     }
                 }
@@ -94,6 +105,8 @@ Rectangle {
             StyledDropdown {
                 Layout.fillWidth: true
                 model: root.availableRoutes
+                ToolTip.visible: hovered
+                ToolTip.text: qsTrc("projectscene", "Add Aux Send")
                 // We want this to act as a command button, not a state selector
                 // So we don't bind currentIndex strictly?
                 // Or we accept it resets to 0.
@@ -106,12 +119,12 @@ Rectangle {
         // Pan Slider (Horizontal) - Temporary until Knob is ready
         ColumnLayout {
             Layout.fillWidth: true
-            spacing: 2
+            spacing: MixerConstants.panSectionSpacing
 
             StyledTextLabel {
                 Layout.alignment: Qt.AlignHCenter
                 text: "Pan: " + Math.round(root.pan * 100) + "%"
-                font.pixelSize: 10
+                font.pixelSize: MixerConstants.panTextPixelSize
             }
 
             StyledSlider {
@@ -119,6 +132,8 @@ Rectangle {
                 from: -1.0
                 to: 1.0
                 value: root.pan
+                ToolTip.visible: hovered
+                ToolTip.text: qsTrc("projectscene", "Pan")
                 onMoved: root.panChangedRequest(value)
             }
         }
@@ -135,32 +150,34 @@ Rectangle {
                 from: 0.0
                 to: 2.0 // Allow up to +6dB approx (2.0 amplitude)
                 value: root.volume
+                ToolTip.visible: hovered
+                ToolTip.text: qsTrc("projectscene", "Volume (Gain)")
 
                 onMoved: root.volumeChangedRequest(value)
 
                 background: Rectangle {
                     x: parent.leftPadding + parent.availableWidth / 2 - width / 2
                     y: parent.topPadding
-                    implicitWidth: 4
-                    implicitHeight: 200
+                    implicitWidth: MixerConstants.faderBackgroundImplicitWidth
+                    implicitHeight: MixerConstants.faderBackgroundImplicitHeight
                     width: implicitWidth
                     height: parent.availableHeight
-                    radius: 2
+                    radius: MixerConstants.faderBackgroundRadius
                     color: ui.theme.trackBackground
 
                     Rectangle {
                         width: parent.width
                         height: parent.height * (parent.parent.visualPosition)
                         color: ui.theme.accentColor
-                        radius: 2
+                        radius: MixerConstants.faderBackgroundRadius
                     }
                 }
 
                 handle: Rectangle {
                     x: parent.leftPadding + parent.availableWidth / 2 - width / 2
                     y: parent.topPadding + parent.visualPosition * (parent.availableHeight - height)
-                    implicitWidth: 20
-                    implicitHeight: 10
+                    implicitWidth: MixerConstants.faderHandleImplicitWidth
+                    implicitHeight: MixerConstants.faderHandleImplicitHeight
                     radius: 2
                     color: parent.pressed ? ui.theme.buttonColor : ui.theme.buttonColor
                     border.color: ui.theme.borderColor
@@ -171,13 +188,15 @@ Rectangle {
         // Mute/Solo Buttons
         RowLayout {
             Layout.fillWidth: true
-            spacing: 2
+            spacing: MixerConstants.muteSoloSpacing
 
             FlatButton {
                 Layout.fillWidth: true
                 text: "M"
                 checkable: true
                 checked: root.mute
+                ToolTip.visible: hovered
+                ToolTip.text: qsTrc("projectscene", "Mute Channel")
                 onClicked: root.muteChangedRequest(checked)
 
                 checkedColor: "red" // Distinctive color for Mute
@@ -187,6 +206,8 @@ Rectangle {
                 text: "S"
                 checkable: true
                 checked: root.solo
+                ToolTip.visible: hovered
+                ToolTip.text: qsTrc("projectscene", "Solo Channel")
                 onClicked: root.soloChangedRequest(checked)
 
                 checkedColor: "yellow" // Distinctive color for Solo
@@ -197,6 +218,8 @@ Rectangle {
         StyledDropdown {
             Layout.fillWidth: true
             model: root.availableRoutes
+            ToolTip.visible: hovered
+            ToolTip.text: qsTrc("projectscene", "Select Output Route")
             currentIndex: {
                  // Manual indexOf implementation if QML array doesn't support it directly on this variant
                  if (root.availableRouteIds) {

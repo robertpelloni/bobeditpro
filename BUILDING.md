@@ -9,13 +9,16 @@
 * A package manager (tested: Choco on Windows, Homebrew on macOS)
 * A CMake generator (tested: Ninja)
 * A C++ compiler (tested: MSVC on Windows, g++ on Linux)
-* Qt 6.10 'Desktop' (macOS), 'MSVC 2022 64-bit' (Windows) or 'MSVC 2022 ARM64' (Windows on ARM) with 'Additional Libraries':
+* Qt 6.9.1 'Desktop' (macOS), 'MSVC 2022 64-bit' (Windows) or 'MSVC 2022 ARM64' (Windows on ARM) with 'Additional Libraries':
   * Qt 5 Compatibility Module
   * Qt Network Authorization
   * Qt Shader Tools
-  * Qt State Machines
+  * Qt State Machines, Qt WebSockets, Qt Graphs, and Qt Quick3D
 
 NB: Bear in mind that, by default, only the latest version of Qt is available for installation. To view older versions, click 'Show > Archive' in the top-right corner of the Qt Online Installer, next to the search bar.
+
+Alternatively, on Linux/Docker, Qt can be installed via `aqtinstall`:
+`python -m aqt install-qt linux desktop 6.9.1 gcc_64 -m qt5compat qtnetworkauth qtshadertools qtstatemachine qtwebsockets qtgraphs qtquick3d`
 
 ## Setup
 

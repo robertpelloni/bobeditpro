@@ -90,8 +90,8 @@ Item {
 
             model: [
                 {
-                    "name": "projects",
-                    "title": qsTrc("appshell", "Project"),
+                    "name": "dashboard",
+                    "title": qsTrc("appshell", "Dashboard"),
                     "icon": IconCode.WAVEFORM,
                     "enabled": true
                 },
