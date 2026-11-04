@@ -8,6 +8,8 @@
 #include "../spectralheal/spectralhealviewmodel.h"
 #include "../multibandcompressor/MultibandCompressorEffect.h"
 #include "../multibandcompressor/multibandcompressorviewmodel.h"
+#include "../parametriceq/ParametricEQEffect.h"
+#include "../parametriceq/parametriceqviewmodel.h"
 
 #include "framework/global/log.h"
 #include "effects/effects_base/effectstypes.h"

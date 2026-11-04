@@ -41,6 +41,7 @@
 //#include "view/notationstatusbarmodel.h"
 #include "view/aboutmodel.h"
 #include "view/firstlaunchsetup/firstlaunchsetupmodel.h"
+#include "view/systemtraycontroller.h"
 #include "view/firstlaunchsetup/themespagemodel.h"
 #include "view/firstlaunchsetup/clipvisualizationpagemodel.h"
 #include "view/firstlaunchsetup/workspacelayoutpagemodel.h"
@@ -172,6 +173,10 @@ void AppShellModule::registerUiTypes()
 #endif
 
     qmlRegisterType<MainWindowTitleProvider>("Audacity.AppShell", 1, 0, "MainWindowTitleProvider");
+    qmlRegisterSingletonType<SystemTrayController>("Audacity.AppShell", 1, 0, "SystemTrayController",
+        [](QQmlEngine*, QJSEngine*) -> QObject* {
+            return new SystemTrayController();
+        });
     qmlRegisterType<ProjectPageModel>("Audacity.AppShell", 1, 0, "ProjectPageModel");
 //    qmlRegisterType<NotationStatusBarModel>("Audacity.AppShell", 1, 0, "NotationStatusBarModel");
     qmlRegisterType<AboutModel>("Audacity.AppShell", 1, 0, "AboutModel");

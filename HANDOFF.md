@@ -1,8 +1,13 @@
 # Super Deep Analysis & Handoff
 
 **Date:** 2024-05-24
-**Version:** 3.7.5
-**Context:** Phase 1 (Mixing & Routing) Complete. BobUI Migration Complete.
+**Version:** 3.7.6
+**Context:** Unified Dashboard & Native System Tray Complete. Preparing for Phase 3 Effects Backend Integration.
+
+## Recent Progress (Version 3.7.6)
+- **Unified Audio Dashboard:** Scaffolded and wired `UnifiedDashboard.qml` into `HomePage.qml`. Combines multitrack project creation, file/stem import, online cloud session manager, background server indicators with quit server action, and embedded recent workspaces with rich tooltips.
+- **System Tray Controller:** Integrated native desktop `SystemTrayController` C++ class (`src/appshell/view/systemtraycontroller.h/.cpp`) with `QSystemTrayIcon`, providing background server status, window toggling, and clean termination of application and audio servers.
+- **Script Archival:** Non-destructively organized legacy root scripts `fix_proj_str.py` and `fix_proj_str2.py` into `tools/archive/`.
 
 ## 1. Architectural Overview
 
