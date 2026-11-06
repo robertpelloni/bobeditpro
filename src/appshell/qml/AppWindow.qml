@@ -56,6 +56,7 @@ ApplicationWindow {
         id: titleProvider
     }
 
+
     MainWindowBridge {
         id: bridge
 

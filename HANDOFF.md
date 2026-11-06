@@ -1,8 +1,17 @@
 # Super Deep Analysis & Handoff
 
 **Date:** 2024-05-24
-**Version:** 3.7.5
-**Context:** Phase 1 (Mixing & Routing) Complete. BobUI Migration Complete.
+**Version:** 3.7.7
+**Context:** Scheduled Maintenance & Dependency Setup Complete. Preparing for Phase 3 Effects Backend Integration.
+
+## Recent Progress (Version 3.7.7)
+- **Maintenance**: Cleanly removed obsolete `msecs_t` alias declaration from `src/playback/playbacktypes.h`.
+- **Deployment**: Updated `DEPLOY.md` with complete Qt 6.9.1 / BobUI dependency instructions using `aqtinstall` (`qt5compat`, `qtnetworkauth`, `qtshadertools`, `qtstatemachine`, `qtwebsockets`, `qtgraphs`, `qtquick3d`). Added `.env.example` template.
+
+## Recent Progress (Version 3.7.6)
+- **Unified Audio Dashboard:** Scaffolded and wired `UnifiedDashboard.qml` into `HomePage.qml`. Combines multitrack project creation, file/stem import, online cloud session manager, background server indicators with quit server action, and embedded recent workspaces with rich tooltips.
+- **System Tray Controller:** Integrated native desktop `SystemTrayController` C++ class (`src/appshell/view/systemtraycontroller.h/.cpp`) with `QSystemTrayIcon`, providing background server status, window toggling, and clean termination of application and audio servers.
+- **Script Archival:** Non-destructively organized legacy root scripts `fix_proj_str.py` and `fix_proj_str2.py` into `tools/archive/`.
 
 ## 1. Architectural Overview
 

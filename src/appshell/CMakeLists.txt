@@ -49,6 +49,8 @@ set(MODULE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/view/appmenumodel.h
     ${CMAKE_CURRENT_LIST_DIR}/view/mainwindowtitleprovider.cpp
     ${CMAKE_CURRENT_LIST_DIR}/view/mainwindowtitleprovider.h
+    ${CMAKE_CURRENT_LIST_DIR}/view/systemtraycontroller.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/view/systemtraycontroller.h
     ${CMAKE_CURRENT_LIST_DIR}/view/projectpagemodel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/view/projectpagemodel.h
     # TODO AU4

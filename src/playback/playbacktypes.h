@@ -8,8 +8,6 @@
 #include "audio/audiotypes.h"
 
 namespace au::playback {
-using msecs_t = int64_t; //! TODO need to remove
-
 using TrackId = int32_t;
 
 using TrackSequenceId = int32_t;

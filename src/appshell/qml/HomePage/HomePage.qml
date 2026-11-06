@@ -121,7 +121,9 @@ DockPage {
     Component {
         id: projetsComp
 
-        ProjectsPage {}
+        UnifiedDashboard {
+            window: root.window
+        }
     }
 
     Component {
