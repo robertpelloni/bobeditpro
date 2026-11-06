@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.7.7] - 2024-05-24
+### Changed
+- **Maintenance**: Removed obsolete `msecs_t` alias declaration from `src/playback/playbacktypes.h`.
+- **Deployment**: Updated `DEPLOY.md` with complete Qt 6.9.1 / BobUI dependency instructions using `aqtinstall` (`qt5compat`, `qtnetworkauth`, `qtshadertools`, `qtstatemachine`, `qtwebsockets`, `qtgraphs`, `qtquick3d`). Added `.env.example` template.
+
 ## [3.7.6] - 2024-05-24
 ### Added
 - **Unified Audio Dashboard:** Consolidated `UnifiedDashboard.qml` combining quick multitrack project workflows, audio file / stem import, online cloud session manager, background server indicators, and embedded recent workspaces with rich tooltips.
