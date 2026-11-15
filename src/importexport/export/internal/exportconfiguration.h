@@ -171,7 +171,6 @@ private:
     muse::async::Notification m_ffmpegUseLpcChanged;
     muse::async::Notification m_ffmpegMuxRateChanged;
     muse::async::Notification m_ffmpegPacketSizeChanged;
-
     muse::async::Notification m_defaultMetadataChanged;
     muse::async::Notification m_lufsTargetChanged;
 };
