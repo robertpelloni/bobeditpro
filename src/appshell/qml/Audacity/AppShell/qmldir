@@ -1,0 +1,3 @@
+module Audacity.AppShell
+
+singleton AppShellConstants 1.0 AppShellConstants.qml

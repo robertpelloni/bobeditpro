@@ -23,3 +23,4 @@ GainTooltip 1.0 trackspanel/audio/GainTooltip.qml
 TrackRulerCustomizePopup 1.0 trackruler/TrackRulerCustomizePopup.qml
 WaveformRuler 1.0 trackruler/WaveformRuler.qml
 SpectrogramTrackRulers 1.0 trackruler/SpectrogramTrackRulers.qml
+singleton AudioGainSettings 1.0 trackspanel/audio/AudioGainSettings.qml

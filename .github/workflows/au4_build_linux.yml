@@ -141,11 +141,11 @@ jobs:
     - name: Install Qt
       uses: jurplel/install-qt-action@v4
       with:
-        version: '6.10.1'
+        version: '6.9.1'
         host: 'linux'
         target: 'desktop'
         arch: 'linux_gcc_64'
-        modules: 'qt5compat qtnetworkauth qtshadertools qtwebsockets qtgraphs qtquick3d'
+        modules: 'qt5compat qtnetworkauth qtshadertools qtstatemachine qtwebsockets qtgraphs qtquick3d'
 
     - name: Setup environment
       if: env.DO_BUILD == 'true'
@@ -225,11 +225,11 @@ jobs:
     - name: Install Qt
       uses: jurplel/install-qt-action@v4
       with:
-        version: '6.10.1'
+        version: '6.9.1'
         host: 'linux'
         target: 'desktop'
         arch: 'linux_gcc_64'
-        modules: 'qt5compat qtnetworkauth qtshadertools qtwebsockets qtgraphs qtquick3d'
+        modules: 'qt5compat qtnetworkauth qtshadertools qtstatemachine qtwebsockets qtgraphs qtquick3d'
         cache: true
 
     - name: Download build artifact

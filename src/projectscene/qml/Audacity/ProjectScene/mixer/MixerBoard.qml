@@ -14,20 +14,20 @@ Item {
 
     RowLayout {
         anchors.fill: parent
-        spacing: 2
+        spacing: MixerConstants.boardSpacing
 
         ScrollView {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
             RowLayout {
-                spacing: 2
+                spacing: MixerConstants.boardSpacing
 
                 Repeater {
                     model: mixerModel
                     delegate: MixerChannelStrip {
                         Layout.fillHeight: true
-                        Layout.preferredWidth: 100
+                        Layout.preferredWidth: MixerConstants.channelStripWidth
 
                         trackName: model.name
                         volume: model.volume
@@ -55,8 +55,16 @@ Item {
                 // Master Fader (Placeholder)
                 Rectangle {
                     Layout.fillHeight: true
-                    Layout.preferredWidth: 120
+                    Layout.preferredWidth: MixerConstants.masterChannelWidth
                     color: ui.theme.backgroundSecondaryColor
+
+                    MouseArea {
+                        id: toolTipArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        ToolTip.visible: containsMouse
+                        ToolTip.text: qsTrc("projectscene", "Master Output Fader")
+                    }
 
                     StyledTextLabel {
                         anchors.centerIn: parent

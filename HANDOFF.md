@@ -61,6 +61,9 @@ In `AudioIO::ProcessPlaybackSlices`:
 - [x] Basic Routing (Track -> Bus -> Master).
 - [x] Aux Sends (Track -> Bus).
 - [x] Cycle Detection.
+- [x] **Phase 1 UI Refactoring**: Extracted hardcoded QML metrics across AppShell, Mixer, ProjectScene, and Toolbars into BobUI-compliant `pragma Singleton` constants (`AppShellConstants.qml`, `MixerConstants.qml`, `GetEffectsConstants.qml`, etc.).
+- [x] **Phase 2 CI Dependencies**: Injected `Core5Compat`, `NetworkAuth`, `ShaderTools`, and `StateMachine` into `SetupBobUi.cmake` to resolve missing Qt 6.9.1 modules.
+- [x] **UI Coverage**: Thoroughly documented the dashboard workflow with descriptive tooltips across all newly refactored BobUI layouts.
 
 ### 4.2 In Progress / Limitations
 - **Bus-to-Bus Latency:** As noted above, the linear iteration of busses in `AudioIO` allows for 1-block latency in complex chains.

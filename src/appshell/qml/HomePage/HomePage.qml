@@ -1,24 +1,3 @@
-/*
- * SPDX-License-Identifier: GPL-3.0-only
- * Audacity-CLA-applies
- *
- * Audacity
- * Music Composition & Notation
- *
- * Copyright (C) 2024 Audacity BVBA and others
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 3 as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
 import QtQuick 2.15
 
 import Muse.Ui 1.0
@@ -33,7 +12,7 @@ import "."
 DockPage {
     id: root
 
-    property string section: "projects"
+    property string section: "dashboard"
     property string subSection: ""
 
     property var window: null
@@ -67,14 +46,18 @@ DockPage {
         section = name
 
         switch (name) {
-        case "projects":
-            root.central = projetsComp
+        case "dashboard":
+            root.central = dashboardComp
             break
         case "learn":
             root.central = learnComp
             break
+        // Keep fallback paths in case they are routed to
+        case "projects":
+            root.central = dashboardComp
+            break
         case "account":
-            root.central = accountComp
+            root.central = dashboardComp
             break
         }
     }
@@ -109,19 +92,14 @@ DockPage {
         }
     ]
 
-    central: projetsComp
+    central: dashboardComp
 
     Component {
-        id: accountComp
-        Loader {
-            source: "AccountPage.qml"
+        id: dashboardComp
+        UnifiedDashboard {
+            cloudEnabled: projectsPageHelper.cloudEnabled
+            projectsModel: projectsPageHelper
         }
-    }
-
-    Component {
-        id: projetsComp
-
-        ProjectsPage {}
     }
 
     Component {
