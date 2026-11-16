@@ -51,11 +51,6 @@ set(QT_LIBRARIES
     Qt::Xml
     Qt::Svg
     Qt::Core5Compat
-    NetworkAuth
-    StateMachine
-    WebSockets
-    Graphs
-    Quick3D
     Qt::NetworkAuth
     Qt::StateMachine
     Qt::WebSockets

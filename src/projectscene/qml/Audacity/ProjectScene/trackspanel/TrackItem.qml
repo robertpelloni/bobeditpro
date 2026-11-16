@@ -130,7 +130,7 @@ ListItemBlank {
             anchors.bottom: parent.bottom
             width: 9
 
-            color: "transparent"
+            color: TracksItemsViewConstants.transparentColor
         }
 
         ColumnLayout {
@@ -271,12 +271,27 @@ ListItemBlank {
         }
     }
 
+    Rectangle {
+        id: trackHeaderBorder
+
+        anchors.fill: parent
+        anchors.rightMargin: -radius
+        anchors.leftMargin: spacer.width
+        anchors.bottomMargin: bottomSeparator.thickness
+
+        color: TracksItemsViewConstants.transparentColor
+        border.width: 1
+        border.color: ui.theme.strokeColor
+
+        radius: 4
+    }
+
     SeparatorLine {
         id: bottomSeparator
 
         anchors.bottom: parent.bottom
 
-        color: "transparent"
+        color: TracksItemsViewConstants.transparentColor
 
         thickness: 2
     }
@@ -292,9 +307,9 @@ ListItemBlank {
 
         visible: root.isFocused
 
-        color: "transparent"
+        color: TracksItemsViewConstants.transparentColor
 
-        border.color: ui.theme.extra["focus_state_color"]
+        border.color: TracksItemsViewConstants.containerBorderColor
         border.width: 2
 
         radius: 6

@@ -41,11 +41,7 @@ BaseSection {
     ComboBoxWithTitle {
         id: selectFontControl
 
-<<<<<<< HEAD:src/appshell/qml/Preferences/internal/UiFontSection.qml
-        title: qsTrc("appshell/preferences", "Font face:")
-=======
         title: qsTrc("preferences", "Font face")
->>>>>>> upstream/master:src/preferences/qml/Audacity/Preferences/internal/UiFontSection.qml
         columnWidth: root.columnWidth
 
         navigation.name: "FontFaceBox"
@@ -60,11 +56,7 @@ BaseSection {
     IncrementalPropertyControlWithTitle {
         id: bodyTextSizeControl
 
-<<<<<<< HEAD:src/appshell/qml/Preferences/internal/UiFontSection.qml
-        title: qsTrc("appshell/preferences", "Body text size:")
-=======
         title: qsTrc("preferences", "Body text size")
->>>>>>> upstream/master:src/preferences/qml/Audacity/Preferences/internal/UiFontSection.qml
         columnWidth: root.columnWidth
         control.width: 112
 

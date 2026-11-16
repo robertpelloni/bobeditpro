@@ -5,12 +5,7 @@ import QtQuick 2.15
 import QtQuick.Layouts 1.15
 
 import Muse.Ui 1.0
-<<<<<<< HEAD
-import Muse.UiComponents 1.0
-import Muse.GraphicalEffects 1.0
-=======
 import Muse.UiComponents
->>>>>>> upstream/master
 import Muse.Cloud 1.0
 
 import Audacity.Cloud 1.0

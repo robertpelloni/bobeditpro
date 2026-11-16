@@ -17,11 +17,8 @@ TrackItemsContainer {
     property bool rightTrimPressedButtons: false
     property real dbRange: -60.0
     property color trackColor
-<<<<<<< HEAD
-=======
     required property int headerHeight
     required property bool isAutomationEnabled
->>>>>>> upstream/master
     required property bool isWaveformViewVisible
     required property bool isSpectrogramViewVisible
 
@@ -360,13 +357,8 @@ TrackItemsContainer {
                                 navigation.accessible.name: Boolean(itemData) ? itemData.title : ""
                                 navigation.onActiveChanged: {
                                     if (navigation.active) {
-<<<<<<< HEAD
-                                        root.context.insureVisible(root.context.positionToTime(itemData.x))
-                                        root.insureVerticallyVisible(root.y, root.y + root.height)
-=======
                                         root.context.animatedInsureVisible(itemData.time.startTime)
                                         root.insureVerticallyVisible()
->>>>>>> upstream/master
                                     }
                                 }
 
@@ -621,8 +613,6 @@ TrackItemsContainer {
                 }
             }
 
-<<<<<<< HEAD
-=======
             TrackSpectralSelectionContainer {
                 id: spectralSelectionContainer
 
@@ -668,7 +658,6 @@ TrackItemsContainer {
                 }
             }
 
->>>>>>> upstream/master
             //! clip
             ChannelSplitter {
                 id: channelSplitter
@@ -678,7 +667,7 @@ TrackItemsContainer {
                 anchors.bottomMargin: 3
 
                 channelHeightRatio: prv.isMultiView ? 0.5 : root.trackViewState.channelHeightRatio
-                color: "#FFFFFF"
+                color: TracksItemsViewConstants.containerWhite
                 opacity: 0.05
                 visible: clipsModel.isStereo
 

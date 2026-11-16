@@ -7,11 +7,8 @@ import Muse.UiComponents
 import Audacity.ProjectScene
 import Audacity.Project
 import Audacity.Playback
-<<<<<<< HEAD
-=======
 import Audacity.Spectrogram
 import Audacity.Record
->>>>>>> upstream/master
 
 Rectangle {
     id: root
@@ -182,14 +179,10 @@ Rectangle {
         //! NOTE Models depend on geometry, so let's create a page first and then initialize the models
         Qt.callLater(root.init)
 
-<<<<<<< HEAD
-        selectionController.load()
-=======
         playbackState.init()
         playRegionModel.init()
         leadInIndicator.init()
         selectionViewController.load()
->>>>>>> upstream/master
         selectionContextMenuModel.load()
         canvasContextMenuModel.load()
 
@@ -367,7 +360,7 @@ Rectangle {
                 anchors.top: parent.verticalCenter
                 anchors.bottom: parent.bottom
 
-                color: "#ABE7FF"
+                color: TracksItemsViewConstants.tracksItemsViewSelectionColor
                 opacity: 0.3
             }
 
@@ -752,7 +745,7 @@ Rectangle {
                 header: Rectangle {
                     height: 2
                     width: parent.width
-                    color: "transparent"
+                    color: TracksItemsViewConstants.transparentColor
                 }
 
                 footer: Item {
@@ -1162,7 +1155,7 @@ Rectangle {
 
             anchors.top: parent.top
             anchors.bottom: parent.bottom
-            color: "#ABE7FF"
+            color: TracksItemsViewConstants.tracksItemsViewSelectionColor
             opacity: 0.05
             visible: false
 
@@ -1213,7 +1206,7 @@ Rectangle {
             width: 1
             height: splitToolController.singleTrack ? hoveredTrackHeight : content.height
 
-            color: "#0121C0"
+            color: TracksItemsViewConstants.minimapTrackHighlight
 
             visible: splitToolController.guidelineVisible
         }
@@ -1241,7 +1234,7 @@ Rectangle {
 
         width: 1
 
-        color: "#FFFFFF"
+        color: TracksItemsViewConstants.minimapTrackWhite
         opacity: 0.8
 
         visible: playRegionModel.active
@@ -1257,7 +1250,7 @@ Rectangle {
 
         width: 1
 
-        color: "#FFFFFF"
+        color: TracksItemsViewConstants.minimapTrackWhite
         opacity: 0.8
 
         visible: playRegionModel.active

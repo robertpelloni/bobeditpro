@@ -153,13 +153,8 @@ endif()
 # Configure framework
 ###########################################
 set(MUSE_APP_BUILD_NUMBER ${CMAKE_BUILD_NUMBER})
-<<<<<<< HEAD
-set(MUSE_APP_INSTALL_PREFIX "\"${CMAKE_INSTALL_PREFIX}\"")
-set(MUSE_APP_INSTALL_NAME "\"${AU4_INSTALL_NAME}\"")
-=======
 set(MUSE_APP_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 set(MUSE_APP_INSTALL_RESOURCES_LOCATION "${AU4_INSTALL_NAME}")
->>>>>>> upstream/master
 
 include(${MUSE_FRAMEWORK_SRC_PATH}/cmake/MuseSetupConfiguration.cmake)
 

@@ -37,11 +37,7 @@ BaseSection {
         id: scoreInversionEnable
         width: parent.width
 
-<<<<<<< HEAD:src/appshell/qml/Preferences/internal/ThemeAdditionalOptionsSection.qml
-        text: qsTrc("appshell/preferences", "Invert score")
-=======
         text: qsTrc("preferences", "Invert project")
->>>>>>> upstream/master:src/preferences/qml/Audacity/Preferences/internal/ThemeAdditionalOptionsSection.qml
 
         navigation.name: "ScoreInversionBox"
         navigation.panel: root.navigation

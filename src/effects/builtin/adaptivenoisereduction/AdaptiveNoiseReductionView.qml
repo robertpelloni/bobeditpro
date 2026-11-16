@@ -25,8 +25,8 @@ BuiltinEffectBase {
 
         Text {
             text: "Adaptive Noise Reduction"
-            font.pixelSize: 24
-            color: "white"
+            font.pixelSize: BuiltinEffectsConstants.titleFontSize
+            color: BuiltinEffectsConstants.textColorWhite
         }
 
         // Stub parameter inputs
@@ -34,7 +34,7 @@ BuiltinEffectBase {
             spacing: 20
 
             Column {
-                Text { text: "Reduction (dB)"; color: "white" }
+                Text { text: "Reduction (dB)"; color: BuiltinEffectsConstants.textColorWhite }
                 TextField {
                     id: reductionInput
                     text: Number(adaptiveNoise.noiseReductionDb).toString()
@@ -43,7 +43,7 @@ BuiltinEffectBase {
                 }
             }
             Column {
-                Text { text: "Sensitivity"; color: "white" }
+                Text { text: "Sensitivity"; color: BuiltinEffectsConstants.textColorWhite }
                 TextField {
                     id: sensitivityInput
                     text: Number(adaptiveNoise.sensitivity).toString()
@@ -52,7 +52,7 @@ BuiltinEffectBase {
                 }
             }
             Column {
-                Text { text: "Smoothing (ms)"; color: "white" }
+                Text { text: "Smoothing (ms)"; color: BuiltinEffectsConstants.textColorWhite }
                 TextField {
                     id: smoothingInput
                     text: Number(adaptiveNoise.smoothing).toString()
@@ -64,8 +64,8 @@ BuiltinEffectBase {
 
         Text {
             text: "Dynamically tracks the noise floor over time."
-            font.pixelSize: 14
-            color: "gray"
+            font.pixelSize: BuiltinEffectsConstants.headerFontSize
+            color: BuiltinEffectsConstants.textColorGrayLight
         }
     }
 }

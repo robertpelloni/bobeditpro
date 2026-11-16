@@ -11,8 +11,8 @@ StyledIconLabel {
 
     iconCode: IconCode.PLAYHEAD_FILLED
 
-    font.pixelSize: 17
-    color: "black"
+    font.pixelSize: TracksItemsViewConstants.playCursorHeadOuterPixelSize
+    color: TracksItemsViewConstants.cursorBlack
 
     StyledIconLabel {
         id: playheadFill
@@ -23,8 +23,8 @@ StyledIconLabel {
 
         iconCode: IconCode.PLAYHEAD_FILLED
 
-        font.pixelSize: 15
-        color: "white"
+        font.pixelSize: TracksItemsViewConstants.playCursorHeadInnerPixelSize
+        color: TracksItemsViewConstants.cursorWhite
     }
 
     // we do some pixel trickery to hide the aliased bottom part and "connect" to the PlayCursorLine
@@ -35,7 +35,7 @@ StyledIconLabel {
         height: 2
         x: parent.width / 2
         y: 15
-        color: "white"
+        color: TracksItemsViewConstants.cursorWhite
         antialiasing: true
     }
     Rectangle {
@@ -45,7 +45,7 @@ StyledIconLabel {
         height: 1
         x: (parent.width / 2) - 1
         y: 16
-        color: "black"
+        color: TracksItemsViewConstants.cursorBlack
         antialiasing: true
     }
     Rectangle {
@@ -55,7 +55,7 @@ StyledIconLabel {
         height: 1
         x: (parent.width / 2) + 1
         y: 16
-        color: "black"
+        color: TracksItemsViewConstants.cursorBlack
         antialiasing: true
     }
 }

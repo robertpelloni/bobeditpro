@@ -29,8 +29,6 @@ Item {
     property bool selectionInProgress: false
     property bool hover: false
 
-<<<<<<< HEAD
-=======
     property bool isLeadInRecordingTrack: false
     property double leadInRecordingStartTime: 0
 
@@ -38,7 +36,6 @@ Item {
     required property bool selectionEditInProgress
     required property bool verticalSelectionEditInProgress
 
->>>>>>> upstream/master
     property alias bottomSeparatorHeight: sep.height
 
     property alias contentItem: contentLoader.item
@@ -58,11 +55,7 @@ Item {
     signal updateMoveActive(bool completed)
 
     signal seekToX(var x)
-<<<<<<< HEAD
-    signal insureVerticallyVisible(var top, var bottom)
-=======
     signal insureVerticallyVisible
->>>>>>> upstream/master
 
     signal handleTimeGuideline(real x, bool completed)
     signal updateItemGuideline(real time)
@@ -152,7 +145,7 @@ Item {
         anchors.bottomMargin: sep.thickness
 
         visible: root.isDataSelected
-        color: "#ABE7FF"
+        color: TracksItemsViewConstants.containerSelectionColor
         opacity: 0.3
     }
 
@@ -163,7 +156,7 @@ Item {
         anchors.bottomMargin: sep.thickness
         anchors.leftMargin: (canvas && canvas.anchors && canvas.anchors.leftMargin) ? -canvas.anchors.leftMargin : 0
 
-        color: "#FFFFFF"
+        color: TracksItemsViewConstants.containerWhite
         opacity: 0.10
 
         visible: root.isDataSelected || root.isTrackSelected
@@ -176,7 +169,7 @@ Item {
         anchors.bottomMargin: sep.thickness
         anchors.leftMargin: (canvas && canvas.anchors && canvas.anchors.leftMargin) ? -canvas.anchors.leftMargin : 0
 
-        color: "#FFFFFF"
+        color: TracksItemsViewConstants.containerWhite
         opacity: 0.05
     }
 
@@ -226,16 +219,16 @@ Item {
 
         visible: isTrackFocused
 
-        color: "transparent"
+        color: TracksItemsViewConstants.transparentColor
 
-        border.color: "#7EB1FF"
+        border.color: TracksItemsViewConstants.containerBorderColor
         border.width: 2
     }
 
     SeparatorLine {
         id: sep
 
-        color: "transparent"
+        color: TracksItemsViewConstants.transparentColor
         anchors.bottom: parent.bottom
         thickness: 2
     }

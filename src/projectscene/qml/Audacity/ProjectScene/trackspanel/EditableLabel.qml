@@ -1,3 +1,4 @@
+import Audacity.ProjectScene
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -48,7 +49,7 @@ Item {
         id: textEditComp
 
         TextInputField {
-            background.color: "transparent"
+            background.color: TracksItemsViewConstants.transparentColor
             background.border.width: 0
             background.radius: 0
             textSidePadding: 0

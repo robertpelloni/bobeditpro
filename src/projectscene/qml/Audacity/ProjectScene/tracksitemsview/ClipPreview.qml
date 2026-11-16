@@ -31,19 +31,19 @@ Rectangle {
 
     radius: 4
     border.width: 1
-    border.color: ui.theme.extra["black_color"]
+    border.color: TracksItemsViewConstants.clipPreviewBorderColor
 
-    color: "transparent"
+    color: TracksItemsViewConstants.clipPreviewTransparent
 
     Rectangle {
         id: borderRect
 
         anchors.fill: parent
         anchors.margins: 1
-        color: "transparent"
+        color: TracksItemsViewConstants.clipPreviewTransparent
 
-        border.width: 1
-        border.color: ui.theme.extra["white_color"]
+        border.width:  1
+        border.color: TracksItemsViewConstants.clipPreviewWhite
         radius: 4
 
         Rectangle {
@@ -51,7 +51,7 @@ Rectangle {
 
             anchors.fill: parent
             anchors.margins: 1
-            color: ui.theme.extra["white_color"]
+            color: TracksItemsViewConstants.clipPreviewWhite
             opacity: 0.3
 
             radius: 4
@@ -81,18 +81,9 @@ Rectangle {
 
             gradient: Gradient {
                 orientation: Qt.Horizontal
-                GradientStop {
-                    position: 0.0
-                    color: root.transparentWhite
-                }
-                GradientStop {
-                    position: 0.4
-                    color: root.currentClipStyle == ClipStyle.COLORFUL ? colorfulThemeGradient : classicThemeGradient
-                }
-                GradientStop {
-                    position: 1.0
-                    color: root.transparentWhite
-                }
+                GradientStop { position: 0.0; color: TracksItemsViewConstants.previewGradientStart }
+                GradientStop { position: 0.4; color: ui.blendColors(ui.blendColors("transparent", "white", 0.3), ui.blendColors("transparent", root.clipColor, 0.4), 0.5)}
+                GradientStop { position: 1.0; color: TracksItemsViewConstants.previewGradientStart }
             }
         }
 
@@ -109,18 +100,9 @@ Rectangle {
 
             gradient: Gradient {
                 orientation: Qt.Horizontal
-                GradientStop {
-                    position: 0.0
-                    color: root.transparentWhite
-                }
-                GradientStop {
-                    position: 0.4
-                    color: ui.theme.extra["white_color"]
-                }
-                GradientStop {
-                    position: 1.0
-                    color: root.transparentWhite
-                }
+                GradientStop { position: 0.0; color: TracksItemsViewConstants.previewGradientStart }
+                GradientStop { position: 0.4; color: TracksItemsViewConstants.previewGradientMid }
+                GradientStop { position: 1.0; color: TracksItemsViewConstants.previewGradientStart }
             }
         }
     }
@@ -151,9 +133,7 @@ Rectangle {
             anchors.rightMargin: 8
             horizontalAlignment: Qt.AlignLeft
 
-            color: ui.theme.extra["black_color"]
-
-            visible: header.width > 10
+            color: TracksItemsViewConstants.previewBlack
         }
 
         Rectangle {
@@ -167,18 +147,9 @@ Rectangle {
 
             gradient: Gradient {
                 orientation: Qt.Horizontal
-                GradientStop {
-                    position: 0.0
-                    color: root.transparentWhite
-                }
-                GradientStop {
-                    position: 0.4
-                    color: root.headerColor
-                }
-                GradientStop {
-                    position: 1.0
-                    color: root.transparentWhite
-                }
+                GradientStop { position: 0.0; color: TracksItemsViewConstants.previewGradientStart }
+                GradientStop { position: 0.4; color: ui.blendColors("white", root.clipColor, 0.3) }
+                GradientStop { position: 1.0; color: TracksItemsViewConstants.previewGradientStart }
             }
         }
     }

@@ -320,11 +320,7 @@ StyledDialogView {
 
                                 checked: exportPreferencesModel.exportChannels == ExportChannels.CUSTOM
                                 text: qsTrc("export", "Custom mapping")
-<<<<<<< HEAD
-                                enabled: false // until custom mapping grid is implemented
-=======
                                 enabled: exportPreferencesModel.maxExportChannels > 2
->>>>>>> upstream/master
 
                                 spacing: 8
 

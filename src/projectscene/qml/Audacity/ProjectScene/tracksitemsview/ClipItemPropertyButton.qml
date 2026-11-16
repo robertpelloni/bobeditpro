@@ -30,7 +30,7 @@ FlatButton {
             Layout.preferredHeight: 8
             iconCode: root.icon
             color: root.iconColor
-            font.pixelSize: 12
+            font.pixelSize: TracksItemsViewConstants.clipItemPropertyButtonPixelSize
         }
 
         StyledTextLabel {

@@ -53,7 +53,7 @@ Rectangle {
         header: Rectangle {
             height: root.listHeaderHeight
             width: parent.width
-            color: "transparent"
+            color: TracksItemsViewConstants.verticalRulerTransparent
         }
 
         footer: Item {
@@ -132,7 +132,7 @@ Rectangle {
 
                         width: parent.width
                         height: trackViewState.isTrackCollapsed ? 0 : 20
-                        color: "#000000"
+                        color: TracksItemsViewConstants.verticalRulerBlack
                         opacity: 0.20
                     }
 
@@ -148,9 +148,9 @@ Rectangle {
 
                         visible: model.isTrackFocused
 
-                        color: "transparent"
+                        color: TracksItemsViewConstants.verticalRulerTransparent
 
-                        border.color: "#7EB1FF"
+                        border.color: TracksItemsViewConstants.verticalRulerBorder
                         border.width: 2
                     }
 
@@ -163,7 +163,7 @@ Rectangle {
 
                         height: 2
 
-                        color: "#7EB1FF"
+                        color: TracksItemsViewConstants.verticalRulerBorder
 
                         visible: model.isTrackFocused
                     }
@@ -171,7 +171,7 @@ Rectangle {
                     SeparatorLine {
                         id: sep
 
-                        color: "#000000"
+                        color: TracksItemsViewConstants.verticalRulerBlack
                         opacity: 0.20
                         anchors.bottom: parent.bottom
                         thickness: 2

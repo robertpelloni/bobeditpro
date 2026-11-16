@@ -4,7 +4,7 @@ import Muse.Ui
 
 Rectangle {
     width: 2
-    color: "transparent"
+    color: TracksItemsViewConstants.playbackSeekLineColor
 
     Rectangle {
         anchors.top: parent.top

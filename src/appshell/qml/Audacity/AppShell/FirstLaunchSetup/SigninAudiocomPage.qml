@@ -246,7 +246,7 @@ Page {
                     implicitWidth: forgotPasswordLabel.implicitWidth
                     implicitHeight: forgotPasswordLabel.implicitHeight
 
-                    background.color: "transparent"
+                    background.color: AppShellConstants.transparentColor
                     background.border.width: 0
 
                     NavigationPanel {
@@ -373,7 +373,7 @@ Page {
                 implicitWidth: accountLinkLabel.implicitWidth
                 implicitHeight: accountLinkLabel.implicitHeight
 
-                background.color: "transparent"
+                background.color: AppShellConstants.transparentColor
                 background.border.width: 0
 
                 NavigationPanel {

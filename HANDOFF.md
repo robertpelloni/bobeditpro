@@ -1,88 +1,12 @@
-# Super Deep Analysis & Handoff
+# Session Handoff
 
-**Date:** 2024-05-24
-**Version:** 3.7.7
-**Context:** Scheduled Maintenance & Dependency Setup Complete. Preparing for Phase 3 Effects Backend Integration.
+## Completed in this session:
+- **Phase 1 (UI Centralization):** Concluded Phase 1 by refactoring hardcoded QML values into Singletons across all remaining major UI components, including `AppShell`, `GetEffects UI`, and the `TracksItemsView` elements. Fixed lingering git markers and unclosed C++ scopes. Also fixed missing QML property mappings in `TracksItemsViewConstants.qml`.
+- **Phase 2 (Build/CI):** Initiated Phase 2 by formally documenting the missing Qt6 dependencies (`Qt 6.10.1`, `qt5compat`, `qtnetworkauth`, `qtshadertools`, `qtwebsockets`, `qtgraphs`, `qtquick3d`) in `DEPLOY.md` and `BUILDING.md`. Added a `.env.example` file. Fixed `SetupBobUi.cmake` to actually include these modules in the build.
+- **Merge Conflicts:** Resolved the final residual git merge conflicts in `spectrogramview.h` and `playpositionactioncontroller.h`.
+- **Documentation:** Bumped `VERSION.md` (to 3.7.22) and updated `CHANGELOG.md` with detailed entries tracking Phase 1 completion and Phase 2 fixes.
 
-## Recent Progress (Version 3.7.7)
-- **Maintenance**: Cleanly removed obsolete `msecs_t` alias declaration from `src/playback/playbacktypes.h`.
-- **Deployment**: Updated `DEPLOY.md` with complete Qt 6.9.1 / BobUI dependency instructions using `aqtinstall` (`qt5compat`, `qtnetworkauth`, `qtshadertools`, `qtstatemachine`, `qtwebsockets`, `qtgraphs`, `qtquick3d`). Added `.env.example` template.
-
-## Recent Progress (Version 3.7.6)
-- **Unified Audio Dashboard:** Scaffolded and wired `UnifiedDashboard.qml` into `HomePage.qml`. Combines multitrack project creation, file/stem import, online cloud session manager, background server indicators with quit server action, and embedded recent workspaces with rich tooltips.
-- **System Tray Controller:** Integrated native desktop `SystemTrayController` C++ class (`src/appshell/view/systemtraycontroller.h/.cpp`) with `QSystemTrayIcon`, providing background server status, window toggling, and clean termination of application and audio servers.
-- **Script Archival:** Non-destructively organized legacy root scripts `fix_proj_str.py` and `fix_proj_str2.py` into `tools/archive/`.
-
-## 1. Architectural Overview
-
-The project is a fork of Audacity ("Audacity 4") aiming for **Adobe Audition Parity**. It has undergone significant architectural shifts to support this goal.
-
-### 1.1 The "Au3" Core
-The backend is modularized into `au3/` libraries. This separation is critical for keeping the audio engine distinct from the UI.
-- **`au3-mixer`:** Contains `BusTrack`, `Mixer`, `MixerSource`. This is the heart of the new mixing engine.
-- **`au3-audio-io`:** Contains `AudioIO`. We have heavily modified this to support **Bus Routing** and **Aux Sends**.
-- **`au3-track` / `au3-playable-track`:** The track hierarchy. `PlayableTrack` is the base for anything that makes sound (`WaveTrack`, `BusTrack`, `MidiTrack`).
-
-### 1.2 The "BobUI" Toolkit
-We have migrated away from system Qt6 to **BobUI**, a custom in-tree fork of QtBase (`bobui/` submodule).
-- **Why?** To have absolute control over rendering, styling, and window management, necessary for the dense, professional "Audition-like" UI.
-- **Build System:** configured via `buildscripts/cmake/SetupBobUi.cmake`. This script replaces the standard `find_package(Qt6)` calls. It adds the `bobui` directory and defines targets like `Qt::Core`, `Qt::Gui` so the rest of the codebase doesn't know the difference.
-
-### 1.3 The Frontend (QML)
-The UI is built with `muse_framework` (QML).
-- **ProjectScene:** The main workspace.
-- **Mixer:** Located in `src/projectscene/qml/Audacity/ProjectScene/mixer`.
-- **Model-View:** `MixerBoardModel` (C++) exposes the `TrackList` to QML. It handles the mapping of `TrackId` to UI elements and enforces business logic like **Cycle Detection** (`canRoute`).
-
-## 2. Deep Dive: Mixing & Routing
-
-The audio signal flow has been redesigned.
-
-### 2.1 Data Model
-- **`PlayableTrack`**:
-  - `mRouteId` (int): ID of the destination track (0 = Master, >0 = Bus Track ID).
-  - `mAuxSends` (vector): List of `AuxSend` structs `{ destId, amount, pan, preFader }`.
-- **`BusTrack`**:
-  - Inherits `PlayableTrack`. Functionally a summing node that can itself be routed.
-
-### 2.2 Execution (AudioIO.cpp)
-In `AudioIO::ProcessPlaybackSlices`:
-1.  **Allocation:** We allocate `mBusAccumulators`, a map of `TrackId -> vector<float*>` buffers.
-2.  **Processing Loop:**
-    - Iterate all tracks.
-    - **Main Output:** Instead of just summing to `mMasterBuffers`, we look up `mRouteId`. If it points to a Bus, we sum to that Bus's accumulator. If 0, we sum to Master.
-    - **Aux Sends:** We iterate `mAuxSends`. For each send, we look up the destination Bus accumulator and mix the signal in (multiplied by `send.amount`).
-3.  **Bus Summing:**
-    - After processing all source tracks, we iterate `mBusAccumulators`.
-    - **Current Limitation:** We sum all Busses directly to Master.
-    - **Future Improvement:** We need a **Topological Sort** of the bus graph to allow Bus-to-Bus routing (e.g., Drum Bus -> Music Bus -> Master). Currently, routing Bus A -> Bus B might delay the signal by one buffer if Bus B is processed before Bus A.
-
-## 3. Deep Dive: Cycle Detection
-- Implemented in `MixerBoardModel::canRoute(sourceId, destId)`.
-- It traces the route path from `destId` downwards. If it ever encounters `sourceId`, it returns `false`, blocking the UI operation.
-- This prevents the Audio Engine from entering infinite feedback loops.
-
-## 4. Current Status & Known Issues
-
-### 4.1 Completed
-- [x] `BusTrack` implementation & serialization.
-- [x] `MixerBoard` UI (Vol, Pan, Mute, Solo, Route, Sends).
-- [x] Basic Routing (Track -> Bus -> Master).
-- [x] Aux Sends (Track -> Bus).
-- [x] Cycle Detection.
-- [x] **Phase 1 UI Refactoring**: Extracted hardcoded QML metrics across AppShell, Mixer, ProjectScene, and Toolbars into BobUI-compliant `pragma Singleton` constants (`AppShellConstants.qml`, `MixerConstants.qml`, `GetEffectsConstants.qml`, etc.).
-- [x] **Phase 2 CI Dependencies**: Injected `Core5Compat`, `NetworkAuth`, `ShaderTools`, and `StateMachine` into `SetupBobUi.cmake` to resolve missing Qt 6.9.1 modules.
-- [x] **UI Coverage**: Thoroughly documented the dashboard workflow with descriptive tooltips across all newly refactored BobUI layouts.
-
-### 4.2 In Progress / Limitations
-- **Bus-to-Bus Latency:** As noted above, the linear iteration of busses in `AudioIO` allows for 1-block latency in complex chains.
-- **Pre-Fader Sends:** The data structure exists (`mPreFader`), but the DSP logic in `AudioIO.cpp` currently treats all sends effectively as Post-Fader (applying track volume implies post, but we need to be careful about where we tap the signal). *Correction from code review: The logic applies track volume to the main mix, but `ProcessSends` is called with `pSrc` which is the processed audio. Depending on where `pSrc` is tapped relative to `ApplyVolume`, it determines Pre/Post. Currently, it looks Pre-Fader relative to the Fader, but Post-FX.*
-- **Visual Polish:** The Mixer UI is functional but plain. Needs "BobUI" styling.
-
-## 5. Next Steps (Roadmap)
-
-1.  **Refine Audio Engine:** Implement Topological Sort for Bus processing to fix latency/ordering.
-2.  **Real-time Master Effects:** Add the ability to host effects on the Master bus.
-3.  **Spectral Editing:** Begin Phase 2. We have `SpectralHealEffect` backend. We need the `SpectralEditor` UI.
-
-**"Don't Stop."**
+## Next steps (for the next model/session):
+- Finish Phase 2 by executing a build to verify the environment. Update `CMakeLists.txt` or CI workflow files directly with the `aqtinstall` step if necessary.
+- Proceed to Phase 3 of the roadmap: Fully wire backend audio processing elements (currently in C++) to the new frontend QML interfaces.
+- Push the local changes to the remote repository.

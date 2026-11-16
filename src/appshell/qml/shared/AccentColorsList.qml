@@ -19,6 +19,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+import Audacity.AppShell
 import QtQuick 2.15
 
 import Muse.Ui 1.0
@@ -78,7 +79,7 @@ RadioButtonGroup {
         indicator: Rectangle {
             anchors.fill: parent
 
-            color: "transparent"
+            color: AppShellConstants.transparentColor
             border.color: ui.theme.fontPrimaryColor
             border.width: parent.checked ? 1 : 0
             radius: width / 2

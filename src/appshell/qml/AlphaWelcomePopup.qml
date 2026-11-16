@@ -1,6 +1,7 @@
 /*
  * Audacity: A Digital Audio Editor
  */
+import Audacity.AppShell
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
@@ -31,7 +32,7 @@ StyledDialogView {
             StyledTextLabel {
                 text: "<b>Notes on Audacity 4 - Alpha 1</b>"
 
-                font.pixelSize: 16
+                font.pixelSize: AppShellConstants.subtitleFontSize
                 anchors.horizontalCenter: parent.horizontalCenter
             }
 

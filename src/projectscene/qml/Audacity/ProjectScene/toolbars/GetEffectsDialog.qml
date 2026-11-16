@@ -12,26 +12,10 @@ StyledDialogView {
 
     title: qsTrc("projectscene", "Get effects")
 
-    QtObject {
-        id: prv
 
-        readonly property int spaceS: 4
-        readonly property int spaceM: 8
-        readonly property int spaceL: 12
-        readonly property int spaceXL: 16
-        readonly property int spaceXXL: 24
 
-        readonly property int menuWidth: 224
-        readonly property int errorTextWidth: 400
-
-        readonly property int contentWidth: 880
-        readonly property int contentHeight: 692 // 720 (figma) - 28 (figma window header)
-
-        readonly property int sideMargin: 16
-    }
-
-    contentWidth: prv.contentWidth
-    contentHeight: prv.contentHeight
+    contentWidth: GetEffectsConstants.contentWidth
+    contentHeight: GetEffectsConstants.contentHeight
 
     modal: true
     resizable: false
@@ -40,7 +24,7 @@ StyledDialogView {
         id: effectsModel
 
         onSelectedCategoryIndexChanged: {
-            flickable.contentY = -prv.spaceXL
+            flickable.contentY = -GetEffectsConstants.spaceXL
         }
     }
 
@@ -62,7 +46,7 @@ StyledDialogView {
                 id: menu
 
                 Layout.fillHeight: true
-                Layout.preferredWidth: prv.menuWidth - 1 // -1 for vertical separator line
+                Layout.preferredWidth: GetEffectsConstants.menuWidth - 1 // -1 for vertical separator line
 
                 navigation.section: root.navigationSection
                 navigation.order: 1
@@ -84,7 +68,7 @@ StyledDialogView {
                 ColumnLayout {
                     anchors.centerIn: parent
                     visible: effectsModel.isLoading
-                    spacing: prv.spaceL
+                    spacing: GetEffectsConstants.spaceL
 
                     StyledBusyIndicator {
                         Layout.alignment: Qt.AlignHCenter
@@ -102,7 +86,7 @@ StyledDialogView {
                 ColumnLayout {
                     anchors.centerIn: parent
                     visible: effectsModel.hasError && !effectsModel.isLoading
-                    spacing: prv.spaceXL
+                    spacing: GetEffectsConstants.spaceXL
 
                     StyledTextLabel {
                         Layout.alignment: Qt.AlignHCenter
@@ -112,7 +96,7 @@ StyledDialogView {
 
                     StyledTextLabel {
                         Layout.alignment: Qt.AlignHCenter
-                        Layout.preferredWidth: prv.errorTextWidth
+                        Layout.preferredWidth: GetEffectsConstants.errorTextWidth
                         text: qsTrc("projectscene", "Audacity is unable to connect to MuseHub.com. Please check your connection and try again.")
                         wrapMode: Text.Wrap
                         horizontalAlignment: Text.AlignHCenter
@@ -130,10 +114,10 @@ StyledDialogView {
                     id: flickable
 
                     anchors.fill: parent
-                    leftMargin: prv.spaceXL
-                    rightMargin: prv.spaceXL
-                    topMargin: prv.spaceXL
-                    bottomMargin: prv.spaceXL
+                    leftMargin: GetEffectsConstants.spaceXL
+                    rightMargin: GetEffectsConstants.spaceXL
+                    topMargin: GetEffectsConstants.spaceXL
+                    bottomMargin: GetEffectsConstants.spaceXL
                     visible: !effectsModel.isLoading && !effectsModel.hasError
                     contentHeight: effectsColumn.height
                     clip: true
@@ -141,7 +125,7 @@ StyledDialogView {
                     Column {
                         id: effectsColumn
                         width: parent.width
-                        spacing: prv.spaceXL
+                        spacing: GetEffectsConstants.spaceXL
 
                         Repeater {
                             model: effectsModel.effectsGroups
@@ -170,7 +154,7 @@ StyledDialogView {
         // Bottom bar
         RowLayout {
             Layout.fillWidth: true
-            Layout.margins: prv.spaceL
+            Layout.margins: GetEffectsConstants.spaceL
 
             FlatButton {
                 text: qsTrc("projectscene", "Become a partner")
@@ -203,12 +187,12 @@ StyledDialogView {
             required property var modelData
 
             visible: index === effectsModel.selectedCategoryIndex
-            spacing: visible ? prv.spaceXL : 0
+            spacing: visible ? GetEffectsConstants.spaceXL : 0
             height: visible ? implicitHeight : 0
 
             Flow {
                 width: parent.width
-                spacing: prv.spaceXL
+                spacing: GetEffectsConstants.spaceXL
 
                 Repeater {
                     model: modelData.effects

@@ -1,6 +1,7 @@
 /*
 * Audacity: A Digital Audio Editor
 */
+import Audacity.AppShell
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
@@ -468,7 +469,7 @@ Rectangle {
         ColorPicker {
             width: 200
 
-            color: "black"
+            color: AppShellConstants.devToolsBlack
 
             onNewColorSelected: function (newColor) {
                 color = newColor
@@ -488,7 +489,7 @@ Rectangle {
                 implicitHeight: 50
                 width: 200
 
-                color: "gray"
+                color: AppShellConstants.devToolsGray
 
                 StyledTextLabel {
                     anchors.fill: parent
@@ -851,8 +852,8 @@ Rectangle {
 
                 topLeftRadius: 40
 
-                color: "gray"
-                border.color: "red"
+                color: AppShellConstants.devToolsGray
+                border.color: AppShellConstants.devToolsErrorBorder
                 border.width: 3
             }
 
@@ -862,8 +863,8 @@ Rectangle {
 
                 topRightRadius: 30
 
-                color: "gray"
-                border.color: "yellow"
+                color: AppShellConstants.devToolsGray
+                border.color: AppShellConstants.devToolsYellow
                 border.width: 10
             }
 
@@ -873,8 +874,8 @@ Rectangle {
 
                 bottomLeftRadius: 20
 
-                color: "gray"
-                border.color: "green"
+                color: AppShellConstants.devToolsGray
+                border.color: AppShellConstants.devToolsGreen
                 border.width: 8
             }
 
@@ -884,8 +885,8 @@ Rectangle {
 
                 bottomRightRadius: 10
 
-                color: "gray"
-                border.color: "blue"
+                color: AppShellConstants.devToolsGray
+                border.color: AppShellConstants.devToolsBlue
                 border.width: 5
             }
         }
@@ -970,17 +971,17 @@ Rectangle {
 
                 Rectangle {
                     height: 40
-                    color: "lightblue"
+                    color: AppShellConstants.devToolsLightBlue
                 }
 
                 Rectangle {
                     height: 40
-                    color: "lightgreen"
+                    color: AppShellConstants.devToolsLightGreen
                 }
 
                 Rectangle {
                     height: 40
-                    color: "orange"
+                    color: AppShellConstants.devToolsOrange
                 }
             }
         }

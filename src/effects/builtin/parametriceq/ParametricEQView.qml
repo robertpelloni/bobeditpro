@@ -23,8 +23,8 @@ BuiltinEffectBase {
 
         Text {
             text: "Parametric Equalizer"
-            font.pixelSize: 24
-            color: "white"
+            font.pixelSize: BuiltinEffectsConstants.titleFontSize
+            color: BuiltinEffectsConstants.textColorWhite
             Layout.alignment: Qt.AlignHCenter
         }
 
@@ -32,14 +32,14 @@ BuiltinEffectBase {
         Rectangle {
             Layout.fillWidth: true
             Layout.preferredHeight: 300
-            color: "#1E1E1E"
-            border.color: "#3A3A3A"
+            color: BuiltinEffectsConstants.chartBackgroundColor
+            border.color: BuiltinEffectsConstants.chartBorderColor
             border.width: 1
 
             Text {
                 anchors.centerIn: parent
                 text: "EQ Curve Visualization (Canvas Placeholder)"
-                color: "#808080"
+                color: BuiltinEffectsConstants.chartLineColor
             }
         }
 
@@ -50,14 +50,14 @@ BuiltinEffectBase {
 
             // HPF
             Column {
-                Text { text: "HPF"; color: "white"; font.bold: true }
+                Text { text: "HPF"; color: BuiltinEffectsConstants.textColorWhite; font.bold: true }
                 CheckBox {
                     text: "Enabled"
                     checked: root.effectModel ? root.effectModel.hpfEnabled : false
                     onCheckedChanged: if(root.effectModel) root.effectModel.hpfEnabled = checked
                 }
-                Text { text: "Freq: " + (root.effectModel ? root.effectModel.hpfFreq : "20"); color: "gray" }
-                Text { text: "Q: " + (root.effectModel ? root.effectModel.hpfQ.toFixed(2) : "0.71"); color: "gray" }
+                Text { text: "Freq: " + (root.effectModel ? root.effectModel.hpfFreq : "20"); color: BuiltinEffectsConstants.textColorGrayLight }
+                Text { text: "Q: " + (root.effectModel ? root.effectModel.hpfQ.toFixed(2) : "0.71"); color: BuiltinEffectsConstants.textColorGrayLight }
             }
 
             // Parametric Bands
@@ -66,27 +66,27 @@ BuiltinEffectBase {
                 Column {
                     property var bandData: root.effectModel ? root.effectModel.bands[index] : { freq: 1000, gain: 0, q: 1.0, enabled: true }
 
-                    Text { text: "Band " + (index + 1); color: "white"; font.bold: true }
+                    Text { text: "Band " + (index + 1); color: BuiltinEffectsConstants.textColorWhite; font.bold: true }
                     CheckBox {
                         text: "Enabled"
                         checked: bandData.enabled
                     }
-                    Text { text: "Freq: " + bandData.freq; color: "gray" }
-                    Text { text: "Gain: " + bandData.gain.toFixed(2) + " dB"; color: "gray" }
-                    Text { text: "Q: " + bandData.q.toFixed(2); color: "gray" }
+                    Text { text: "Freq: " + bandData.freq; color: BuiltinEffectsConstants.textColorGrayLight }
+                    Text { text: "Gain: " + bandData.gain.toFixed(2) + " dB"; color: BuiltinEffectsConstants.textColorGrayLight }
+                    Text { text: "Q: " + bandData.q.toFixed(2); color: BuiltinEffectsConstants.textColorGrayLight }
                 }
             }
 
             // LPF
             Column {
-                Text { text: "LPF"; color: "white"; font.bold: true }
+                Text { text: "LPF"; color: BuiltinEffectsConstants.textColorWhite; font.bold: true }
                 CheckBox {
                     text: "Enabled"
                     checked: root.effectModel ? root.effectModel.lpfEnabled : false
                     onCheckedChanged: if(root.effectModel) root.effectModel.lpfEnabled = checked
                 }
-                Text { text: "Freq: " + (root.effectModel ? root.effectModel.lpfFreq : "20000"); color: "gray" }
-                Text { text: "Q: " + (root.effectModel ? root.effectModel.lpfQ.toFixed(2) : "0.71"); color: "gray" }
+                Text { text: "Freq: " + (root.effectModel ? root.effectModel.lpfFreq : "20000"); color: BuiltinEffectsConstants.textColorGrayLight }
+                Text { text: "Q: " + (root.effectModel ? root.effectModel.lpfQ.toFixed(2) : "0.71"); color: BuiltinEffectsConstants.textColorGrayLight }
             }
         }
     }

@@ -28,13 +28,9 @@ Rectangle {
     property bool showChannelSplitter: false
     property alias channelHeightRatio: waveChannelSplitter.channelHeightRatio
     property var canvas: null
-<<<<<<< HEAD
-    property color clipColor: "#677CE4"
-=======
     required property int headerHeight
     property color clipColor: ui.theme.extra["clip_color_1"]
     property color clipSelectedColor: ui.theme.extra["clip_selected_color_1"]
->>>>>>> upstream/master
     property color normalHeaderColor: root.currentClipStyle == ClipStyle.COLORFUL ? root.clipColor : root.classicHeaderColor
     property color selectedHeaderColor: root.currentClipStyle == ClipStyle.COLORFUL ? ui.blendColors("#ffffff", root.clipColor, 0.3) : classicHeaderColor
     property color normalHeaderHoveredColor: root.currentClipStyle == ClipStyle.COLORFUL ? ui.blendColors("#ffffff", root.clipColor, 0.8) : classicHeaderHoveredColor
@@ -104,13 +100,8 @@ Rectangle {
     property alias navigation: navCtrl
 
     radius: 4
-<<<<<<< HEAD
-    color: clipSelected ? "white" : clipColor
-    border.color: "#000000"
-=======
     color: clipSelected ? clipSelectedColor : clipColor
     border.color: ui.theme.extra["black_color"]
->>>>>>> upstream/master
     opacity: root.moveActive && (clipSelected || clipIntersectsSelection) ? 0.5 : isAudible ? 1.0 : 0.3
 
     onMoveActiveChanged: {
@@ -172,9 +163,9 @@ Rectangle {
         id: borderRect
 
         anchors.fill: parent
-        color: "transparent"
+        color: TracksItemsViewConstants.transparentColor
         border.width: root.enableContrastBorder ? 2 : 1
-        border.color: "#000000"
+        border.color: TracksItemsViewConstants.clipItemBorderColor
         radius: root.enableContrastBorder ? 0 : 4
         z: root.parent.z + 1
     }
@@ -196,7 +187,7 @@ Rectangle {
 
         navigationCtrl: navCtrl
 
-        border.color: "white"
+        border.color: TracksItemsViewConstants.clipItemInnerBorderColor
         border.width: 2
         radius: 4
 
@@ -260,8 +251,6 @@ Rectangle {
         Qt.callLater(root.titleEditAccepted, newTitle)
     }
 
-<<<<<<< HEAD
-=======
     function openContextMenu() {
         if (root.multiClipsSelected || root.groupId != -1) {
             prv.ensureMultiMenuLoaded()
@@ -271,7 +260,6 @@ Rectangle {
         menuBtn.toggleMenu(menuBtn)
     }
 
->>>>>>> upstream/master
     function mousePositionChanged(x, y) {
         clipItemMousePositionChanged(x, y)
         waveView.onWaveViewPositionChanged(x, y - header.height)
@@ -339,13 +327,8 @@ Rectangle {
     }
 
     Component.onCompleted: {
-<<<<<<< HEAD
-        singleClipContextMenuModel.load()
-        multiClipContextMenuModel.load()
-=======
         playbackState.init()
         clipGainModel.init()
->>>>>>> upstream/master
     }
 
     Component.onDestruction: {
@@ -615,12 +598,8 @@ Rectangle {
                         root.editTitle()
                     } else {
                         //! NOTE Handle singleClick logic
-<<<<<<< HEAD
-                        if (!root.multiClipsSelected && !isWithinRange(e.x, headerSelectionRectangle.x, headerSelectionRectangle.width)) {
-=======
                         if ((!root.multiClipsSelected || (e.modifiers & Qt.ShiftModifier))
                                 && !(root.isDataSelected && isWithinRange(e.x, headerSelectionRectangle.x, headerSelectionRectangle.width))) {
->>>>>>> upstream/master
                             root.requestSelected()
                         }
 
@@ -885,7 +864,7 @@ Rectangle {
                     editable: root.enableCursorInteraction && root.asymmetricStereoHeightsPossible
                     asymmetricStereoHeightsPossible: root.asymmetricStereoHeightsPossible
 
-                    color: "#000000"
+                    color: TracksItemsViewConstants.clipItemOverlayColor
                     opacity: 0.10
 
                     onPositionChangeRequested: function (position) {
@@ -1026,12 +1005,9 @@ Rectangle {
                 frameEndTime: root.context.frameEndTime
                 selectionStartTime: root.context.selectionStartTime
                 selectionEndTime: root.context.selectionEndTime
-<<<<<<< HEAD
-=======
                 selectionStartFrequency: root.selectionStartFrequency
                 selectionEndFrequency: root.selectionEndFrequency
                 clipSelected: root.clipSelected
->>>>>>> upstream/master
 
                 ChannelSplitter {
                     id: spectrogramChannelSplitter
@@ -1044,7 +1020,7 @@ Rectangle {
                     editable: root.enableCursorInteraction && root.asymmetricStereoHeightsPossible
                     asymmetricStereoHeightsPossible: root.asymmetricStereoHeightsPossible
 
-                    color: "#000000"
+                    color: TracksItemsViewConstants.clipItemOverlayColor
                     opacity: 0.10
 
                     onPositionChangeRequested: function (position) {
@@ -1151,7 +1127,7 @@ Rectangle {
             }
             PropertyChanges {
                 target: titleLabel
-                color: "#000000"
+                color: TracksItemsViewConstants.clipItemOverlayColor
             }
             PropertyChanges {
                 target: pitchBtn
@@ -1177,7 +1153,7 @@ Rectangle {
             }
             PropertyChanges {
                 target: titleLabel
-                color: "#000000"
+                color: TracksItemsViewConstants.clipItemOverlayColor
             }
             PropertyChanges {
                 target: pitchBtn
@@ -1203,7 +1179,7 @@ Rectangle {
             }
             PropertyChanges {
                 target: titleLabel
-                color: "#000000"
+                color: TracksItemsViewConstants.clipItemOverlayColor
             }
             PropertyChanges {
                 target: pitchBtn
@@ -1229,7 +1205,7 @@ Rectangle {
             }
             PropertyChanges {
                 target: titleLabel
-                color: "#000000"
+                color: TracksItemsViewConstants.clipItemOverlayColor
             }
             PropertyChanges {
                 target: pitchBtn

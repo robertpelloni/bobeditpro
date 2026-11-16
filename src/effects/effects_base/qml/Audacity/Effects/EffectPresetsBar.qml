@@ -51,12 +51,6 @@ RowLayout {
     EffectPresetsBarModel {
         id: presetsBarModel
         instanceId: root.instanceId
-<<<<<<< HEAD
-
-        onUseVendorUIChanged: {
-            // Reload the menu to update the checkmark
-            manageMenuModel.load()
-=======
         persistLastUsedPreset: root.destructiveMode
     }
 
@@ -69,7 +63,6 @@ RowLayout {
 
         function onPresetsChanged() {
             presetSelector.currentIndex = presetsBarModel.presets.findIndex(preset => preset.id === presetsBarModel.preset)
->>>>>>> upstream/master
         }
     }
 

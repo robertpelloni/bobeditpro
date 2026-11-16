@@ -60,7 +60,6 @@ public:
     double selectionEndTime() const { return m_selectionEndTime; }
     void setSelectionEndTime(double time);
 
-=======
     double selectionStartFrequency() const;
     void setSelectionStartFrequency(double frequency);
 
@@ -70,7 +69,6 @@ public:
     bool clipSelected() const { return m_clipSelected; }
     void setClipSelected(bool selected);
 
->>>>>>> upstream/master:src/spectrogram/view/clipchannelspectrogramview.h
 signals:
     void clipIdChanged();
     void trackIdChanged();

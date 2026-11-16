@@ -1,3 +1,4 @@
+import Audacity.ProjectScene
 import QtQuick
 import Audacity.Spectrogram
 import Audacity.UiComponents
@@ -177,7 +178,7 @@ Item {
         height: selectionModel.selectionHeight
 
         lineWidth: 1
-        color: "white"
+        color: TracksItemsViewConstants.cursorWhite
         allowCursorShapeChange: !root.selectionInProgress
 
         Item {

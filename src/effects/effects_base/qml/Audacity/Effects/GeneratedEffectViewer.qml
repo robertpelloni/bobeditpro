@@ -15,13 +15,6 @@ Rectangle {
 
     property int instanceId: -1
 
-<<<<<<< HEAD
-    implicitWidth: 400
-    implicitHeight: 300
-
-    color: ui.theme.backgroundPrimaryColor
-
-=======
     implicitWidth: prv.dialogWidth
     implicitHeight: {
         // why 2 times spaceXL? and 2 times spaceM?
@@ -64,24 +57,10 @@ Rectangle {
         viewModel.init()
     }
 
->>>>>>> upstream/master
     ColumnLayout {
         anchors.fill: parent
-<<<<<<< HEAD
-        anchors.margins: 16
-        spacing: 16
-
-        StyledTextLabel {
-            Layout.fillWidth: true
-            text: qsTrc("effects", "Generated UI")
-            font: ui.theme.headerBoldFont
-            horizontalAlignment: Text.AlignHCenter
-        }
-
-=======
         spacing: prv.spaceXL
 
->>>>>>> upstream/master
         Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -90,12 +69,6 @@ Rectangle {
             border.width: 1
             radius: 4
 
-<<<<<<< HEAD
-            ColumnLayout {
-                anchors.fill: parent
-                anchors.margins: 16
-                spacing: 12
-=======
             StyledFlickable {
                 id: flickable
 
@@ -104,7 +77,6 @@ Rectangle {
                 anchors.topMargin: prv.spaceXXL
                 anchors.bottomMargin: prv.spaceXXL
                 contentHeight: parametersColumn.height
->>>>>>> upstream/master
 
                 StyledTextLabel {
                     Layout.fillWidth: true
@@ -122,13 +94,6 @@ Rectangle {
                     Layout.fillHeight: true
                 }
 
-<<<<<<< HEAD
-                StyledTextLabel {
-                    Layout.fillWidth: true
-                    text: qsTrc("effects", "Parameter extraction and UI generation coming soon...")
-                    horizontalAlignment: Text.AlignHCenter
-                    opacity: 0.6
-=======
                         delegate: ParameterControl {
                             Layout.fillWidth: true
                             parameterData: model
@@ -162,7 +127,6 @@ Rectangle {
                             }
                         }
                     }
->>>>>>> upstream/master
                 }
 
                 ScrollBar.vertical: scrollBar

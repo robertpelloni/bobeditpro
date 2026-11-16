@@ -40,9 +40,7 @@ class PlayPositionActionController : public QObject, public muse::actions::Actio
 
     muse::Inject<context::IGlobalContext> globalContext;
     muse::Inject<muse::actions::IActionsDispatcher> dispatcher;
-=======
     muse::ContextInject<trackedit::ISelectionController> selectionController{ this };
->>>>>>> upstream/master
 
 public:
     PlayPositionActionController(QObject* parent = nullptr);

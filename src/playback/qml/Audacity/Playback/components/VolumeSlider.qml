@@ -183,7 +183,7 @@ Slider {
             id: handleRect
             anchors.fill: parent
             radius: width / 2
-            color: "transparent"
+            color: PlaybackConstants.transparentColor
             border.color: ui.theme.fontPrimaryColor
 
             Rectangle {
