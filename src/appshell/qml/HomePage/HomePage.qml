@@ -103,6 +103,14 @@ DockPage {
     }
 
     Component {
+        id: projetsComp
+
+        UnifiedDashboard {
+            window: root.window
+        }
+    }
+
+    Component {
         id: learnComp
 
         LearnPage {
